@@ -22,16 +22,25 @@ import google.generativeai as genai
 
 from . import services
 
-# Key ko environment variable ki jagah ek simple file se padhte hain -
-# isse har naye terminal me dobara set karne ka jhanjhat khatam ho jata hai.
+# Pehle environment variable se key dhoondo (Render/production ke liye).
+# Agar wahan nahi mili, to local file se try karo (jo sirf apne laptop
+# par hoti hai aur GitHub par kabhi push nahi hoti).
 _KEY_FILE = os.path.join(os.path.dirname(__file__), "gemini_key.txt")
 
-with open(_KEY_FILE, "r") as f:
-    _api_key = f.read().strip()
+_api_key = os.environ.get("GEMINI_API_KEY")
 
-genai.configure(api_key=_api_key)
+if not _api_key and os.path.exists(_KEY_FILE):
+    with open(_KEY_FILE, "r") as f:
+        _api_key = f.read().strip()
 
-SYSTEM_PROMPT = """Aap Ghidora Transport ke liye ek helpful customer support assistant hain.
+# Agar key bilkul nahi mili, to poori site crash karne ki jagah
+# sirf chatbot ko disable kar dete hain - baaki website normal chalti rahegi.
+_model = None
+
+if _api_key:
+    genai.configure(api_key=_api_key)
+
+    SYSTEM_PROMPT = """Aap Ghidora Transport ke liye ek helpful customer support assistant hain.
 
 Language rule: customer JIS bhasha me sawaal poochhe, usi bhasha me jawab dein -
 Hindi poocha to Hindi/Hinglish me, English poocha to English me.
@@ -42,16 +51,16 @@ bataye, function khud ek default vehicle se estimate dega - customer ko
 bata dein ki vehicle badalne se fare alag ho sakta hai. Driver ka contact
 sirf tabhi dein jab booking ID valid ho. Reply short aur friendly rakhein."""
 
-_model = genai.GenerativeModel(
-    model_name="gemini-flash-latest",
-    system_instruction=SYSTEM_PROMPT,
-    tools=[
-        services.calculate_fare,
-        services.get_booking_status,
-        services.get_driver_contact,
-        services.get_services,
-    ],
-)
+    _model = genai.GenerativeModel(
+        model_name="gemini-flash-latest",
+        system_instruction=SYSTEM_PROMPT,
+        tools=[
+            services.calculate_fare,
+            services.get_booking_status,
+            services.get_driver_contact,
+            services.get_services,
+        ],
+    )
 
 
 def get_reply(message: str) -> str:
@@ -64,6 +73,9 @@ def get_reply(message: str) -> str:
     frontend/backend dono simple rahein. Zyada complex multi-turn
     conversations ke liye baad me history add ki ja sakti hai.
     """
+    if _model is None:
+        return "Chatbot abhi available nahi hai. Kripya humein seedhe call/WhatsApp par sampark karein."
+
     chat = _model.start_chat(enable_automatic_function_calling=True)
     response = chat.send_message(message)
     return response.text
