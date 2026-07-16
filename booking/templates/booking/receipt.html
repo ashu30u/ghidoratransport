@@ -1,0 +1,619 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>
+        Ghidora Transport Receipt
+    </title>
+
+    <style>
+
+        @page{
+            size:A4;
+            margin:25px;
+        }
+
+        body{
+
+            font-family:Helvetica;
+
+            color:#222;
+
+            font-size:13px;
+
+        }
+
+        .container{
+
+            width:100%;
+
+        }
+
+        .mantra{
+
+            text-align:center;
+
+            color:#d35400;
+
+            font-size:12px;
+
+            line-height:20px;
+
+            font-weight:bold;
+
+            margin-bottom:15px;
+
+        }
+
+        .header{
+
+            width:100%;
+
+        }
+
+        .logo{
+
+            width:90px;
+
+        }
+
+        .company{
+
+            text-align:center;
+
+        }
+
+        .company h1{
+
+            margin:0;
+
+            color:#0D47A1;
+
+            font-size:28px;
+
+        }
+
+        .company p{
+
+            margin:2px;
+
+            font-size:13px;
+
+        }
+
+        .line{
+
+            border-top:2px solid #0D47A1;
+
+            margin-top:15px;
+
+            margin-bottom:15px;
+
+        }
+
+        .title{
+
+            text-align:center;
+
+            font-size:22px;
+
+            color:#0D47A1;
+
+            font-weight:bold;
+
+            margin-bottom:20px;
+
+        }
+
+        table{
+
+            width:100%;
+
+            border-collapse:collapse;
+
+        }
+
+        td{
+
+            padding:8px;
+
+        }
+
+        .receipt-info{
+
+            margin-bottom:20px;
+
+        }
+
+        .receipt-info td{
+
+            border:1px solid #dcdcdc;
+
+        }
+
+        .heading{
+
+            background:#0D47A1;
+
+            color:white;
+
+            font-weight:bold;
+
+        }
+
+        .details{
+
+            margin-top:15px;
+
+        }
+
+        .details td{
+
+            border:1px solid #bbbbbb;
+
+        }
+
+        .label{
+
+            background:#F5F5F5;
+
+            font-weight:bold;
+
+            width:35%;
+
+        }
+
+        .value{
+
+            width:65%;
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="mantra">
+
+ॐ भूर्भुवः स्वः<br>
+
+तत्सवितुर्वरेण्यं<br>
+
+भर्गो देवस्य धीमहि<br>
+
+धियो यो नः प्रचोदयात् ॥
+
+</div>
+
+<table class="header">
+
+<tr>
+
+<td width="20%">
+
+<img
+src="{% static 'images/logo.png' %}"
+class="logo">
+
+</td>
+
+<td class="company">
+
+<h1>
+
+GHIDORA TRANSPORT
+
+</h1>
+
+<p>
+
+Transport & Logistics Services
+
+</p>
+
+<p>
+
+Dhamtari, Chhattisgarh
+
+</p>
+
+<p>
+
+☎ +91 6264588894
+
+</p>
+
+</td>
+
+</tr>
+
+</table>
+
+<div class="line"></div>
+
+<div class="title">
+
+TRANSPORT BOOKING RECEIPT
+
+</div>
+
+<table class="receipt-info">
+
+<tr>
+
+<td class="heading">
+
+Receipt No.
+
+</td>
+
+<td>
+
+GT-{{ booking.booking_id }}
+
+</td>
+
+<td class="heading">
+
+Issue Date
+
+</td>
+
+<td>
+
+{{ today }}
+
+</td>
+
+</tr>
+
+<tr>
+
+<td class="heading">
+
+Booking ID
+
+</td>
+
+<td>
+
+{{ booking.booking_id }}
+
+</td>
+
+<td class="heading">
+
+Journey Date
+
+</td>
+
+<td>
+
+{{ booking.journey_date }}
+
+</td>
+
+</tr>
+
+</table>
+
+<h2
+style="
+color:#0D47A1;
+margin-top:20px;
+">
+
+Customer Details
+
+</h2>
+
+<table class="details">
+
+
+
+
+<tr>
+
+    <td class="label">
+        Customer Name
+    </td>
+
+    <td class="value">
+        {{ booking.name }}
+    </td>
+
+</tr>
+
+<tr>
+
+    <td class="label">
+        Mobile Number
+    </td>
+
+    <td class="value">
+        {{ booking.phone }}
+    </td>
+
+</tr>
+
+<tr>
+
+    <td class="label">
+        Pickup Location
+    </td>
+
+    <td class="value">
+        {{ booking.pickup }}
+    </td>
+
+</tr>
+
+<tr>
+
+    <td class="label">
+        Destination
+    </td>
+
+    <td class="value">
+        {{ booking.destination }}
+    </td>
+
+</tr>
+
+<tr>
+
+    <td class="label">
+        Vehicle Type
+    </td>
+
+    <td class="value">
+        {{ booking.vehicle_type }}
+    </td>
+
+</tr>
+
+<tr>
+
+    <td class="label">
+        Trip Type
+    </td>
+
+    <td class="value">
+        {{ booking.trip_type }}
+    </td>
+
+</tr>
+
+<tr>
+
+    <td class="label">
+        Journey Date
+    </td>
+
+    <td class="value">
+        {{ booking.journey_date }}
+    </td>
+
+</tr>
+
+<tr>
+
+    <td class="label">
+        Distance
+    </td>
+
+    <td class="value">
+        {{ booking.distance }} KM
+    </td>
+
+</tr>
+
+<tr>
+
+    <td class="label">
+        Total Fare
+    </td>
+
+    <td class="value"
+        style="
+        color:#0D8F3D;
+        font-size:18px;
+        font-weight:bold;
+        ">
+        ₹{{ booking.fare }}
+    </td>
+
+</tr>
+
+<tr>
+
+    <td class="label">
+        Booking Status
+    </td>
+
+    <td class="value">
+
+        {% if booking.status == "Pending" %}
+
+            🟡 Pending
+
+        {% elif booking.status == "Confirmed" %}
+
+            🟢 Confirmed
+
+        {% elif booking.status == "Completed" %}
+
+            🔵 Completed
+
+        {% else %}
+
+            🔴 Cancelled
+
+        {% endif %}
+
+    </td>
+
+</tr>
+
+</table>
+
+<br>
+
+<table
+style="
+width:100%;
+border-collapse:collapse;
+">
+
+<tr>
+
+<td
+style="
+background:#E8F5E9;
+padding:18px;
+border:1px solid #4CAF50;
+">
+
+<b
+style="
+font-size:18px;
+color:#2E7D32;
+">
+
+Amount Paid :
+₹{{ booking.fare }}
+
+</b>
+
+</td>
+
+</tr>
+
+</table>
+
+<br>    
+
+<h2
+style="
+color:#0D47A1;
+margin-bottom:10px;
+">
+
+Terms & Conditions
+
+</h2>
+
+<div
+style="
+border:1px solid #CCCCCC;
+padding:15px;
+font-size:12px;
+line-height:22px;
+background:#FAFAFA;
+">
+
+• Customer is requested to carry this receipt during the journey.<br>
+
+• Fare once paid is non-refundable after journey starts.<br>
+
+• Vehicle timing may vary due to traffic or weather conditions.<br>
+
+• Any extra distance will be charged separately.<br>
+
+• Please contact Ghidora Transport for any support.
+
+</div>
+
+<br><br>
+
+<table style="width:100%;">
+
+<tr>
+
+<td align="left">
+
+<b>Customer Signature</b>
+
+<br><br><br>
+
+_____________________
+
+</td>
+
+<td align="center">
+
+<img
+src="{% static 'images/stamp.png' %}"
+width="110">
+
+</td>
+
+<td align="right">
+
+<img
+src="{% static 'images/signature.png' %}"
+width="150">
+
+<br>
+
+<b>Authorized Signature</b>
+
+</td>
+
+</tr>
+
+</table>
+
+<br><br>
+
+<div
+style="
+text-align:center;
+font-size:18px;
+color:#0D47A1;
+font-weight:bold;
+">
+
+🙏 Thank You For Choosing Ghidora Transport 🙏
+
+</div>
+
+<div
+style="
+text-align:center;
+margin-top:10px;
+font-size:12px;
+color:#666;
+">
+
+Safe • Secure • Reliable Transportation Services
+
+</div>
+
+<hr>
+
+<div
+style="
+text-align:center;
+font-size:11px;
+color:#888;
+">
+
+Generated Automatically by Ghidora Transport Management System
+
+</div>
+
+</div>
+
+</body>
+
+</html>

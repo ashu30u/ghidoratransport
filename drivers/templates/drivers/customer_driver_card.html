@@ -1,0 +1,34 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'drivers/css/driver.css' %}">
+
+{% if driver %}
+<div class="customer-driver-card">
+    <h3>🚚 Your Driver Details</h3>
+
+    <div class="driver-card-header">
+        {% if driver.photo %}
+            <img class="driver-photo" src="{{ driver.photo.url }}">
+        {% endif %}
+        <div>
+            <div class="driver-name">{{ driver.name }}</div>
+            <div class="driver-sub">📞 {{ driver.mobile }}</div>
+        </div>
+    </div>
+
+    {% with vehicle=driver.vehicle %}
+    {% if vehicle %}
+        <div class="driver-info-row">Vehicle: {{ vehicle.vehicle_type }}</div>
+        <div class="driver-info-row">Vehicle No: {{ vehicle.vehicle_number }}</div>
+    {% endif %}
+    {% endwith %}
+
+    <div class="contact-buttons">
+        <a class="btn-call" href="tel:{{ driver.mobile }}">📞 Call Driver</a>
+        <a class="btn-whatsapp" target="_blank" href="https://wa.me/91{{ driver.mobile }}">💬 WhatsApp Driver</a>
+    </div>
+</div>
+{% else %}
+<div class="customer-driver-card">
+    <p>Driver jald hi assign kiya jayega. Kripya thodi der wait karein.</p>
+</div>
+{% endif %}

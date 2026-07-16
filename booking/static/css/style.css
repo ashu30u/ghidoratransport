@@ -1,0 +1,504 @@
+:root{
+  --brand:#ff7a1a;
+  --dark:#141a24;
+  --text:#ffffff;
+}
+*{ box-sizing: border-box; }
+body{ margin:0; font-family: Arial, Helvetica, sans-serif; background:#f3f4f6; }
+
+/* ===== NAVBAR ===== */
+.navbar{
+  position: sticky;
+  top:0;
+  z-index: 20;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding: 14px 40px;
+  background: rgba(20,26,36,.55);
+  backdrop-filter: blur(10px);
+  flex-wrap: wrap;
+}
+.nav-logo{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  color:#fff;
+  font-weight:800;
+  font-size:20px;
+  letter-spacing:.5px;
+  text-decoration:none;
+}
+.nav-logo .accent{ color: var(--brand); }
+.nav-logo svg{ width:44px; height:44px; }
+
+.nav-links{
+  display:flex;
+  gap: 34px;
+}
+.nav-links a{
+  color:#e8e8e8;
+  text-decoration:none;
+  font-weight:600;
+  font-size:15px;
+  padding-bottom:6px;
+  border-bottom: 2px solid transparent;
+}
+.nav-links a.active{
+  color:#fff;
+  border-bottom-color: var(--brand);
+}
+
+.call-btn{
+  background: var(--brand);
+  color:#111;
+  border:none;
+  padding:10px 18px;
+  border-radius:10px;
+  font-weight:700;
+  font-size:14px;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+/* ===== HERO (real photo background + subtle animation) ===== */
+.hero{
+  position: relative;
+  min-height: 640px;
+  display:flex;
+  align-items:center;
+  overflow: hidden;
+  padding: 40px;
+}
+
+/* Photo layer: slow "Ken Burns" zoom */
+.hero::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:0;
+  background-image:
+    linear-gradient(90deg, rgba(10,14,20,.88) 0%, rgba(10,14,20,.55) 45%, rgba(10,14,20,.15) 75%),
+    url("/static/images/hero-truck.png");
+  background-size: cover;
+  background-position: center;
+  animation: heroZoom 24s ease-in-out infinite alternate;
+  will-change: transform;
+}
+@keyframes heroZoom{
+  0%{ transform: scale(1); }
+  100%{ transform: scale(1.09); }
+}
+
+/* Drifting cloud overlay, sits above the photo, behind the text */
+.clouds{
+  position:absolute;
+  inset:0;
+  z-index:1;
+  overflow:hidden;
+  pointer-events:none;
+}
+.cloud{
+  position:absolute;
+  width: 200px;
+  height: 70px;
+  background: rgba(255,255,255,.16);
+  border-radius: 999px;
+  filter: blur(2px);
+  opacity:.5;
+  animation: cloudDrift linear infinite;
+}
+.cloud::before,
+.cloud::after{
+  content:"";
+  position:absolute;
+  background: rgba(255,255,255,.16);
+  border-radius: 999px;
+}
+.cloud::before{ width:80px; height:40px; left:24px; top:-16px; }
+.cloud::after{ width:110px; height:50px; left:90px; top:-8px; }
+
+.cloud.c1{ top:10%;  left:-30%; animation-duration:34s; transform:scale(.85); }
+.cloud.c2{ top:18%;  left:-45%; animation-duration:44s; transform:scale(1.05); opacity:.35; animation-delay:-14s; }
+.cloud.c3{ top:6%;   left:-60%; animation-duration:52s; transform:scale(.7);  opacity:.3;  animation-delay:-28s; }
+
+@keyframes cloudDrift{
+  0%{ transform: translateX(0); }
+  100%{ transform: translateX(160vw); }
+}
+
+.hero-content{
+  position: relative;
+  z-index: 3;
+  max-width: 620px;
+  color:#fff;
+}
+.hero-badge{
+  display:inline-block;
+  color: var(--brand);
+  font-weight:700;
+  letter-spacing: 2px;
+  font-size: 14px;
+  margin-bottom: 14px;
+}
+.hero-content h1{
+  margin:0;
+  font-size: clamp(38px, 6vw, 64px);
+  line-height: 1.02;
+  font-weight: 900;
+  letter-spacing: .5px;
+}
+.hero-content h1 .accent{ color: var(--brand); display:block; }
+.hero-divider{
+  width: 90px;
+  height: 3px;
+  background:#fff;
+  margin: 18px 0;
+}
+.hero-content p{
+  font-size: 16px;
+  line-height: 1.6;
+  opacity:.92;
+  max-width: 460px;
+  margin: 0 0 26px;
+}
+.hero-actions{ display:flex; gap:14px; flex-wrap:wrap; }
+.btn{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  border:none;
+  cursor:pointer;
+  font-weight:700;
+  font-size:14px;
+  padding: 13px 20px;
+  border-radius: 10px;
+  text-decoration:none;
+}
+.btn-primary{ background: var(--brand); color:#111; }
+.btn-outline{ background: rgba(255,255,255,.08); color:#fff; border:1px solid rgba(255,255,255,.4); }
+
+/* ===== Feature strip inside hero ===== */
+.feature-strip{
+  position:absolute;
+  left:0; right:0; bottom:0;
+  z-index: 3;
+  background: rgba(10,14,20,.25);
+  backdrop-filter: blur(4px);
+  display:grid;
+  grid-template-columns: repeat(4, 1fr);
+  padding: 22px 40px;
+}
+.feature-item{
+  display:flex;
+  align-items:flex-start;
+  gap:12px;
+  color:#fff;
+}
+.feature-item .ficon{
+  width:42px; height:42px;
+  flex-shrink:0;
+  border-radius:50%;
+  border:1.5px solid var(--brand);
+  display:flex; align-items:center; justify-content:center;
+  color: var(--brand);
+  font-size:18px;
+}
+.feature-item h4{ margin:0 0 3px; font-size:14px; }
+.feature-item p{ margin:0; font-size:12px; opacity:.75; line-height:1.4; }
+
+/* ===== Feature icon animations ===== */
+.feature-item:nth-child(1) .ficon{ animation: heartbeat 1.3s ease-in-out infinite; }
+.feature-item:nth-child(2) .ficon{ animation: clockTick 1s ease-in-out infinite; transform-origin: 50% 60%; }
+.feature-item:nth-child(3) .ficon{ animation: pinBounce 1.6s ease-in-out infinite; }
+.feature-item:nth-child(4) .ficon{ animation: headsetPulse 1.6s ease-in-out infinite; }
+
+@keyframes heartbeat{
+  0%, 100%{ transform: scale(1); }
+  15%{ transform: scale(1.18); }
+  30%{ transform: scale(1); }
+  45%{ transform: scale(1.18); }
+  60%{ transform: scale(1); }
+}
+
+@keyframes clockTick{
+  0%, 100%{ transform: rotate(0deg); }
+  25%{ transform: rotate(12deg); }
+  50%{ transform: rotate(0deg); }
+  75%{ transform: rotate(-12deg); }
+}
+
+@keyframes pinBounce{
+  0%, 100%{ transform: translateY(0); }
+  50%{ transform: translateY(-7px); }
+}
+
+@keyframes headsetPulse{
+  0%, 100%{ transform: scale(1); box-shadow: 0 0 0 0 rgba(255,122,26,.5); }
+  50%{ transform: scale(1.12); box-shadow: 0 0 0 6px rgba(255,122,26,0); }
+}
+
+/* ===== Booking Form ===== */
+.booking-section{
+  max-width: 1100px;
+  margin: 30px auto 40px;
+  background:#fff;
+  border-radius: 18px;
+  box-shadow: 0 15px 40px rgba(0,0,0,.12);
+  padding: 30px 34px;
+  position: relative;
+  z-index: 5;
+}
+.booking-section h2{
+  display:flex; align-items:center; gap:10px;
+  font-size: 22px;
+  margin: 0 0 22px;
+  color:#1a2130;
+}
+.booking-grid{
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 16px;
+  align-items:end;
+}
+.field label{
+  display:block;
+  font-size:13px;
+  font-weight:700;
+  color:#555;
+  margin-bottom:6px;
+}
+.field input, .field select{
+  width:100%;
+  padding: 11px 12px;
+  border-radius: 10px;
+  border:1px solid #e2e2e2;
+  background:#f9f9fb;
+  font-size:14px;
+}
+.field input:focus, .field select:focus{
+  outline: 2px solid var(--brand);
+  border-color: var(--brand);
+}
+.calc-btn{
+  background: var(--brand);
+  color:#111;
+  border:none;
+  border-radius:10px;
+  padding: 12px 16px;
+  font-weight:800;
+  font-size:14px;
+  cursor:pointer;
+  height: 44px;
+}
+.fare-box{
+  margin-top: 20px;
+  background:#f9f9fb;
+  border-radius: 12px;
+  padding: 16px;
+  text-align:center;
+  font-size: 20px;
+  font-weight:800;
+  color:#1a2130;
+}
+.fare-box .amount{ color: var(--brand); }
+.success-box{
+  margin-top:18px;
+  background:#eafff1;
+  border:1px solid #b5f0c9;
+  border-radius: 12px;
+  padding: 16px 18px;
+  font-size: 14px;
+  line-height: 1.7;
+  color:#1a2130;
+}
+.error-box{
+  margin-bottom: 16px;
+  background:#fff0ee;
+  border:1px solid #ffc9c2;
+  border-radius: 10px;
+  padding: 12px 16px;
+  color:#b12d1e;
+  font-size:14px;
+}
+
+/* ===== Contact Section ===== */
+.contact-section{
+  max-width: 1100px;
+  margin: 0 auto 40px;
+  background: var(--dark);
+  color:#fff;
+  border-radius: 18px;
+  padding: 30px 34px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  gap: 20px;
+}
+.contact-section h3{ margin:0 0 8px; }
+.contact-section p{ margin:0; opacity:.85; }
+.whatsapp-btn{
+  background:#25D366;
+  color:#fff;
+  border:none;
+  padding: 13px 22px;
+  border-radius: 10px;
+  font-weight:800;
+  cursor:pointer;
+}
+
+/* ===== Reviews Section ===== */
+.reviews-section{
+  max-width: 1100px;
+  margin: 0 auto 60px;
+  padding: 0 8px;
+}
+.reviews-section h2{ text-align:center; color:#1a2130; margin-bottom:20px; }
+.rating-summary{
+  background:#fff;
+  border-radius: 16px;
+  padding: 26px;
+  text-align:center;
+  box-shadow: 0 10px 30px rgba(0,0,0,.08);
+  margin-bottom: 26px;
+}
+.rating-summary h2{ margin:0; color: var(--brand); }
+.rating-summary hr{ border:none; border-top:1px solid #eee; margin: 18px 0; }
+.rating-summary p{ margin: 4px 0; color:#333; }
+
+.reviews-grid{
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 18px;
+}
+.review-card{
+  background:#fff;
+  border-radius: 14px;
+  padding: 20px;
+  box-shadow: 0 8px 20px rgba(0,0,0,.06);
+}
+.review-head{ display:flex; align-items:center; margin-bottom:12px; }
+.review-avatar{
+  width:48px; height:48px;
+  border-radius:50%;
+  background: var(--brand);
+  display:flex; align-items:center; justify-content:center;
+  font-weight:800; color:#fff; margin-right:12px;
+}
+.review-name{ margin:0; font-size:15px; color:#1a2130; }
+.review-verified{ color:#1d9e75; font-size:12px; }
+.review-stars{ color:#f5a623; font-size:18px; margin: 6px 0; }
+.review-text{ font-size:14px; color:#444; line-height:1.6; }
+.review-date{ color:#999; font-size:12px; }
+
+/* ======================================================
+   MOBILE FIXES (screen chhoti hone par) - 900px se neeche
+   ====================================================== */
+@media (max-width: 900px){
+  .navbar{
+    padding: 12px 16px;
+    gap: 8px;
+  }
+
+  .nav-logo{ font-size: 16px; }
+  .nav-logo svg{ width: 34px; height: 34px; }
+
+  /* Pehle "display:none" tha jisse links gayab ho jaate the -
+     ab iski jagah links wrap karke dikhte rahenge */
+  .nav-links{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px 14px;
+    width: 100%;
+    order: 3;
+    font-size: 13px;
+  }
+  .nav-links a{ white-space: nowrap; padding-bottom: 2px; }
+
+  .call-btn{ font-size: 13px; padding: 8px 12px; order: 2; }
+
+  .hero{
+    min-height: auto;
+    padding: 24px 18px 20px;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .hero-content h1{ font-size: 30px; }
+  .hero-content p{ font-size: 14px; }
+  .hero-divider{ margin: 12px 0; }
+
+  .hero-actions{ flex-direction: column; gap: 10px; }
+  .hero-actions .btn{ width: 100%; justify-content: center; }
+
+  /* Feature strip: laptop jaisa ek hi line me, bas sab chhota (compact) */
+  .feature-strip{
+    position: static;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+    padding: 10px 6px;
+  }
+  .feature-item{
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 3px;
+  }
+  .feature-item .ficon{
+    width: 26px;
+    height: 26px;
+    font-size: 11px;
+    border-width: 1px;
+  }
+  .feature-item h4{ font-size: 9px; margin: 0; line-height: 1.15; }
+  .feature-item p{ display: none; }   /* description hide, sirf title dikhega taaki ek line me fit ho jaye */
+
+  .booking-section{
+    margin: 16px 12px 24px;
+    padding: 20px 16px;
+  }
+
+  .booking-section h2{ font-size: 18px; }
+
+  .booking-grid{
+    grid-template-columns: 1fr;   /* mobile pe har field apni alag line me, aasani se type karne ke liye */
+    gap: 14px;
+  }
+
+  .field input, .field select{
+    padding: 12px;
+    font-size: 15px;   /* thoda bada taaki mobile pe type karna aasan ho */
+  }
+
+  .distance-box{
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .distance-box input{ width: 100%; }
+  .locate-btn{ width: 100%; justify-content: center; }
+
+  .fare-btn, .confirm-btn{ font-size: 15px; padding: 13px; }
+
+  .fare-result-box .fare-amount{ font-size: 22px; }
+
+  .contact-section{
+    margin: 0 12px 24px;
+    padding: 20px 18px;
+    flex-direction: column;
+    text-align: center;
+  }
+  .whatsapp-btn{ width: 100%; }
+
+  .reviews-section{ padding: 0 12px; }
+  .reviews-section h2{ font-size: 19px; }
+  .rating-summary{ padding: 20px; }
+  .reviews-grid{ grid-template-columns: 1fr; gap: 14px; }
+}
+
+@media (max-width: 420px){
+  .nav-links{ font-size: 12px; gap: 6px 10px; }
+}

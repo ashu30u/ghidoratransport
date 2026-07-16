@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>GHIDORA TRANSPORT - Booking Status</title>
+
+    {% load static %}
+
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    padding:0;
+    font-family:'Poppins',sans-serif;
+    min-height:100vh;
+    overflow-x:hidden;
+    background:linear-gradient(180deg,#050b18 0%,#0a1730 40%,#122447 70%,#1a3266 100%);
+    position:relative;
+}
+
+/* =========================================
+   TWINKLING STARS (sky depth)
+========================================= */
+
+.stars{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:60%;
+    z-index:0;
+    background-image:
+        radial-gradient(2px 2px at 20px 30px, rgba(255,255,255,0.6), transparent),
+        radial-gradient(2px 2px at 140px 80px, rgba(255,255,255,0.5), transparent),
+        radial-gradient(1.5px 1.5px at 300px 150px, rgba(255,255,255,0.4), transparent),
+        radial-gradient(2px 2px at 420px 60px, rgba(255,255,255,0.5), transparent),
+        radial-gradient(1.5px 1.5px at 550px 200px, rgba(255,255,255,0.35), transparent),
+        radial-gradient(2px 2px at 700px 100px, rgba(255,255,255,0.5), transparent),
+        radial-gradient(1.5px 1.5px at 850px 40px, rgba(255,255,255,0.4), transparent);
+    background-repeat:repeat;
+    background-size:900px 300px;
+    animation:twinkle 4s ease-in-out infinite alternate;
+}
+
+@keyframes twinkle{
+    from{ opacity:0.4; }
+    to{ opacity:1; }
+}
+
+.moon{
+    position:fixed;
+    top:40px;
+    right:60px;
+    width:70px;
+    height:70px;
+    border-radius:50%;
+    background:radial-gradient(circle at 35% 35%, #fffde7, #ffe082 60%, #ffca28 100%);
+    box-shadow:0 0 40px 10px rgba(255,224,130,0.45);
+    z-index:0;
+}
+
+/* =========================================
+   MAIN CONTENT
+========================================= */
+
+.status-container{
+    position:relative;
+    z-index:2;
+    width:90%;
+    max-width:1000px;
+    margin:auto;
+    padding-top:40px;
+    padding-bottom:60px;
+}
+
+h1{
+    text-align:center;
+    color:white;
+    font-size:40px;
+    font-weight:800;
+    letter-spacing:0.5px;
+    text-shadow:0 0 25px rgba(0,229,255,0.6);
+    margin-bottom:35px;
+}
+
+h1 span{
+    display:block;
+    font-size:15px;
+    font-weight:400;
+    color:rgba(255,255,255,0.55);
+    letter-spacing:2px;
+    margin-top:6px;
+    text-shadow:none;
+}
+
+form{
+    background:rgba(255,255,255,0.06);
+    backdrop-filter:blur(18px);
+    padding:30px;
+    border-radius:22px;
+    text-align:center;
+    border:1px solid rgba(255,255,255,0.12);
+    box-shadow:0 10px 40px rgba(0,0,0,0.35);
+    display:flex;
+    justify-content:center;
+    gap:14px;
+    flex-wrap:wrap;
+}
+
+.input-wrap{
+    position:relative;
+    flex:1;
+    min-width:220px;
+    max-width:400px;
+}
+
+.input-wrap span{
+    position:absolute;
+    left:18px;
+    top:50%;
+    transform:translateY(-50%);
+    font-size:18px;
+    opacity:0.7;
+}
+
+input{
+    width:100%;
+    padding:16px 16px 16px 46px;
+    border:1px solid rgba(255,255,255,0.15);
+    border-radius:14px;
+    font-size:16px;
+    outline:none;
+    background:rgba(255,255,255,0.9);
+    font-family:'Poppins',sans-serif;
+    transition:.3s;
+}
+
+input:focus{
+    box-shadow:0 0 0 3px rgba(0,229,255,0.4);
+}
+
+button{
+    position:relative;
+    overflow:hidden;
+    padding:16px 38px;
+    border:none;
+    border-radius:14px;
+    background:linear-gradient(135deg,#00e5ff,#2979ff 60%,#1a56db);
+    color:white;
+    font-size:16px;
+    font-weight:700;
+    font-family:'Poppins',sans-serif;
+    cursor:pointer;
+    letter-spacing:0.3px;
+    box-shadow:0 8px 25px rgba(0,150,255,0.45);
+    transition:transform .3s, box-shadow .3s;
+}
+
+button:hover{
+    transform:translateY(-3px);
+    box-shadow:0 14px 35px rgba(0,180,255,0.6);
+}
+
+button::after{
+    content:"";
+    position:absolute;
+    top:0;
+    left:-75%;
+    width:50%;
+    height:100%;
+    background:linear-gradient(120deg, transparent, rgba(255,255,255,0.55), transparent);
+    transform:skewX(-20deg);
+    transition:left .6s ease;
+}
+
+button:hover::after{
+    left:125%;
+}
+
+.booking-card-wrap{
+    position:relative;
+    margin-top:35px;
+    border-radius:28px;
+    padding:2px;
+    animation:cardShow .8s ease;
+}
+
+.booking-card-wrap::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    border-radius:28px;
+    padding:2px;
+    background:conic-gradient(from 0deg,#00e5ff,#2979ff,#7c4dff,#00e5ff);
+    -webkit-mask:
+        linear-gradient(#fff 0 0) content-box,
+        linear-gradient(#fff 0 0);
+    -webkit-mask-composite:xor;
+    mask:
+        linear-gradient(#fff 0 0) content-box,
+        linear-gradient(#fff 0 0);
+    mask-composite:exclude;
+    animation:rotateBorder 5s linear infinite;
+}
+
+@keyframes rotateBorder{
+    to{ transform:rotate(360deg); }
+}
+
+@keyframes cardShow{
+    from{ opacity:0; transform:translateY(40px); }
+    to{ opacity:1; transform:translateY(0); }
+}
+
+.booking-card{
+    position:relative;
+    padding:32px;
+    border-radius:26px;
+    background:rgba(13,20,38,0.75);
+    backdrop-filter:blur(22px);
+    color:white;
+    border:1px solid rgba(255,255,255,0.1);
+    box-shadow:0 10px 40px rgba(0,0,0,0.35);
+}
+
+.booking-card h2{
+    text-align:center;
+    margin-bottom:25px;
+    color:#00e5ff;
+    font-weight:700;
+    letter-spacing:0.5px;
+}
+
+.booking-card p{
+    padding:13px 16px;
+    margin:10px 0;
+    border-radius:12px;
+    background:rgba(255,255,255,0.05);
+    border:1px solid rgba(255,255,255,0.06);
+    font-size:15px;
+}
+
+.booking-card p b{
+    color:#8ecbff;
+    margin-right:6px;
+}
+
+.pending,
+.confirmed,
+.completed,
+.cancelled{
+    text-align:center;
+    padding:18px;
+    margin-top:25px;
+    border-radius:16px;
+    font-size:22px;
+    font-weight:700;
+    letter-spacing:0.5px;
+    animation:pulse 1.8s infinite;
+}
+
+.pending{
+    background:linear-gradient(135deg,#ffb300,#ff6f00);
+    box-shadow:0 0 30px rgba(255,152,0,0.55);
+}
+
+.confirmed{
+    background:linear-gradient(135deg,#00e676,#00b248);
+    box-shadow:0 0 30px rgba(0,230,118,0.5);
+}
+
+.completed{
+    background:linear-gradient(135deg,#2979ff,#1a56db);
+    box-shadow:0 0 30px rgba(41,121,255,0.55);
+}
+
+.cancelled{
+    background:linear-gradient(135deg,#ff5252,#c62828);
+    box-shadow:0 0 30px rgba(255,82,82,0.5);
+}
+
+@keyframes pulse{
+    0%{ transform:scale(1); }
+    50%{ transform:scale(1.03); }
+    100%{ transform:scale(1); }
+}
+
+/* =========================================
+   ANIMATED SPINNING OPEN BOOK
+   (replaces the old rotating gradient border)
+========================================= */
+
+.book-loader-wrap{
+    display:flex;
+    justify-content:center;
+    margin-bottom:22px;
+    perspective:700px;
+}
+
+.book-loader{
+    position:relative;
+    width:90px;
+    height:64px;
+    transform-style:preserve-3d;
+    animation:bookSpin 3.5s linear infinite;
+}
+
+.book-loader .page{
+    position:absolute;
+    top:0;
+    width:45px;
+    height:64px;
+    background:linear-gradient(135deg,#ffffff,#dbe9ff 70%,#c3dcff);
+    border:1px solid rgba(0,150,255,0.45);
+    box-shadow:0 0 16px rgba(0,229,255,0.4);
+}
+
+.book-loader .page::before{
+    content:"";
+    position:absolute;
+    top:8px;
+    left:8px;
+    right:8px;
+    bottom:8px;
+    background:
+        repeating-linear-gradient(
+            180deg,
+            rgba(41,121,255,0.25) 0px,
+            rgba(41,121,255,0.25) 2px,
+            transparent 2px,
+            transparent 8px
+        );
+    border-radius:2px;
+}
+
+.book-loader .page.left{
+    left:0;
+    border-radius:6px 0 0 6px;
+    transform-origin:right center;
+    animation:pageFlipLeft 3.5s ease-in-out infinite;
+}
+
+.book-loader .page.right{
+    right:0;
+    border-radius:0 6px 6px 0;
+    transform-origin:left center;
+    animation:pageFlipRight 3.5s ease-in-out infinite;
+}
+
+.book-loader .spine{
+    position:absolute;
+    left:50%;
+    top:-2px;
+    width:6px;
+    height:68px;
+    background:linear-gradient(#00e5ff,#2979ff,#7c4dff);
+    transform:translateX(-50%);
+    box-shadow:0 0 14px rgba(0,229,255,0.7);
+    border-radius:3px;
+    z-index:3;
+}
+
+@keyframes bookSpin{
+    0%   { transform:rotateY(0deg); }
+    100% { transform:rotateY(360deg); }
+}
+
+@keyframes pageFlipLeft{
+    0%,100%{ transform:rotateY(0deg); }
+    50%{ transform:rotateY(-30deg); }
+}
+
+@keyframes pageFlipRight{
+    0%,100%{ transform:rotateY(0deg); }
+    50%{ transform:rotateY(30deg); }
+}
+
+/* =========================================
+   BOOKING PROGRESS — PREMIUM STEPPER
+========================================= */
+
+.progress-section{
+    margin-top:34px;
+}
+
+.timeline-title{
+    text-align:center;
+    color:#00e5ff;
+    font-weight:700;
+    font-size:16px;
+    margin:30px 0 20px 0;
+    letter-spacing:0.4px;
+}
+
+.timeline{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-wrap:wrap;
+}
+
+.timeline-step{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    min-width:80px;
+}
+
+.timeline-circle{
+    width:44px;
+    height:44px;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:18px;
+    background:rgba(255,255,255,0.06);
+    border:2px solid rgba(255,255,255,0.15);
+    transition:.4s;
+}
+
+.timeline-label{
+    margin-top:8px;
+    font-size:12px;
+    text-align:center;
+    color:rgba(255,255,255,0.55);
+    font-weight:600;
+}
+
+.timeline-line{
+    flex:1;
+    height:3px;
+    min-width:20px;
+    max-width:60px;
+    background:rgba(255,255,255,0.1);
+    margin:0 4px;
+    margin-bottom:26px;
+    border-radius:2px;
+}
+
+.timeline-line.line-completed{
+    background:linear-gradient(90deg,#00e5ff,#2979ff);
+}
+
+.timeline-step.completed .timeline-circle{
+    background:#00c853;
+    border-color:#00c853;
+    box-shadow:0 0 16px rgba(0,200,83,0.55);
+}
+
+.timeline-step.completed .timeline-label{
+    color:#69f0ae;
+}
+
+.timeline-step.current .timeline-circle{
+    animation:pulse 1.8s infinite;
+    transform:scale(1.1);
+}
+
+.timeline-step.current.stage-pending .timeline-circle{
+    background:#ff9800;
+    border-color:#ff9800;
+    box-shadow:0 0 20px rgba(255,152,0,0.6);
+}
+
+.timeline-step.current.stage-confirmed .timeline-circle{
+    background:#00c853;
+    border-color:#00c853;
+    box-shadow:0 0 20px rgba(0,255,102,0.6);
+}
+
+.timeline-step.current.stage-completed .timeline-circle{
+    background:#2979ff;
+    border-color:#2979ff;
+    box-shadow:0 0 20px rgba(41,121,255,0.6);
+}
+
+.timeline-step.current .timeline-label{
+    color:white;
+}
+
+.timeline-step.upcoming{
+    opacity:0.5;
+}
+
+/* =========================================
+   DRIVER DETAILS CARD (naya section)
+========================================= */
+
+.driver-details-box{
+    margin-top:22px;
+    padding:20px;
+    border-radius:18px;
+    background:rgba(0,229,255,0.07);
+    border:1px solid rgba(0,229,255,0.25);
+}
+
+.driver-details-box h3{
+    font-size:17px;
+    margin-bottom:14px;
+    color:#00e5ff;
+    text-align:left;
+    font-weight:700;
+}
+
+.driver-contact-buttons{
+    display:flex;
+    gap:12px;
+    margin-top:14px;
+    flex-wrap:wrap;
+}
+
+.driver-contact-buttons a{
+    flex:1;
+    min-width:140px;
+    text-align:center;
+    padding:12px;
+    border-radius:12px;
+    text-decoration:none;
+    font-weight:700;
+    font-size:14px;
+}
+
+.btn-call-driver{
+    background:linear-gradient(135deg,#00e5ff,#2979ff);
+    color:white;
+}
+
+.btn-whatsapp-driver{
+    background:linear-gradient(135deg,#00e676,#00b248);
+    color:white;
+}
+
+@media (max-width:600px){
+
+    h1{ font-size:30px; }
+
+    form{ flex-direction:column; }
+
+    .timeline{
+        flex-direction:column;
+        gap:10px;
+    }
+
+    .timeline-line{
+        width:3px;
+        height:20px;
+        max-width:none;
+        margin:0;
+    }
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="stars"></div>
+<div class="moon"></div>
+
+<div class="status-container">
+
+    <h1>
+        GHIDORA TRANSPORT
+        <span>REAL-TIME BOOKING STATUS TRACKER</span>
+    </h1>
+
+    <form method="POST">
+
+        {% csrf_token %}
+
+        <div class="input-wrap">
+            <span>🔎</span>
+            <input
+                type="text"
+                name="booking_id"
+                placeholder="Enter Booking ID"
+                required>
+        </div>
+
+        <button type="submit">
+            Check Status
+        </button>
+
+    </form>
+
+    {% if booking %}
+
+    <div class="booking-card-wrap">
+    <div class="booking-card">
+
+        <div class="book-loader-wrap">
+            <div class="book-loader">
+                <div class="page left"></div>
+                <div class="page right"></div>
+                <div class="spine"></div>
+            </div>
+        </div>
+
+        <h2> 𝔹𝕆𝕆𝕂𝕀ℕ𝔾 𝔻𝔼𝕋𝔸𝕀𝕃</h2>
+
+        <p><b>Booking ID:</b> {{ booking.booking_id }}</p>
+
+        <p><b>Name:</b> {{ booking.name }}</p>
+
+        <p><b>Phone:</b> {{ booking.phone }}</p>
+
+        <p><b>Vehicle:</b> {{ booking.vehicle_type }}</p>
+
+        <p><b>Pickup:</b> {{ booking.pickup }}</p>
+
+        <p><b>Destination:</b> {{ booking.destination }}</p>
+
+        <p><b>Journey Date:</b> {{ booking.journey_date }}</p>
+
+        <p><b>Distance:</b> {{ booking.distance }} KM</p>
+
+        <p><b>Total Fare:</b> ₹{{ booking.fare }}</p>
+
+        {% if booking.assigned_driver %}
+        <div class="driver-details-box">
+            <h3>🚚 Your Driver Details</h3>
+            <p><b>Driver:</b> {{ booking.assigned_driver.name }}</p>
+            <p><b>Phone:</b> {{ booking.assigned_driver.mobile }}</p>
+            {% with vehicle=booking.assigned_driver.vehicle %}
+            {% if vehicle %}
+            <p><b>Vehicle:</b> {{ vehicle.vehicle_type }}</p>
+            <p><b>Vehicle No:</b> {{ vehicle.vehicle_number }}</p>
+            {% endif %}
+            {% endwith %}
+            <div class="driver-contact-buttons">
+                <a class="btn-call-driver" href="tel:{{ booking.assigned_driver.mobile }}">📞 Call Driver</a>
+                <a class="btn-whatsapp-driver" target="_blank" href="https://wa.me/91{{ booking.assigned_driver.mobile }}">💬 WhatsApp Driver</a>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if booking.status != "Cancelled" %}
+
+        <div class="timeline-title">Booking Progress</div>
+
+        <div class="timeline">
+
+            <div class="timeline-step completed">
+                <div class="timeline-circle">📝</div>
+                <div class="timeline-label">Booking<br>Received</div>
+            </div>
+
+            <div class="timeline-line line-completed"></div>
+
+            <div class="timeline-step
+                {% if booking.status == 'Pending' %}current stage-pending
+                {% else %}completed{% endif %}">
+                <div class="timeline-circle">🟡</div>
+                <div class="timeline-label">Pending</div>
+            </div>
+
+            <div class="timeline-line
+                {% if booking.status == 'Pending' %}line-upcoming
+                {% else %}line-completed{% endif %}"></div>
+
+            <div class="timeline-step
+                {% if booking.status == 'Pending' %}upcoming
+                {% elif booking.status == 'Confirmed' %}current stage-confirmed
+                {% else %}completed{% endif %}">
+                <div class="timeline-circle">🟢</div>
+                <div class="timeline-label">Confirmed</div>
+            </div>
+
+            <div class="timeline-line
+                {% if booking.status == 'Completed' %}line-completed
+                {% else %}line-upcoming{% endif %}"></div>
+
+            <div class="timeline-step
+                {% if booking.status == 'Completed' %}current stage-completed
+                {% else %}upcoming{% endif %}">
+                <div class="timeline-circle">✅</div>
+                <div class="timeline-label">Completed</div>
+            </div>
+
+        </div>
+
+        {% endif %}
+
+        {% if booking.status == "Pending" %}
+        <div class="pending">
+            🟡 BOOKING PENDING
+        </div>
+
+        {% elif booking.status == "Confirmed" %}
+        <div class="confirmed">
+            🟢 BOOKING CONFIRMED
+        </div>
+
+        {% elif booking.status == "Completed" %}
+        <div class="completed">
+            🔵 JOURNEY COMPLETED
+        </div>
+
+        {% else %}
+        <div class="cancelled">
+            🔴 BOOKING CANCELLED
+        </div>
+        {% endif %}
+
+    </div>
+    </div>
+
+    {% endif %}
+
+</div>
+
+{% include "chatbot/widget.html" %}
+
+</body>
+</html>

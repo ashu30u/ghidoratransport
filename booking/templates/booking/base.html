@@ -1,0 +1,53 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}Ghidora Transport{% endblock %}</title>
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+{% block extra_style %}{% endblock %}
+</head>
+
+<body>
+
+  <!-- ===== Navbar (shared on every page) ===== -->
+  <div class="navbar">
+    <a href="{% url 'home' %}" class="nav-logo">
+      <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+        <rect x="4" y="26" width="30" height="18" rx="2" fill="#fff"/>
+        <path d="M34 30h12l8 8v6h-20z" fill="#fff"/>
+        <circle cx="16" cy="46" r="5" fill="#141a24"/>
+        <circle cx="46" cy="46" r="5" fill="#141a24"/>
+        <path d="M2 22 L18 22 M6 18 L22 18 M10 14 L26 14" stroke="#ff7a1a" stroke-width="3" stroke-linecap="round"/>
+      </svg>
+      GHIDORA <span class="accent">TRANSPORT</span>
+    </a>
+    <div class="nav-links">
+      <a href="{% url 'home' %}">Home</a>
+      <a href="{% url 'home' %}#services">Services</a>
+      <a href="{% url 'home' %}#booking">Booking</a>
+      <a href="{% url 'about' %}">About Us</a>
+      <a href="{% url 'home' %}#contact">Contact</a>
+    </div>
+    <button class="call-btn" onclick="callNow()">📞 Call Now</button>
+  </div>
+
+  <!-- ===== Page-specific content goes here ===== -->
+  {% block content %}{% endblock %}
+
+  <script>
+    function callNow() {
+      let confirmCall = confirm("Kya aap Ghidora Transport ko call karna chahte hain?");
+      if (confirmCall) {
+        window.location.href = "tel:+916264588894";
+      }
+    }
+  </script>
+
+  {% block extra_script %}{% endblock %}
+
+  {% include "chatbot/widget.html" %}
+
+</body>
+</html>

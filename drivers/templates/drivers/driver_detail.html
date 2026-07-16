@@ -1,0 +1,40 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ driver.name }} - Driver Detail</title>
+    <link rel="stylesheet" href="{% static 'drivers/css/driver.css' %}">
+</head>
+<body>
+<div class="driver-page">
+    <div class="driver-card" style="max-width:420px;">
+        <div class="driver-card-header">
+            {% if driver.photo %}
+                <img class="driver-photo" src="{{ driver.photo.url }}">
+            {% endif %}
+            <div>
+                <div class="driver-name">{{ driver.name }}</div>
+                <div class="driver-sub">📞 {{ driver.mobile }}</div>
+            </div>
+        </div>
+
+        <div class="driver-info-row">License No: {{ driver.license_number }}</div>
+        <div class="driver-info-row">Address: {{ driver.address }}</div>
+        <div class="driver-info-row">Experience: {{ driver.experience_years }} Years</div>
+
+        {% with vehicle=driver.vehicle %}
+        {% if vehicle %}
+            <div class="form-section-title">🚚 Vehicle</div>
+            <div class="driver-info-row">Type: {{ vehicle.vehicle_type }}</div>
+            <div class="driver-info-row">Number: {{ vehicle.vehicle_number }}</div>
+            <div class="driver-info-row">Capacity: {{ vehicle.capacity }}</div>
+            <div class="driver-info-row">RC No: {{ vehicle.rc_number }}</div>
+        {% endif %}
+        {% endwith %}
+
+        <a class="btn-add" style="margin-top:16px;" href="{% url 'drivers:driver_list' %}">← Back to List</a>
+    </div>
+</div>
+</body>
+</html>

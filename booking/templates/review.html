@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Rate Your Experience - Ghidora Transport</title>
+
+    <style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Segoe UI',sans-serif;
+}
+
+body{
+
+    min-height:100vh;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    background:linear-gradient(-45deg,#0f2027,#203a43,#2c5364,#00c6ff);
+
+    background-size:400% 400%;
+
+    animation:bg 12s ease infinite;
+
+}
+
+@keyframes bg{
+
+0%{background-position:0% 50%;}
+50%{background-position:100% 50%;}
+100%{background-position:0% 50%;}
+
+}
+
+.card{
+
+    width:600px;
+
+    background:rgba(255,255,255,.12);
+
+    backdrop-filter:blur(20px);
+
+    border-radius:25px;
+
+    padding:40px;
+
+    color:white;
+
+    box-shadow:0 0 35px rgba(0,255,255,.25);
+
+}
+
+h1{
+
+    text-align:center;
+
+    margin-bottom:30px;
+
+    color:#00e5ff;
+
+}
+
+.info{
+
+    background:rgba(255,255,255,.08);
+
+    padding:15px;
+
+    border-radius:12px;
+
+    margin-bottom:20px;
+
+}
+
+label{
+
+    font-size:18px;
+
+    display:block;
+
+    margin:15px 0 8px;
+
+}
+
+select,
+textarea{
+
+    width:100%;
+
+    padding:14px;
+
+    border:none;
+
+    border-radius:12px;
+
+    font-size:16px;
+
+    outline:none;
+
+}
+
+textarea{
+
+    resize:none;
+
+    height:150px;
+
+}
+
+button{
+
+    width:100%;
+
+    margin-top:25px;
+
+    padding:15px;
+
+    border:none;
+
+    border-radius:12px;
+
+    background:linear-gradient(45deg,#FFD700,#FF9800);
+
+    font-size:18px;
+
+    font-weight:bold;
+
+    cursor:pointer;
+
+    transition:.3s;
+
+}
+
+button:hover{
+
+    transform:scale(1.03);
+
+    box-shadow:0 0 25px gold;
+
+}
+
+.back{
+
+display:inline-block;
+
+margin-top:20px;
+
+text-decoration:none;
+
+color:white;
+
+}
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="card">
+
+<h1>⭐ Rate Your Experience</h1>
+
+<div class="info">
+
+<b>Booking ID:</b> {{ booking.booking_id }}
+
+<br><br>
+
+<b>Name:</b> {{ booking.name }}
+
+<br><br>
+
+<b>Vehicle:</b> {{ booking.vehicle_type }}
+
+</div>
+
+<form method="POST">
+
+{% csrf_token %}
+
+<label>Rating</label>
+
+{{ form.rating }}
+
+<label>Your Review</label>
+
+{{ form.review }}
+
+<button type="submit">
+
+Submit Review
+
+</button>
+
+</form>
+
+<a href="{% url 'history' %}" class="back">
+
+⬅ Back
+
+</a>
+
+</div>
+
+</body>
+</html>

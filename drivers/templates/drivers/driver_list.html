@@ -1,0 +1,66 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <title>Driver Management - Ghidora Admin</title>
+    <link rel="stylesheet" href="{% static 'drivers/css/driver.css' %}">
+</head>
+<body>
+<div class="driver-page">
+    <h1>👨‍✈️ Driver Management</h1>
+    <a class="btn-add" href="{% url 'drivers:driver_add' %}">+ Add New Driver</a>
+
+    {% if messages %}
+        {% for m in messages %}<p style="color:#22c55e;">{{ m }}</p>{% endfor %}
+    {% endif %}
+
+    <div class="driver-grid">
+        {% for driver in drivers %}
+        <div class="driver-card">
+            <div class="driver-card-header">
+                {% if driver.photo %}
+                    <img class="driver-photo" src="{{ driver.photo.url }}">
+                {% else %}
+                    <div class="driver-photo" style="display:flex;align-items:center;justify-content:center;background:#334155;">👤</div>
+                {% endif %}
+                <div>
+                    <div class="driver-name">{{ driver.name }}</div>
+                    <div class="driver-sub">📞 {{ driver.mobile }}</div>
+                </div>
+            </div>
+
+            {% with vehicle=driver.vehicle %}
+            {% if vehicle %}
+                <div class="driver-info-row">🚚 {{ vehicle.vehicle_type }}</div>
+                <div class="driver-info-row">{{ vehicle.vehicle_number }}</div>
+            {% else %}
+                <div class="driver-info-row">Vehicle not added</div>
+            {% endif %}
+            {% endwith %}
+
+            <div class="driver-info-row">
+                Status:
+                {% if driver.status == 'available' %}
+                    <span class="badge badge-available">🟢 Available</span>
+                {% else %}
+                    <span class="badge badge-busy">🔴 Busy</span>
+                {% endif %}
+                {% if driver.is_default %}<span class="badge badge-default">⭐ Default</span>{% endif %}
+            </div>
+
+            <div class="driver-actions">
+                <a href="{% url 'drivers:driver_detail' driver.pk %}">View</a>
+                <a href="{% url 'drivers:driver_edit' driver.pk %}">Edit</a>
+                {% if not driver.is_default %}
+                    <a href="{% url 'drivers:make_default_driver' driver.pk %}">Make Default</a>
+                {% endif %}
+            </div>
+        </div>
+        {% empty %}
+        <p>Abhi koi driver add nahi hua hai.</p>
+        {% endfor %}
+    </div>
+</div>
+</body>
+</html>

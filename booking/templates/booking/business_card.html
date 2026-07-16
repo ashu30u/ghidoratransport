@@ -1,0 +1,325 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Business Card - Ghidora Transport</title>
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+<style>
+    body{ background:#0a0e17; }
+
+    .card-hero{
+        background:linear-gradient(135deg, #0a0e17 0%, #1a1f2e 100%);
+        padding:70px 20px 40px;
+        text-align:center;
+        color:#fff;
+    }
+    .card-hero h1{
+        font-size:36px;
+        font-weight:700;
+        margin-bottom:8px;
+        background:linear-gradient(90deg, #4facfe, #00f2fe);
+        -webkit-background-clip:text;
+        background-clip:text;
+        -webkit-text-fill-color:transparent;
+    }
+    .card-hero p{ color:#9aa5b8; font-size:15px; }
+
+    .card-page{
+        max-width:520px;
+        margin:0 auto;
+        padding:20px 20px 90px;
+    }
+
+    #businessCard{
+        width:100%;
+        display:block;
+        border-radius:16px;
+        border:1px solid rgba(79,172,254,0.25);
+        box-shadow:0 20px 50px rgba(0,0,0,0.5);
+    }
+
+    .card-actions{
+        display:flex;
+        flex-direction:column;
+        gap:12px;
+        margin-top:26px;
+    }
+    .action-row{ display:flex; gap:12px; }
+    .btn-action{
+        flex:1;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        gap:8px;
+        padding:14px 10px;
+        border-radius:12px;
+        border:1px solid rgba(255,255,255,0.1);
+        background:rgba(255,255,255,0.04);
+        color:#e0e6f0;
+        font-size:14px;
+        font-weight:600;
+        cursor:pointer;
+        transition:transform 0.2s ease, border-color 0.2s ease;
+        text-decoration:none;
+    }
+    .btn-action:hover{ transform:translateY(-2px); border-color:rgba(79,172,254,0.4); }
+    .btn-primary{
+        background:linear-gradient(90deg, #4facfe, #00f2fe);
+        color:#0a0e17;
+        border:none;
+    }
+
+    .share-panel{
+        margin-top:8px;
+        padding:16px;
+        background:rgba(255,255,255,0.03);
+        border:1px solid rgba(255,255,255,0.08);
+        border-radius:14px;
+        display:none;
+    }
+    .share-panel.active{ display:block; }
+    .share-panel p{
+        font-size:12.5px;
+        color:#9aa5b8;
+        margin:0 0 12px;
+        text-align:center;
+    }
+    .share-grid{ display:flex; gap:10px; }
+    .share-icon{
+        flex:1;
+        text-align:center;
+        padding:12px 6px;
+        border-radius:10px;
+        text-decoration:none;
+        font-size:12px;
+        font-weight:600;
+        color:#e0e6f0;
+        border:1px solid rgba(255,255,255,0.1);
+        cursor:pointer;
+    }
+    .share-icon .emoji{ display:block; font-size:22px; margin-bottom:6px; }
+    .share-icon.whatsapp:hover{ border-color:#25D366; }
+    .share-icon.mail:hover{ border-color:#ea4335; }
+    .share-icon.insta:hover{ border-color:#d62976; }
+
+    .hint{
+        text-align:center;
+        font-size:12px;
+        color:#6f7c91;
+        margin-top:16px;
+        line-height:1.6;
+    }
+
+    /* ===== Cursor-following spotlight glow (with glowing border) ===== */
+    :root {
+        --glow-color: 79, 172, 254; /* Ghidora blue RGB */
+    }
+    .glow-card {
+        position: relative;
+        overflow: hidden;
+        isolation: isolate;
+    }
+    .glow-card::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        pointer-events: none;
+        background: radial-gradient(
+            320px circle at var(--x, 50%) var(--y, 50%),
+            rgba(var(--glow-color), 0.35),
+            transparent 70%
+        );
+        opacity: 0;
+        transition: opacity 0.35s ease;
+        z-index: 0;
+    }
+    .glow-card::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        padding: 1px;
+        background: radial-gradient(
+            320px circle at var(--x, 50%) var(--y, 50%),
+            rgba(var(--glow-color), 0.9),
+            transparent 70%
+        );
+        -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+        mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+        -webkit-mask-composite: xor;
+        mask-composite: exclude;
+        opacity: 0;
+        transition: opacity 0.35s ease;
+        z-index: 0;
+        pointer-events: none;
+    }
+    .glow-card:hover::before,
+    .glow-card:hover::after {
+        opacity: 1;
+    }
+    .glow-card > * {
+        position: relative;
+        z-index: 1;
+    }
+</style>
+</head>
+
+<body>
+
+  <div class="navbar">
+    <a href="{% url 'home' %}" class="nav-logo">
+      <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+        <rect x="4" y="26" width="30" height="18" rx="2" fill="#fff"/>
+        <path d="M34 30h12l8 8v6h-20z" fill="#fff"/>
+        <circle cx="16" cy="46" r="5" fill="#141a24"/>
+        <circle cx="46" cy="46" r="5" fill="#141a24"/>
+        <path d="M2 22 L18 22 M6 18 L22 18 M10 14 L26 14" stroke="#ff7a1a" stroke-width="3" stroke-linecap="round"/>
+      </svg>
+      GHIDORA <span class="accent">TRANSPORT</span>
+    </a>
+    <div class="nav-links">
+      <a href="{% url 'home' %}">Home</a>
+      <a href="{% url 'services' %}">Services</a>
+      <a href="{% url 'home' %}#booking">Booking</a>
+      <a href="{% url 'about' %}">About Us</a>
+      <a href="{% url 'home' %}#contact">Contact</a>
+      <a href="{% url 'business_card' %}">Business Card</a>
+    </div>
+    <button class="call-btn" onclick="callNow()">📞 Call Now</button>
+  </div>
+
+  <div class="card-hero">
+    <h1>Our Business Card</h1>
+    <p>View, download ya seedha share karein — WhatsApp, Mail, Instagram pe.</p>
+  </div>
+
+  <div class="card-page">
+
+    <div class="glow-card" style="border-radius:16px;">
+        <img id="businessCard" src="{% static 'images/business-card.jpeg' %}" alt="Ghidora Transport Business Card">
+    </div>
+
+    <div class="card-actions">
+      <a class="btn-action btn-primary glow-card" id="downloadBtn" href="{% static 'images/business-card.jpeg' %}" download="Ghidora-Transport-Business-Card.jpeg">🖼️ Download Card</a>
+      <button class="btn-action glow-card" onclick="downloadVCard()">📇 Save Contact (vCard)</button>
+      <button class="btn-action glow-card" onclick="toggleShare()">🔗 Share Card</button>
+
+      <div class="share-panel" id="sharePanel">
+        <p>Direct share karne ke liye chunein</p>
+        <div class="share-grid">
+          <a href="#" class="share-icon whatsapp glow-card" onclick="shareWhatsapp(event)">
+            <span class="emoji"></span>WhatsApp
+          </a>
+          <a href="#" class="share-icon mail glow-card" onclick="shareMail(event)">
+            <span class="emoji">📧</span>Email
+          </a>
+          <span class="share-icon insta glow-card" onclick="shareNative(event)">
+            <span class="emoji">📸</span>Instagram
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <p class="hint">
+      Note: WhatsApp aur Email link sirf text share karte hain seedhe — card image alag se attach karni pad sakti hai (agar "Share Card" native menu nahi khulta).<br>
+      "Share Card" pe tap karne se, mobile pe seedha card image ke sath WhatsApp/Instagram/Mail ka share menu khulega.
+    </p>
+
+  </div>
+
+  <script>
+    function callNow() {
+      let confirmCall = confirm("Kya aap Ghidora Transport ko call karna chahte hain?");
+      if (confirmCall) {
+        window.location.href = "tel:+916264588894";
+      }
+    }
+
+    const CARD_IMAGE_URL = "{% static 'images/business-card.jpeg' %}";
+
+    // ---------- SAVE CONTACT AS VCARD ----------
+    function downloadVCard() {
+      const vcard = [
+        'BEGIN:VCARD',
+        'VERSION:3.0',
+        'FN:Ghidora Transport',
+        'ORG:Ghidora Transport',
+        'TITLE:Tarun Kumar Sahu (Prop.) / Pankaj Kumar Sahu (Prop.)',
+        'TEL;TYPE=CELL:+917489297841',
+        'TEL;TYPE=CELL:+916266014139',
+        'EMAIL:piku626458@gmail.com',
+        'ADR:;;Kodebod, Post-Marod, Tehsil-Kurud;Dhamtari;Chhattisgarh;;India',
+        'END:VCARD'
+      ].join('\n');
+
+      const blob = new Blob([vcard], { type: 'text/vcard' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = 'Ghidora-Transport.vcf';
+      link.click();
+      URL.revokeObjectURL(link.href);
+    }
+
+    // ---------- SHARE ----------
+    function toggleShare() {
+      if (navigator.share) {
+        shareNative();
+      } else {
+        document.getElementById('sharePanel').classList.toggle('active');
+      }
+    }
+
+    async function shareNative(e) {
+      if (e) e.preventDefault();
+      try {
+        const response = await fetch(CARD_IMAGE_URL);
+        const blob = await response.blob();
+        const file = new File([blob], 'Ghidora-Transport-Business-Card.png', { type: blob.type || 'image/png' });
+        const shareData = {
+          title: 'Ghidora Transport',
+          text: 'Ghidora Transport — Mo: 7489297841, 6266014139',
+          files: [file]
+        };
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share(shareData);
+        } else if (navigator.share) {
+          await navigator.share({ title: shareData.title, text: shareData.text });
+        } else {
+          document.getElementById('sharePanel').classList.add('active');
+        }
+      } catch (err) {
+        document.getElementById('sharePanel').classList.add('active');
+      }
+    }
+
+    function shareWhatsapp(e) {
+      e.preventDefault();
+      const text = encodeURIComponent('Ghidora Transport\nTarun Kumar Sahu / Pankaj Kumar Sahu\nMo: 7489297841, 6266014139\npiku626458@gmail.com');
+      window.open('https://wa.me/?text=' + text, '_blank');
+    }
+
+    function shareMail(e) {
+      e.preventDefault();
+      const subject = encodeURIComponent('Ghidora Transport - Contact Card');
+      const body = encodeURIComponent('Ghidora Transport\nTarun Kumar Sahu (Prop.) / Pankaj Kumar Sahu (Prop.)\nMo: 7489297841, 6266014139\nEmail: piku626458@gmail.com\nAddress: Kodebod, Post-Marod, Tehsil-Kurud, Dhamtari (Chhattisgarh)');
+      window.location.href = 'mailto:?subject=' + subject + '&body=' + body;
+    }
+
+    // ===== Cursor-following spotlight glow =====
+    document.querySelectorAll('.glow-card').forEach(function (card) {
+      card.addEventListener('mousemove', function (e) {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        card.style.setProperty('--x', x + 'px');
+        card.style.setProperty('--y', y + 'px');
+      });
+    });
+  </script>
+
+</body>
+</html>

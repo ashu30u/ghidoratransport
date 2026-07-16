@@ -1,0 +1,27 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <title>{% if mode == 'add' %}Add Driver{% else %}Edit Driver{% endif %} - Ghidora Admin</title>
+    <link rel="stylesheet" href="{% static 'drivers/css/driver.css' %}">
+</head>
+<body>
+<div class="driver-page">
+    <h1>{% if mode == 'add' %}+ Add New Driver{% else %}✏️ Edit Driver{% endif %}</h1>
+
+    <form method="post" enctype="multipart/form-data" class="driver-form">
+        {% csrf_token %}
+
+        <div class="form-section-title">Driver Details</div>
+        {{ driver_form.as_p }}
+
+        <div class="form-section-title">🚚 Vehicle Details</div>
+        {{ vehicle_form.as_p }}
+
+        <button type="submit" class="btn-save">Save</button>
+        <a href="{% url 'drivers:driver_list' %}" style="margin-left:12px;color:#94a3b8;">Cancel</a>
+    </form>
+</div>
+</body>
+</html>

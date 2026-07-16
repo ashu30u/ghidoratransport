@@ -1,0 +1,103 @@
+<div id="ghidora-chat-button" onclick="ghidoraToggleChat()">
+  💬 Chat with Ghidora Assistant
+</div>
+
+<div id="ghidora-chat-window" style="display: none;">
+  <div id="ghidora-chat-header">
+    Ghidora Assistant
+    <span onclick="ghidoraToggleChat()" style="cursor:pointer; float:right;">✕</span>
+  </div>
+  <div id="ghidora-chat-messages"></div>
+  <div id="ghidora-chat-input-row">
+    <input type="text" id="ghidora-chat-input" placeholder="अपना सवाल लिखें..." />
+    <button onclick="ghidoraSendMessage()">भेजें</button>
+  </div>
+</div>
+
+<style>
+  #ghidora-chat-button {
+    position: fixed; bottom: 20px; right: 20px;
+    background: #ff6b00; color: white; padding: 12px 20px;
+    border-radius: 30px; cursor: pointer; font-weight: bold;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 1000;
+  }
+  #ghidora-chat-window {
+    position: fixed; bottom: 80px; right: 20px; width: 340px; height: 460px;
+    background: white; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+    display: flex; flex-direction: column; z-index: 1000; overflow: hidden;
+  }
+  #ghidora-chat-header {
+    background: #ff6b00; color: white; padding: 12px 16px; font-weight: bold;
+  }
+  #ghidora-chat-messages {
+    flex: 1; padding: 12px; overflow-y: auto; font-size: 14px;
+  }
+  .ghidora-msg { margin-bottom: 10px; padding: 8px 12px; border-radius: 10px; max-width: 80%; white-space: pre-wrap; }
+  .ghidora-msg.user { background: #ff6b00; color: white; margin-left: auto; }
+  .ghidora-msg.bot { background: #f1f1f1; color: #222; }
+  #ghidora-chat-input-row { display: flex; border-top: 1px solid #eee; }
+  #ghidora-chat-input { flex: 1; border: none; padding: 10px; font-size: 14px; }
+  #ghidora-chat-input-row button {
+    background: #ff6b00; color: white; border: none; padding: 0 16px; cursor: pointer;
+  }
+</style>
+
+<script>
+  function ghidoraToggleChat() {
+    const win = document.getElementById("ghidora-chat-window");
+    const isOpen = win.style.display === "flex";
+    win.style.display = isOpen ? "none" : "flex";
+    if (!isOpen) {
+      const box = document.getElementById("ghidora-chat-messages");
+      if (box.children.length === 0) {
+        ghidoraAddMessage("bot", "नमस्ते Ghidora Transport में आपका स्वागत है। मैं आपकी कैसे मदद कर सकता हूँ?");
+      }
+    }
+  }
+
+  function ghidoraAddMessage(sender, text) {
+    const box = document.getElementById("ghidora-chat-messages");
+    const div = document.createElement("div");
+    div.className = "ghidora-msg " + sender;
+    div.textContent = text;
+    box.appendChild(div);
+    box.scrollTop = box.scrollHeight;
+  }
+
+  async function ghidoraSendMessage() {
+    const input = document.getElementById("ghidora-chat-input");
+    const message = input.value.trim();
+    if (!message) return;
+
+    ghidoraAddMessage("user", message);
+    input.value = "";
+    ghidoraAddMessage("bot", "...");
+
+    try {
+      const res = await fetch("/api/chat/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: message }),
+      });
+      const data = await res.json();
+
+      const box = document.getElementById("ghidora-chat-messages");
+      box.removeChild(box.lastChild);
+
+      if (data.error) {
+        ghidoraAddMessage("bot", "माफ़ कीजिए, कुछ दिक्कत हुई।");
+        return;
+      }
+
+      ghidoraAddMessage("bot", data.reply);
+    } catch (e) {
+      ghidoraAddMessage("bot", "Network error।");
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    document.getElementById("ghidora-chat-input").addEventListener("keypress", function (e) {
+      if (e.key === "Enter") ghidoraSendMessage();
+    });
+  });
+</script>
