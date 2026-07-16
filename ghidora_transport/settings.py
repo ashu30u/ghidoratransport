@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -20,12 +21,17 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-07kifmlf3r+js5e00dp@1#old47f6cjudsc0a@lq1mb&c*p$i%'
+# Ab environment variable se aayega Render pe; local pe fallback use hoga.
+SECRET_KEY = os.environ.get(
+    'SECRET_KEY',
+    'django-insecure-07kifmlf3r+js5e00dp@1#old47f6cjudsc0a@lq1mb&c*p$i%'
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# Render pe DEBUG env variable 'False' set karenge.
+DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '10.62.140.235']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '10.62.140.235', '.onrender.com']
 
 
 # Application definition
@@ -45,6 +51,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -124,18 +131,21 @@ STATICFILES_DIRS = [
     BASE_DIR / "booking/static",
 ]
 
+# Render pe static files yahan collect hongi (whitenoise serve karega)
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # ================================
 # Email Configuration (Gmail)
 # ================================
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-#EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'ghidoratransport@gmail.com'
-EMAIL_HOST_PASSWORD = 'xmcqcdadvdljbypx'
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', 'xmcqcdadvdljbypx')
 DEFAULT_FROM_EMAIL = 'Ghidora Transport <ghidoratransport@gmail.com>'
 
 MEDIA_URL = '/media/'
@@ -144,4 +154,7 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # ================================
 # OpenRouteService (Distance API)
 # ================================
-ORS_API_KEY = 'eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6IjM1MjMyY2Q2MjU1OTRmMTZhYmY5OGIzOTE0YzQ3NGQ1IiwiaCI6Im11cm11cjY0In0='
+ORS_API_KEY = os.environ.get(
+    'ORS_API_KEY',
+    'eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6IjM1MjMyY2Q2MjU1OTRmMTZhYmY5OGIzOTE0YzQ3NGQ1IiwiaCI6Im11cm11cjY0In0='
+)
