@@ -1,0 +1,209 @@
+/* ==========================================================================
+   Ghidora Transport — Payment Module Theme
+   Palette:  #060b1a (void)   #0d1b3e (deep navy)   #142850 (steel navy)
+             #3b82f6 (route blue)  #22d3ee (verified cyan)  #f5a623 (pending amber)
+             #ef4444 (rejected red)
+   Type:     Display -> Space Grotesk / Body -> Inter / Ledger -> JetBrains Mono
+   Signature: animated dashed "route line" connecting status nodes — a literal
+              cargo route, used for the payment progress tracker.
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root{
+  --void:#060b1a;
+  --navy-deep:#0d1b3e;
+  --navy-steel:#142850;
+  --navy-glass:rgba(20,40,80,.38);
+  --border-glass:rgba(120,170,255,.16);
+  --route-blue:#3b82f6;
+  --route-blue-soft:#60a5fa;
+  --verified-cyan:#22d3ee;
+  --pending-amber:#f5a623;
+  --rejected-red:#ef4444;
+  --text-primary:#eaf1ff;
+  --text-muted:#8ea3c9;
+  --radius-lg:20px;
+  --radius-md:14px;
+}
+
+*{box-sizing:border-box;}
+
+body.ghidora-dark{
+  background:
+    radial-gradient(circle at 15% 0%, rgba(59,130,246,.16), transparent 45%),
+    radial-gradient(circle at 90% 10%, rgba(34,211,238,.10), transparent 40%),
+    linear-gradient(180deg, var(--void) 0%, var(--navy-deep) 55%, var(--void) 100%);
+  color:var(--text-primary);
+  font-family:'Inter', sans-serif;
+  min-height:100vh;
+}
+
+.font-display{ font-family:'Space Grotesk', sans-serif; letter-spacing:-.01em; }
+.font-ledger{ font-family:'JetBrains Mono', monospace; letter-spacing:.01em; }
+.text-muted-soft{ color:var(--text-muted); }
+
+/* ---------- Glass surfaces ---------- */
+.glass-card{
+  background:var(--navy-glass);
+  border:1px solid var(--border-glass);
+  border-radius:var(--radius-lg);
+  backdrop-filter:blur(18px) saturate(140%);
+  -webkit-backdrop-filter:blur(18px) saturate(140%);
+  box-shadow:0 8px 32px rgba(3,8,20,.45);
+  animation:card-rise .5s ease both;
+}
+
+@keyframes card-rise{
+  from{ opacity:0; transform:translateY(14px); }
+  to{ opacity:1; transform:translateY(0); }
+}
+
+.glass-card.hover-lift{ transition:transform .25s ease, box-shadow .25s ease; }
+.glass-card.hover-lift:hover{
+  transform:translateY(-4px);
+  box-shadow:0 14px 40px rgba(59,130,246,.18);
+}
+
+.glass-input{
+  background:rgba(6,11,26,.55) !important;
+  border:1px solid var(--border-glass) !important;
+  color:var(--text-primary) !important;
+  border-radius:10px !important;
+}
+.glass-input:focus{
+  border-color:var(--route-blue) !important;
+  box-shadow:0 0 0 3px rgba(59,130,246,.25) !important;
+  background:rgba(6,11,26,.75) !important;
+  color:var(--text-primary) !important;
+}
+.glass-input::placeholder{ color:var(--text-muted); }
+
+/* ---------- Buttons ---------- */
+.btn-route{
+  background:linear-gradient(135deg, var(--route-blue), var(--route-blue-soft));
+  color:#fff; border:none; border-radius:12px; font-weight:600;
+  padding:.6rem 1.4rem; transition:transform .2s ease, box-shadow .2s ease;
+}
+.btn-route:hover{ transform:translateY(-2px); box-shadow:0 10px 24px rgba(59,130,246,.35); color:#fff; }
+
+.btn-ghost-glass{
+  background:rgba(255,255,255,.04); border:1px solid var(--border-glass);
+  color:var(--text-primary); border-radius:12px; font-weight:500;
+}
+.btn-ghost-glass:hover{ background:rgba(255,255,255,.08); color:#fff; }
+
+/* ---------- Status pill ---------- */
+.status-pill{
+  display:inline-flex; align-items:center; gap:.4rem;
+  padding:.32rem .85rem; border-radius:999px; font-size:.78rem; font-weight:600;
+  font-family:'JetBrains Mono', monospace;
+  border:1px solid currentColor; background:rgba(255,255,255,.04);
+}
+.status-pill .dot{ width:7px; height:7px; border-radius:50%; background:currentColor; }
+
+/* ---------- Signature element: the Route Tracker ---------- */
+.route-tracker{
+  display:flex; align-items:center; justify-content:space-between;
+  position:relative; padding:1.2rem .5rem;
+}
+.route-tracker::before{
+  content:""; position:absolute; left:6%; right:6%; top:calc(1.2rem + 13px);
+  height:2px;
+  background-image:linear-gradient(90deg, var(--route-blue-soft) 0 8px, transparent 8px 16px);
+  background-size:16px 2px; background-repeat:repeat-x;
+  opacity:.45;
+}
+.route-tracker .route-progress{
+  position:absolute; left:6%; top:calc(1.2rem + 13px); height:2px;
+  background:linear-gradient(90deg, var(--verified-cyan), var(--route-blue));
+  transition:width .6s ease; z-index:1;
+}
+.route-node{
+  position:relative; z-index:2; display:flex; flex-direction:column; align-items:center;
+  gap:.5rem; flex:1; text-align:center;
+}
+.route-node .node-dot{
+  width:26px; height:26px; border-radius:50%;
+  background:var(--navy-steel); border:2px solid var(--border-glass);
+  display:flex; align-items:center; justify-content:center;
+  font-size:.75rem; color:var(--text-muted); transition:all .3s ease;
+}
+.route-node.done .node-dot{
+  background:linear-gradient(135deg, var(--verified-cyan), var(--route-blue));
+  border-color:transparent; color:#04121f; box-shadow:0 0 14px rgba(34,211,238,.55);
+}
+.route-node.current .node-dot{
+  border-color:var(--route-blue); color:var(--route-blue-soft);
+  animation:pulse-node 1.6s ease-in-out infinite;
+}
+@keyframes pulse-node{
+  0%,100%{ box-shadow:0 0 0 0 rgba(59,130,246,.45); }
+  50%{ box-shadow:0 0 0 8px rgba(59,130,246,0); }
+}
+.route-node .node-label{ font-size:.72rem; color:var(--text-muted); max-width:90px; }
+.route-node.done .node-label, .route-node.current .node-label{ color:var(--text-primary); }
+
+/* ---------- Payment method tabs ---------- */
+.method-tabs .nav-link{
+  border-radius:12px; color:var(--text-muted); font-weight:600; border:1px solid transparent;
+  margin-right:.4rem;
+}
+.method-tabs .nav-link.active{
+  background:rgba(59,130,246,.15); color:#fff; border-color:var(--border-glass);
+}
+
+/* ---------- QR frame ---------- */
+.qr-frame{
+  background:#fff; padding:14px; border-radius:16px; display:inline-block;
+  box-shadow:0 0 30px rgba(59,130,246,.25);
+}
+
+/* ---------- Copy chip ---------- */
+.copy-chip{
+  display:flex; align-items:center; justify-content:space-between; gap:.75rem;
+  background:rgba(6,11,26,.55); border:1px solid var(--border-glass);
+  border-radius:10px; padding:.55rem .85rem; font-family:'JetBrains Mono', monospace;
+}
+.copy-chip button{ background:none; border:none; color:var(--route-blue-soft); font-weight:600; cursor:pointer; }
+.copy-chip button:hover{ color:#fff; }
+.copy-chip .copied-flash{ color:var(--verified-cyan); }
+
+/* ---------- Progress bar (upload / amount) ---------- */
+.progress-glass{ background:rgba(255,255,255,.06); border-radius:999px; height:8px; overflow:hidden; }
+.progress-glass .fill{
+  height:100%; background:linear-gradient(90deg, var(--route-blue), var(--verified-cyan));
+  transition:width .5s ease;
+}
+
+/* ---------- Success animation ---------- */
+.success-check{
+  width:64px; height:64px; border-radius:50%;
+  background:radial-gradient(circle, rgba(34,211,238,.25), transparent 70%);
+  display:flex; align-items:center; justify-content:center; margin:0 auto;
+}
+.success-check svg{ animation:pop-in .4s ease both; }
+@keyframes pop-in{ from{ transform:scale(.4); opacity:0;} to{ transform:scale(1); opacity:1;} }
+
+/* ---------- Loading shimmer ---------- */
+.loading-line{
+  height:10px; border-radius:6px; background:linear-gradient(90deg, rgba(255,255,255,.05), rgba(255,255,255,.14), rgba(255,255,255,.05));
+  background-size:200% 100%; animation:shimmer 1.4s infinite;
+}
+@keyframes shimmer{ 0%{background-position:200% 0;} 100%{background-position:-200% 0;} }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 767px){
+  .route-tracker{ flex-wrap:wrap; row-gap:1rem; }
+  .route-node{ flex:0 0 33%; }
+}
+
+/* ---------- Reduced motion ---------- */
+@media (prefers-reduced-motion: reduce){
+  .glass-card, .route-node .node-dot, .success-check svg{ animation:none !important; }
+}
+
+/* ---------- Focus visibility ---------- */
+a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible{
+  outline:2px solid var(--route-blue-soft); outline-offset:2px;
+}

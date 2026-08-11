@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'social/css/social.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="gs-wrap">
+  {% include "social/partials/post_card.html" %}
+
+  <div class="gs-composer">
+    <form method="post">
+      {% csrf_token %}
+      {{ comment_form.content }}
+      <div style="text-align:right; margin-top:8px;">
+        <button type="submit" class="gs-btn">Comment</button>
+      </div>
+    </form>
+  </div>
+
+  <div style="background: var(--gs-surface); border:1px solid var(--gs-line); border-radius: var(--gs-radius); overflow:hidden;">
+    {% for comment in comments %}
+      <div class="gs-comment" style="{% if not forloop.last %}border-bottom:1px solid var(--gs-line);{% endif %}">
+        <a href="{% url 'social:profile' comment.author.username %}" class="gs-author">{{ comment.author.username }}</a>
+        <span>{{ comment.content }}</span>
+        <span class="gs-timestamp" style="margin-left:auto;">{{ comment.created_at|timesince }} ago</span>
+      </div>
+    {% empty %}
+      <div class="gs-empty">No comments yet.</div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,280 @@
+{% extends "payments/base.html" %}
+{% block title %}Pay — {{ payment_request.payment_id }} | Ghidora Transport{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+
+  <!-- Route tracker -->
+  <div class="col-12">
+    <div class="glass-card p-4">
+      <div class="route-tracker">
+        <div class="route-progress" style="width:
+          {% if payment_request.status == 'pending' %}20%
+          {% elif payment_request.status == 'submitted' or payment_request.status == 'waiting_verification' %}55%
+          {% elif payment_request.status == 'verified' or payment_request.status == 'completed' %}100%
+          {% elif payment_request.status == 'rejected' %}55%
+          {% else %}10%{% endif %};"></div>
+
+        <div class="route-node done"><div class="node-dot"><i class="bi bi-check"></i></div><div class="node-label">Booking Approved</div></div>
+        <div class="route-node {% if payment_request.status != 'pending' %}done{% else %}current{% endif %}">
+          <div class="node-dot"><i class="bi bi-cash-coin"></i></div><div class="node-label">Payment Requested</div>
+        </div>
+        <div class="route-node
+          {% if payment_request.status == 'waiting_verification' %}current
+          {% elif payment_request.status == 'verified' or payment_request.status == 'completed' %}done
+          {% endif %}">
+          <div class="node-dot"><i class="bi bi-upload"></i></div><div class="node-label">Proof Submitted</div>
+        </div>
+        <div class="route-node {% if payment_request.status == 'verified' or payment_request.status == 'completed' %}done{% endif %}">
+          <div class="node-dot"><i class="bi bi-shield-check"></i></div><div class="node-label">Verified</div>
+        </div>
+        <div class="route-node {% if payment_request.status == 'completed' %}done{% endif %}">
+          <div class="node-dot"><i class="bi bi-flag-fill"></i></div><div class="node-label">Booking Confirmed</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Booking summary -->
+  <div class="col-lg-4">
+    <div class="glass-card p-4 h-100 hover-lift">
+      <h5 class="font-display mb-3">Booking Summary</h5>
+      <div class="font-ledger small text-muted-soft mb-1">BOOKING ID</div>
+      <div class="fw-semibold mb-3">{{ booking.booking_id }}</div>
+
+      <div class="d-flex justify-content-between border-bottom border-secondary-subtle py-2">
+        <span class="text-muted-soft">Pickup</span><span>{{ booking.pickup }}</span>
+      </div>
+      <div class="d-flex justify-content-between border-bottom border-secondary-subtle py-2">
+        <span class="text-muted-soft">Destination</span><span>{{ booking.destination }}</span>
+      </div>
+      <div class="d-flex justify-content-between border-bottom border-secondary-subtle py-2">
+        <span class="text-muted-soft">Cargo</span><span>{{ booking.cargo_type|default:"-" }}</span>
+      </div>
+      <div class="d-flex justify-content-between border-bottom border-secondary-subtle py-2">
+        <span class="text-muted-soft">Trip Type</span><span>{{ booking.trip_type|default:"-" }}</span>
+      </div>
+      <div class="d-flex justify-content-between border-bottom border-secondary-subtle py-2">
+        <span class="text-muted-soft">Distance</span><span>{{ booking.distance|default:"-" }} km</span>
+      </div>
+      <div class="d-flex justify-content-between py-2">
+        <span class="text-muted-soft">Vehicle</span><span>{{ booking.vehicle_type|default:"-" }}</span>
+      </div>
+
+      <hr class="border-secondary-subtle">
+
+      <div class="d-flex justify-content-between py-1">
+        <span class="text-muted-soft">Total Fare</span><span class="font-ledger">₹{{ payment_request.total_fare }}</span>
+      </div>
+      <div class="d-flex justify-content-between py-1">
+        <span class="text-muted-soft">This Request ({{ payment_request.get_payment_type_display }})</span>
+        <span class="font-ledger text-info">₹{{ payment_request.amount }}</span>
+      </div>
+      <div class="d-flex justify-content-between py-1">
+        <span class="text-muted-soft">Remaining After</span>
+        <span class="font-ledger">₹{{ payment_request.remaining_amount }}</span>
+      </div>
+      <div class="d-flex justify-content-between py-1">
+        <span class="text-muted-soft">Deadline</span>
+        <span class="font-ledger">{{ payment_request.due_date|date:"d M, H:i" }}</span>
+      </div>
+
+      <div class="mt-3">
+        <span class="status-pill" style="color:{{ status_color }}">
+          <span class="dot"></span>{{ payment_request.get_status_display }}
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Payment methods + proof upload -->
+  <div class="col-lg-8">
+    <div class="glass-card p-4">
+      <h5 class="font-display mb-3">Choose a Payment Method</h5>
+      <p class="text-muted-soft small">{{ settings_obj.payment_instructions }}</p>
+
+      <ul class="nav method-tabs mb-3" role="tablist">
+        <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-qr" type="button">
+          <i class="bi bi-qr-code me-1"></i>QR Code</button></li>
+        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-upi" type="button">
+          <i class="bi bi-phone me-1"></i>UPI</button></li>
+        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-bank" type="button">
+          <i class="bi bi-bank me-1"></i>Bank Transfer</button></li>
+      </ul>
+
+      <div class="tab-content mb-4">
+        <!-- QR -->
+        <div class="tab-pane fade show active" id="tab-qr">
+          <div class="row align-items-center g-3">
+            <div class="col-auto">
+              {% if settings_obj.qr_code_image %}
+                <div class="qr-frame">
+                  {% if upi_pay_link %}
+                    <a href="{{ upi_pay_link }}">
+                      <img id="qr-img" src="{{ settings_obj.qr_code_image.url }}" width="160" height="160" alt="Payment QR Code — tap to pay">
+                    </a>
+                  {% else %}
+                    <img id="qr-img" src="{{ settings_obj.qr_code_image.url }}" width="160" height="160" alt="Payment QR Code">
+                  {% endif %}
+                </div>
+              {% else %}
+                <div class="text-muted-soft small">QR not configured yet.</div>
+              {% endif %}
+            </div>
+            <div class="col">
+              <div class="mb-1"><strong>{{ settings_obj.company_name }}</strong></div>
+              <div class="font-ledger small text-muted-soft mb-2">Booking {{ booking.booking_id }} · Amount ₹{{ payment_request.amount }}</div>
+              {% if upi_pay_link %}
+                <a href="{{ upi_pay_link }}" class="btn btn-route mb-2 d-inline-flex align-items-center">
+                  <i class="bi bi-phone-vibrate me-1"></i>Pay Now with UPI App
+                </a>
+                <div class="text-muted-soft small mb-2">On mobile, this opens GPay / PhonePe / Paytm directly with the amount filled in. On a computer, scan the QR with your phone's camera instead.</div>
+              {% endif %}
+              <div class="copy-chip mb-2">
+                <span>{{ settings_obj.upi_id }}</span>
+                <button type="button" onclick="copyToClipboard('{{ settings_obj.upi_id }}', this)">Copy UPI</button>
+              </div>
+              {% if settings_obj.qr_code_image %}
+                <button type="button" class="btn btn-ghost-glass btn-sm" onclick="downloadQr('{{ settings_obj.qr_code_image.url }}','ghidora_qr.png')">
+                  <i class="bi bi-download me-1"></i>Download QR
+                </button>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <!-- UPI -->
+        <div class="tab-pane fade" id="tab-upi">
+          {% if upi_pay_link %}
+            <a href="{{ upi_pay_link }}" class="btn btn-route mb-3 d-inline-flex align-items-center">
+              <i class="bi bi-phone-vibrate me-1"></i>Pay Now with UPI App
+            </a>
+          {% endif %}
+          <div class="copy-chip mb-2">
+            <span>{{ settings_obj.upi_id }}</span>
+            <button type="button" onclick="copyToClipboard('{{ settings_obj.upi_id }}', this)">Copy</button>
+          </div>
+          <div class="text-muted-soft small">Amount: <span class="font-ledger">₹{{ payment_request.amount }}</span></div>
+          <div class="text-muted-soft small mt-2">After paying, enter the reference number below in the proof form.</div>
+        </div>
+
+        <!-- Bank -->
+        <div class="tab-pane fade" id="tab-bank">
+          <div class="row g-2">
+            <div class="col-md-6">
+              <div class="copy-chip mb-2"><span>Bank: {{ settings_obj.bank_name }}</span>
+                <button type="button" onclick="copyToClipboard('{{ settings_obj.bank_name }}', this)">Copy</button></div>
+            </div>
+            <div class="col-md-6">
+              <div class="copy-chip mb-2"><span>Branch: {{ settings_obj.bank_branch }}</span>
+                <button type="button" onclick="copyToClipboard('{{ settings_obj.bank_branch }}', this)">Copy</button></div>
+            </div>
+            <div class="col-md-6">
+              <div class="copy-chip mb-2"><span>A/C Name: {{ settings_obj.account_holder_name }}</span>
+                <button type="button" onclick="copyToClipboard('{{ settings_obj.account_holder_name }}', this)">Copy</button></div>
+            </div>
+            <div class="col-md-6">
+              <div class="copy-chip mb-2"><span>A/C No: {{ settings_obj.account_number }}</span>
+                <button type="button" onclick="copyToClipboard('{{ settings_obj.account_number }}', this)">Copy</button></div>
+            </div>
+            <div class="col-md-6">
+              <div class="copy-chip mb-2"><span>IFSC: {{ settings_obj.ifsc_code }}</span>
+                <button type="button" onclick="copyToClipboard('{{ settings_obj.ifsc_code }}', this)">Copy</button></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <hr class="border-secondary-subtle">
+
+      {% if payment_request.status == 'pending' or payment_request.status == 'rejected' %}
+        <h5 class="font-display mb-3">Upload Payment Proof</h5>
+        <form method="post" enctype="multipart/form-data" class="glass-form">
+          {% csrf_token %}
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label small text-muted-soft">Payment Method Used</label>
+              {{ form.method_used }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small text-muted-soft">Screenshot / Receipt (PNG, JPG, PDF — max 10MB)</label>
+              {{ form.screenshot }}
+              <div id="screenshot-preview-wrap" class="d-none mt-2 d-flex align-items-center gap-2">
+                <img id="screenshot-preview-img" class="rounded d-none" style="height:48px;width:48px;object-fit:cover;">
+                <span id="screenshot-preview-name" class="small text-muted-soft"></span>
+                <button type="button" id="screenshot-replace-btn" class="btn btn-ghost-glass btn-sm">Replace</button>
+                <button type="button" id="screenshot-delete-btn" class="btn btn-ghost-glass btn-sm">Delete</button>
+              </div>
+              {% if form.screenshot.errors %}<div class="text-danger small mt-1">{{ form.screenshot.errors.0 }}</div>{% endif %}
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label small text-muted-soft">Transaction ID</label>
+              {{ form.transaction_id }}
+              {% if form.transaction_id.errors %}<div class="text-danger small mt-1">{{ form.transaction_id.errors.0 }}</div>{% endif %}
+            </div>
+            <div class="col-md-4">
+              <label class="form-label small text-muted-soft">Reference Number</label>
+              {{ form.reference_number }}
+            </div>
+            <div class="col-md-4">
+              <label class="form-label small text-muted-soft">Amount Paid</label>
+              {{ form.amount_paid }}
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label small text-muted-soft">Payment Date</label>
+              {{ form.payment_date }}
+            </div>
+            <div class="col-md-4">
+              <label class="form-label small text-muted-soft">Payment Time</label>
+              {{ form.payment_time }}
+            </div>
+            <div class="col-md-4">
+              <label class="form-label small text-muted-soft">UPI App Used</label>
+              {{ form.upi_app_used }}
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label small text-muted-soft">Bank Name (if applicable)</label>
+              {{ form.bank_name }}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small text-muted-soft">Remarks</label>
+              {{ form.remarks }}
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-route mt-4">
+            <i class="bi bi-send-check me-1"></i>Submit for Verification
+          </button>
+        </form>
+      {% elif payment_request.status == 'waiting_verification' %}
+        <div class="text-center py-4">
+          <div class="success-check mb-3">
+            <i class="bi bi-hourglass-split fs-2 text-info"></i>
+          </div>
+          <p class="mb-0">Your proof has been submitted and is awaiting admin verification.</p>
+        </div>
+      {% elif payment_request.status == 'verified' or payment_request.status == 'completed' %}
+        <div class="text-center py-4">
+          <div class="success-check mb-3">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#22d3ee" stroke-width="2">
+              <path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <p class="mb-2">Payment verified! Your receipt is ready.</p>
+          <a href="{% url 'payments:download_receipt' payment_request.payment_id %}" class="btn btn-route">
+            <i class="bi bi-download me-1"></i>Download Receipt
+          </a>
+        </div>
+      {% elif payment_request.status == 'expired' %}
+        <div class="text-center py-4 text-danger">
+          <i class="bi bi-clock-history fs-2"></i>
+          <p class="mt-2 mb-0">This payment window has expired. Please contact support.</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

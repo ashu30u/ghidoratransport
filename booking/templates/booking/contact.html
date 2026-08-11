@@ -1,0 +1,574 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contact Us - Ghidora Transport</title>
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+<style>
+    body { background: #0a0e17; }
+
+    .contact-hero{
+        background: linear-gradient(135deg, #0a0e17 0%, #1a1f2e 100%);
+        padding: 80px 20px 50px;
+        text-align: center;
+        color: #fff;
+    }
+    .contact-hero h1{
+        font-size: 40px;
+        font-weight: 700;
+        margin-bottom: 10px;
+        background: linear-gradient(90deg, #4facfe, #00f2fe);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    .contact-hero p{ font-size: 16px; color: #9aa5b8; max-width: 560px; margin: 0 auto; }
+
+    .contact-wrap{ max-width: 1080px; margin: 0 auto; padding: 0 20px; }
+
+    .info-grid{
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 20px;
+        margin: -40px auto 50px;
+        position: relative;
+        z-index: 2;
+    }
+    .info-card{
+        background: rgba(255,255,255,0.04);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 16px;
+        padding: 26px 22px;
+        text-align: center;
+    }
+    .info-card .icon{ font-size: 30px; display: block; margin-bottom: 10px; }
+    .info-card h3{ color: #fff; font-size: 16px; margin: 0 0 8px; }
+    .info-card p{ color: #9aa5b8; font-size: 14px; margin: 2px 0; line-height: 1.5; }
+    .info-card a{ color: #4facfe; text-decoration: none; }
+    .info-card a:hover{ text-decoration: underline; }
+
+    .quick-actions{
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px;
+        justify-content: center;
+        margin-bottom: 55px;
+    }
+    .qa-btn{
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 13px 24px;
+        border-radius: 30px;
+        text-decoration: none;
+        font-weight: 700;
+        font-size: 14px;
+        transition: transform 0.15s ease;
+    }
+    .qa-btn:hover{ transform: translateY(-2px); }
+    .qa-call{ background: linear-gradient(90deg, #4facfe, #00f2fe); color: #0a0e17; }
+    .qa-whatsapp{ background: #25D366; color: #fff; }
+    .qa-map{ background: rgba(255,255,255,0.08); color: #fff; border: 1px solid rgba(255,255,255,0.2); }
+    .qa-book{ background: var(--brand); color: #111; }
+
+    .section-title{
+        text-align: center;
+        font-size: 26px;
+        color: #fff;
+        margin: 0 0 30px;
+    }
+    .section-title .accent{ color: #4facfe; }
+
+    .map-section{ margin-bottom: 55px; }
+    .map-frame{
+        width: 100%;
+        height: 340px;
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 16px;
+        overflow: hidden;
+    }
+    .map-frame iframe{ width: 100%; height: 100%; border: 0; }
+
+    .form-section{ margin-bottom: 55px; }
+    .contact-form-card{
+        max-width: 640px;
+        margin: 0 auto;
+        background: rgba(255,255,255,0.04);
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 16px;
+        padding: 34px 30px;
+    }
+    .form-row{ display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+    @media (max-width: 600px){ .form-row{ grid-template-columns: 1fr; } }
+    .form-control{
+        width: 100%;
+        padding: 12px 14px;
+        border-radius: 10px;
+        border: 1px solid rgba(255,255,255,0.12);
+        background: rgba(255,255,255,0.03);
+        color: #fff;
+        font-size: 14px;
+        margin-bottom: 14px;
+        font-family: inherit;
+    }
+    .form-control::placeholder{ color: #6f7c91; }
+    .form-control:focus{ outline: none; border-color: #4facfe; }
+    .form-submit-btn{
+        width: 100%;
+        background: linear-gradient(90deg, #4facfe, #00f2fe);
+        color: #0a0e17;
+        border: none;
+        padding: 14px;
+        border-radius: 10px;
+        font-weight: 700;
+        font-size: 15px;
+        cursor: pointer;
+    }
+    .form-success{
+        background: rgba(37,211,102,0.1);
+        border: 1px solid rgba(37,211,102,0.4);
+        color: #7ee6a8;
+        padding: 14px 18px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        text-align: center;
+        font-size: 14px;
+    }
+
+    .hours-emergency-grid{
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        margin-bottom: 55px;
+    }
+    @media (max-width: 700px){ .hours-emergency-grid{ grid-template-columns: 1fr; } }
+    .hours-card, .emergency-card{
+        border-radius: 16px;
+        padding: 28px 26px;
+    }
+    .hours-card{
+        background: rgba(255,255,255,0.04);
+        border: 1px solid rgba(255,255,255,0.08);
+    }
+    .hours-card h3{ color: #fff; margin: 0 0 14px; font-size: 18px; }
+    .hours-row{ display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed rgba(255,255,255,0.08); color: #b8c1d1; font-size: 14px; }
+    .hours-row:last-child{ border-bottom: none; }
+    .emergency-card{
+        background: linear-gradient(135deg, rgba(255,80,80,0.12), rgba(255,80,80,0.04));
+        border: 1px solid rgba(255,80,80,0.3);
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+    .emergency-card h3{ color: #ff6b6b; margin: 0 0 8px; font-size: 18px; }
+    .emergency-card p{ color: #d8c1c1; font-size: 14px; margin: 0 0 14px; }
+    .emergency-card a{
+        display: inline-block;
+        background: #ff5555;
+        color: #fff;
+        padding: 12px 26px;
+        border-radius: 10px;
+        text-decoration: none;
+        font-weight: 700;
+    }
+
+    .faq-section{ margin-bottom: 55px; }
+    .faq-item{
+        background: rgba(255,255,255,0.03);
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 12px;
+        margin-bottom: 12px;
+        padding: 4px 20px;
+    }
+    .faq-item summary{
+        padding: 16px 0;
+        color: #fff;
+        font-weight: 600;
+        font-size: 15px;
+        cursor: pointer;
+        list-style: none;
+    }
+    .faq-item summary::-webkit-details-marker{ display: none; }
+    .faq-item summary::after{ content: "+"; float: right; color: #4facfe; font-size: 20px; }
+    .faq-item[open] summary::after{ content: "−"; }
+    .faq-item p{ color: #9aa5b8; font-size: 14px; line-height: 1.6; padding-bottom: 16px; margin: 0; }
+
+    .why-section{ margin-bottom: 55px; }
+    .why-grid{
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 12px;
+    }
+    .why-item{
+        background: rgba(79,172,254,0.06);
+        border: 1px solid rgba(79,172,254,0.2);
+        border-radius: 10px;
+        padding: 12px 16px;
+        color: #e0e6f0;
+        font-size: 14px;
+    }
+
+    .social-section{
+        text-align: center;
+        padding: 20px 20px 70px;
+    }
+    .social-links{
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        flex-wrap: wrap;
+        margin-top: 20px;
+    }
+    .social-links a{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        text-decoration: none;
+        background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(255,255,255,0.1);
+        padding: 14px 24px;
+        border-radius: 14px;
+        color: #e0e6f0;
+        font-size: 13px;
+        font-weight: 600;
+        transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+    .social-links a:hover{ transform: translateY(-3px); }
+
+    /* ===== Cursor-following spotlight glow (with glowing border) ===== */
+    :root {
+        --glow-color: 79, 172, 254;
+    }
+    .glow-card {
+        position: relative;
+        overflow: hidden;
+        isolation: isolate;
+    }
+    .glow-card::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        pointer-events: none;
+        background: radial-gradient(
+            380px circle at var(--x, 50%) var(--y, 50%),
+            rgba(var(--glow-color), 0.35),
+            transparent 70%
+        );
+        opacity: 0;
+        transition: opacity 0.35s ease;
+        z-index: 0;
+    }
+    .glow-card::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        padding: 1px;
+        background: radial-gradient(
+            380px circle at var(--x, 50%) var(--y, 50%),
+            rgba(var(--glow-color), 0.9),
+            transparent 70%
+        );
+        -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+        mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+        -webkit-mask-composite: xor;
+        mask-composite: exclude;
+        opacity: 0;
+        transition: opacity 0.35s ease;
+        z-index: 0;
+        pointer-events: none;
+    }
+    .glow-card:hover::before,
+    .glow-card:hover::after {
+        opacity: 1;
+    }
+    .glow-card > * {
+        position: relative;
+        z-index: 1;
+    }
+</style>
+</head>
+
+<body>
+
+  <!-- Sticky Navbar -->
+  <nav class="navbar">
+    <div class="navbar-inner" style="display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 1440px; margin: 0 auto; padding: 0 16px;">
+      <a href="{% url 'home' %}" class="nav-logo">
+        <img src="{% static 'images/logo6.png' %}" alt="Ghidora Transport Logo" class="logo-img">
+        GHIDORA <span class="accent">TRANSPORT</span>
+      </a>
+      <div class="nav-links">
+        <a href="{% url 'home' %}">Home</a>
+        <a href="{% url 'services' %}">Services</a>
+        <a href="{% url 'home' %}#booking">Booking</a>
+        <a href="{% url 'about' %}">About Us</a>
+        <a href="{% url 'contact_us' %}" class="active">Contact</a>
+      </div>
+      <div class="nav-actions" style="display: flex; align-items: center; gap: 8px;">
+        <a href="tel:+916264588894" class="call-btn"><span class="phone-shake">📞</span> Call Now</a>
+
+        {% if not user.is_authenticated %}
+          <a href="{% url 'login' %}" class="animated-login-btn">
+            <span>🔑</span> Login
+          </a>
+        {% else %}
+          <div class="user-badge-glowing">
+            <span>👤</span> <strong style="color:#ffffff;">{{ user.first_name|default:user.username }}</strong>
+            <form method="post" action="{% url 'logout' %}" style="display: inline; margin-left: 4px;">
+              {% csrf_token %}
+              <button type="submit" style="background: rgba(239, 68, 68, 0.25); border: 1px solid #ef4444; color: #fca5a5; padding: 2px 8px; border-radius: 8px; font-size: 11px; cursor: pointer; font-weight: bold;" title="Logout">
+                🚪
+              </button>
+            </form>
+          </div>
+        {% endif %}
+
+        <button class="hamburger-btn" id="hamburgerBtn" onclick="toggleMobileMenu(event)" aria-label="Toggle Navigation Menu">
+          <svg width="24" height="18" viewBox="0 0 24 18" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: block; pointer-events: none;">
+            <rect y="0" width="24" height="3" rx="1.5" fill="#FFFFFF"/>
+            <rect y="7.5" width="24" height="3" rx="1.5" fill="#FFFFFF"/>
+            <rect y="15" width="24" height="3" rx="1.5" fill="#FFFFFF"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mega Slide-Down Drawer Navigation Menu -->
+    <div class="mobile-nav-drawer" id="mobileNavDrawer" style="display: none !important;">
+      <div style="font-size: 11px; font-weight: 800; letter-spacing: 1.5px; color: #ff7a1a; padding: 6px 12px 2px; text-transform: uppercase;">📍 Main Pages</div>
+      <a href="{% url 'home' %}">🏠 Home</a>
+      <a href="{% url 'services' %}">🛠️ Services</a>
+      <a href="{% url 'home' %}#booking">📦 Book Transport</a>
+      <a href="{% url 'about' %}">ℹ️ About Us</a>
+      <a href="{% url 'contact_us' %}" class="active">🕿 Contact Us</a>
+
+      <div style="height: 1px; background: rgba(255, 255, 255, 0.1); margin: 8px 0;"></div>
+
+      <div style="font-size: 11px; font-weight: 800; letter-spacing: 1.5px; color: #00d2ff; padding: 6px 12px 2px; text-transform: uppercase;">⚡ Special Features & Tools</div>
+      <a href="{% url 'home' %}#360-viewer" style="color: #ff9e00; font-weight: 700;">🏎️ 360° Vehicle View</a>
+      <a href="{% url 'quotations:quote_request' %}">💰 Check Fare & Rate Quote</a>
+      <a href="{% url 'business_card' %}">🪪 Digital Business Card</a>
+      <a href="{% url 'status' %}">💳 Check Booking Status & Payment</a>
+    </div>
+  </nav>
+
+  <script>
+    function toggleMobileMenu(event) {
+      if (event) event.stopPropagation();
+      var drawer = document.getElementById('mobileNavDrawer');
+      var btn = document.getElementById('hamburgerBtn');
+      if (!drawer) return;
+
+      var isVisible = drawer.classList.contains('active') || drawer.style.display === 'flex';
+
+      if (isVisible) {
+        drawer.classList.remove('active');
+        drawer.style.setProperty('display', 'none', 'important');
+        if (btn) btn.classList.remove('active');
+      } else {
+        drawer.style.setProperty('display', 'flex', 'important');
+        drawer.classList.add('active');
+        if (btn) btn.classList.add('active');
+      }
+    }
+
+    document.addEventListener('click', function(e) {
+      var drawer = document.getElementById('mobileNavDrawer');
+      var btn = document.getElementById('hamburgerBtn');
+      if (drawer && (drawer.classList.contains('active') || drawer.style.display === 'flex')) {
+        if (!drawer.contains(e.target) && (!btn || !btn.contains(e.target))) {
+          drawer.classList.remove('active');
+          drawer.style.setProperty('display', 'none', 'important');
+          if (btn) btn.classList.remove('active');
+        }
+      }
+    });
+  </script>
+
+  <div class="contact-hero">
+    <h1>Contact Ghidora Transport</h1>
+    <p>We're always ready to help you. Have questions about booking, pricing, or transportation? Our team is here for you.</p>
+  </div>
+
+  <div class="contact-wrap">
+
+    <!-- Info Cards -->
+    <div class="info-grid">
+      <div class="info-card glow-card">
+        <span class="icon">📞</span>
+        <h3>Call Us</h3>
+        <p><a href="tel:+917489297841">+91 7489297841</a></p>
+        <p><a href="tel:+916266014139">+91 6266014139</a></p>
+        <p>9:00 AM – 8:00 PM</p>
+      </div>
+      <div class="info-card glow-card">
+        <span class="icon">📧</span>
+        <h3>Email</h3>
+        <p><a href="mailto:ghidoratransport@gmail.com">ghidoratransport@gmail.com</a></p>
+        <p>Quick response within 24 hours</p>
+      </div>
+      <div class="info-card glow-card">
+        <span class="icon">📍</span>
+        <h3>Office Address</h3>
+        <p>Kodebod, Post-Marod</p>
+        <p>Tehsil-Kurud, Dhamtari</p>
+        <p>Chhattisgarh, India</p>
+      </div>
+      <div class="info-card glow-card">
+        <span class="icon">🌐</span>
+        <h3>Website</h3>
+        <p><a href="{% url 'home' %}">Ghidora Transport</a></p>
+        <p>Book online anytime</p>
+      </div>
+    </div>
+
+    <!-- Quick Action Buttons -->
+    <div class="quick-actions">
+      <button class="qa-btn qa-call glow-card" onclick="callNow()">📞 Call Now</button>
+      <a href="https://wa.me/916264588894" target="_blank" class="qa-btn qa-whatsapp glow-card">💬 WhatsApp Chat</a>
+      <a href="https://www.google.com/maps/search/?api=1&query=Kodebod+Kurud+Dhamtari+Chhattisgarh" target="_blank" class="qa-btn qa-map glow-card">📍 Get Directions</a>
+      <a href="{% url 'home' %}#booking" class="qa-btn qa-book glow-card">🚚 Book Vehicle</a>
+    </div>
+
+    <!-- Google Map -->
+    <div class="map-frame">
+      <iframe
+         src="https://maps.google.com/maps?q=Ghidora%20Transport%2C%20Kodebod%2C%20Kurud%2C%20Chhattisgarh%20493663&t=&z=15&ie=UTF8&iwloc=&output=embed"
+        allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade">
+      </iframe>
+    </div>
+
+    <!-- Contact Form -->
+    <div class="form-section">
+      <h2 class="section-title">Send Us A <span class="accent">Message</span></h2>
+      <div class="contact-form-card glow-card">
+
+        {% if success %}
+          <div class="form-success">✓ Aapka message bhej diya gaya hai. Hum jald hi aapse contact karenge!</div>
+        {% endif %}
+
+        <form method="POST" action="">
+          {% csrf_token %}
+          <div class="form-row">
+            {{ form.name }}
+            {{ form.phone }}
+          </div>
+          <div class="form-row">
+            {{ form.email }}
+            {{ form.subject }}
+          </div>
+          {{ form.message }}
+          <button type="submit" class="form-submit-btn">Send Message</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Business Hours + Emergency -->
+    <div class="hours-emergency-grid">
+      <div class="hours-card glow-card">
+        <h3>🕒 Business Hours</h3>
+        <div class="hours-row"><span>Monday - Saturday</span><span>9:00 AM - 8:00 PM</span></div>
+        <div class="hours-row"><span>Sunday</span><span>Emergency Support Only</span></div>
+      </div>
+      <div class="emergency-card glow-card">
+        <h3>🚨 Need Urgent Transport?</h3>
+        <p>Call us immediately, we're here to help.</p>
+        <a href="tel:+916266014139">Call Now: 6266014139</a>
+      </div>
+    </div>
+
+    <!-- FAQ -->
+    <div class="faq-section">
+      <h2 class="section-title">Frequently Asked <span class="accent">Questions</span></h2>
+
+      <details class="faq-item glow-card">
+        <summary>Booking kaise kare?</summary>
+        <p>Aap hamari website ke booking form se, ya seedha WhatsApp/Call se booking kar sakte hain.</p>
+      </details>
+
+      <details class="faq-item glow-card">
+        <summary>Payment ke options kya hain?</summary>
+        <p>Hum UPI, Cash, aur delivery ke waqt payment jaisi options accept karte hain.</p>
+      </details>
+
+      <details class="faq-item glow-card">
+        <summary>Driver kab assign hota hai?</summary>
+        <p>Booking confirm hone ke baad hi driver automatically assign kar diya jaata hai.</p>
+      </details>
+
+      <details class="faq-item glow-card">
+        <summary>Kya aap long-distance transport bhi karte hain?</summary>
+        <p>Haan, hum local aur long-distance dono tarah ki transportation service dete hain.</p>
+      </details>
+    </div>
+
+    <!-- Why Contact Us -->
+    <div class="why-section">
+      <h2 class="section-title">Why Contact <span class="accent">Us?</span></h2>
+      <div class="why-grid">
+        <div class="why-item glow-card">✔ Instant Booking Support</div>
+        <div class="why-item glow-card">✔ Fare Enquiry</div>
+        <div class="why-item glow-card">✔ Vehicle Availability</div>
+        <div class="why-item glow-card">✔ Business Transport</div>
+        <div class="why-item glow-card">✔ House Shifting</div>
+        <div class="why-item glow-card">✔ Agriculture Transport</div>
+        <div class="why-item glow-card">✔ Complaint Resolution</div>
+        <div class="why-item glow-card">✔ Corporate Partnership</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Social Links -->
+  <div class="social-section">
+    <h2 class="section-title">Follow <span class="accent">Us</span></h2>
+    <div class="social-links">
+      <a href="https://instagram.com/hamar_kodebod05" target="_blank" class="glow-card">📸 Instagram</a>
+      <a href="https://wa.me/916264588894" target="_blank" class="glow-card">💬 WhatsApp</a>
+      <a href="mailto:ghidoratransport@gmail.com" class="glow-card">📧 Email</a>
+    </div>
+  </div>
+
+  <script>
+    function callNow() {
+      let confirmCall = confirm("Kya aap Ghidora Transport ko call karna chahte hain?");
+      if (confirmCall) {
+        window.location.href = "tel:+916264588894";
+      }
+    }
+
+    function updateGlow(card, clientX, clientY) {
+      const rect = card.getBoundingClientRect();
+      const x = clientX - rect.left;
+      const y = clientY - rect.top;
+      card.style.setProperty('--x', x + 'px');
+      card.style.setProperty('--y', y + 'px');
+    }
+
+    document.querySelectorAll('.glow-card').forEach(function (card) {
+      card.addEventListener('mousemove', function (e) {
+        updateGlow(card, e.clientX, e.clientY);
+      });
+
+      card.addEventListener('touchstart', function (e) {
+        const touch = e.touches[0];
+        updateGlow(card, touch.clientX, touch.clientY);
+      }, { passive: true });
+
+      card.addEventListener('touchmove', function (e) {
+        const touch = e.touches[0];
+        updateGlow(card, touch.clientX, touch.clientY);
+      }, { passive: true });
+    });
+  </script>
+
+</body>
+</html>

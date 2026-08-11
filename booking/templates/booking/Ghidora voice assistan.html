@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<title>Ghidora AI — Voice Assistant</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Hind:wght@500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+:root{
+  --bg:#0E1420;
+  --panel:#161E2E;
+  --panel-2:#1D2739;
+  --border:rgba(255,255,255,0.08);
+  --text:#ECEFF4;
+  --text-dim:#8792A6;
+  --amber:#F5A623;
+  --amber-dim:#8A6320;
+  --teal:#34D1BF;
+  --danger:#E85D5D;
+  --radius:14px;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:
+    radial-gradient(ellipse at 20% -10%, #1B2740 0%, transparent 55%),
+    radial-gradient(ellipse at 90% 110%, #1A2E2C 0%, transparent 50%),
+    var(--bg);
+  color:var(--text);
+  font-family:'Noto Sans Devanagari','Hind',sans-serif;
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  padding:28px 16px;
+}
+.app{
+  width:100%;
+  max-width:980px;
+}
+
+/* ---------- Header ---------- */
+.header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:18px;
+  padding:0 4px;
+}
+.brand{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+.brand-mark{
+  width:42px;height:42px;border-radius:10px;
+  background:linear-gradient(135deg,var(--amber),#C97C10);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Hind',sans-serif;font-weight:700;font-size:19px;color:#1A1200;
+  flex-shrink:0;
+}
+.brand-name{
+  font-family:'Hind',sans-serif;font-weight:700;font-size:21px;letter-spacing:0.3px;
+}
+.brand-sub{
+  font-size:12px;color:var(--text-dim);margin-top:1px;
+}
+.live-pill{
+  display:flex;align-items:center;gap:7px;
+  font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--teal);
+  border:1px solid rgba(52,209,191,0.35);background:rgba(52,209,191,0.08);
+  padding:6px 12px;border-radius:99px;
+}
+.live-dot{width:7px;height:7px;border-radius:50%;background:var(--teal);animation:blink 1.6s infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.25}}
+
+/* ---------- Main grid ---------- */
+.grid{
+  display:grid;
+  grid-template-columns:1.55fr 1fr;
+  gap:16px;
+}
+@media (max-width:760px){ .grid{grid-template-columns:1fr;} }
+
+.panel{
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+}
+
+/* ---------- Chat ---------- */
+.chat-head{
+  padding:14px 18px;border-bottom:1px solid var(--border);
+  font-size:12.5px;color:var(--text-dim);
+  display:flex;justify-content:space-between;align-items:center;
+}
+.chat-head b{color:var(--text);font-weight:600;}
+.chip-row{
+  display:flex;flex-wrap:wrap;gap:8px;
+  padding:12px 16px;border-bottom:1px solid var(--border);
+  background:var(--panel-2);
+}
+.chip{
+  font-size:12.5px;padding:7px 12px;border-radius:99px;
+  border:1px solid var(--border);color:var(--text-dim);
+  background:transparent;cursor:pointer;transition:all .15s;
+  font-family:inherit;
+}
+.chip:hover{border-color:var(--amber);color:var(--amber);}
+
+.transcript{
+  flex:1;
+  min-height:360px;
+  max-height:360px;
+  overflow-y:auto;
+  padding:18px;
+  display:flex;flex-direction:column;gap:12px;
+}
+.transcript::-webkit-scrollbar{width:6px;}
+.transcript::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+
+.bubble{
+  max-width:82%;
+  padding:10px 14px;
+  border-radius:12px;
+  font-size:14.5px;
+  line-height:1.5;
+}
+.bubble.assistant{
+  align-self:flex-start;
+  background:var(--panel-2);
+  border:1px solid var(--border);
+  border-bottom-left-radius:3px;
+}
+.bubble.user{
+  align-self:flex-end;
+  background:linear-gradient(135deg,#2B3A2F,#22331F);
+  border:1px solid rgba(52,209,191,0.25);
+  border-bottom-right-radius:3px;
+  color:#E7F5EE;
+}
+.bubble .tag{
+  display:block;font-family:'JetBrains Mono',monospace;font-size:10px;
+  color:var(--text-dim);margin-bottom:4px;letter-spacing:0.5px;text-transform:uppercase;
+}
+.typing{
+  align-self:flex-start;display:flex;gap:4px;padding:12px 14px;
+}
+.typing span{
+  width:6px;height:6px;border-radius:50%;background:var(--text-dim);
+  animation:tbounce 1.1s infinite ease-in-out;
+}
+.typing span:nth-child(2){animation-delay:.15s;}
+.typing span:nth-child(3){animation-delay:.3s;}
+@keyframes tbounce{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-4px);opacity:1}}
+
+/* ---------- Input row ---------- */
+.input-row{
+  border-top:1px solid var(--border);
+  padding:14px 16px;
+  display:flex;align-items:center;gap:10px;
+  background:var(--panel-2);
+}
+.mic-btn{
+  width:52px;height:52px;border-radius:50%;flex-shrink:0;
+  background:linear-gradient(135deg,var(--amber),#C97C10);
+  border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  position:relative;
+  transition:transform .12s;
+}
+.mic-btn:active{transform:scale(0.94);}
+.mic-btn.listening{
+  background:linear-gradient(135deg,var(--danger),#A03434);
+}
+.mic-btn.listening::after{
+  content:'';position:absolute;inset:-6px;border-radius:50%;
+  border:2px solid var(--danger);animation:pulse 1.3s infinite;
+}
+@keyframes pulse{
+  0%{transform:scale(0.9);opacity:0.9;}
+  100%{transform:scale(1.5);opacity:0;}
+}
+.mic-btn svg{width:22px;height:22px;fill:#1A1200;}
+.mic-btn.listening svg{fill:#fff;}
+
+.wave{
+  display:flex;align-items:center;gap:3px;height:24px;flex-shrink:0;width:40px;
+}
+.wave i{
+  width:3px;border-radius:2px;background:var(--teal);height:6px;
+  animation:none;
+}
+.wave.active i{animation:wv 0.9s ease-in-out infinite;}
+.wave i:nth-child(1){animation-delay:0s}
+.wave i:nth-child(2){animation-delay:.1s}
+.wave i:nth-child(3){animation-delay:.2s}
+.wave i:nth-child(4){animation-delay:.3s}
+.wave i:nth-child(5){animation-delay:.15s}
+@keyframes wv{0%,100%{height:5px;}50%{height:20px;}}
+
+#textInput{
+  flex:1;background:var(--panel);border:1px solid var(--border);
+  border-radius:10px;padding:12px 14px;color:var(--text);
+  font-family:inherit;font-size:14px;outline:none;
+}
+#textInput:focus{border-color:var(--amber);}
+.send-btn{
+  background:var(--panel);border:1px solid var(--border);
+  color:var(--text-dim);border-radius:10px;padding:12px 16px;
+  cursor:pointer;font-family:inherit;font-size:13.5px;
+}
+.send-btn:hover{color:var(--amber);border-color:var(--amber);}
+
+.hint{
+  font-size:11px;color:var(--text-dim);text-align:center;padding:8px 16px 0;
+}
+
+/* ---------- Route meter ---------- */
+.meter-head{
+  padding:14px 18px;border-bottom:1px solid var(--border);
+  display:flex;justify-content:space-between;align-items:center;
+}
+.meter-head b{font-family:'Hind',sans-serif;font-size:13px;letter-spacing:1px;text-transform:uppercase;color:var(--text-dim);}
+.meter-body{padding:16px 18px;display:flex;flex-direction:column;gap:14px;}
+.field{
+  display:flex;justify-content:space-between;align-items:baseline;
+  padding-bottom:10px;border-bottom:1px dashed var(--border);
+}
+.field:last-child{border-bottom:none;padding-bottom:0;}
+.field .label{font-size:12px;color:var(--text-dim);}
+.field .value{
+  font-family:'JetBrains Mono',monospace;font-size:13.5px;color:var(--text);
+  text-align:right;max-width:60%;
+}
+.field .value.empty{color:var(--text-dim);opacity:.5;}
+.field .value.hi{color:var(--amber);font-weight:700;font-size:16px;}
+
+.fare-box{
+  margin-top:4px;padding:14px;border-radius:10px;
+  background:linear-gradient(135deg,rgba(245,166,35,0.12),rgba(245,166,35,0.03));
+  border:1px solid rgba(245,166,35,0.3);
+  text-align:center;
+}
+.fare-box .amt{font-family:'JetBrains Mono',monospace;font-size:26px;font-weight:700;color:var(--amber);}
+.fare-box .lbl{font-size:11px;color:var(--text-dim);margin-top:2px;text-transform:uppercase;letter-spacing:1px;}
+
+.status-strip{
+  margin-top:10px;padding:10px 12px;border-radius:10px;
+  background:var(--panel-2);border:1px solid var(--border);
+  font-size:12px;color:var(--text-dim);
+}
+.status-strip b{color:var(--teal);}
+
+.services-note{
+  padding:14px 18px;font-size:11.5px;color:var(--text-dim);line-height:1.6;
+  border-top:1px solid var(--border);
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="header">
+    <div class="brand">
+      <div class="brand-mark">G</div>
+      <div>
+        <div class="brand-name">Ghidora Transport</div>
+        <div class="brand-sub">AI Voice Booking Assistant</div>
+      </div>
+    </div>
+    <div class="live-pill"><span class="live-dot"></span>LIVE CONSOLE</div>
+  </div>
+
+  <div class="grid">
+
+    <!-- CHAT PANEL -->
+    <div class="panel">
+      <div class="chat-head">
+        <span><b>Ghidora AI</b> से बातचीत</span>
+        <span id="voiceSupportTag" style="font-family:'JetBrains Mono',monospace;"></span>
+      </div>
+
+      <div class="chip-row">
+        <button class="chip" data-msg="मुझे booking करनी है">📦 Booking करें</button>
+        <button class="chip" data-msg="किराया कितना लगेगा">💰 किराया पूछें</button>
+        <button class="chip" data-msg="मेरी booking status बताओ">📍 Status चेक करें</button>
+        <button class="chip" data-msg="driver का नंबर चाहिए">👤 Driver नंबर</button>
+        <button class="chip" data-msg="आप कौन कौन सी service देते हो">ℹ️ Services</button>
+        <button class="chip" data-msg="driver बहुत late है, शिकायत दर्ज करनी है">⚠️ शिकायत करें</button>
+      </div>
+
+      <div class="transcript" id="transcript"></div>
+
+      <div class="input-row">
+        <button class="mic-btn" id="micBtn" title="बोलकर बताएं">
+          <svg viewBox="0 0 24 24"><path d="M12 15c1.66 0 3-1.34 3-3V6c0-1.66-1.34-3-3-3S9 4.34 9 6v6c0 1.66 1.34 3 3 3zm5-3c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-2.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>
+        </button>
+        <div class="wave" id="wave"><i></i><i></i><i></i><i></i><i></i></div>
+        <input type="text" id="textInput" placeholder="यहाँ टाइप करें, जैसे: Dhamtari से Raipur furniture भेजना है...">
+        <button class="send-btn" id="sendBtn">भेजें</button>
+      </div>
+      <div class="hint" id="hintLine">माइक दबाकर हिंदी में बोलें, या नीचे टाइप करें।</div>
+    </div>
+
+    <!-- ROUTE METER PANEL -->
+    <div class="panel">
+      <div class="meter-head"><b>Route Meter</b><span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-dim);" id="bookingIdTag">—</span></div>
+      <div class="meter-body">
+        <div class="field"><span class="label">Pickup</span><span class="value empty" id="mPickup">—</span></div>
+        <div class="field"><span class="label">Drop</span><span class="value empty" id="mDrop">—</span></div>
+        <div class="field"><span class="label">सामान</span><span class="value empty" id="mGoods">—</span></div>
+        <div class="field"><span class="label">वजन</span><span class="value empty" id="mWeight">—</span></div>
+        <div class="field"><span class="label">दूरी</span><span class="value empty" id="mDistance">—</span></div>
+        <div class="field"><span class="label">वाहन</span><span class="value empty" id="mVehicle">—</span></div>
+
+        <div class="fare-box">
+          <div class="amt" id="mFare">₹ —</div>
+          <div class="lbl">Estimated Fare</div>
+        </div>
+
+        <div class="status-strip" id="statusStrip">कोई सक्रिय booking नहीं है। बुकिंग शुरू करने के लिए बोलें या टाइप करें।</div>
+      </div>
+      <div class="services-note">Goods Transport · House Shifting · Agriculture Transport · Business Transport</div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+/* ================= STATE ================= */
+const S = {
+  step: 'idle',            // idle | ask_pickup | ask_drop | ask_goods | ask_weight | confirm | ask_phone | ask_status_id | ask_complaint_detail
+  flowType: null,          // 'booking' | 'fare'
+  data: { pickup:null, drop:null, goods:null, weight:null, distance:null, vehicle:null, fare:null },
+  bookings: {}             // id -> {status, ...data}
+};
+
+const DIST_FROM_RAIPUR = {
+  'raipur':0,'dhamtari':78,'durg':40,'bhilai':35,'rajnandgaon':70,'mahasamund':55,
+  'korba':200,'kanker':140,'jagdalpur':300,'ambikapur':330,'raigarh':240,'janjgir':100,
+  'bilaspur':130,'baloda bazar':60,'bemetara':75,'kondagaon':230,'bastar':290
+};
+
+const DRIVERS = [
+  {name:'रमेश कुमार', phone:'9876543210'},
+  {name:'सुनील वर्मा', phone:'9827012345'},
+  {name:'अनिल साहू', phone:'9752298765'}
+];
+
+/* ================= DOM refs ================= */
+const transcriptEl = document.getElementById('transcript');
+const textInput = document.getElementById('textInput');
+const sendBtn = document.getElementById('sendBtn');
+const micBtn = document.getElementById('micBtn');
+const waveEl = document.getElementById('wave');
+const hintLine = document.getElementById('hintLine');
+const voiceSupportTag = document.getElementById('voiceSupportTag');
+
+const mFields = {
+  pickup: document.getElementById('mPickup'),
+  drop: document.getElementById('mDrop'),
+  goods: document.getElementById('mGoods'),
+  weight: document.getElementById('mWeight'),
+  distance: document.getElementById('mDistance'),
+  vehicle: document.getElementById('mVehicle'),
+  fare: document.getElementById('mFare'),
+};
+const statusStrip = document.getElementById('statusStrip');
+const bookingIdTag = document.getElementById('bookingIdTag');
+
+/* ================= Speech setup ================= */
+let recognition = null;
+let isListening = false;
+const SpeechRecognitionImpl = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+if (SpeechRecognitionImpl) {
+  recognition = new SpeechRecognitionImpl();
+  recognition.lang = 'hi-IN';
+  recognition.continuous = false;
+  recognition.interimResults = true;
+
+  recognition.onstart = () => {
+    isListening = true;
+    micBtn.classList.add('listening');
+    waveEl.classList.add('active');
+    hintLine.textContent = 'सुन रहा हूँ... अभी बोलिए';
+  };
+  recognition.onerror = (e) => {
+    stopListeningUI();
+    hintLine.textContent = 'माइक में समस्या आई (' + e.error + ')। कृपया टाइप करके भेजें।';
+  };
+  recognition.onend = () => { stopListeningUI(); };
+
+  recognition.onresult = (event) => {
+    let interim = '';
+    let final = '';
+    for (let i = event.resultIndex; i < event.results.length; i++) {
+      const t = event.results[i][0].transcript;
+      if (event.results[i].isFinal) final += t; else interim += t;
+    }
+    if (interim) textInput.value = interim;
+    if (final) {
+      textInput.value = final;
+      handleUserInput(final.trim());
+    }
+  };
+  voiceSupportTag.textContent = '🎤 Voice Ready';
+} else {
+  micBtn.style.opacity = '0.4';
+  micBtn.style.cursor = 'not-allowed';
+  voiceSupportTag.textContent = 'Voice: Chrome में उपलब्ध';
+  hintLine.textContent = 'यह ब्राउज़र माइक सपोर्ट नहीं करता — कृपया नीचे टाइप करें।';
+}
+
+function stopListeningUI(){
+  isListening = false;
+  micBtn.classList.remove('listening');
+  waveEl.classList.remove('active');
+  hintLine.textContent = 'माइक दबाकर हिंदी में बोलें, या नीचे टाइप करें।';
+}
+
+micBtn.addEventListener('click', () => {
+  if (!recognition) return;
+  if (isListening) { recognition.stop(); return; }
+  try { recognition.start(); } catch(e) { /* already started */ }
+});
+
+/* ================= TTS ================= */
+let hiVoice = null;
+function pickVoice(){
+  const voices = window.speechSynthesis ? window.speechSynthesis.getVoices() : [];
+  hiVoice = voices.find(v => v.lang === 'hi-IN') || voices.find(v => v.lang && v.lang.startsWith('hi')) || null;
+}
+if (window.speechSynthesis) {
+  window.speechSynthesis.onvoiceschanged = pickVoice;
+  pickVoice();
+}
+function speak(text){
+  if (!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'hi-IN';
+  if (hiVoice) u.voice = hiVoice;
+  u.rate = 0.98;
+  window.speechSynthesis.speak(u);
+}
+
+/* ================= Chat UI helpers ================= */
+function addBubble(role, text, tag){
+  const b = document.createElement('div');
+  b.className = 'bubble ' + role;
+  if (tag) {
+    const t = document.createElement('span');
+    t.className = 'tag';
+    t.textContent = tag;
+    b.appendChild(t);
+  }
+  const body = document.createElement('div');
+  body.textContent = text;
+  b.appendChild(body);
+  transcriptEl.appendChild(b);
+  transcriptEl.scrollTop = transcriptEl.scrollHeight;
+}
+
+function showTyping(){
+  const t = document.createElement('div');
+  t.className = 'typing';
+  t.id = 'typingIndicator';
+  t.innerHTML = '<span></span><span></span><span></span>';
+  transcriptEl.appendChild(t);
+  transcriptEl.scrollTop = transcriptEl.scrollHeight;
+}
+function hideTyping(){
+  const t = document.getElementById('typingIndicator');
+  if (t) t.remove();
+}
+
+function assistantSay(text, tag){
+  showTyping();
+  setTimeout(() => {
+    hideTyping();
+    addBubble('assistant', text, tag || 'Ghidora AI');
+    speak(text);
+  }, 550 + Math.random()*350);
+}
+
+/* ================= Route meter helpers ================= */
+function setField(el, value, opts){
+  if (value === null || value === undefined || value === '') {
+    el.textContent = '—';
+    el.classList.add('empty');
+    el.classList.remove('hi');
+  } else {
+    el.textContent = value;
+    el.classList.remove('empty');
+    if (opts && opts.highlight) el.classList.add('hi');
+  }
+}
+function refreshMeter(){
+  setField(mFields.pickup, S.data.pickup);
+  setField(mFields.drop, S.data.drop);
+  setField(mFields.goods, S.data.goods);
+  setField(mFields.weight, S.data.weight ? S.data.weight + ' किलो' : null);
+  setField(mFields.distance, S.data.distance ? S.data.distance + ' KM' : null);
+  setField(mFields.vehicle, S.data.vehicle);
+  mFields.fare.textContent = S.data.fare ? '₹ ' + S.data.fare : '₹ —';
+}
+function resetMeter(){
+  S.data = { pickup:null, drop:null, goods:null, weight:null, distance:null, vehicle:null, fare:null };
+  refreshMeter();
+}
+
+/* ================= Business logic ================= */
+function normalize(text){ return text.toLowerCase().trim(); }
+
+function extractCity(text){
+  const t = normalize(text);
+  for (const city in DIST_FROM_RAIPUR){
+    if (t.includes(city)) return capitalize(city);
+  }
+  // fallback: just return the raw cleaned input (first meaningful word chunk)
+  const cleaned = text.trim().replace(/[.।,]/g,'');
+  return cleaned || 'Unknown';
+}
+function capitalize(s){ return s.charAt(0).toUpperCase()+s.slice(1); }
+
+function getDistance(pickup, drop){
+  const p = normalize(pickup), d = normalize(drop);
+  const pd = DIST_FROM_RAIPUR[p], dd = DIST_FROM_RAIPUR[d];
+  if (pd !== undefined && dd !== undefined){
+    if (p === 'raipur') return dd;
+    if (d === 'raipur') return pd;
+    return Math.max(20, Math.round((pd + dd) * 0.6));
+  }
+  // deterministic fallback based on string hash so same pair always gives same distance
+  let hash = 0;
+  const key = p + '|' + d;
+  for (let i=0;i<key.length;i++){ hash = (hash*31 + key.charCodeAt(i)) >>> 0; }
+  return 40 + (hash % 260);
+}
+
+function extractNumber(text){
+  const m = text.replace(/,/g,'').match(/\d+(\.\d+)?/);
+  return m ? parseFloat(m[0]) : null;
+}
+
+function calcFare(distanceKm, weightKg){
+  let vehicle, ratePerKm, base;
+  if (weightKg <= 500)      { vehicle='Tata Ace (750 kg)';        ratePerKm=25; base=400; }
+  else if (weightKg <= 1500){ vehicle='Mahindra Pickup (1.5 T)';  ratePerKm=35; base=500; }
+  else if (weightKg <= 3000){ vehicle='Eicher 14ft (3 T)';        ratePerKm=45; base=800; }
+  else                      { vehicle='Truck 19ft (7 T)';         ratePerKm=60; base=1200; }
+  const fare = Math.round(base + distanceKm * ratePerKm);
+  return { vehicle, fare };
+}
+
+function genBookingId(){
+  const num = Math.floor(10000 + Math.random()*89999);
+  return 'GT' + num;
+}
+
+function hashStatus(id){
+  const statuses = ['Confirmed','Picked Up','In Transit','Delivered'];
+  let hash = 0;
+  for (let i=0;i<id.length;i++){ hash = (hash*31 + id.charCodeAt(i)) >>> 0; }
+  return statuses[hash % statuses.length];
+}
+
+/* ================= Intent detection ================= */
+function detectIntent(text){
+  const t = normalize(text);
+  const has = (arr) => arr.some(k => t.includes(k));
+
+  if (has(['status','कहाँ पहुं','ट्रैक','track','booking id','कहा पहुच']))
+    return 'status';
+  if (has(['driver','ड्राइवर']))
+    return 'driver_info';
+  if (has(['complaint','शिकायत','late','देर','लेट']))
+    return 'complaint';
+  if (has(['service','सेवा','कौन कौन सी','information','आप कौन','कंपनी']))
+    return 'company_info';
+  if (has(['kiraya','किराया','fare','price','कितना पैसा','rate','cost']))
+    return 'fare';
+  if (has(['booking','bhejna','bhejni','jana hai','jaana','samaan','माल','भेजना','जाना है','बुकिंग','shift']))
+    return 'booking';
+  return 'unknown';
+}
+
+/* ================= Main handler ================= */
+function handleUserInput(rawText){
+  if (!rawText || !rawText.trim()) return;
+  addBubble('user', rawText, 'आप');
+  textInput.value = '';
+
+  switch(S.step){
+    case 'ask_pickup': {
+      S.data.pickup = extractCity(rawText);
+      refreshMeter();
+      S.step = 'ask_drop';
+      assistantSay('ठीक है, ' + S.data.pickup + ' से। अब बताइए, सामान कहाँ पहुँचाना है (Drop location)?');
+      return;
+    }
+    case 'ask_drop': {
+      S.data.drop = extractCity(rawText);
+      S.data.distance = getDistance(S.data.pickup, S.data.drop);
+      refreshMeter();
+      S.step = 'ask_goods';
+      assistantSay('समझ गया। ' + S.data.pickup + ' से ' + S.data.drop + ' — लगभग ' + S.data.distance + ' किलोमीटर। अब बताइए, सामान क्या है?');
+      return;
+    }
+    case 'ask_goods': {
+      S.data.goods = rawText.trim();
+      refreshMeter();
+      S.step = 'ask_weight';
+      assistantSay('ठीक है, ' + S.data.goods + '। लगभग कितना वजन है (किलो में बताइए)?');
+      return;
+    }
+    case 'ask_weight': {
+      const w = extractNumber(rawText);
+      if (w === null){
+        assistantSay('माफ़ कीजिए, वजन समझ नहीं आया। कृपया सिर्फ अंकों में वजन बताइए, जैसे "600 किलो"।');
+        return;
+      }
+      S.data.weight = w;
+      const { vehicle, fare } = calcFare(S.data.distance, w);
+      S.data.vehicle = vehicle;
+      S.data.fare = fare;
+      refreshMeter();
+      mFields.fare.parentElement.querySelector('.amt').classList.add('hi');
+      S.step = 'confirm';
+      if (S.flowType === 'fare'){
+        assistantSay('आपका अनुमानित किराया ₹' + fare + ' है (वाहन: ' + vehicle + ')। क्या आप booking करना चाहते हैं? हाँ या नहीं बताइए।');
+      } else {
+        assistantSay('एक क्षण... मैं आपका estimated fare निकाल रहा हूँ। आपका अनुमानित किराया ₹' + fare + ' है, वाहन होगा ' + vehicle + '। क्या आप booking confirm करना चाहते हैं?');
+      }
+      return;
+    }
+    case 'confirm': {
+      const t = normalize(rawText);
+      if (t.includes('ha') || t.includes('हाँ') || t.includes('han') || t.includes('yes') || t.includes('theek')){
+        S.step = 'ask_phone';
+        assistantSay('बहुत बढ़िया! कृपया अपना 10 अंकों का मोबाइल नंबर बताइए।');
+      } else if (t.includes('nahi') || t.includes('नहीं') || t.includes('no')){
+        assistantSay('ठीक है, कोई बात नहीं। जब चाहें booking कर सकते हैं। मैं आपकी और कैसे मदद कर सकता हूँ?');
+        S.step = 'idle'; S.flowType = null;
+      } else {
+        assistantSay('माफ़ कीजिए, कृपया सिर्फ "हाँ" या "नहीं" बताइए — क्या booking confirm करें?');
+      }
+      return;
+    }
+    case 'ask_phone': {
+      const m = rawText.replace(/\D/g,'');
+      if (m.length < 10){
+        assistantSay('कृपया सही 10 अंकों का मोबाइल नंबर बताइए।');
+        return;
+      }
+      const phone = m.slice(-10);
+      const id = genBookingId();
+      S.bookings[id] = { ...S.data, phone, status: 'Confirmed' };
+      bookingIdTag.textContent = id;
+      statusStrip.innerHTML = 'Booking <b>' + id + '</b> दर्ज हो गई — स्टेटस: <b>Confirmed</b>';
+      assistantSay('धन्यवाद। आपकी booking सफलतापूर्वक दर्ज कर ली गई है। आपकी Booking ID है ' + id + '। मैसेज के ज़रिए भी confirmation भेज दिया गया है।');
+      S.step = 'idle'; S.flowType = null;
+      return;
+    }
+    case 'ask_status_id': {
+      const id = rawText.trim().toUpperCase().replace(/\s/g,'');
+      let status;
+      if (S.bookings[id]) status = S.bookings[id].status;
+      else status = hashStatus(id);
+      statusStrip.innerHTML = 'Booking <b>' + id + '</b> — स्टेटस: <b>' + status + '</b>';
+      assistantSay('आपकी booking ' + id + ' अभी "' + status + '" स्टेटस में है।');
+      S.step = 'idle';
+      return;
+    }
+    case 'ask_complaint_detail': {
+      const cid = 'CMP' + Math.floor(1000+Math.random()*8999);
+      assistantSay('मुझे खेद है इस असुविधा के लिए। मैंने आपकी शिकायत दर्ज कर ली है (Complaint ID: ' + cid + ')। हमारी टीम जल्द ही आपसे संपर्क करेगी।');
+      S.step = 'idle';
+      return;
+    }
+    default: {
+      // idle — detect fresh intent
+      const intent = detectIntent(rawText);
+      switch(intent){
+        case 'booking':
+          S.flowType = 'booking'; resetMeter(); statusStrip.textContent = 'नई booking शुरू की जा रही है...'; bookingIdTag.textContent='—';
+          S.step = 'ask_pickup';
+          assistantSay('जी हाँ, booking कर देते हैं। कृपया Pickup Location बताइए।');
+          return;
+        case 'fare':
+          S.flowType = 'fare'; resetMeter(); statusStrip.textContent = 'Fare calculate किया जा रहा है...'; bookingIdTag.textContent='—';
+          S.step = 'ask_pickup';
+          assistantSay('ठीक है, किराया बताता हूँ। कृपया Pickup Location बताइए।');
+          return;
+        case 'status':
+          S.step = 'ask_status_id';
+          assistantSay('कृपया अपनी Booking ID बताइए (जैसे GT00025)।');
+          return;
+        case 'driver_info': {
+          const d = DRIVERS[Math.floor(Math.random()*DRIVERS.length)];
+          assistantSay('Driver का नाम है ' + d.name + ', मोबाइल नंबर है ' + d.phone + '।');
+          S.step = 'idle';
+          return;
+        }
+        case 'complaint':
+          S.step = 'ask_complaint_detail';
+          assistantSay('मुझे खेद है। कृपया बताइए क्या समस्या हुई, मैं शिकायत दर्ज कर रहा हूँ।');
+          return;
+        case 'company_info':
+          assistantSay('हम Goods Transport, House Shifting, Agriculture Transport और Business Transport जैसी सेवाएँ प्रदान करते हैं। और कुछ जानना चाहेंगे?');
+          S.step = 'idle';
+          return;
+        default:
+          assistantSay('माफ़ कीजिए, मैं ठीक से समझ नहीं पाया। आप booking करना चाहते हैं, किराया पूछना चाहते हैं, या booking status जानना चाहते हैं?');
+          S.step = 'idle';
+          return;
+      }
+    }
+  }
+}
+
+/* ================= Wiring ================= */
+sendBtn.addEventListener('click', () => handleUserInput(textInput.value));
+textInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') handleUserInput(textInput.value); });
+document.querySelectorAll('.chip').forEach(c => {
+  c.addEventListener('click', () => handleUserInput(c.dataset.msg));
+});
+
+/* ================= Boot ================= */
+refreshMeter();
+assistantSay('नमस्ते, Ghidora Transport में आपका स्वागत है। मैं आपकी कैसे सहायता कर सकता हूँ? आप booking कर सकते हैं, किराया पूछ सकते हैं, या booking status जान सकते हैं।', 'Ghidora AI');
+</script>
+</body>
+</html>

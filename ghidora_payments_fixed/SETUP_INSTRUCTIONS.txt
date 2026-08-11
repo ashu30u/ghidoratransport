@@ -1,0 +1,103 @@
+SETUP INSTRUCTIONS — for your real project at
+C:\Users\dmtam\OneDrive\Desktop\GhidoraTransportProject
+================================================================
+
+STEP 1 — Copy the folder
+-------------------------
+Copy the whole "payments" folder from this zip into your project root,
+next to your existing "booking", "chatbot", "drivers" etc. folders:
+
+GhidoraTransportProject\
+├── booking\              (your existing app — untouched)
+├── chatbot\
+├── drivers\
+├── expenses\
+├── occasions\
+├── quotations\
+├── social\
+├── payments\             <-- PASTE THE NEW FOLDER HERE
+├── ghidora_transport\    (this has settings.py / urls.py)
+├── templates\
+├── manage.py
+
+STEP 2 — Edit ghidora_transport\settings.py
+--------------------------------------------
+Find INSTALLED_APPS and add "payments" to the list:
+
+    INSTALLED_APPS = [
+        ...
+        "booking",
+        "drivers",
+        "expenses",
+        "quotations",
+        "social",
+        "chatbot",
+        "occasions",
+        "payments",          # <-- ADD THIS LINE
+    ]
+
+Also make sure these two lines exist somewhere in settings.py
+(you likely already have them since you use media/ for uploads):
+
+    MEDIA_URL = "/media/"
+    MEDIA_ROOT = BASE_DIR / "media"
+
+STEP 3 — Edit ghidora_transport\urls.py
+-----------------------------------------
+Add one line inside urlpatterns:
+
+    from django.urls import path, include
+
+    urlpatterns = [
+        ...
+        path("payments/", include("payments.urls")),   # <-- ADD THIS LINE
+    ]
+
+STEP 4 — Run migrations
+-------------------------
+Open your terminal (with venv activated) in the project root and run:
+
+    python manage.py makemigrations payments
+    python manage.py migrate
+
+STEP 5 — Add reportlab + qrcode to your environment
+-----------------------------------------------------
+This module generates PDF receipts with reportlab and can render UPI QR
+codes with qrcode. Install them:
+
+    pip install reportlab qrcode Pillow
+
+DONE — Matched to your real Booking model
+========================================
+This version has already been updated to match your actual booking\models.py
+(booking_id, name, phone, email, pickup, destination, distance, fare,
+vehicle_type, trip_type — no `customer`/login field). Specifically:
+
+  - payments/models.py: Notification.user is now nullable (Booking has no
+    user account to attach it to).
+  - payments/utils.py: notify() no longer requires a user; the PDF receipt
+    now reads booking.pickup / booking.distance / booking.name / .phone /
+    .email instead of a User account.
+  - payments/signals.py + management/commands/send_payment_reminders.py:
+    dropped the `user=booking.customer` kwarg everywhere.
+  - payments/views.py: customer-facing views (payment page, history,
+    receipt download) no longer require login — access is via the unique
+    payment_id in the URL, like a payment link. `payment_history` is now
+    reached as /payments/history/<booking_id>/ instead of a login session.
+  - payments/admin.py + templates: fixed field names (pickup, fare, name,
+    phone) everywhere they were wrong.
+
+One thing to decide: since customers have no login, the *payment link*
+itself (containing the payment_id) is what grants access — so whatever
+sends that link to the customer (SMS/email/WhatsApp) needs to be careful
+not to leak it elsewhere. If you want an extra layer (e.g. also requiring
+the phone number to match), tell me and I'll add a check.
+
+STEP 6 — Wire "create payment request" into your Approve flow
+------------------------------------------------------------------
+Right now, an admin manually generates a payment request by visiting:
+
+    /payments/admin-panel/booking/<booking_id>/create-request/
+
+Once your Booking model fields are confirmed, we can hook this into your
+existing booking-approval view/admin action so it happens automatically.

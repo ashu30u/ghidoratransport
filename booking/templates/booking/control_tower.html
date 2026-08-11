@@ -1,0 +1,692 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ghidora AI Transport Control Tower | Enterprise Fleet Intelligence</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Orbitron:wght@600;800;900&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- Chart.js for Visual Intelligence -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Leaflet.js for GPS Live Telematics Map -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <link rel="stylesheet" href="/static/control-tower/styles.css">
+</head>
+<body class="dark-theme">
+
+    <!-- Top Notification Bar / AI Audio Announcer Status -->
+    <header class="top-header">
+        <div class="header-left">
+            <div class="logo-container">
+                <i class="fa-solid fa-brain brand-icon pulse-glow"></i>
+                <div class="logo-text">
+                    <span class="brand-name">GHIDORA <span class="ai-badge">AI 2.0</span></span>
+                    <span class="sub-name">Enterprise Transport Control Tower</span>
+                </div>
+            </div>
+            <div class="live-status-pill">
+                <span class="dot green-pulse"></span>
+                <span>SYSTEM ACTIVE • REALTIME TELEMETRY</span>
+            </div>
+        </div>
+
+        <div class="header-center">
+            <button id="btnVoiceGreet" class="btn-voice-greet pulse-button">
+                <i class="fa-solid fa-volume-high"></i>
+                <span>Play Morning Briefing</span>
+            </button>
+            <button id="btnMicGlobal" class="btn-mic-global">
+                <i class="fa-solid fa-microphone"></i>
+                <span>Voice Command (Hinglish/English)</span>
+            </button>
+        </div>
+
+        <div class="header-right">
+            <div class="health-meter-box">
+                <div class="health-label">Business Health</div>
+                <div class="health-value">96% <i class="fa-solid fa-circle-check"></i></div>
+            </div>
+            <div class="user-profile">
+                <img src="{% static 'images/developer.jpeg' %}" alt="Admin" class="avatar" style="object-fit: cover; object-position: top;">
+                <div class="user-info">
+                    <span class="user-name">Amit Sahu</span>
+                    <span class="user-role">Super Admin</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- App Container -->
+    <div class="app-layout">
+        
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <nav class="nav-menu">
+                <a href="#home" class="nav-link active" data-target="sec-home">
+                    <i class="fa-solid fa-table-cells-large"></i>
+                    <span>Control Tower Home</span>
+                </a>
+                <a href="#alerts" class="nav-link" data-target="sec-alerts">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    <span>Smart Alerts</span>
+                    <span class="badge badge-alert" id="alertCountBadge">6</span>
+                </a>
+                <a href="#recommendations" class="nav-link" data-target="sec-recommendations">
+                    <i class="fa-solid fa-truck-fast"></i>
+                    <span>Dispatch Engine</span>
+                </a>
+                <a href="#gps" class="nav-link" data-target="sec-gps">
+                    <i class="fa-solid fa-location-crosshairs"></i>
+                    <span>GPS Telematics</span>
+                </a>
+                <a href="#fuel-weather" class="nav-link" data-target="sec-fuel-weather">
+                    <i class="fa-solid fa-gas-pump"></i>
+                    <span>Fuel & Weather AI</span>
+                </a>
+                <a href="#analytics" class="nav-link" data-target="sec-analytics">
+                    <i class="fa-solid fa-chart-line"></i>
+                    <span>BI & Predictions</span>
+                </a>
+                <a href="#ai-chat" class="nav-link" data-target="sec-ai-chat">
+                    <i class="fa-solid fa-robot"></i>
+                    <span>AI Manager Bot</span>
+                </a>
+                <a href="#reports" class="nav-link" data-target="sec-reports">
+                    <i class="fa-solid fa-file-invoice-dollar"></i>
+                    <span>Auto Reports</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="weather-widget-mini">
+                    <i class="fa-solid fa-cloud-showers-heavy weather-icon"></i>
+                    <div class="weather-info">
+                        <span class="loc">Raipur Route</span>
+                        <span class="cond">Heavy Rain Expected</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Viewport -->
+        <main class="content-viewport">
+            
+            <!-- SECTION 1: HOME CONTROL TOWER -->
+            <section id="sec-home" class="content-section active">
+                <!-- AI Audio Greeting Banner -->
+                <div class="ai-hero-banner glass-card">
+                    <div class="ai-avatar-ring">
+                        <div class="ai-core-glow"></div>
+                        <i class="fa-solid fa-brain-circuit ai-icon"></i>
+                    </div>
+                    <div class="ai-speech-bubble">
+                        <div class="speech-tag"><i class="fa-solid fa-sparkles"></i> Ghidora AI Live Executive Summary</div>
+                        <h2 class="ai-greeting-title" id="aiGreetingText">
+                            "Good Morning Amit Sahu! Today 18 bookings are active. 12 vehicles on road, 3 available. 2 drivers on leave. Heavy Rain alert on Raipur Route. 2 Insurance renewals due in 5 days."
+                        </h2>
+                        <div class="ai-action-pills">
+                            <span class="pill pill-info"><i class="fa-solid fa-route"></i> Raipur Route: +24% Profitability</span>
+                            <span class="pill pill-warning"><i class="fa-solid fa-droplet"></i> Nagpur Route: Fuel +15%</span>
+                            <span class="pill pill-alert"><i class="fa-solid fa-shield-exclamation"></i> Insurance Expiring: CG04XX1234</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- KPI Metric Grid -->
+                <div class="kpi-grid">
+                    <div class="kpi-card glass-card">
+                        <div class="kpi-icon icon-blue"><i class="fa-solid fa-box-archive"></i></div>
+                        <div class="kpi-data">
+                            <span class="kpi-title">Today's Bookings</span>
+                            <span class="kpi-value" id="kpiBookings">18</span>
+                            <span class="kpi-sub text-green"><i class="fa-solid fa-arrow-trend-up"></i> +18% vs Last Week</span>
+                        </div>
+                    </div>
+
+                    <div class="kpi-card glass-card">
+                        <div class="kpi-icon icon-emerald"><i class="fa-solid fa-indian-rupee-sign"></i></div>
+                        <div class="kpi-data">
+                            <span class="kpi-title">Today's Revenue</span>
+                            <span class="kpi-value" id="kpiRevenue">₹48,500</span>
+                            <span class="kpi-sub text-green">Target ₹50k (97%)</span>
+                        </div>
+                    </div>
+
+                    <div class="kpi-card glass-card">
+                        <div class="kpi-icon icon-purple"><i class="fa-solid fa-truck-moving"></i></div>
+                        <div class="kpi-data">
+                            <span class="kpi-title">Active Vehicles</span>
+                            <span class="kpi-value">12 / 15</span>
+                            <span class="kpi-sub text-cyan">3 Vehicles Available</span>
+                        </div>
+                    </div>
+
+                    <div class="kpi-card glass-card">
+                        <div class="kpi-icon icon-gold"><i class="fa-solid fa-id-card"></i></div>
+                        <div class="kpi-data">
+                            <span class="kpi-title">Drivers Available</span>
+                            <span class="kpi-value">5</span>
+                            <span class="kpi-sub text-amber">2 Drivers on Leave</span>
+                        </div>
+                    </div>
+
+                    <div class="kpi-card glass-card">
+                        <div class="kpi-icon icon-rose"><i class="fa-solid fa-clock-rotate-left"></i></div>
+                        <div class="kpi-data">
+                            <span class="kpi-title">Pending Payment</span>
+                            <span class="kpi-value">₹22,000</span>
+                            <span class="kpi-sub text-rose">Customer Amit ₹3,500</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section Grid: Alerts & BI Suggestions -->
+                <div class="two-col-grid">
+                    <!-- Left: Smart Alert Highlights -->
+                    <div class="glass-card panel-box">
+                        <div class="panel-header">
+                            <h3><i class="fa-solid fa-bell text-alert"></i> Live AI Alerts</h3>
+                            <button class="btn-text" onclick="switchSection('sec-alerts')">View All (6) <i class="fa-solid fa-chevron-right"></i></button>
+                        </div>
+                        <div class="alert-list-mini" id="miniAlertsList">
+                            <!-- Injected by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Right: Business Intelligence & Suggestions -->
+                    <div class="glass-card panel-box">
+                        <div class="panel-header">
+                            <h3><i class="fa-solid fa-lightbulb text-gold"></i> AI Business Intelligence</h3>
+                            <span class="tag-ai">AI Decision Engine</span>
+                        </div>
+                        <div class="bi-cards-container">
+                            <div class="bi-card border-green">
+                                <div class="bi-icon"><i class="fa-solid fa-trophy"></i></div>
+                                <div class="bi-content">
+                                    <h4>Raipur Route Most Profitable</h4>
+                                    <p>Lowest Fuel Cost, Highest Booking Demand & Fast Delivery turnarounds this month.</p>
+                                </div>
+                            </div>
+
+                            <div class="bi-card border-warning">
+                                <div class="bi-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                                <div class="bi-content">
+                                    <h4>Nagpur Route Diesel Cost Increased +15%</h4>
+                                    <p>Reason: Longer detours & traffic congestion. <strong>AI Suggestion:</strong> Try Alternate Route B to save ₹350 per trip.</p>
+                                </div>
+                            </div>
+
+                            <div class="bi-card border-purple">
+                                <div class="bi-icon"><i class="fa-solid fa-couch"></i></div>
+                                <div class="bi-content">
+                                    <h4>Furniture Transport Demand Peak</h4>
+                                    <p>Furniture transport is the #1 booked category this week (42% total cargo volume).</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 2: SMART ALERTS SYSTEM -->
+            <section id="sec-alerts" class="content-section">
+                <div class="section-title-bar">
+                    <div>
+                        <h2>🚨 AI Smart Alert System</h2>
+                        <p>Continuous AI surveillance monitoring vehicles, drivers, route hazards, compliance & payments.</p>
+                    </div>
+                    <div class="alert-filter-tabs">
+                        <button class="filter-tab active" data-filter="all">All Alerts</button>
+                        <button class="filter-tab" data-filter="compliance">Compliance & Insurance</button>
+                        <button class="filter-tab" data-filter="driver">Driver Safety</button>
+                        <button class="filter-tab" data-filter="weather">Weather & GPS</button>
+                        <button class="filter-tab" data-filter="payment">Pending Payments</button>
+                    </div>
+                </div>
+
+                <div class="alerts-grid" id="fullAlertsGrid">
+                    <!-- Injected by JS -->
+                </div>
+            </section>
+
+            <!-- SECTION 3: SMART VEHICLE & DRIVER DISPATCH RECOMMENDATION ENGINE -->
+            <section id="sec-recommendations" class="content-section">
+                <div class="section-title-bar">
+                    <div>
+                        <h2>🚛 Smart Vehicle & Driver Recommendation Engine</h2>
+                        <p>Enter cargo details & route to let AI calculate capacity, distance, diesel cost, and assign the best vehicle & driver.</p>
+                    </div>
+                </div>
+
+                <div class="dispatch-layout">
+                    <!-- Booking Form -->
+                    <div class="glass-card dispatch-form-card">
+                        <h3><i class="fa-solid fa-boxes-packing"></i> New Booking Simulator</h3>
+                        <form id="dispatchForm">
+                            <div class="form-group">
+                                <label><i class="fa-solid fa-box"></i> Cargo Category</label>
+                                <select id="cargoType" class="form-input">
+                                    <option value="Furniture" selected>Furniture</option>
+                                    <option value="Cement">Cement / Construction Material</option>
+                                    <option value="Electronics">Consumer Electronics</option>
+                                    <option value="FMCG">FMCG Goods</option>
+                                </select>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label><i class="fa-solid fa-weight-hanging"></i> Weight (KG)</label>
+                                    <input type="number" id="cargoWeight" class="form-input" value="700" step="50" min="50" max="10000">
+                                </div>
+                                <div class="form-group">
+                                    <label><i class="fa-solid fa-map-pin"></i> Pickup Location</label>
+                                    <input type="text" id="pickupLoc" class="form-input" value="Dhamtari">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label><i class="fa-solid fa-location-dot"></i> Destination Location</label>
+                                <input type="text" id="dropLoc" class="form-input" value="Raipur">
+                            </div>
+
+                            <button type="submit" class="btn-primary btn-block pulse-glow">
+                                <i class="fa-solid fa-microchip"></i> Ask AI Best Match
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- AI Recommendation Output -->
+                    <div class="glass-card dispatch-results-card">
+                        <div class="result-header">
+                            <h3><i class="fa-solid fa-wand-magic-sparkles text-cyan"></i> AI Optimal Recommendation</h3>
+                            <span class="status-pill-matched"><i class="fa-solid fa-check-double"></i> Optimal Match Found</span>
+                        </div>
+
+                        <div class="rec-dual-grid">
+                            <!-- Recommended Vehicle -->
+                            <div class="rec-box border-cyan">
+                                <div class="rec-tag">Recommended Vehicle</div>
+                                <div class="rec-title" id="recVehicleName">Mahindra Pickup</div>
+                                <div class="rec-reg" id="recVehicleReg">CG 04 EX 8842</div>
+                                
+                                <ul class="rec-reason-list" id="recVehicleReasons">
+                                    <li><i class="fa-solid fa-circle-check text-green"></i> <strong>Nearest Vehicle:</strong> Located 3.2 KM from Dhamtari</li>
+                                    <li><i class="fa-solid fa-circle-check text-green"></i> <strong>Capacity:</strong> Perfect fit for 700 KG Furniture (Max 1.2 Ton)</li>
+                                    <li><i class="fa-solid fa-circle-check text-green"></i> <strong>Lowest Fuel Cost:</strong> Best km/L efficiency for Dhamtari → Raipur route</li>
+                                    <li><i class="fa-solid fa-circle-check text-green"></i> <strong>Status:</strong> Idle & Maintenance Cleared</li>
+                                </ul>
+                            </div>
+
+                            <!-- Recommended Driver -->
+                            <div class="rec-box border-purple">
+                                <div class="rec-tag">Recommended Driver</div>
+                                <div class="rec-title" id="recDriverName">Ramesh Kumar</div>
+                                <div class="rec-reg"><i class="fa-solid fa-star text-gold"></i> 4.9 Rating • 340 Completed Trips</div>
+                                
+                                <ul class="rec-reason-list" id="recDriverReasons">
+                                    <li><i class="fa-solid fa-circle-check text-green"></i> <strong>Nearby:</strong> 5 mins away from pickup hub</li>
+                                    <li><i class="fa-solid fa-circle-check text-green"></i> <strong>Route Expert:</strong> Driven Dhamtari → Raipur 85+ times</li>
+                                    <li><i class="fa-solid fa-circle-check text-green"></i> <strong>Fatigue Clearance:</strong> 9 Hours rest logged (Zero alerts)</li>
+                                    <li><i class="fa-solid fa-circle-check text-green"></i> <strong>Free Status:</strong> No pending trips</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="rec-action-footer">
+                            <div class="est-cost">
+                                Estimated Diesel Cost: <strong class="text-green" id="estFuelCost">₹840</strong> | Distance: <strong>78 KM</strong>
+                            </div>
+                            <button id="btnAssignDispatch" class="btn-accent btn-large">
+                                <i class="fa-solid fa-paper-plane"></i> One-Click Assign Dispatch
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 4: GPS TELEMATICS & UNEXPECTED STOPS -->
+            <section id="sec-gps" class="content-section">
+                <div class="section-title-bar">
+                    <div>
+                        <h2>📍 GPS Intelligence & Telematics Surveillance</h2>
+                        <p>Live vehicle tracking with automated AI detection for unexpected stops & route deviations.</p>
+                    </div>
+                    <div class="map-actions">
+                        <button class="btn-secondary" id="btnSimulateStop"><i class="fa-solid fa-circle-pause"></i> Trigger 25-Min Stop Alert</button>
+                        <button class="btn-secondary" id="btnSimulateDeviate"><i class="fa-solid fa-diamond-turn-right"></i> Trigger Route Deviation</button>
+                    </div>
+                </div>
+
+                <div class="gps-layout">
+                    <!-- Map Canvas Container -->
+                    <div class="glass-card map-card">
+                        <div id="telematicsMap"></div>
+                    </div>
+
+                    <!-- Fleet Live Status Sidebar -->
+                    <div class="glass-card fleet-status-card">
+                        <h3><i class="fa-solid fa-radar"></i> Live Vehicle Surveillance</h3>
+                        <div class="fleet-list" id="fleetList">
+                            <!-- Injected by JS -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 5: FUEL & WEATHER AI OPTIMIZATION -->
+            <section id="sec-fuel-weather" class="content-section">
+                <div class="section-title-bar">
+                    <div>
+                        <h2>⛽ Fuel Optimization & 🌦 Weather Decision Engine</h2>
+                        <p>Smart route comparison and weather-based dispatch advisories.</p>
+                    </div>
+                </div>
+
+                <div class="two-col-grid">
+                    <!-- Fuel Route Comparison -->
+                    <div class="glass-card panel-box">
+                        <div class="panel-header">
+                            <h3><i class="fa-solid fa-gas-pump text-green"></i> Route Fuel Comparative Optimizer</h3>
+                            <span class="tag-ai">Save ₹350 / Trip</span>
+                        </div>
+                        <div class="route-compare-box">
+                            <div class="route-card route-b-selected border-green">
+                                <div class="route-tag tag-recommended"><i class="fa-solid fa-thumbs-up"></i> Recommended: Route B</div>
+                                <h4>Raipur → Durg via Bypass (Route B)</h4>
+                                <div class="route-metrics">
+                                    <span>Distance: 54 KM</span>
+                                    <span>Traffic: Light</span>
+                                    <span>Diesel Cost: <strong class="text-green">₹1,450</strong></span>
+                                </div>
+                                <div class="route-benefit">
+                                    <i class="fa-solid fa-piggy-bank text-green"></i> <strong>Fuel Saving: ₹350</strong> compared to Highway Route A
+                                </div>
+                            </div>
+
+                            <div class="route-card route-a border-muted">
+                                <div class="route-tag">Route A (City Express)</div>
+                                <h4>Raipur → Durg via Ring Road 1</h4>
+                                <div class="route-metrics">
+                                    <span>Distance: 62 KM</span>
+                                    <span>Traffic: Heavy Bottleneck</span>
+                                    <span>Diesel Cost: <strong class="text-rose">₹1,800</strong></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Weather Decision Engine -->
+                    <div class="glass-card panel-box">
+                        <div class="panel-header">
+                            <h3><i class="fa-solid fa-cloud-bolt text-amber"></i> Weather Decision Advisory</h3>
+                            <span class="tag-live">Live Forecast Feed</span>
+                        </div>
+                        <div class="weather-advisory-container">
+                            <div class="weather-alert-box border-warning">
+                                <div class="weather-icon-large"><i class="fa-solid fa-cloud-showers-water text-cyan"></i></div>
+                                <div class="weather-text">
+                                    <h4>Raipur & Dhamtari Belt: Tomorrow Heavy Rain Warning</h4>
+                                    <p>Forecast indicates 85mm rainfall starting tomorrow morning 6:00 AM with possible highway flash flooding.</p>
+                                    <div class="ai-recommendation-pill">
+                                        <i class="fa-solid fa-robot"></i> <strong>AI Recommendation:</strong> Dispatch Today Recommended to avoid 40+ minute delivery delays.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="weather-alert-box border-info">
+                                <div class="weather-icon-large"><i class="fa-solid fa-smog text-purple"></i></div>
+                                <div class="weather-text">
+                                    <h4>Nagpur Pass: Morning Fog Alert</h4>
+                                    <p>Low visibility (< 100 meters) expected between 4:00 AM - 8:00 AM.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 6: BI & PREDICTIVE ANALYTICS -->
+            <section id="sec-analytics" class="content-section">
+                <div class="section-title-bar">
+                    <div>
+                        <h2>📈 Business Intelligence & Future AI Predictions</h2>
+                        <p>Historical trends analysis, expense breakdown, and revenue forecasting.</p>
+                    </div>
+                </div>
+
+                <div class="two-col-grid">
+                    <!-- Chart 1: Revenue & Booking Future Prediction -->
+                    <div class="glass-card panel-box">
+                        <div class="panel-header">
+                            <h3><i class="fa-solid fa-chart-area text-cyan"></i> 🔮 Revenue Forecast & Booking Prediction</h3>
+                            <span class="tag-ai">AI Confidence: 94.2%</span>
+                        </div>
+                        <div class="prediction-highlight">
+                            <div class="pred-item">
+                                <span class="lbl">Expected Next Month Revenue</span>
+                                <span class="val text-green">₹8,50,000</span>
+                            </div>
+                            <div class="pred-item">
+                                <span class="lbl">Booking Surge Expected</span>
+                                <span class="val text-cyan">+18% Increase</span>
+                            </div>
+                        </div>
+                        <div class="chart-wrapper">
+                            <canvas id="revenueForecastChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Chart 2: Monthly Expense Analysis -->
+                    <div class="glass-card panel-box">
+                        <div class="panel-header">
+                            <h3><i class="fa-solid fa-chart-pie text-rose"></i> 💰 Expense & Diesel Cost Breakdown</h3>
+                            <span class="tag-warning">Diesel Cost +10%</span>
+                        </div>
+                        <div class="expense-insight-box">
+                            <i class="fa-solid fa-circle-info text-amber"></i>
+                            <span>AI Finding: Diesel costs increased 10% this month due to longer detours & increased AC usage in extreme heat.</span>
+                        </div>
+                        <div class="chart-wrapper">
+                            <canvas id="expenseChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 7: AI MANAGER CHAT & VOICE BOT -->
+            <section id="sec-ai-chat" class="content-section">
+                <div class="section-title-bar">
+                    <div>
+                        <h2>📞 Ghidora AI Manager (Voice & Text Assistant)</h2>
+                        <p>Ask anything about bookings, empty vehicles, revenue, or pending payments in natural Hinglish or English.</p>
+                    </div>
+                </div>
+
+                <div class="chat-container glass-card">
+                    <div class="chat-header">
+                        <div class="bot-info">
+                            <div class="bot-avatar"><i class="fa-solid fa-headset"></i></div>
+                            <div>
+                                <span class="bot-name">Ghidora AI Transport Assistant</span>
+                                <span class="bot-status"><span class="dot green-pulse"></span> Online & Listening</span>
+                            </div>
+                        </div>
+                        <div class="quick-questions">
+                            <button class="chip-btn" onclick="sendQuickQuery('आज कितनी booking हुई?')">आज कितनी booking हुई?</button>
+                            <button class="chip-btn" onclick="sendQuickQuery('कौन-सी गाड़ी खाली है?')">कौन-सी गाड़ी खाली है?</button>
+                            <button class="chip-btn" onclick="sendQuickQuery('सबसे ज्यादा कमाई किस vehicle ने की?')">सबसे ज्यादा कमाई?</button>
+                            <button class="chip-btn" onclick="sendQuickQuery('Pending payment कितना है?')">Pending payment?</button>
+                        </div>
+                    </div>
+
+                    <div class="chat-messages" id="chatMessages">
+                        <div class="msg msg-bot">
+                            <div class="msg-avatar"><i class="fa-solid fa-robot"></i></div>
+                            <div class="msg-bubble">
+                                Namaste Amit ji! Main Ghidora AI Assistant hoon. Aap mujhse voice ya text me transport company ke bare me koi bhi sawal pooch sakte hain.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="chat-input-area">
+                        <button id="btnVoiceInputChat" class="btn-icon-mic" title="Click to speak">
+                            <i class="fa-solid fa-microphone"></i>
+                        </button>
+                        <input type="text" id="chatInputText" placeholder="Type your query (e.g. Aaj kitni booking hui?)..." class="chat-input">
+                        <button id="btnSendChat" class="btn-primary">
+                            <i class="fa-solid fa-paper-plane"></i> Send
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 8: AUTOMATED REPORTS GENERATOR -->
+            <section id="sec-reports" class="content-section">
+                <div class="section-title-bar">
+                    <div>
+                        <h2>📄 Automated AI Executive Reports</h2>
+                        <p>Instantly generate and download PDF, Excel, or CSV reports for Daily, Weekly, Monthly, and Yearly operations.</p>
+                    </div>
+                </div>
+
+                <div class="reports-container glass-card">
+                    <div class="reports-header-controls">
+                        <div class="report-type-selector">
+                            <label>Report Frequency:</label>
+                            <select id="reportFreq" class="form-input">
+                                <option value="Daily">Daily Report (Today)</option>
+                                <option value="Weekly">Weekly Executive Summary</option>
+                                <option value="Monthly" selected>Monthly Financial & Fleet Report</option>
+                                <option value="Yearly">Annual Growth Report</option>
+                            </select>
+                        </div>
+                        <div class="report-actions">
+                            <button class="btn-secondary" onclick="generateReportPreview()"><i class="fa-solid fa-eye"></i> Generate Preview</button>
+                            <button class="btn-primary" onclick="downloadReport('PDF')"><i class="fa-solid fa-file-pdf"></i> Export PDF</button>
+                            <button class="btn-accent" onclick="downloadReport('CSV')"><i class="fa-solid fa-file-csv"></i> Download CSV</button>
+                        </div>
+                    </div>
+
+                    <div class="report-preview-sheet" id="reportSheet">
+                        <div class="sheet-header">
+                            <div class="sheet-logo">
+                                <i class="fa-solid fa-brain"></i>
+                                <div>
+                                    <h3>GHIDORA TRANSPORT LOGISTICS</h3>
+                                    <span>AI Automated Executive Report</span>
+                                </div>
+                            </div>
+                            <div class="sheet-meta">
+                                <div><strong>Report Period:</strong> August 2026</div>
+                                <div><strong>Generated On:</strong> 05 Aug 2026, 09:00 AM</div>
+                            </div>
+                        </div>
+
+                        <div class="sheet-body">
+                            <h4>1. Operations & Financial Performance</h4>
+                            <table class="report-table">
+                                <thead>
+                                    <tr>
+                                        <th>Metric</th>
+                                        <th>Target</th>
+                                        <th>Actual Achieved</th>
+                                        <th>Variance / AI Remark</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Total Completed Bookings</td>
+                                        <td>450 Bookings</td>
+                                        <td><strong>492 Bookings</strong></td>
+                                        <td><span class="text-green">+9.3% Higher Demand</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Gross Operational Revenue</td>
+                                        <td>₹7,50,000</td>
+                                        <td><strong>₹8,15,400</strong></td>
+                                        <td><span class="text-green">Target Exceeded</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Total Diesel Fuel Expense</td>
+                                        <td>₹1,80,000</td>
+                                        <td><strong>₹1,98,000</strong></td>
+                                        <td><span class="text-rose">+10% Route detour increase</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Net Operational Profit</td>
+                                        <td>₹5,70,000</td>
+                                        <td><strong>₹6,17,400</strong></td>
+                                        <td><span class="text-green">+8.3% Profit Margin</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <h4>2. Top Vehicle Performance</h4>
+                            <table class="report-table">
+                                <thead>
+                                    <tr>
+                                        <th>Vehicle Number</th>
+                                        <th>Category</th>
+                                        <th>Total Trips</th>
+                                        <th>Total Revenue Earned</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>CG04XX1234</td>
+                                        <td>Mahindra Pickup</td>
+                                        <td>84 Trips</td>
+                                        <td><strong>₹2,45,000</strong> (Highest Earned)</td>
+                                    </tr>
+                                    <tr>
+                                        <td>CG04EX8842</td>
+                                        <td>Tata Ace Super</td>
+                                        <td>72 Trips</td>
+                                        <td><strong>₹1,95,000</strong></td>
+                                    </tr>
+                                    <tr>
+                                        <td>CG04YY5678</td>
+                                        <td>Ashok Leyland 16T</td>
+                                        <td>38 Trips</td>
+                                        <td><strong>₹3,75,400</strong></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- Alert Action Modal -->
+    <div id="actionModal" class="modal-backdrop hidden">
+        <div class="modal-box glass-card">
+            <div class="modal-header">
+                <h3 id="modalTitle">Action Required</h3>
+                <button class="btn-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Injected by JS -->
+            </div>
+            <div class="modal-footer" id="modalFooter">
+                <button class="btn-secondary" onclick="closeModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/control-tower/app.js"></script>
+</body>
+</html>

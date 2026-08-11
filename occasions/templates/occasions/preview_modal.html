@@ -1,0 +1,137 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preview: {{ occasion.name }} - Ghidora Transport</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        @property --angle { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
+        @keyframes borderRotate { to { --angle: 360deg; } }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: #060911;
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 30px 20px;
+        }
+
+        .preview-card-wrap {
+            position: relative;
+            padding: 3px;
+            border-radius: 26px;
+            background: conic-gradient(from var(--angle), #00f2fe, #7928ca, #ff007f, #00f2fe);
+            animation: borderRotate 6s linear infinite;
+            box-shadow: 0 30px 70px rgba(0, 0, 0, 0.8), 0 0 40px rgba(0, 242, 254, 0.25);
+            max-width: 550px;
+            width: 100%;
+        }
+
+        .preview-card-inner {
+            background: linear-gradient(135deg, rgba(11, 17, 30, 0.98), rgba(20, 29, 47, 0.99));
+            border-radius: 23px;
+            padding: 35px 30px;
+            text-align: center;
+        }
+
+        .brand-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 22px;
+            font-weight: 900;
+            color: #00f2fe;
+            letter-spacing: 1px;
+            margin-bottom: 6px;
+        }
+
+        .occ-name {
+            font-size: 26px;
+            font-weight: 900;
+            color: #ffffff;
+            margin-bottom: 15px;
+        }
+
+        .poster-img {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 14px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+        }
+
+        .msg-box {
+            background: rgba(15, 23, 42, 0.85);
+            border: 1px solid rgba(0, 242, 254, 0.3);
+            border-radius: 16px;
+            padding: 20px;
+            font-size: 15px;
+            line-height: 1.6;
+            color: #f1f5f9;
+            white-space: pre-line;
+            text-align: left;
+            margin-bottom: 25px;
+        }
+
+        .preview-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn-act {
+            flex: 1;
+            padding: 12px;
+            border-radius: 12px;
+            font-weight: 800;
+            font-size: 13.5px;
+            text-decoration: none;
+            color: #fff;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.4);
+            transition: transform 0.2s ease;
+        }
+        .btn-act:hover { transform: translateY(-2px); }
+        .btn-approve { background: linear-gradient(135deg, #10b981, #059669); }
+        .btn-reject { background: linear-gradient(135deg, #ef4444, #dc2626); }
+        .btn-dash { background: linear-gradient(135deg, #0ea5e9, #0284c7); }
+    </style>
+</head>
+<body>
+
+<div class="preview-card-wrap">
+    <div class="preview-card-inner">
+        <div class="brand-title">GHIDORA TRANSPORT</div>
+        <div class="occ-name">{{ occasion.name }}</div>
+
+        {% if occasion.poster %}
+            <img src="{{ occasion.poster.url }}" class="poster-img" alt="{{ occasion.name }}">
+        {% endif %}
+
+        <div class="msg-box">
+            <b>Message:</b><br>
+            {{ occasion.message|default:occasion.ai_message|default:"Happy Festival from Ghidora Transport!" }}
+        </div>
+
+        <div style="margin-bottom: 20px; font-size: 13px; color: #94a3b8;">
+            <b>Date:</b> {{ occasion.date|date:"d M Y" }} &nbsp;|&nbsp; 
+            <b>Source:</b> {{ occasion.get_source_display }} &nbsp;|&nbsp; 
+            <b>Status:</b> {{ occasion.get_approval_status_display }}
+        </div>
+
+        <div class="preview-actions">
+            {% if occasion.approval_status == 'pending' %}
+                <a href="{% url 'occasions_approve' occasion.id %}" class="btn-act btn-approve">✅ Approve</a>
+                <a href="{% url 'occasions_reject' occasion.id %}" class="btn-act btn-reject">❌ Reject</a>
+            {% endif %}
+            <a href="{% url 'occasions_dashboard' %}" class="btn-act btn-dash">📊 Dashboard</a>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

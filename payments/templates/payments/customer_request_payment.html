@@ -1,0 +1,86 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>भुगतान विकल्प - Ghidora Transport</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body { background: #0a1730; color: #fff; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .card { background: rgba(13, 20, 38, 0.9); border: 1px solid rgba(0, 229, 255, 0.3); border-radius: 20px; width: 100%; max-width: 550px; padding: 30px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
+        h2 { text-align: center; color: #00e5ff; margin-top: 0; }
+        .summary-box { background: rgba(255,255,255,0.05); border-radius: 12px; padding: 16px; margin-bottom: 24px; border: 1px solid rgba(255,255,255,0.1); }
+        .summary-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 15px; }
+        .summary-row.total { font-size: 18px; font-weight: bold; border-top: 1px dashed rgba(255,255,255,0.2); padding-top: 10px; margin-top: 10px; color: #ff5252; }
+        .option-card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.15); border-radius: 12px; padding: 16px; margin-bottom: 14px; cursor: pointer; transition: 0.3s; }
+        .option-card:hover, .option-card.selected { border-color: #00e5ff; background: rgba(0, 229, 255, 0.1); }
+        .option-header { display: flex; justify-content: space-between; align-items: center; font-weight: bold; }
+        .option-desc { font-size: 12px; color: #8ecbff; margin-top: 4px; }
+        .amount { color: #00e676; font-size: 18px; }
+        input[type="number"] { width: 100%; padding: 12px; margin-top: 10px; border-radius: 8px; border: 1px solid #00e5ff; background: #050b18; color: #fff; font-size: 16px; outline: none; }
+        .btn-submit { width: 100%; padding: 16px; border: none; border-radius: 12px; background: linear-gradient(135deg, #00e5ff, #2979ff); color: #fff; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 20px; transition: 0.3s; }
+        .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0, 229, 255, 0.5); }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>💳 ऑनलाइन पेमेंट चुनें</h2>
+        <p style="text-align: center; color: #8ecbff; font-size: 14px;">बुकिंग ID: #{{ booking.booking_id }}</p>
+
+        <div class="summary-box">
+            <div class="summary-row"><span>कुल किराया (Total Fare):</span> <span>₹{{ total_fare }}</span></div>
+            <div class="summary-row"><span>जमा राशि (Already Paid):</span> <span style="color: #00e676;">₹{{ total_paid }}</span></div>
+            <div class="summary-row total"><span>बकाया राशि (Remaining):</span> <span>₹{{ remaining_amount }}</span></div>
+        </div>
+
+        <form method="POST">
+            {% csrf_token %}
+
+            {% if suggested_advance < remaining_amount %}
+            <div class="option-card selected" onclick="selectOption('advance')">
+                <input type="radio" name="pay_option" id="opt_advance" value="advance" checked style="display:none;">
+                <div class="option-header">
+                    <span>अग्रिम भुगतान (Advance - {{ advance_percentage }}%)</span>
+                    <span class="amount">₹{{ suggested_advance }}</span>
+                </div>
+                <div class="option-desc">बुकिंग कन्फर्म करने के लिए न्यूनतम राशि</div>
+            </div>
+            {% endif %}
+
+            <div class="option-card" onclick="selectOption('remaining')">
+                <input type="radio" name="pay_option" id="opt_remaining" value="remaining" style="display:none;">
+                <div class="option-header">
+                    <span>पूरा बकाया (Full Remaining)</span>
+                    <span class="amount">₹{{ remaining_amount }}</span>
+                </div>
+                <div class="option-desc">पूरा बचा हुआ किराया एक साथ दें</div>
+            </div>
+
+            <div class="option-card" onclick="selectOption('custom')">
+                <input type="radio" name="pay_option" id="opt_custom" value="custom" style="display:none;">
+                <div class="option-header">
+                    <span>अपनी पसंद की राशि (Custom Amount)</span>
+                </div>
+                <div class="option-desc">अपनी मर्ज़ी से राशि दर्ज करें</div>
+                <div id="custom_box" style="display:none;">
+                    <input type="number" name="custom_amount" step="0.01" max="{{ remaining_amount }}" placeholder="राशि यहाँ दर्ज करें (उदा: 500)">
+                </div>
+            </div>
+
+            <button type="submit" class="btn-submit">आगे बढ़ें ➔</button>
+        </form>
+    </div>
+
+    <script>
+        function selectOption(val) {
+            document.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
+            const rad = document.getElementById('opt_' + val);
+            rad.checked = true;
+            rad.closest('.option-card').classList.add('selected');
+            document.getElementById('custom_box').style.display = (val === 'custom') ? 'block' : 'none';
+        }
+    </script>
+</body>
+</html>

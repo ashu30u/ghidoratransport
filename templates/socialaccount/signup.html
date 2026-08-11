@@ -1,0 +1,222 @@
+{% load i18n %}
+{% load allauth account %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% trans "Sign Up" %} — Ghidora Transport</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --bg-0:#04060b;
+    --blue:#3fa4ff;
+    --blue-soft:#7cc4ff;
+    --cyan:#1fe6c8;
+    --amber:#ff9142;
+    --amber-soft:#ffb578;
+    --text-hi:#eef3fb;
+    --text-mid:#aab7cf;
+    --text-lo:#647192;
+    --glass-fill: rgba(14,22,40,0.55);
+    --glass-border: rgba(130,185,255,0.22);
+    --glass-border-hi: rgba(160,205,255,0.5);
+    --danger:#ff5f6d;
+    --radius-card:22px;
+    --radius-field:12px;
+    --ff-display:'Space Grotesk', sans-serif;
+    --ff-body:'Inter', sans-serif;
+    --ff-mono:'JetBrains Mono', monospace;
+  }
+
+  *{ box-sizing:border-box; }
+  html,body{ height:100%; margin:0; }
+
+  body{
+    min-height:100vh;
+    display:flex; align-items:center; justify-content:center;
+    padding:24px;
+    background:
+      radial-gradient(90% 60% at 15% 10%, rgba(63,164,255,0.14), transparent 55%),
+      radial-gradient(70% 50% at 90% 20%, rgba(31,230,200,0.09), transparent 55%),
+      radial-gradient(100% 80% at 50% 100%, rgba(255,145,66,0.06), transparent 60%),
+      var(--bg-0);
+    color:var(--text-hi);
+    font-family:var(--ff-body);
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* faint drifting particles for continuity with the login scene */
+  .ambient{
+    position:fixed; inset:0; pointer-events:none; overflow:hidden; z-index:0;
+  }
+  .ambient span{
+    position:absolute; width:3px; height:3px; border-radius:50%;
+    background:var(--blue-soft); opacity:0.35;
+    animation:drift 14s linear infinite;
+  }
+  .ambient span:nth-child(2n){ background:var(--cyan); animation-duration:18s; }
+  .ambient span:nth-child(3n){ background:var(--amber-soft); animation-duration:22s; }
+  @keyframes drift{
+    from{ transform:translateY(110vh); }
+    to{ transform:translateY(-10vh); }
+  }
+
+  .wrap{ position:relative; z-index:1; width:100%; max-width:440px; }
+
+  .brand{
+    display:flex; align-items:center; gap:11px; justify-content:center; margin-bottom:28px;
+  }
+  .brand-mark{
+    width:34px; height:34px; border-radius:9px; flex:none;
+    background:conic-gradient(from 220deg, var(--blue), var(--cyan), var(--amber), var(--blue));
+    position:relative;
+    box-shadow:0 0 22px rgba(63,164,255,0.5);
+  }
+  .brand-mark::before{
+    content:''; position:absolute; inset:5px; background:var(--bg-0); border-radius:6px;
+    clip-path:polygon(20% 85%, 20% 35%, 50% 15%, 80% 35%, 80% 85%, 65% 85%, 65% 45%, 50% 35%, 35% 45%, 35% 85%);
+  }
+  .brand-text{ font-family:var(--ff-display); font-weight:600; font-size:18px; }
+  .brand-text small{ display:block; font-family:var(--ff-mono); font-weight:400; font-size:9px; letter-spacing:0.2em; color:var(--text-lo); text-transform:uppercase; }
+
+  .card{
+    background:var(--glass-fill);
+    border:1px solid var(--glass-border);
+    border-radius:var(--radius-card);
+    padding:34px 32px 30px;
+    backdrop-filter:blur(20px) saturate(140%);
+    -webkit-backdrop-filter:blur(20px) saturate(140%);
+    box-shadow:0 30px 70px -24px rgba(0,0,0,0.65), 0 1px 0 rgba(255,255,255,0.08) inset;
+    position:relative;
+  }
+  .card::before{
+    content:''; position:absolute; inset:-1px; border-radius:inherit; padding:1px;
+    background:linear-gradient(135deg, var(--glass-border-hi), transparent 35%, transparent 65%, rgba(255,145,66,0.3));
+    -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite:xor; mask-composite:exclude;
+    pointer-events:none; opacity:0.9;
+  }
+
+  .card-eyebrow{
+    font-family:var(--ff-mono); font-size:10.5px; letter-spacing:0.2em; text-transform:uppercase;
+    color:var(--cyan); margin-bottom:8px;
+  }
+  h1{ font-family:var(--ff-display); font-weight:600; font-size:24px; margin:0 0 12px; }
+  .intro{ color:var(--text-mid); font-size:13.5px; line-height:1.6; margin:0 0 24px; }
+  .intro strong{ color:var(--blue-soft); font-weight:600; }
+
+  form.signup{ margin:0; }
+
+  .field{ margin-bottom:16px; }
+  .field label{
+    display:block; font-size:12px; font-weight:500; color:var(--text-mid);
+    margin-bottom:7px;
+  }
+  .field-shell{
+    background:rgba(6,10,20,0.55);
+    border:1px solid rgba(255,255,255,0.09);
+    border-radius:var(--radius-field);
+    transition:border-color .2s ease, box-shadow .2s ease;
+  }
+  .field-shell:focus-within{
+    border-color:var(--blue);
+    box-shadow:0 0 0 3px rgba(63,164,255,0.14);
+  }
+  .field-shell input, .field-shell select, .field-shell textarea{
+    width:100%; background:none; border:none; outline:none; color:var(--text-hi);
+    font-family:var(--ff-body); font-size:14.5px; padding:12px 14px;
+  }
+  .field-shell input::placeholder{ color:var(--text-lo); }
+
+  .field-error{ font-size:11.5px; color:var(--danger); margin-top:6px; }
+
+  .helptext{ font-size:11.5px; color:var(--text-lo); margin-top:6px; }
+
+  .errorlist{
+    list-style:none; margin:0 0 16px; padding:12px 14px;
+    background:rgba(255,95,109,0.08); border:1px solid rgba(255,95,109,0.3);
+    border-radius:var(--radius-field); color:var(--danger); font-size:13px;
+  }
+
+  .btn-primary{
+    width:100%; border:none; border-radius:var(--radius-field);
+    font-family:var(--ff-body); font-weight:600; font-size:14.5px;
+    padding:14px 18px; cursor:pointer; margin-top:6px;
+    background:linear-gradient(135deg, var(--blue) 0%, #2c7ff0 55%, var(--amber) 130%);
+    color:#04060b;
+    box-shadow:0 12px 28px -10px rgba(63,164,255,0.5);
+    transition:box-shadow .2s ease, transform .15s ease;
+  }
+  .btn-primary:hover{ box-shadow:0 14px 34px -8px rgba(63,164,255,0.7); }
+  .btn-primary:active{ transform:scale(0.98); }
+
+  .back-link{
+    display:block; text-align:center; margin-top:20px; font-size:13px;
+    color:var(--text-mid); text-decoration:none;
+  }
+  .back-link:hover{ color:var(--blue-soft); }
+</style>
+</head>
+<body>
+
+<div class="ambient" aria-hidden="true">
+  <span style="left:8%; animation-delay:0s;"></span>
+  <span style="left:22%; animation-delay:-4s;"></span>
+  <span style="left:38%; animation-delay:-9s;"></span>
+  <span style="left:55%; animation-delay:-2s;"></span>
+  <span style="left:68%; animation-delay:-13s;"></span>
+  <span style="left:80%; animation-delay:-6s;"></span>
+  <span style="left:92%; animation-delay:-10s;"></span>
+</div>
+
+<div class="wrap">
+  <div class="brand">
+    <div class="brand-mark"></div>
+    <div class="brand-text">GHIDORA<small>TRANSPORT NETWORK</small></div>
+  </div>
+
+  <div class="card">
+    <div class="card-eyebrow">{% trans "Almost there" %}</div>
+    <h1>{% trans "Complete your sign up" %}</h1>
+    <p class="intro">
+      {% blocktrans with provider=account.get_provider.name %}You're signing in with your <strong>{{ provider }}</strong> account. Just confirm a few details to finish creating your Ghidora account.{% endblocktrans %}
+    </p>
+
+    {% if form.non_field_errors %}
+      <ul class="errorlist">
+        {% for error in form.non_field_errors %}<li>{{ error }}</li>{% endfor %}
+      </ul>
+    {% endif %}
+
+    <form class="signup" method="post" action="{% url 'socialaccount_signup' %}" novalidate>
+      {% csrf_token %}
+
+      {% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}
+
+      {% for field in form.visible_fields %}
+        <div class="field">
+          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+          <div class="field-shell">{{ field }}</div>
+          {% if field.help_text %}<div class="helptext">{{ field.help_text }}</div>{% endif %}
+          {% if field.errors %}<div class="field-error">{{ field.errors|striptags }}</div>{% endif %}
+        </div>
+      {% endfor %}
+
+      {% if redirect_field_value %}
+        <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+      {% endif %}
+
+      <button type="submit" class="btn-primary">{% trans "Sign Up" %}</button>
+    </form>
+
+    <a href="{% url 'login' %}" class="back-link">← {% trans "Back to sign in" %}</a>
+  </div>
+</div>
+
+</body>
+</html>

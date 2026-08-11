@@ -7,3 +7,17 @@ db.sqlite3
 staticfiles/
 media/
 chatbot/gemini_key.txt
+
+
+# Large media & animation files >50MB
+booking/static/images/aianimation2
+*.zip
+ghidora_payments_fixed.zip
+ghidora_social_app.zip
+
+
+# Large media & animation files >50MB
+booking/static/images/aianimation2
+*.zip
+ghidora_payments_fixed.zip
+ghidora_social_app.zip

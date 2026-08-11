@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'social/css/social.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="gs-wrap">
+  <div class="gs-profile-header">
+    {% if profile.avatar %}
+      <img class="gs-avatar" src="{{ profile.avatar.url }}" alt="{{ profile_user.username }}">
+    {% else %}
+      <div class="gs-avatar"></div>
+    {% endif %}
+    <div>
+      <h1 class="gs-title" style="font-size:1.3rem; margin:0;">
+        {{ profile_user.get_full_name|default:profile_user.username }}
+        {% if profile.is_driver %}<span class="gs-badge-driver">DRIVER</span>{% endif %}
+      </h1>
+      <div class="gs-timestamp">@{{ profile_user.username }}</div>
+      {% if profile.bio %}<p style="margin:8px 0 0; font-size:0.92rem;">{{ profile.bio }}</p>{% endif %}
+      <div class="gs-stats"><strong>{{ post_count }}</strong>&nbsp;posts</div>
+    </div>
+    {% if is_own_profile %}
+      <a href="{% url 'social:edit_profile' %}" class="gs-btn gs-btn-ghost" style="margin-left:auto;">Edit profile</a>
+    {% endif %}
+  </div>
+
+  {% if posts %}
+    {% for post in posts %}
+      {% include "social/partials/post_card.html" %}
+    {% endfor %}
+  {% else %}
+    <div class="gs-empty">No posts yet.</div>
+  {% endif %}
+</div>
+{% endblock %}

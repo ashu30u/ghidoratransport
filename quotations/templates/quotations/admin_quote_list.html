@@ -1,0 +1,64 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <title>Quotation Management - Ghidora Admin</title>
+    <link rel="stylesheet" href="{% static 'quotations/css/quotations.css' %}">
+</head>
+<body>
+<div class="quo-page">
+    <h1>📋 Quotation Management</h1>
+
+    <div class="admin-cards">
+        <div><h3>Pending</h3><h2>{{ pending }}</h2></div>
+        <div><h3>Accepted</h3><h2>{{ accepted }}</h2></div>
+        <div><h3>Rejected</h3><h2>{{ rejected }}</h2></div>
+        <div><h3>Expired</h3><h2>{{ expired }}</h2></div>
+    </div>
+
+    <div style="text-align:center;margin-bottom:20px;">
+        <a href="{% url 'quotations:admin_quote_create' %}" class="btn-submit" style="text-decoration:none;">
+            + Custom Quotation Banayein
+        </a>
+    </div>
+
+    <table>
+        <tr>
+            <th>Quote No</th>
+            <th>Customer</th>
+            <th>Route</th>
+            <th>Amount</th>
+            <th>Status</th>
+            <th>Approval</th>
+            <th></th>
+        </tr>
+        {% for q in quotations %}
+        <tr>
+            <td>{{ q.quote_number }}</td>
+            <td>{{ q.name }}<br><small>{{ q.phone }}</small></td>
+            <td>{{ q.pickup }} → {{ q.destination }}</td>
+            <td>₹{{ q.final_amount }}</td>
+            <td>
+                <span class="badge
+                    {% if q.status == 'Pending' %}badge-pending
+                    {% elif q.status == 'Accepted' %}badge-accepted
+                    {% elif q.status == 'Rejected' %}badge-rejected
+                    {% else %}badge-expired{% endif %}">
+                    {{ q.status }}
+                </span>
+            </td>
+            <td>
+                {% if q.needs_admin_approval %}
+                    {% if q.is_approved %}✅{% else %}<span class="approval-flag">Chahiye</span>{% endif %}
+                {% else %}—{% endif %}
+            </td>
+            <td><a href="{% url 'quotations:admin_quote_detail' q.pk %}" style="color:#00e5ff;">Manage</a></td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="7">Abhi koi quotation nahi hai.</td></tr>
+        {% endfor %}
+    </table>
+</div>
+</body>
+</html>

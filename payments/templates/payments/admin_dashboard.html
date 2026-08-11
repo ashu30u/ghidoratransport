@@ -1,0 +1,89 @@
+{% extends "payments/base.html" %}
+{% block title %}Admin — Payment Dashboard | Ghidora Transport{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h4 class="font-display mb-0"><i class="bi bi-speedometer2 me-2"></i>Payment Dashboard</h4>
+  <a href="{% url 'payments:admin_payment_settings' %}" class="btn btn-ghost-glass btn-sm">
+    <i class="bi bi-gear me-1"></i>Payment Settings
+  </a>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-6 col-lg-3">
+    <div class="glass-card p-3 hover-lift h-100">
+      <div class="text-muted-soft small">Pending Verification</div>
+      <div class="fs-3 font-display" style="color:#f5a623">{{ stats.pending_verification }}</div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="glass-card p-3 hover-lift h-100">
+      <div class="text-muted-soft small">Verified</div>
+      <div class="fs-3 font-display" style="color:#22d3ee">{{ stats.verified }}</div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="glass-card p-3 hover-lift h-100">
+      <div class="text-muted-soft small">Rejected</div>
+      <div class="fs-3 font-display" style="color:#ef4444">{{ stats.rejected }}</div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="glass-card p-3 hover-lift h-100">
+      <div class="text-muted-soft small">Today's Payments</div>
+      <div class="fs-3 font-display">{{ stats.todays_payments }}</div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="glass-card p-3 hover-lift h-100">
+      <div class="text-muted-soft small">Monthly Payments</div>
+      <div class="fs-3 font-display">{{ stats.monthly_payments }}</div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="glass-card p-3 hover-lift h-100">
+      <div class="text-muted-soft small">Total Collection</div>
+      <div class="fs-3 font-display font-ledger" style="color:#22d3ee">₹{{ stats.total_collection }}</div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="glass-card p-3 hover-lift h-100">
+      <div class="text-muted-soft small">Advance Collected</div>
+      <div class="fs-3 font-display font-ledger">₹{{ stats.advance_collection }}</div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="glass-card p-3 hover-lift h-100">
+      <div class="text-muted-soft small">Remaining Collected</div>
+      <div class="fs-3 font-display font-ledger">₹{{ stats.remaining_collection }}</div>
+    </div>
+  </div>
+</div>
+
+<div class="glass-card p-4">
+  <h5 class="font-display mb-3">Pending Verification Queue</h5>
+  <div class="table-responsive">
+    <table class="table table-borderless align-middle" style="color:var(--text-primary);">
+      <thead>
+        <tr class="text-muted-soft small text-uppercase">
+          <th>Payment ID</th><th>Booking</th><th>Customer</th><th>Amount</th><th>Submitted</th><th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for pr in pending_queue %}
+        <tr class="border-top border-secondary-subtle">
+          <td class="font-ledger">{{ pr.payment_id }}</td>
+          <td class="font-ledger">{{ pr.booking.booking_id }}</td>
+          <td>{{ pr.booking.name }}</td>
+          <td class="font-ledger">₹{{ pr.amount }}</td>
+          <td>{{ pr.updated_at|date:"d M, H:i" }}</td>
+          <td><a href="{% url 'payments:admin_verification_panel' pr.payment_id %}" class="btn btn-route btn-sm">Review</a></td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6" class="text-center text-muted-soft py-4">Queue is empty — nothing waiting on you right now.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

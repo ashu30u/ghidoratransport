@@ -60,6 +60,11 @@ urlpatterns = [
         views.calculate_distance_api,
         name="calculate_distance_api"
     ),
+    path(
+        "api/check-route-fare/",
+        views.check_route_fare_api,
+        name="check_route_fare_api"
+    ),
 
     path('about/', views.about, name='about'),
 
@@ -67,6 +72,13 @@ urlpatterns = [
 
     path('card/', views.business_card, name='business_card'),
 
+    path('contact/', views.contact_us, name='contact_us'),
+
+    path('control-tower/', views.control_tower, name='control_tower'),
+    path('api/review/<int:review_id>/like/', views.toggle_review_like, name='toggle_review_like'),
+    path('api/review/<int:review_id>/comment/', views.add_review_comment, name='add_review_comment'),
+    path('api/review/<int:review_id>/share/', views.record_review_share, name='record_review_share'),
+    path('api/submit-user-review/', views.submit_user_review, name='submit_user_review'),
 ]
 
 if settings.DEBUG:

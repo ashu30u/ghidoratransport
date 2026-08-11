@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ghidora Transport — Smart Goods Transport & Booking</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-dark: #030712;
+      --card-bg: rgba(15, 23, 42, 0.75);
+      --card-border: rgba(255, 255, 255, 0.12);
+      --brand-cyan: #00f2fe;
+      --brand-blue: #4facfe;
+      --brand-purple: #7928ca;
+      --brand-pink: #ff007f;
+      --brand-orange: #ff7a1a;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+
+    body {
+      background: var(--bg-dark);
+      color: var(--text-main);
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* 3D Canvas Background */
+    #surgeCanvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .app-container {
+      position: relative;
+      z-index: 1;
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 20px 24px 60px;
+    }
+
+    /* Header Nav */
+    .top-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 24px;
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(20px);
+      border-radius: 20px;
+      border: 1px solid var(--card-border);
+      margin-bottom: 30px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+
+    .logo-text {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: #fff;
+    }
+    .logo-text span { color: var(--brand-orange); }
+
+    .nav-links-wrap {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .nav-btn {
+      text-decoration: none;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 9px 16px;
+      border-radius: 99px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      transition: all 0.25s ease;
+    }
+    .nav-btn:hover {
+      background: linear-gradient(135deg, var(--brand-cyan), var(--brand-blue));
+      color: #000;
+      transform: translateY(-2px);
+    }
+
+    .nav-btn-highlight {
+      background: linear-gradient(135deg, #00f2fe, #ff007f);
+      border: none;
+      box-shadow: 0 0 15px rgba(0, 242, 254, 0.4);
+    }
+
+    /* Hero Banner */
+    .hero-wrap {
+      text-align: center;
+      padding: 40px 20px;
+      margin-bottom: 40px;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 18px;
+      border-radius: 99px;
+      background: rgba(0, 242, 254, 0.12);
+      border: 1px solid rgba(0, 242, 254, 0.3);
+      color: var(--brand-cyan);
+      font-size: 12.5px;
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+
+    .hero-title {
+      font-size: 42px;
+      font-weight: 800;
+      line-height: 1.2;
+      margin-bottom: 16px;
+      background: linear-gradient(135deg, #ffffff 0%, var(--brand-cyan) 50%, var(--brand-pink) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-sub {
+      font-size: 16px;
+      color: var(--text-muted);
+      max-width: 680px;
+      margin: 0 auto 30px;
+    }
+
+    /* 3D Action Cards Grid */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+      margin-bottom: 40px;
+    }
+
+    @property --angle {
+      syntax: '<angle>';
+      initial-value: 0deg;
+      inherits: false;
+    }
+
+    @keyframes borderRotate {
+      0% { --angle: 0deg; }
+      100% { --angle: 360deg; }
+    }
+
+    .card-3d-wrap {
+      position: relative;
+      padding: 2.5px;
+      border-radius: 24px;
+      background: conic-gradient(from var(--angle), var(--brand-cyan), var(--brand-purple), var(--brand-pink), var(--brand-cyan));
+      animation: borderRotate 6s linear infinite;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+      transition: transform 0.3s ease;
+    }
+    .card-3d-wrap:hover {
+      transform: translateY(-5px);
+    }
+
+    .card-inner {
+      background: rgba(11, 17, 30, 0.95);
+      border-radius: 22px;
+      padding: 28px;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .card-icon {
+      font-size: 36px;
+      margin-bottom: 16px;
+    }
+
+    .card-h2 {
+      font-size: 20px;
+      font-weight: 800;
+      margin-bottom: 10px;
+      color: #fff;
+    }
+
+    .card-p {
+      font-size: 13.5px;
+      color: var(--text-muted);
+      line-height: 1.6;
+      margin-bottom: 22px;
+    }
+
+    .card-action-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      padding: 13px;
+      border-radius: 14px;
+      font-size: 13.5px;
+      font-weight: 800;
+      text-decoration: none;
+      color: #fff;
+      background: linear-gradient(135deg, var(--brand-cyan), var(--brand-blue));
+      box-shadow: 0 4px 15px rgba(0, 242, 254, 0.3);
+      border-bottom: 4px solid rgba(0,0,0,0.3);
+      transition: all 0.2s ease;
+    }
+    .card-action-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0, 242, 254, 0.5);
+    }
+
+    .btn-pink { background: linear-gradient(135deg, #00f2fe, #ff007f); }
+    .btn-emerald { background: linear-gradient(135deg, #10b981, #059669); }
+    .btn-purple { background: linear-gradient(135deg, #a855f7, #6366f1); }
+  </style>
+</head>
+<body>
+
+  <!-- 3D Particle Background -->
+  <canvas id="surgeCanvas"></canvas>
+
+  <div class="app-container">
+    <!-- Navigation -->
+    <div class="top-nav">
+      <div class="logo-text">🚚 GHIDORA <span>TRANSPORT</span></div>
+      <div class="nav-links-wrap">
+        <a href="https://ghidoratransport.onrender.com/get-quotation/" class="nav-btn">💰 Instant Fare Quote</a>
+        <a href="https://ghidoratransport.onrender.com/dashboard/" class="nav-btn">📊 Command Center</a>
+        <a href="https://ghidoratransport.onrender.com/occasions/dashboard/" class="nav-btn nav-btn-highlight">🎉 Smart Occasions</a>
+      </div>
+    </div>
+
+    <!-- Hero Banner -->
+    <div class="hero-wrap">
+      <div class="hero-badge">⚡ Enterprise Transport & Logistics Platform</div>
+      <h1 class="hero-title">Smart Goods Transport & Occasion System</h1>
+      <p class="hero-sub">Statewide Fleet Booking, Automated GPS Route Calculation, Real-Time Driver Dispatch & Smart Festival Greeting System.</p>
+    </div>
+
+    <!-- 3D Feature Cards Grid -->
+    <div class="cards-grid">
+
+      <!-- Card 1: Instant Quotation -->
+      <div class="card-3d-wrap">
+        <div class="card-inner">
+          <div>
+            <div class="card-icon">💰</div>
+            <h2 class="card-h2">Get Instant Price Estimate</h2>
+            <p class="card-p">Calculate exact trip fare instantly without booking. Download PDF summary, WhatsApp quote & auto-save lead in database.</p>
+          </div>
+          <a href="https://ghidoratransport.onrender.com/get-quotation/" class="card-action-btn">Check Instant Fare Quote ➔</a>
+        </div>
+      </div>
+
+      <!-- Card 2: Smart Occasions Dashboard -->
+      <div class="card-3d-wrap">
+        <div class="card-inner">
+          <div>
+            <div class="card-icon">🎉</div>
+            <h2 class="card-h2">Smart Occasions Dashboard</h2>
+            <p class="card-p">Auto-sync upcoming Indian & Chhattisgarh festivals 1 day in advance. Gemini AI greetings & 8:35 AM automatic customer email dispatches.</p>
+          </div>
+          <a href="https://ghidoratransport.onrender.com/occasions/dashboard/" class="card-action-btn btn-pink">Open Occasions Dashboard ➔</a>
+        </div>
+      </div>
+
+      <!-- Card 3: 3D Command Dashboard -->
+      <div class="card-3d-wrap">
+        <div class="card-inner">
+          <div>
+            <div class="card-icon">📊</div>
+            <h2 class="card-h2">3D Command Dashboard</h2>
+            <p class="card-p">Real-time operation control tower, fleet revenue analytics, booking dispatches & driver assignments in high-tech 3D view.</p>
+          </div>
+          <a href="https://ghidoratransport.onrender.com/dashboard/" class="card-action-btn btn-purple">Open Command Dashboard ➔</a>
+        </div>
+      </div>
+
+      <!-- Card 4: Book Transport -->
+      <div class="card-3d-wrap">
+        <div class="card-inner">
+          <div>
+            <div class="card-icon">📦</div>
+            <h2 class="card-h2">Book Goods Transport</h2>
+            <p class="card-p">Pick up and drop cargo transport booking with live distance calculation, fare breakdown, and instant driver confirmation.</p>
+          </div>
+          <a href="https://ghidoratransport.onrender.com/#booking" class="card-action-btn btn-emerald">Book Transport Order ➔</a>
+        </div>
+      </div>
+
+      <!-- Card 5: Online Payments Verification -->
+      <div class="card-3d-wrap">
+        <div class="card-inner">
+          <div>
+            <div class="card-icon">💳</div>
+            <h2 class="card-h2">Online Payments Portal</h2>
+            <p class="card-p">Instant UTR verification, QR payment portal, receipt generation and online banking status verification for freight orders.</p>
+          </div>
+          <a href="https://ghidoratransport.onrender.com/payments/pay/PAY-675D9FBC2F/" class="card-action-btn">Open Payment Gateway ➔</a>
+        </div>
+      </div>
+
+      <!-- Card 6: Fleet & Driver Management -->
+      <div class="card-3d-wrap">
+        <div class="card-inner">
+          <div>
+            <div class="card-icon">👨‍✈️</div>
+            <h2 class="card-h2">Driver & Fleet Control</h2>
+            <p class="card-p">Driver profiles, vehicle verification, trip status logs, and active fleet monitoring across all Chhattisgarh routes.</p>
+          </div>
+          <a href="https://ghidoratransport.onrender.com/drivers/" class="card-action-btn btn-purple">Manage Fleet Drivers ➔</a>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <script>
+    // 3D Canvas Energy Beams
+    const canvas = document.getElementById('surgeCanvas');
+    const ctx = canvas.getContext('2d');
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    const particles = [];
+    for (let i = 0; i < 45; i++) {
+      particles.push({
+        x: Math.random() * window.innerWidth,
+        y: Math.random() * window.innerHeight,
+        vx: (Math.random() - 0.5) * 0.8,
+        vy: (Math.random() - 0.5) * 0.8,
+        radius: Math.random() * 2 + 1
+      });
+    }
+
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      for (let i = 0; i < particles.length; i++) {
+        let p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+
+        if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
+        if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fillStyle = '#00f2fe';
+        ctx.fill();
+
+        for (let j = i + 1; j < particles.length; j++) {
+          let p2 = particles[j];
+          let dist = Math.hypot(p2.x - p.x, p2.y - p.y);
+          if (dist < 140) {
+            ctx.beginPath();
+            ctx.moveTo(p.x, p.y);
+            ctx.lineTo(p2.x, p2.y);
+            ctx.strokeStyle = `rgba(0, 242, 254, ${1 - dist / 140})`;
+            ctx.lineWidth = 0.6;
+            ctx.stroke();
+          }
+        }
+      }
+      requestAnimationFrame(animate);
+    }
+    animate();
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'social/css/social.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="gs-wrap">
+  <h1 class="gs-title" style="font-size:1.6rem; margin-bottom:18px;">Feed</h1>
+
+  <div class="gs-composer">
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      {{ form.content }}
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
+        <label class="gs-btn-ghost" style="border-radius:8px; padding:6px 10px; font-size:0.85rem; cursor:pointer;">
+          📷 Photo
+          {{ form.image }}
+        </label>
+        <button type="submit" class="gs-btn">Post</button>
+      </div>
+    </form>
+  </div>
+
+  {% if messages %}
+    {% for message in messages %}
+      <div style="color: var(--gs-accent); font-size:0.85rem; margin-bottom:12px;">{{ message }}</div>
+    {% endfor %}
+  {% endif %}
+
+  {% if posts %}
+    {% for post in posts %}
+      {% include "social/partials/post_card.html" %}
+    {% endfor %}
+
+    <div style="display:flex; justify-content:center; gap:12px; margin-top:20px;">
+      {% if page_obj.has_previous %}
+        <a class="gs-btn-ghost gs-btn" href="?page={{ page_obj.previous_page_number }}">← Newer</a>
+      {% endif %}
+      {% if page_obj.has_next %}
+        <a class="gs-btn-ghost gs-btn" href="?page={{ page_obj.next_page_number }}">Older →</a>
+      {% endif %}
+    </div>
+  {% else %}
+    <div class="gs-empty">No posts yet — be the first to share an update.</div>
+  {% endif %}
+</div>
+{% endblock %}

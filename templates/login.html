@@ -1,0 +1,1234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Ghidora Transport — Sign In</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --bg-0:#04060b;
+    --bg-1:#070b16;
+    --bg-2:#0c1324;
+    --blue:#3fa4ff;
+    --blue-soft:#7cc4ff;
+    --cyan:#1fe6c8;
+    --amber:#ff9142;
+    --amber-soft:#ffb578;
+    --text-hi:#eef3fb;
+    --text-mid:#aab7cf;
+    --text-lo:#647192;
+    --glass-fill: rgba(14,22,40,0.46);
+    --glass-border: rgba(130,185,255,0.28);
+    --glass-border-hi: rgba(160,205,255,0.55);
+    --danger:#ff5f6d;
+    --radius-card: 22px;
+    --radius-field: 12px;
+    --ff-display:'Space Grotesk', sans-serif;
+    --ff-body:'Inter', sans-serif;
+    --ff-mono:'JetBrains Mono', monospace;
+  }
+
+  *{box-sizing:border-box; margin:0; padding:0;}
+
+  html,body{
+    height:100%;
+    background:var(--bg-0);
+    color:var(--text-hi);
+    font-family:var(--ff-body);
+    overflow:hidden;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  body{ position:relative; }
+
+  /* ============ 3D SCENE LAYER ============ */
+  #scene-canvas{
+    position:fixed;
+    inset:0;
+    width:100%;
+    height:100%;
+    display:block;
+    z-index:0;
+  }
+
+  #scene-canvas.dim{ filter:brightness(0.35) saturate(0.7); transition:filter 1.1s ease; }
+
+  /* atmospheric vignette + grade over the canvas */
+  .scene-grade{
+    position:fixed; inset:0; z-index:1; pointer-events:none;
+    background:
+      radial-gradient(120% 90% at 18% 30%, rgba(63,164,255,0.10), transparent 60%),
+      radial-gradient(90% 70% at 78% 70%, rgba(31,230,200,0.06), transparent 55%),
+      radial-gradient(150% 120% at 50% 100%, rgba(0,0,0,0.65), transparent 45%),
+      linear-gradient(180deg, rgba(4,6,11,0.35) 0%, rgba(4,6,11,0) 22%, rgba(4,6,11,0.15) 70%, rgba(4,6,11,0.75) 100%);
+  }
+
+  .scene-grade::after{
+    content:'';
+    position:absolute; inset:0;
+    background:radial-gradient(140% 140% at 50% 50%, transparent 55%, rgba(0,0,0,0.55) 100%);
+  }
+
+  /* ============ TOP BAR ============ */
+  .topbar{
+    position:fixed; top:0; left:0; right:0; z-index:5;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:28px clamp(20px,4vw,56px);
+    opacity:0; transform:translateY(-14px);
+  }
+
+  .logo{
+    display:flex; align-items:center; gap:11px;
+    font-family:var(--ff-display); font-weight:600; font-size:19px; letter-spacing:0.01em;
+  }
+  .logo-mark{
+    width:34px; height:34px; border-radius:9px;
+    background:conic-gradient(from 220deg, var(--blue), var(--cyan), var(--amber), var(--blue));
+    position:relative;
+    box-shadow:0 0 22px rgba(63,164,255,0.55), 0 0 2px rgba(255,255,255,0.4) inset;
+  }
+  .logo-mark::before{
+    content:'';
+    position:absolute; inset:5px;
+    background:var(--bg-0);
+    border-radius:6px;
+    clip-path:polygon(20% 85%, 20% 35%, 50% 15%, 80% 35%, 80% 85%, 65% 85%, 65% 45%, 50% 35%, 35% 45%, 35% 85%);
+  }
+  .logo-text small{ display:block; font-family:var(--ff-mono); font-weight:400; font-size:9.5px; letter-spacing:0.22em; color:var(--text-lo); text-transform:uppercase; margin-top:1px; }
+
+  .telemetry{
+    font-family:var(--ff-mono); font-size:11px; color:var(--text-lo);
+    letter-spacing:0.06em; text-align:right; line-height:1.6;
+    display:flex; gap:22px;
+  }
+  .telemetry span b{ color:var(--blue-soft); font-weight:500; }
+  @media (max-width:720px){ .telemetry{ display:none; } }
+
+  /* ============ HERO TEXT ============ */
+  .hero-copy{
+    position:fixed; z-index:4; left:clamp(20px,6vw,72px); top:38%;
+    max-width:420px;
+  }
+  .hero-eyebrow{
+    font-family:var(--ff-mono); font-size:11px; letter-spacing:0.28em; text-transform:uppercase;
+    color:var(--cyan); opacity:0; margin-bottom:14px; display:flex; align-items:center; gap:9px;
+  }
+  .hero-eyebrow::before{ content:''; width:22px; height:1px; background:var(--cyan); box-shadow:0 0 8px var(--cyan); }
+
+  .hero-title{
+    font-family:var(--ff-display); font-weight:700; letter-spacing:-0.01em;
+    font-size:clamp(34px,4.4vw,54px); line-height:1.04;
+  }
+  .hero-title .word{ display:inline-block; opacity:0; filter:blur(6px); transform:translateY(16px); }
+
+  .hero-sub{
+    margin-top:16px; font-size:15.5px; line-height:1.6; color:var(--text-mid);
+    max-width:360px; opacity:0; transform:translateY(10px);
+  }
+
+  @media (max-width:900px){
+    .hero-copy{ display:none; }
+  }
+
+  /* ============ LOGIN CARD ============ */
+  .card-stage{
+    position:fixed; z-index:6; inset:0;
+    display:flex; align-items:center; justify-content:flex-end;
+    padding:24px clamp(18px,6vw,72px);
+    pointer-events:none;
+  }
+
+  .route-svg{
+    position:absolute; inset:0; width:100%; height:100%; pointer-events:none; z-index:5;
+  }
+  .route-path{
+    fill:none; stroke:url(#routeGrad); stroke-width:1.6; stroke-linecap:round;
+    stroke-dasharray:6 3; opacity:0;
+  }
+  .route-glow{
+    fill:none; stroke:var(--cyan); stroke-width:5; stroke-linecap:round;
+    opacity:0; filter:blur(6px);
+  }
+  .route-dot{ opacity:0; }
+
+  .login-card{
+    pointer-events:auto;
+    width:min(408px, 100%);
+    padding:38px 34px 30px;
+    border-radius:var(--radius-card);
+    background:var(--glass-fill);
+    border:1px solid var(--glass-border);
+    backdrop-filter:blur(22px) saturate(140%);
+    -webkit-backdrop-filter:blur(22px) saturate(140%);
+    box-shadow:
+      0 30px 70px -20px rgba(0,0,0,0.65),
+      0 0 0 1px rgba(255,255,255,0.02) inset,
+      0 1px 0 rgba(255,255,255,0.08) inset;
+    opacity:0;
+    transform:translateY(46px) rotateX(4deg);
+    transform-style:preserve-3d;
+    will-change:transform;
+    position:relative;
+  }
+
+  .login-card::before{
+    content:'';
+    position:absolute; inset:-1px;
+    border-radius:inherit;
+    padding:1px;
+    background:linear-gradient(135deg, var(--glass-border-hi), transparent 30%, transparent 70%, rgba(255,145,66,0.35));
+    -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite:xor; mask-composite:exclude;
+    pointer-events:none;
+    opacity:0.9;
+  }
+
+  .card-head{ margin-bottom:26px; }
+  .card-eyebrow{ font-family:var(--ff-mono); font-size:10.5px; letter-spacing:0.2em; text-transform:uppercase; color:var(--text-lo); margin-bottom:8px; }
+  .card-title{ font-family:var(--ff-display); font-weight:600; font-size:26px; }
+  .card-title .accent{ color:var(--amber-soft); }
+
+  .field{ margin-bottom:16px; position:relative; }
+  .field label{
+    display:block; font-size:12px; font-weight:500; color:var(--text-mid);
+    margin-bottom:7px; letter-spacing:0.01em;
+  }
+  .field-shell{
+    display:flex; align-items:center; gap:10px;
+    background:rgba(6,10,20,0.55);
+    border:1px solid rgba(255,255,255,0.09);
+    border-radius:var(--radius-field);
+    padding:0 14px;
+    transition:border-color .25s ease, box-shadow .25s ease, background .25s ease;
+  }
+  .field-shell svg{ flex:none; opacity:0.55; }
+  .field-shell input{
+    flex:1; background:none; border:none; outline:none; color:var(--text-hi);
+    font-family:var(--ff-body); font-size:14.5px; padding:13px 0;
+    letter-spacing:0.01em;
+  }
+  .field-shell input::placeholder{ color:var(--text-lo); }
+  .field-shell:focus-within{
+    border-color:var(--blue);
+    background:rgba(10,16,30,0.72);
+    box-shadow:0 0 0 3px rgba(63,164,255,0.14), 0 0 18px rgba(63,164,255,0.12);
+  }
+  .field-shell svg{ stroke:var(--text-mid); }
+  .field-shell:focus-within svg{ stroke:var(--blue-soft); opacity:0.9; }
+
+  .toggle-eye{ cursor:pointer; opacity:0.55; transition:opacity .2s; background:none; border:none; padding:4px; display:flex; }
+  .toggle-eye:hover{ opacity:0.95; }
+
+  .row-between{
+    display:flex; align-items:center; justify-content:space-between;
+    margin:2px 0 22px; font-size:12.5px;
+  }
+  .remember{ display:flex; align-items:center; gap:8px; color:var(--text-mid); cursor:pointer; user-select:none; }
+  .remember input{ appearance:none; width:15px; height:15px; border-radius:4px; border:1px solid rgba(255,255,255,0.25); background:rgba(255,255,255,0.03); position:relative; cursor:pointer; flex:none; }
+  .remember input:checked{ background:var(--blue); border-color:var(--blue); }
+  .remember input:checked::after{ content:''; position:absolute; left:4px; top:1px; width:4px; height:8px; border:solid var(--bg-0); border-width:0 2px 2px 0; transform:rotate(45deg); }
+  .forgot{ color:var(--blue-soft); text-decoration:none; }
+  .forgot:hover{ text-decoration:underline; }
+
+  .btn{
+    width:100%; border:none; border-radius:var(--radius-field);
+    font-family:var(--ff-body); font-weight:600; font-size:14.5px;
+    padding:14px 18px; cursor:pointer; position:relative; overflow:hidden;
+    display:flex; align-items:center; justify-content:center; gap:8px;
+  }
+  .btn:focus-visible{ outline:2px solid var(--cyan); outline-offset:3px; }
+
+  .btn-primary{
+    background:linear-gradient(135deg, var(--blue) 0%, #2c7ff0 55%, var(--amber) 130%);
+    color:#04060b;
+    box-shadow:0 12px 28px -10px rgba(63,164,255,0.55);
+    margin-bottom:12px;
+  }
+  .btn-primary::after{
+    content:''; position:absolute; inset:0;
+    background:linear-gradient(115deg, transparent 20%, rgba(255,255,255,0.55) 45%, transparent 60%);
+    transform:translateX(-120%);
+  }
+  .btn-primary:hover::after{ transform:translateX(120%); transition:transform .85s ease; }
+  .btn-primary:hover{ box-shadow:0 14px 34px -8px rgba(63,164,255,0.75); }
+  .btn-primary:active{ transform:scale(0.98); }
+
+  .btn-ghost{
+    background:rgba(255,255,255,0.04);
+    border:1px solid rgba(255,255,255,0.12);
+    color:var(--text-hi);
+    margin-bottom:10px;
+  }
+  .btn-ghost:hover{ background:rgba(255,255,255,0.08); border-color:rgba(255,255,255,0.22); }
+
+  .divider{
+    display:flex; align-items:center; gap:12px; margin:20px 0 16px;
+    color:var(--text-lo); font-size:11px; letter-spacing:0.08em; text-transform:uppercase; font-family:var(--ff-mono);
+  }
+  .divider::before,.divider::after{ content:''; flex:1; height:1px; background:rgba(255,255,255,0.1); }
+
+  .switch-mode{ text-align:center; margin-top:20px; font-size:13px; color:var(--text-mid); }
+  .switch-mode a{ color:var(--amber-soft); text-decoration:none; font-weight:500; }
+  .switch-mode a:hover{ text-decoration:underline; }
+
+  .field-error{ font-size:11.5px; color:var(--danger); margin-top:6px; display:none; }
+  .field.has-error .field-shell{ border-color:var(--danger); box-shadow:0 0 0 3px rgba(255,95,109,0.14); }
+  .field.has-error .field-error{ display:block; }
+
+  /* ============ LOADING OVERLAY ============ */
+  .loading-overlay{
+    position:fixed; inset:0; z-index:20;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    background:rgba(4,6,11,0.35);
+    opacity:0; pointer-events:none;
+  }
+  .loading-track{
+    width:min(320px, 70vw); height:2px; background:rgba(255,255,255,0.12);
+    border-radius:2px; overflow:hidden; margin-top:22px; position:relative;
+  }
+  .loading-fill{
+    position:absolute; inset:0; width:0%;
+    background:linear-gradient(90deg, var(--blue), var(--cyan));
+    box-shadow:0 0 12px var(--cyan);
+  }
+  .loading-pct{ font-family:var(--ff-mono); font-size:13px; color:var(--blue-soft); margin-top:14px; letter-spacing:0.05em; }
+  .loading-label{ font-family:var(--ff-mono); font-size:11px; color:var(--text-lo); letter-spacing:0.18em; text-transform:uppercase; }
+
+  /* ============ SUCCESS OVERLAY ============ */
+  .success-overlay{
+    position:fixed; inset:0; z-index:21;
+    display:flex; align-items:center; justify-content:center;
+    opacity:0; pointer-events:none;
+  }
+  .success-ring{
+    width:96px; height:96px; border-radius:50%;
+    border:1.5px solid rgba(31,230,200,0.4);
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 0 50px rgba(31,230,200,0.35);
+    position:relative;
+  }
+  .success-ring::before{
+    content:''; position:absolute; inset:-14px; border-radius:50%;
+    border:1px solid rgba(31,230,200,0.18);
+  }
+  .success-ring svg{ width:40px; height:40px; }
+  .success-ring path{
+    stroke:var(--cyan); stroke-width:2.4; fill:none; stroke-linecap:round; stroke-linejoin:round;
+    stroke-dasharray:40; stroke-dashoffset:40;
+  }
+  .success-text{
+    position:absolute; top:calc(50% + 78px); left:50%; transform:translateX(-50%);
+    font-family:var(--ff-mono); font-size:12px; letter-spacing:0.16em; text-transform:uppercase; color:var(--text-mid);
+    white-space:nowrap;
+  }
+
+  /* ============ MOBILE LAYOUT ============ */
+  @media (max-width:900px){
+    #scene-canvas{ height:44vh; top:0; }
+    .scene-grade{ height:44vh; }
+    .card-stage{
+      align-items:flex-start; justify-content:center;
+      padding-top:38vh; overflow-y:auto;
+    }
+    .login-card{ width:100%; max-width:440px; }
+    .topbar{ padding:18px 18px; }
+  }
+
+  @media (max-height:680px) and (min-width:901px){
+    .login-card{ padding:26px 30px 22px; }
+    .field{ margin-bottom:12px; }
+  }
+
+  ::selection{ background:rgba(63,164,255,0.35); }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration:0.01ms !important; transition-duration:0.01ms !important; }
+  }
+
+  .sr-only{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); }
+</style>
+</head>
+<body>
+
+<canvas id="scene-canvas" aria-hidden="true"></canvas>
+<div class="scene-grade" aria-hidden="true"></div>
+
+<!-- Route line connecting the highway to the card — the signature element -->
+<svg class="route-svg" aria-hidden="true">
+  <defs>
+    <linearGradient id="routeGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#1fe6c8"/>
+      <stop offset="100%" stop-color="#3fa4ff"/>
+    </linearGradient>
+  </defs>
+  <path class="route-glow" id="routeGlow" d=""/>
+  <path class="route-path" id="routePath" d=""/>
+</svg>
+
+<header class="topbar">
+  <div class="logo">
+    <div class="logo-mark"></div>
+    <div class="logo-text">GHIDORA<small>TRANSPORT NETWORK</small></div>
+  </div>
+  <div class="telemetry" id="telemetry">
+    <span>ROUTE <b id="tRoute">NH-7 → DRG</b></span>
+    <span>UNITS ACTIVE <b id="tUnits">248</b></span>
+    <span>UPTIME <b>99.98%</b></span>
+  </div>
+</header>
+
+<div class="hero-copy">
+  <div class="hero-eyebrow" id="eyebrow">Secure Network Access</div>
+  <h1 class="hero-title" id="heroTitle" aria-label="Welcome Back"></h1>
+  <p class="hero-sub" id="heroSub">Your trusted transport network starts here. Track fleets, manage bookings, and move freight — all from one command view.</p>
+</div>
+
+<main class="card-stage">
+  <form class="login-card" id="loginCard" novalidate>
+    {% csrf_token %}
+    <div class="card-head">
+      <div class="card-eyebrow">01 / Authenticate</div>
+      <h2 class="card-title">Sign in to <span class="accent">Ghidora</span></h2>
+    </div>
+
+    <!-- Password mode fields -->
+    <div id="passwordFields">
+      <div class="field" id="mobileField">
+        <label for="mobile">Mobile number</label>
+        <div class="field-shell">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="1.6"><path d="M17 2H7a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2Z"/><path d="M12 18h.01"/></svg>
+          <input id="mobile" name="mobile" type="tel" inputmode="numeric" autocomplete="tel" placeholder="98xxxxxxxx" maxlength="10">
+        </div>
+        <div class="field-error">Enter a valid 10-digit mobile number.</div>
+      </div>
+
+      <div class="field" id="passwordField">
+        <label for="password">Password</label>
+        <div class="field-shell">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="1.6"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+          <input id="password" name="password" type="password" autocomplete="current-password" placeholder="••••••••">
+          <button type="button" class="toggle-eye" id="toggleEye" aria-label="Show password">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+        <div class="field-error">Password is required.</div>
+      </div>
+
+      <div class="row-between">
+        <label class="remember"><input type="checkbox" name="remember"> Remember me</label>
+        <a href="#" class="forgot">Forgot password?</a>
+      </div>
+    </div>
+
+    <!-- OTP mode field (hidden by default) -->
+    <div id="otpFields" style="display:none;">
+      <div class="field">
+        <label for="mobileOtp">Mobile number</label>
+        <div class="field-shell">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="1.6"><path d="M17 2H7a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2Z"/><path d="M12 18h.01"/></svg>
+          <input id="mobileOtp" name="mobile_otp" type="tel" inputmode="numeric" autocomplete="tel" placeholder="98xxxxxxxx" maxlength="10">
+        </div>
+      </div>
+
+      <!-- Shown only when the backend reports needs_signup=true for this number -->
+      <div class="field" id="signupNameField" style="display:none;">
+        <label for="signupName">Your name</label>
+        <div class="field-shell">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="1.6"><path d="M20 21a8 8 0 0 0-16 0"/><circle cx="12" cy="7" r="4"/></svg>
+          <input id="signupName" name="signup_name" type="text" placeholder="Full name">
+        </div>
+      </div>
+      <div class="field" id="signupEmailField" style="display:none;">
+        <label for="signupEmail">Email</label>
+        <div class="field-shell">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="1.6"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 6-10 7L2 6"/></svg>
+          <input id="signupEmail" name="signup_email" type="email" placeholder="you@example.com">
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="otp">One-time code</label>
+        <div class="field-shell">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="1.6"><path d="M12 2v4M12 18v4M4.9 4.9l2.8 2.8M16.3 16.3l2.8 2.8M2 12h4M18 12h4M4.9 19.1l2.8-2.8M16.3 7.7l2.8-2.8"/></svg>
+          <input id="otp" name="otp" type="text" inputmode="numeric" maxlength="6" placeholder="6-digit code">
+        </div>
+      </div>
+      <div class="row-between" style="justify-content:flex-end;">
+        <a href="#" class="forgot" id="resendOtp">Send code</a>
+      </div>
+      <div class="field-error" id="otpStatus" style="display:none; color:var(--blue-soft);"></div>
+    </div>
+
+    <button type="submit" class="btn btn-primary" id="submitBtn">
+      <span id="submitLabel">Sign In</span>
+    </button>
+    <button type="button" class="btn btn-ghost" id="otpModeBtn">Login with OTP instead</button>
+
+    <div class="divider">or continue with</div>
+
+    <a href="/accounts/google/login/" style="text-decoration: none; width: 100%;">
+      <button type="button" class="btn btn-ghost" id="googleBtn" style="width: 100%;">
+        <svg width="16" height="16" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.5 12.27c0-.85-.08-1.67-.22-2.45H12v4.64h6.44a5.5 5.5 0 0 1-2.39 3.61v3h3.86c2.26-2.08 3.59-5.15 3.59-8.8Z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.07 7.93-2.9l-3.86-3c-1.08.72-2.46 1.15-4.07 1.15-3.13 0-5.78-2.11-6.73-4.96H1.27v3.1A12 12 0 0 0 12 24Z"/><path fill="#FBBC05" d="M5.27 14.29a7.2 7.2 0 0 1 0-4.58v-3.1H1.27a12 12 0 0 0 0 10.78l4-3.1Z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0A12 12 0 0 0 1.27 6.61l4 3.1C6.22 6.86 8.87 4.75 12 4.75Z"/></svg>
+        Sign in with Google
+      </button>
+    </a>
+
+    <div class="switch-mode">New to Ghidora? <a href="#">Create an account</a></div>
+  </form>
+</main>
+
+<!-- Loading overlay (sign-in progress) -->
+<div class="loading-overlay" id="loadingOverlay" role="status" aria-live="polite">
+  <div class="loading-label">Establishing secure route</div>
+  <div class="loading-track"><div class="loading-fill" id="loadingFill"></div></div>
+  <div class="loading-pct" id="loadingPct">0%</div>
+</div>
+
+<!-- Success overlay -->
+<div class="success-overlay" id="successOverlay">
+  <div class="success-ring">
+    <svg viewBox="0 0 24 24"><path id="checkPath" d="M4 12.5 9.5 18 20 6"/></svg>
+  </div>
+  <div class="success-text">Access granted — welcome back</div>
+</div>
+
+<p class="sr-only" id="liveRegion" aria-live="polite"></p>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+
+<script type="module">
+import * as THREE from 'three';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+
+const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const canvas = document.getElementById('scene-canvas');
+const isMobile = window.innerWidth < 900;
+
+/* ---------------------------------------------------------------
+   SCENE SETUP
+--------------------------------------------------------------- */
+const scene = new THREE.Scene();
+scene.fog = new THREE.FogExp2(0x04060b, 0.028);
+
+const camera = new THREE.PerspectiveCamera(42, window.innerWidth / window.innerHeight, 0.1, 400);
+camera.position.set(-2, 5.5, 26);
+camera.lookAt(0, 1.5, 0);
+
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false, powerPreference: 'high-performance' });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, isMobile ? 1.5 : 2));
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.05;
+renderer.setClearColor(0x04060b, 1);
+
+/* Bloom composer (skip heavy pass on low-end / mobile for perf) */
+const composer = new EffectComposer(renderer);
+composer.addPass(new RenderPass(scene, camera));
+let bloomPass = null;
+if (!isMobile) {
+  bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 0.85, 0.55, 0.15);
+  composer.addPass(bloomPass);
+}
+
+/* ---------------------------------------------------------------
+   LIGHTING
+--------------------------------------------------------------- */
+scene.add(new THREE.AmbientLight(0x2a3a5c, 0.7));
+
+const moonLight = new THREE.DirectionalLight(0x7fb8ff, 0.9);
+moonLight.position.set(-8, 14, 6);
+scene.add(moonLight);
+
+const rimLight = new THREE.PointLight(0x1fe6c8, 2.2, 40, 2);
+rimLight.position.set(6, 3, -4);
+scene.add(rimLight);
+
+const amberFill = new THREE.PointLight(0xff9142, 1.4, 30, 2);
+amberFill.position.set(-6, 2, 4);
+scene.add(amberFill);
+
+/* ---------------------------------------------------------------
+   GROUND / HIGHWAY
+--------------------------------------------------------------- */
+const roadGroup = new THREE.Group();
+scene.add(roadGroup);
+
+const groundGeo = new THREE.PlaneGeometry(140, 140, 1, 1);
+const groundMat = new THREE.MeshStandardMaterial({ color: 0x060a14, roughness: 0.85, metalness: 0.15 });
+const ground = new THREE.Mesh(groundGeo, groundMat);
+ground.rotation.x = -Math.PI / 2;
+ground.position.y = -0.02;
+roadGroup.add(ground);
+
+const roadMat = new THREE.MeshStandardMaterial({ color: 0x0b0f1c, roughness: 0.55, metalness: 0.4 });
+const road = new THREE.Mesh(new THREE.PlaneGeometry(9, 140), roadMat);
+road.rotation.x = -Math.PI / 2;
+road.position.set(0, 0, 0);
+roadGroup.add(road);
+
+/* glowing lane lines — scrolled to fake endless motion */
+const laneGroup = new THREE.Group();
+roadGroup.add(laneGroup);
+const laneMat = new THREE.MeshBasicMaterial({ color: 0x3fa4ff });
+for (let i = 0; i < 40; i++) {
+  const seg = new THREE.Mesh(new THREE.PlaneGeometry(0.12, 2.4), laneMat);
+  seg.rotation.x = -Math.PI / 2;
+  seg.position.set(0, 0.02, -70 + i * 3.6);
+  laneGroup.add(seg);
+}
+
+/* edge glow strips */
+const edgeMat = new THREE.MeshBasicMaterial({ color: 0x1fe6c8 });
+[-4.6, 4.6].forEach((x) => {
+  const strip = new THREE.Mesh(new THREE.PlaneGeometry(0.08, 140), edgeMat);
+  strip.rotation.x = -Math.PI / 2;
+  strip.position.set(x, 0.02, 0);
+  roadGroup.add(strip);
+});
+
+/* ---------------------------------------------------------------
+   SKYLINE / WAREHOUSES (instanced boxes with emissive windows)
+--------------------------------------------------------------- */
+const skylineGroup = new THREE.Group();
+scene.add(skylineGroup);
+
+function makeBuilding(x, z, w, h, d, hue) {
+  const bodyMat = new THREE.MeshStandardMaterial({ color: 0x0a0e1a, roughness: 0.75, metalness: 0.3 });
+  const body = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), bodyMat);
+  body.position.set(x, h / 2, z);
+  skylineGroup.add(body);
+
+  const winMat = new THREE.MeshBasicMaterial({ color: hue, transparent: true, opacity: 0.85 });
+  const rows = Math.max(2, Math.floor(h / 2.2));
+  const cols = Math.max(2, Math.floor(w / 1.6));
+  const winGeo = new THREE.PlaneGeometry(0.5, 0.7);
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      if (Math.random() > 0.55) continue;
+      const win = new THREE.Mesh(winGeo, winMat);
+      win.position.set(
+        x - w / 2 + (c + 0.5) * (w / cols),
+        1.2 + r * (h / rows),
+        z + d / 2 + 0.01
+      );
+      skylineGroup.add(win);
+    }
+  }
+}
+
+const skylineHues = [0x3fa4ff, 0x1fe6c8, 0xff9142];
+for (let i = 0; i < 22; i++) {
+  const side = i % 2 === 0 ? -1 : 1;
+  const x = side * (9 + Math.random() * 16);
+  const z = -60 + Math.random() * 100;
+  const h = 3 + Math.random() * 12;
+  makeBuilding(x, z, 3 + Math.random() * 3, h, 3 + Math.random() * 3, skylineHues[i % 3]);
+}
+
+/* ---------------------------------------------------------------
+   HERO TRUCK — procedural low-poly, metallic
+--------------------------------------------------------------- */
+const truck = new THREE.Group();
+
+const cabPaint = new THREE.MeshPhysicalMaterial({
+  color: 0x1a2740, metalness: 0.85, roughness: 0.28, clearcoat: 1, clearcoatRoughness: 0.15, reflectivity: 0.6
+});
+const trailerPaint = new THREE.MeshPhysicalMaterial({
+  color: 0xe9edf5, metalness: 0.35, roughness: 0.4, clearcoat: 0.6, clearcoatRoughness: 0.25
+});
+const trimMat = new THREE.MeshStandardMaterial({ color: 0xff9142, emissive: 0xff9142, emissiveIntensity: 0.4, metalness: 0.5, roughness: 0.4 });
+const glassMat = new THREE.MeshPhysicalMaterial({ color: 0x0d1b2e, metalness: 0.1, roughness: 0.05, transmission: 0.4, transparent: true, opacity: 0.85 });
+const wheelMat = new THREE.MeshStandardMaterial({ color: 0x0a0a0c, roughness: 0.6, metalness: 0.3 });
+const rimMat = new THREE.MeshStandardMaterial({ color: 0x8a94a8, metalness: 0.9, roughness: 0.25 });
+
+/* cab */
+const cab = new THREE.Mesh(new THREE.BoxGeometry(2.1, 1.9, 2.4), cabPaint);
+cab.position.set(2.6, 1.35, 0);
+truck.add(cab);
+const cabTop = new THREE.Mesh(new THREE.BoxGeometry(1.9, 0.9, 2.2), cabPaint);
+cabTop.position.set(2.55, 2.55, 0);
+truck.add(cabTop);
+const windshield = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.8, 2.0), glassMat);
+windshield.position.set(3.55, 2.5, 0);
+truck.add(windshield);
+const trim = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.06, 2.42), trimMat);
+trim.position.set(2.6, 0.55, 0);
+truck.add(trim);
+
+/* headlights */
+const headlightMat = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xfff3d6, emissiveIntensity: 1.6 });
+const headlightL = new THREE.Mesh(new THREE.SphereGeometry(0.13, 12, 12), headlightMat);
+headlightL.position.set(3.65, 1.0, 0.85);
+const headlightR = headlightL.clone();
+headlightR.position.z = -0.85;
+truck.add(headlightL, headlightR);
+const headSpotL = new THREE.SpotLight(0xfff0d0, 3.5, 14, Math.PI / 7, 0.5, 1.2);
+headSpotL.position.copy(headlightL.position);
+headSpotL.target.position.set(9, 0.3, 0.85);
+truck.add(headSpotL, headSpotL.target);
+
+/* tail/indicator lights */
+const tailMat = new THREE.MeshStandardMaterial({ color: 0xff3b3b, emissive: 0xff2020, emissiveIntensity: 1.2 });
+const indicatorMat = new THREE.MeshStandardMaterial({ color: 0xffb03b, emissive: 0xff9142, emissiveIntensity: 0.2 });
+const indicatorL = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.14, 0.22), indicatorMat);
+indicatorL.position.set(-1.62, 1.0, 1.05);
+const indicatorR = indicatorL.clone(); indicatorR.position.z = -1.05;
+truck.add(indicatorL, indicatorR);
+
+/* trailer */
+const trailer = new THREE.Mesh(new THREE.BoxGeometry(4.6, 2.3, 2.3), trailerPaint);
+trailer.position.set(-1.4, 1.55, 0);
+truck.add(trailer);
+const trailerStripe = new THREE.Mesh(new THREE.BoxGeometry(4.62, 0.14, 2.32), trimMat);
+trailerStripe.position.set(-1.4, 1.15, 0);
+truck.add(trailerStripe);
+const tailL = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.3, 0.05), tailMat);
+tailL.position.set(-3.72, 1.2, 1.0); truck.add(tailL);
+const tailR = tailL.clone(); tailR.position.z = -1.0; truck.add(tailR);
+
+/* wheels */
+const wheelGroup = [];
+function makeWheel(x, z) {
+  const g = new THREE.Group();
+  const tire = new THREE.Mesh(new THREE.CylinderGeometry(0.52, 0.52, 0.4, 20), wheelMat);
+  tire.rotation.z = Math.PI / 2;
+  const rim = new THREE.Mesh(new THREE.CylinderGeometry(0.26, 0.26, 0.42, 16), rimMat);
+  rim.rotation.z = Math.PI / 2;
+  g.add(tire, rim);
+  g.position.set(x, 0.55, z);
+  truck.add(g);
+  wheelGroup.push(g);
+}
+[2.9, 1.7, -0.6, -2.4].forEach((x) => { makeWheel(x, 1.15); makeWheel(x, -1.15); });
+
+/* ground contact fog puff (simple soft sprite) */
+const fogTex = new THREE.CanvasTexture(makeRadialTexture());
+function makeRadialTexture() {
+  const c = document.createElement('canvas'); c.width = c.height = 128;
+  const ctx = c.getContext('2d');
+  const grad = ctx.createRadialGradient(64, 64, 0, 64, 64, 64);
+  grad.addColorStop(0, 'rgba(160,190,230,0.55)');
+  grad.addColorStop(1, 'rgba(160,190,230,0)');
+  ctx.fillStyle = grad; ctx.fillRect(0, 0, 128, 128);
+  return c;
+}
+const fogSpriteMat = new THREE.SpriteMaterial({ map: fogTex, transparent: true, depthWrite: false, opacity: 0.5 });
+const wheelFog = new THREE.Sprite(fogSpriteMat);
+wheelFog.scale.set(2.4, 1.0, 1);
+wheelFog.position.set(0.6, 0.15, 0);
+truck.add(wheelFog);
+
+truck.position.set(0, 0, 6);
+truck.rotation.y = Math.PI * 1.5;
+scene.add(truck);
+
+/* soft shadow blob under truck */
+const shadowMat = new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.4 });
+const shadowBlob = new THREE.Mesh(new THREE.CircleGeometry(3.4, 24), shadowMat);
+shadowBlob.rotation.x = -Math.PI / 2;
+shadowBlob.position.set(0.6, 0.015, 6);
+scene.add(shadowBlob);
+
+/* ---------------------------------------------------------------
+   DRONE with package
+--------------------------------------------------------------- */
+const drone = new THREE.Group();
+const droneBody = new THREE.Mesh(new THREE.SphereGeometry(0.16, 12, 12), new THREE.MeshStandardMaterial({ color: 0xdbe4f5, emissive: 0x3fa4ff, emissiveIntensity: 0.3, metalness: 0.5, roughness: 0.3 }));
+drone.add(droneBody);
+const pkg = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.18, 0.18), new THREE.MeshStandardMaterial({ color: 0xff9142, emissive: 0xff9142, emissiveIntensity: 0.3 }));
+pkg.position.y = -0.32;
+drone.add(pkg);
+const droneLight = new THREE.PointLight(0x3fa4ff, 1.2, 6);
+drone.add(droneLight);
+drone.position.set(-6, 7, -8);
+scene.add(drone);
+
+/* ---------------------------------------------------------------
+   FLOATING PARTICLES (dust + energy motes)
+--------------------------------------------------------------- */
+const particleCount = isMobile ? 220 : 500;
+const particleGeo = new THREE.BufferGeometry();
+const positions = new Float32Array(particleCount * 3);
+for (let i = 0; i < particleCount; i++) {
+  positions[i * 3] = (Math.random() - 0.5) * 60;
+  positions[i * 3 + 1] = Math.random() * 16;
+  positions[i * 3 + 2] = (Math.random() - 0.5) * 90;
+}
+particleGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+const particleMat = new THREE.PointsMaterial({ color: 0x7cc4ff, size: 0.05, transparent: true, opacity: 0.55, sizeAttenuation: true });
+const particles = new THREE.Points(particleGeo, particleMat);
+scene.add(particles);
+
+/* stars */
+const starGeo = new THREE.BufferGeometry();
+const starPos = new Float32Array(300 * 3);
+for (let i = 0; i < 300; i++) {
+  starPos[i * 3] = (Math.random() - 0.5) * 160;
+  starPos[i * 3 + 1] = 20 + Math.random() * 40;
+  starPos[i * 3 + 2] = (Math.random() - 0.5) * 160;
+}
+starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+const stars = new THREE.Points(starGeo, new THREE.PointsMaterial({ color: 0xffffff, size: 0.06, transparent: true, opacity: 0.6 }));
+scene.add(stars);
+
+/* ---------------------------------------------------------------
+   ANIMATION LOOP
+--------------------------------------------------------------- */
+const clock = new THREE.Clock();
+let mouseX = 0, mouseY = 0, targetRotY = truck.rotation.y;
+let idleDrive = 0;
+
+window.addEventListener('pointermove', (e) => {
+  mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
+  mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
+});
+
+function animate() {
+  requestAnimationFrame(animate);
+  const t = clock.getElapsedTime();
+  const dt = clock.getDelta();
+
+  /* lane markers scroll toward camera */
+  laneGroup.children.forEach((seg) => {
+    seg.position.z += dt * 9;
+    if (seg.position.z > 12) seg.position.z -= 144;
+  });
+
+  /* wheel spin */
+  wheelGroup.forEach((w) => { w.rotation.x -= dt * 6; });
+
+  /* idle suspension + periodic forward nudge */
+  idleDrive += dt;
+  const bob = Math.sin(t * 2.4) * 0.015;
+  truck.position.y = bob;
+  const driveCycle = idleDrive % 6;
+  const driveOffset = driveCycle < 1.2 ? Math.sin((driveCycle / 1.2) * Math.PI) * 0.9 : 0;
+  truck.position.z = 6 + driveOffset * 0.4;
+  shadowBlob.position.z = truck.position.z;
+  shadowBlob.position.x = 0.6 + Math.sin(t * 0.6) * 0.02;
+
+  /* mouse parallax on truck + camera */
+  if (!prefersReduced) {
+    targetRotY = Math.PI * 1.5 + mouseX * 0.25;
+    truck.rotation.y += (targetRotY - truck.rotation.y) * 0.04;
+    camera.position.x += (-2 + mouseX * 1.4 - camera.position.x) * 0.03;
+    camera.position.y += (5.5 - mouseY * 0.8 - camera.position.y) * 0.03;
+    camera.lookAt(0, 1.5, 0);
+  }
+
+  /* headlight flicker / indicator blink */
+  const blink = (Math.sin(t * 6) + 1) / 2;
+  indicatorMat.emissiveIntensity = 0.15 + blink * 0.9;
+
+  /* drone loop path */
+  drone.position.x = -6 + Math.sin(t * 0.35) * 10;
+  drone.position.z = -8 + Math.cos(t * 0.35) * 14;
+  drone.position.y = 7 + Math.sin(t * 1.2) * 0.4;
+  drone.rotation.y += dt * 0.6;
+
+  /* particle drift */
+  particles.rotation.y += dt * 0.01;
+  const posAttr = particleGeo.attributes.position;
+  for (let i = 0; i < particleCount; i++) {
+    posAttr.array[i * 3 + 1] += dt * 0.15;
+    if (posAttr.array[i * 3 + 1] > 16) posAttr.array[i * 3 + 1] = 0;
+  }
+  posAttr.needsUpdate = true;
+
+  stars.rotation.y += dt * 0.002;
+
+  if (bloomPass) composer.render(); else renderer.render(scene, camera);
+}
+animate();
+
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  composer.setSize(window.innerWidth, window.innerHeight);
+});
+
+/* ---------------------------------------------------------------
+   ROUTE LINE (SVG signature element) — draws from truck toward card
+--------------------------------------------------------------- */
+function updateRoutePath() {
+  const svg = document.querySelector('.route-svg');
+  const path = document.getElementById('routePath');
+  const glow = document.getElementById('routeGlow');
+  const card = document.getElementById('loginCard');
+  if (!card) return;
+  const cardRect = card.getBoundingClientRect();
+  const w = window.innerWidth, h = window.innerHeight;
+  const startX = w * (isMobile ? 0.5 : 0.28);
+  const startY = h * (isMobile ? 0.4 : 0.72);
+  const endX = cardRect.left;
+  const endY = cardRect.top + 46;
+  const midX = (startX + endX) / 2;
+  const d = `M ${startX} ${startY} C ${midX} ${startY - 40}, ${midX} ${endY + 40}, ${endX} ${endY}`;
+  path.setAttribute('d', d);
+  glow.setAttribute('d', d);
+}
+window.addEventListener('resize', updateRoutePath);
+
+/* ---------------------------------------------------------------
+   INTRO TIMELINE (GSAP) — 3.5s cinematic entrance
+--------------------------------------------------------------- */
+window.addEventListener('load', () => {
+  updateRoutePath();
+  const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+
+  if (prefersReduced) {
+    gsap.set(['.topbar', '#eyebrow', '#heroSub', '.hero-title .word', '#loginCard'], { opacity: 1, x: 0, y: 0, filter: 'none' });
+    document.getElementById('routePath').style.opacity = 0.9;
+    document.getElementById('routeGlow').style.opacity = 0.35;
+  } else {
+    tl.to('#scene-canvas', { opacity: 1, duration: 0.1 })
+      .from(camera.position, {
+        x: -14, y: 9, z: 40, duration: 2.6, ease: 'power2.out',
+        onUpdate: () => camera.lookAt(0, 1.5, 0)
+      }, 0)
+      .to('.topbar', { opacity: 1, y: 0, duration: 0.8 }, 1.1)
+      .to('#eyebrow', { opacity: 1, duration: 0.6 }, 1.3)
+      .to('.hero-title .word', { opacity: 1, y: 0, filter: 'blur(0px)', duration: 0.7, stagger: 0.06 }, 1.4)
+      .to('#heroSub', { opacity: 1, y: 0, duration: 0.7 }, 1.9)
+      .to('#routePath', { opacity: 0.9, duration: 0.8 }, 2.0)
+      .to('#routeGlow', { opacity: 0.35, duration: 0.8 }, 2.0)
+      .fromTo('#routePath', { strokeDashoffset: 400 }, { strokeDashoffset: 0, duration: 1.4, ease: 'power1.inOut' }, 2.0)
+      .to('#loginCard', { opacity: 1, y: 0, rotateX: 0, duration: 1.0, ease: 'power3.out' }, 2.3)
+      .from('.field', { opacity: 0, y: 14, duration: 0.5, stagger: 0.09 }, 2.55)
+      .from('.row-between, .btn, .divider, .switch-mode', { opacity: 0, y: 10, duration: 0.5, stagger: 0.06 }, 2.85);
+  }
+});
+
+/* card gentle 3D tilt with mouse (desktop only) */
+if (!isMobile && !prefersReduced) {
+  const card = document.getElementById('loginCard');
+  const quickX = gsap.quickTo(card, 'rotateY', { duration: 0.6, ease: 'power3.out' });
+  const quickY = gsap.quickTo(card, 'rotateX', { duration: 0.6, ease: 'power3.out' });
+  window.addEventListener('pointermove', (e) => {
+    const nx = (e.clientX / window.innerWidth - 0.5) * 2;
+    const ny = (e.clientY / window.innerHeight - 0.5) * 2;
+    quickX(nx * 4);
+    quickY(-ny * 3);
+  });
+}
+
+/* live telemetry number tick (decorative) */
+setInterval(() => {
+  const el = document.getElementById('tUnits');
+  const base = 248;
+  el.textContent = base + Math.floor(Math.random() * 6) - 2;
+}, 2600);
+
+/* set hero title word spans */
+const titleEl = document.getElementById('heroTitle');
+'Welcome Back'.split(' ').forEach((w, i, arr) => {
+  const span = document.createElement('span');
+  span.className = 'word';
+  span.textContent = w + (i < arr.length - 1 ? '\u00A0' : '');
+  titleEl.appendChild(span);
+});
+</script>
+
+<script>
+/* ---------------------------------------------------------------
+   FORM LOGIC — mode switch, validation, real backend sign-in
+--------------------------------------------------------------- */
+(function () {
+  const passwordFields = document.getElementById('passwordFields');
+  const otpFields = document.getElementById('otpFields');
+  const otpModeBtn = document.getElementById('otpModeBtn');
+  const submitLabel = document.getElementById('submitLabel');
+  const form = document.getElementById('loginCard');
+  const loadingOverlay = document.getElementById('loadingOverlay');
+  const loadingFill = document.getElementById('loadingFill');
+  const loadingPct = document.getElementById('loadingPct');
+  const successOverlay = document.getElementById('successOverlay');
+  const checkPath = document.getElementById('checkPath');
+  const sceneCanvas = document.getElementById('scene-canvas');
+  const liveRegion = document.getElementById('liveRegion');
+  const resendOtpLink = document.getElementById('resendOtp');
+  const otpStatus = document.getElementById('otpStatus');
+  const signupNameField = document.getElementById('signupNameField');
+  const signupEmailField = document.getElementById('signupEmailField');
+
+  const csrftoken = document.querySelector('#loginCard [name=csrfmiddlewaretoken]').value;
+
+  let mode = 'password';
+  let otpSent = false;
+  let needsSignup = false;
+
+  otpModeBtn.addEventListener('click', () => {
+    mode = mode === 'password' ? 'otp' : 'password';
+    const isOtp = mode === 'otp';
+    if (isOtp) {
+      document.getElementById('mobileOtp').value = document.getElementById('mobile').value;
+    } else {
+      document.getElementById('mobile').value = document.getElementById('mobileOtp').value;
+    }
+    passwordFields.style.display = isOtp ? 'none' : 'block';
+    otpFields.style.display = isOtp ? 'block' : 'none';
+    otpModeBtn.textContent = isOtp ? 'Login with password instead' : 'Login with OTP instead';
+    submitLabel.textContent = isOtp ? (otpSent ? 'Verify & Sign In' : (needsSignup ? 'Create Account & Send Code' : 'Send Code')) : 'Sign In';
+  });
+
+  document.getElementById('mobileOtp').addEventListener('input', () => {
+    if (needsSignup) {
+      needsSignup = false;
+      signupNameField.style.display = 'none';
+      signupEmailField.style.display = 'none';
+      otpStatus.style.display = 'none';
+      if (!otpSent) submitLabel.textContent = 'Send Code';
+    }
+  });
+
+  document.getElementById('toggleEye').addEventListener('click', function () {
+    const input = document.getElementById('password');
+    const showing = input.type === 'text';
+    input.type = showing ? 'password' : 'text';
+    this.setAttribute('aria-label', showing ? 'Show password' : 'Hide password');
+  });
+
+  /* Google button — sends the browser straight to allauth's Google login flow */
+  document.getElementById('googleBtn').addEventListener('click', () => {
+    liveRegion.textContent = 'Redirecting to Google sign-in…';
+    window.location.href = '/accounts/google/login/';
+  });
+
+  async function postJSON(url, body) {
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrftoken },
+      body: JSON.stringify(body)
+    });
+    let data;
+    try { data = await res.json(); } catch (e) { data = { ok: false, error: 'Unexpected server response.' }; }
+    return data;
+  }
+
+  function startCooldown() {
+    let cooldown = 30;
+    resendOtpLink.style.pointerEvents = 'none';
+    resendOtpLink.style.opacity = '0.5';
+    const timer = setInterval(() => {
+      cooldown -= 1;
+      resendOtpLink.textContent = `Resend code (${cooldown}s)`;
+      if (cooldown <= 0) {
+        clearInterval(timer);
+        resendOtpLink.textContent = 'Resend code';
+        resendOtpLink.style.pointerEvents = 'auto';
+        resendOtpLink.style.opacity = '1';
+      }
+    }, 1000);
+  }
+
+  async function handleOtpAction() {
+    const mobile = document.getElementById('mobileOtp').value.trim();
+    if (!/^\d{10}$/.test(mobile)) {
+      otpStatus.style.display = 'block';
+      otpStatus.style.color = 'var(--danger)';
+      otpStatus.textContent = 'Enter a valid 10-digit mobile number.';
+      document.getElementById('mobileOtp').focus();
+      return false;
+    }
+
+    if (needsSignup) {
+      const name = document.getElementById('signupName').value.trim();
+      const email = document.getElementById('signupEmail').value.trim();
+      if (!name) {
+        otpStatus.style.display = 'block';
+        otpStatus.style.color = 'var(--danger)';
+        otpStatus.textContent = 'Please enter your name.';
+        document.getElementById('signupName').focus();
+        return false;
+      }
+      if (!email || !/\S+@\S+\.\S+/.test(email)) {
+        otpStatus.style.display = 'block';
+        otpStatus.style.color = 'var(--danger)';
+        otpStatus.textContent = 'Enter a valid email address.';
+        document.getElementById('signupEmail').focus();
+        return false;
+      }
+
+      otpStatus.style.display = 'block';
+      otpStatus.style.color = 'var(--blue-soft)';
+      otpStatus.textContent = 'Creating account…';
+
+      const data = await postJSON('/social/auth/self-signup/', { mobile, name, email });
+      if (data.ok) {
+        otpSent = true;
+        needsSignup = false;
+        signupNameField.style.display = 'none';
+        signupEmailField.style.display = 'none';
+        otpStatus.style.color = 'var(--cyan)';
+        otpStatus.textContent = data.message || 'Account created! Code sent to your email.';
+        submitLabel.textContent = 'Verify & Sign In';
+        resendOtpLink.textContent = 'Resend code';
+        document.getElementById('otp').focus();
+        startCooldown();
+        return true;
+      } else {
+        otpStatus.style.color = 'var(--danger)';
+        otpStatus.textContent = data.error || 'Could not create account.';
+        return false;
+      }
+    } else {
+      otpStatus.style.display = 'block';
+      otpStatus.style.color = 'var(--blue-soft)';
+      otpStatus.textContent = 'Sending code…';
+
+      const data = await postJSON('/social/auth/request-otp/', { mobile });
+      if (data.ok) {
+        otpSent = true;
+        otpStatus.style.color = 'var(--cyan)';
+        otpStatus.textContent = data.message || 'Code sent to your email.';
+        submitLabel.textContent = 'Verify & Sign In';
+        resendOtpLink.textContent = 'Resend code';
+        document.getElementById('otp').focus();
+        startCooldown();
+        return true;
+      } else if (data.needs_signup) {
+        needsSignup = true;
+        signupNameField.style.display = 'block';
+        signupEmailField.style.display = 'block';
+        otpStatus.style.color = 'var(--amber-soft)';
+        otpStatus.textContent = data.error || 'No account found. Enter your name and email to create one.';
+        submitLabel.textContent = 'Create Account & Send Code';
+        resendOtpLink.textContent = 'Create account & send code';
+        document.getElementById('signupName').focus();
+        return false;
+      } else {
+        otpStatus.style.color = 'var(--danger)';
+        otpStatus.textContent = data.error || 'Could not send code.';
+        return false;
+      }
+    }
+  }
+
+  /* --- Send / resend OTP code link --- */
+  resendOtpLink.addEventListener('click', async (e) => {
+    e.preventDefault();
+    await handleOtpAction();
+  });
+
+  /* --- Form Submission --- */
+  form.addEventListener('submit', async function (e) {
+    e.preventDefault();
+
+    if (mode === 'password') {
+      const mobileField = document.getElementById('mobileField');
+      const passwordField = document.getElementById('passwordField');
+      const mobile = document.getElementById('mobile').value.trim();
+      const pass = document.getElementById('password').value;
+      mobileField.classList.toggle('has-error', !/^\d{10}$/.test(mobile));
+      passwordField.classList.toggle('has-error', pass.length === 0);
+      if (!/^\d{10}$/.test(mobile) || pass.length === 0) return;
+
+      sceneCanvas.classList.add('dim');
+      loadingOverlay.style.pointerEvents = 'auto';
+      gsap.to(loadingOverlay, { opacity: 1, duration: 0.4 });
+      gsap.to(form, { opacity: 0, y: -12, duration: 0.4 });
+      let progressInterval = animateProgress();
+
+      const data = await postJSON('/social/auth/password-login/', { mobile, password: pass });
+      clearInterval(progressInterval);
+
+      if (data.ok) {
+        loadingFill.style.width = '100%';
+        loadingPct.textContent = '100%';
+        setTimeout(() => showSuccess(data.redirect || '/social/'), 250);
+      } else {
+        gsap.to(loadingOverlay, { opacity: 0, duration: 0.3, onComplete: () => { loadingOverlay.style.pointerEvents = 'none'; } });
+        gsap.to(form, { opacity: 1, y: 0, duration: 0.4 });
+        sceneCanvas.classList.remove('dim');
+        mobileField.classList.add('has-error');
+        passwordField.classList.add('has-error');
+        document.querySelector('#passwordField .field-error').textContent = data.error || 'Sign in failed.';
+      }
+    } else {
+      // OTP mode
+      if (!otpSent) {
+        await handleOtpAction();
+        return;
+      }
+
+      const mobile = document.getElementById('mobileOtp').value.trim();
+      const otp = document.getElementById('otp').value.trim();
+      if (!/^\d{4,6}$/.test(otp)) {
+        otpStatus.style.display = 'block';
+        otpStatus.style.color = 'var(--danger)';
+        otpStatus.textContent = 'Enter the 6-digit code sent to your email.';
+        document.getElementById('otp').focus();
+        return;
+      }
+
+      sceneCanvas.classList.add('dim');
+      loadingOverlay.style.pointerEvents = 'auto';
+      gsap.to(loadingOverlay, { opacity: 1, duration: 0.4 });
+      gsap.to(form, { opacity: 0, y: -12, duration: 0.4 });
+      let progressInterval = animateProgress();
+
+      const data = await postJSON('/social/auth/verify-otp/', { mobile, otp });
+      clearInterval(progressInterval);
+
+      if (data.ok) {
+        loadingFill.style.width = '100%';
+        loadingPct.textContent = '100%';
+        setTimeout(() => showSuccess(data.redirect || '/social/'), 250);
+      } else {
+        gsap.to(loadingOverlay, { opacity: 0, duration: 0.3, onComplete: () => { loadingOverlay.style.pointerEvents = 'none'; } });
+        gsap.to(form, { opacity: 1, y: 0, duration: 0.4 });
+        sceneCanvas.classList.remove('dim');
+        otpStatus.style.display = 'block';
+        otpStatus.style.color = 'var(--danger)';
+        otpStatus.textContent = data.error || 'Invalid code.';
+      }
+    }
+  });
+
+  function animateProgress() {
+    let pct = 0;
+    loadingFill.style.width = '0%';
+    loadingPct.textContent = '0%';
+    return setInterval(() => {
+      pct = Math.min(pct + Math.random() * 12 + 4, 92);
+      loadingFill.style.width = pct + '%';
+      loadingPct.textContent = Math.floor(pct) + '%';
+    }, 220);
+  }
+
+  function showSuccess(redirectUrl) {
+    gsap.to(loadingOverlay, { opacity: 0, duration: 0.4, onComplete: () => { loadingOverlay.style.pointerEvents = 'none'; } });
+    successOverlay.style.pointerEvents = 'auto';
+    gsap.to(successOverlay, { opacity: 1, duration: 0.5 });
+    gsap.to(checkPath, {
+      strokeDashoffset: 0, duration: 0.6, delay: 0.2, ease: 'power2.out',
+      onComplete: () => {
+        liveRegion.textContent = 'Signed in successfully.';
+        setTimeout(() => {
+          window.location.href = redirectUrl;
+        }, 1000);
+      }
+    });
+  }
+})();
+</script>
+
+</body>
+</html>

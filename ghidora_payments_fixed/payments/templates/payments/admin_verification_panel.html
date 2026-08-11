@@ -1,0 +1,84 @@
+{% extends "payments/base.html" %}
+{% block title %}Verify Payment — {{ payment_request.payment_id }} | Ghidora Transport{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+  <div class="col-lg-6">
+    <div class="glass-card p-4 h-100">
+      <h5 class="font-display mb-3">Proof of Payment</h5>
+
+      {% if proof.screenshot.url|slice:"-4:" == ".pdf" %}
+        <a href="{{ proof.screenshot.url }}" target="_blank" class="btn btn-route">
+          <i class="bi bi-file-earmark-pdf me-1"></i>Open PDF Proof
+        </a>
+      {% else %}
+        <img src="{{ proof.screenshot.url }}" class="img-fluid rounded mb-2" style="cursor:zoom-in;"
+             id="proof-img" data-bs-toggle="modal" data-bs-target="#zoomModal" alt="Payment proof screenshot">
+        <div class="d-flex gap-2">
+          <button class="btn btn-ghost-glass btn-sm" data-bs-toggle="modal" data-bs-target="#zoomModal">
+            <i class="bi bi-zoom-in me-1"></i>Zoom
+          </button>
+          <a href="{{ proof.screenshot.url }}" download class="btn btn-ghost-glass btn-sm">
+            <i class="bi bi-download me-1"></i>Download
+          </a>
+        </div>
+
+        <div class="modal fade" id="zoomModal" tabindex="-1">
+          <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content bg-transparent border-0">
+              <img src="{{ proof.screenshot.url }}" class="img-fluid rounded" alt="Zoomed payment proof">
+            </div>
+          </div>
+        </div>
+      {% endif %}
+
+      <hr class="border-secondary-subtle">
+
+      <div class="row g-2 font-ledger small">
+        <div class="col-6 text-muted-soft">Transaction ID</div><div class="col-6">{{ proof.transaction_id }}</div>
+        <div class="col-6 text-muted-soft">Reference No.</div><div class="col-6">{{ proof.reference_number|default:"-" }}</div>
+        <div class="col-6 text-muted-soft">Method</div><div class="col-6">{{ proof.get_method_used_display }}</div>
+        <div class="col-6 text-muted-soft">Amount Paid</div><div class="col-6">₹{{ proof.amount_paid }}</div>
+        <div class="col-6 text-muted-soft">Payment Date/Time</div><div class="col-6">{{ proof.payment_date }} {{ proof.payment_time }}</div>
+        <div class="col-6 text-muted-soft">Bank</div><div class="col-6">{{ proof.bank_name|default:"-" }}</div>
+        <div class="col-6 text-muted-soft">UPI App</div><div class="col-6">{{ proof.upi_app_used|default:"-" }}</div>
+        <div class="col-6 text-muted-soft">Remarks</div><div class="col-6">{{ proof.remarks|default:"-" }}</div>
+        <div class="col-6 text-muted-soft">Uploaded</div><div class="col-6">{{ proof.uploaded_at }} ({{ proof.uploaded_ip }})</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-6">
+    <div class="glass-card p-4 mb-4">
+      <h5 class="font-display mb-3">Booking &amp; Customer</h5>
+      <div class="row g-2 font-ledger small">
+        <div class="col-6 text-muted-soft">Booking ID</div><div class="col-6">{{ payment_request.booking.booking_id }}</div>
+        <div class="col-6 text-muted-soft">Customer</div><div class="col-6">{{ payment_request.booking.name }} ({{ payment_request.booking.phone }})</div>
+        <div class="col-6 text-muted-soft">Route</div><div class="col-6">{{ payment_request.booking.pickup }} → {{ payment_request.booking.destination }}</div>
+        <div class="col-6 text-muted-soft">Total Fare</div><div class="col-6">₹{{ payment_request.total_fare }}</div>
+        <div class="col-6 text-muted-soft">Requested Amount</div><div class="col-6">₹{{ payment_request.amount }}</div>
+      </div>
+    </div>
+
+    <div class="glass-card p-4">
+      <h5 class="font-display mb-3">Verification Decision</h5>
+      <form method="post" class="glass-form">
+        {% csrf_token %}
+        <label class="form-label small text-muted-soft">Action</label>
+        {{ form.action }}
+
+        <label class="form-label small text-muted-soft mt-3">Rejection Reason (if rejecting)</label>
+        {{ form.rejection_reason }}
+
+        <label class="form-label small text-muted-soft mt-3">Notes</label>
+        {{ form.notes }}
+
+        <div class="d-flex gap-2 mt-4">
+          <button type="submit" class="btn btn-route"><i class="bi bi-check2-circle me-1"></i>Save Decision</button>
+          <a href="{% url 'payments:admin_dashboard' %}" class="btn btn-ghost-glass">Back to Dashboard</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

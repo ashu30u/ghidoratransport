@@ -1,0 +1,232 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Occasions Automation Settings - Ghidora Transport</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        @property --angle { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
+        @keyframes borderRotate { to { --angle: 360deg; } }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: #060911;
+            color: #ffffff;
+            min-height: 100vh;
+            padding: 30px 20px 60px;
+        }
+
+        .settings-container { max-width: 750px; margin: 0 auto; }
+
+        .settings-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .settings-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 24px;
+            font-weight: 900;
+            background: linear-gradient(135deg, #ffffff 20%, #00f2fe 60%, #ff007f 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .btn-dash {
+            padding: 10px 18px;
+            border-radius: 12px;
+            font-weight: 800;
+            font-size: 13px;
+            text-transform: uppercase;
+            text-decoration: none;
+            cursor: pointer;
+            background: linear-gradient(135deg, #0ea5e9, #0284c7);
+            color: #fff;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+            transition: all 0.25s ease;
+        }
+        .btn-dash:hover { transform: translateY(-3px); }
+
+        .alert-box {
+            padding: 14px 20px;
+            border-radius: 14px;
+            margin-bottom: 25px;
+            font-weight: 700;
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            color: #34d399;
+        }
+
+        /* 🌟 3D Card */
+        .card-wrap {
+            position: relative;
+            padding: 2.5px;
+            border-radius: 24px;
+            background: conic-gradient(from var(--angle), #00f2fe, #7928ca, #ff007f, #00f2fe);
+            animation: borderRotate 7s linear infinite;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8);
+        }
+
+        .card-inner {
+            background: rgba(11, 17, 30, 0.97);
+            border-radius: 22px;
+            padding: 35px 30px;
+        }
+
+        .setting-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .setting-label { font-weight: 800; font-size: 14px; color: #f1f5f9; }
+        .setting-desc { font-size: 12px; color: #94a3b8; margin-top: 3px; }
+
+        /* Switch Toggle */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 26px;
+        }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider {
+            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #334155; transition: .3s; border-radius: 34px;
+        }
+        .slider:before {
+            position: absolute; content: ""; height: 18px; width: 18px; left: 4px; bottom: 4px;
+            background-color: white; transition: .3s; border-radius: 50%;
+        }
+        input:checked + .slider { background-color: #00f2fe; }
+        input:checked + .slider:before { transform: translateX(24px); }
+
+        .btn-save {
+            width: 100%;
+            padding: 14px;
+            margin-top: 25px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            border: none;
+            border-radius: 14px;
+            color: white;
+            font-weight: 900;
+            font-size: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            cursor: pointer;
+            box-shadow: 0 8px 24px rgba(16, 185, 129, 0.4);
+            transition: all 0.25s ease;
+        }
+        .btn-save:hover { transform: translateY(-3px); }
+    </style>
+</head>
+<body>
+
+<div class="settings-container">
+    <div class="settings-header">
+        <h1 class="settings-title">AUTOMATION SETTINGS</h1>
+        <a href="{% url 'occasions_dashboard' %}" class="btn-dash">📊 Dashboard</a>
+    </div>
+
+    {% if messages %}
+        {% for m in messages %}
+            <div class="alert-box">{{ m }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="card-wrap">
+        <div class="card-inner">
+            <form method="post">
+                {% csrf_token %}
+
+                <div class="setting-row">
+                    <div>
+                        <div class="setting-label">Automatic Occasion Sync</div>
+                        <div class="setting-desc">Automatically fetch festivals from Google Calendar ~30 days in advance</div>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" name="auto_sync_enabled" {% if setting.auto_sync_enabled %}checked{% endif %}>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div class="setting-row">
+                    <div>
+                        <div class="setting-label">Advance Import Days</div>
+                        <div class="setting-desc">Number of days in advance to detect & import upcoming occasions</div>
+                    </div>
+                    <input type="number" name="advance_import_days" value="{{ setting.advance_import_days }}" style="width: 80px; padding: 8px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: rgba(15,23,42,0.8); color: #fff; text-align: center; font-weight: 800;">
+                </div>
+
+                <div class="setting-row">
+                    <div>
+                        <div class="setting-label">AI Message Generation</div>
+                        <div class="setting-desc">Automatically generate Ghidora Transport brand greeting messages using Gemini AI</div>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" name="ai_generation_enabled" {% if setting.ai_generation_enabled %}checked{% endif %}>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div class="setting-row">
+                    <div>
+                        <div class="setting-label">Admin Approval Required (Mandatory)</div>
+                        <div class="setting-desc">Require explicit Admin review & approval before any customer message is dispatched</div>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" name="admin_approval_required" {% if setting.admin_approval_required %}checked{% endif %}>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div class="setting-row">
+                    <div>
+                        <div class="setting-label">Automatic Customer Dispatch</div>
+                        <div class="setting-desc">Auto-send approved occasion messages on scheduled date (Default: OFF)</div>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" name="auto_sending_enabled" {% if setting.auto_sending_enabled %}checked{% endif %}>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div class="setting-row">
+                    <div>
+                        <div class="setting-label">Customer Notification System</div>
+                        <div class="setting-desc">Enable Email & WhatsApp customer messaging</div>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" name="customer_sending_enabled" {% if setting.customer_sending_enabled %}checked{% endif %}>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div class="setting-row">
+                    <div>
+                        <div class="setting-label">Duplicate Protection</div>
+                        <div class="setting-desc">Prevent sending same occasion message multiple times to the same customer</div>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" name="duplicate_protection_enabled" {% if setting.duplicate_protection_enabled %}checked{% endif %}>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <button type="submit" class="btn-save">💾 Save Automation Settings</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

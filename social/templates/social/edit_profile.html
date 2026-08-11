@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'social/css/social.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="gs-wrap">
+  <h1 class="gs-title" style="font-size:1.4rem; margin-bottom:16px;">Edit profile</h1>
+  <div class="gs-composer">
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <label style="font-size:0.85rem; color:var(--gs-ink-soft);">Bio</label>
+      {{ form.bio }}
+      <label style="font-size:0.85rem; color:var(--gs-ink-soft); display:block; margin-top:10px;">Avatar</label>
+      {{ form.avatar }}
+      <div style="text-align:right; margin-top:14px;">
+        <button type="submit" class="gs-btn">Save</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

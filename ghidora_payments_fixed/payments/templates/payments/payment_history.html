@@ -1,0 +1,43 @@
+{% extends "payments/base.html" %}
+{% block title %}My Payments | Ghidora Transport{% endblock %}
+
+{% block content %}
+<div class="glass-card p-4">
+  <h4 class="font-display mb-4"><i class="bi bi-receipt me-2"></i>Payment History</h4>
+
+  <div class="table-responsive">
+    <table class="table table-borderless align-middle" style="color:var(--text-primary);">
+      <thead>
+        <tr class="text-muted-soft small text-uppercase">
+          <th>Booking</th><th>Type</th><th>Amount</th><th>Date</th>
+          <th>Method</th><th>Reference</th><th>Status</th><th>Receipt</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for pr in payment_requests %}
+        <tr class="border-top border-secondary-subtle">
+          <td class="font-ledger">{{ pr.booking.booking_id }}</td>
+          <td>{{ pr.get_payment_type_display }}</td>
+          <td class="font-ledger">₹{{ pr.amount }}</td>
+          <td>{{ pr.created_at|date:"d M Y" }}</td>
+          <td>{{ pr.get_preferred_method_display|default:"-" }}</td>
+          <td class="font-ledger">{{ pr.latest_proof.transaction_id|default:"-" }}</td>
+          <td><span class="status-pill" style="color:{{ pr.status_color }}"><span class="dot"></span>{{ pr.get_status_display }}</span></td>
+          <td>
+            {% if pr.status == 'verified' or pr.status == 'completed' %}
+              <a href="{% url 'payments:download_receipt' pr.payment_id %}" class="btn btn-ghost-glass btn-sm">
+                <i class="bi bi-download"></i>
+              </a>
+            {% else %}
+              <a href="{% url 'payments:customer_payment_page' pr.payment_id %}" class="btn btn-route btn-sm">Pay</a>
+            {% endif %}
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="8" class="text-center text-muted-soft py-4">No payment requests yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

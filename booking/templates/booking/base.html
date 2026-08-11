@@ -6,6 +6,95 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>{% block title %}Ghidora Transport{% endblock %}</title>
 <link rel="stylesheet" href="{% static 'css/style.css' %}">
+<style>
+  .hamburger-btn {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 44px !important;
+    height: 38px !important;
+    background: #1e293b !important;
+    border: 1.5px solid #ff7a1a !important;
+    border-radius: 10px !important;
+    cursor: pointer !important;
+    padding: 0 !important;
+    z-index: 1001 !important;
+    flex-shrink: 0 !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
+    transition: background 0.2s ease, border-color 0.2s ease !important;
+  }
+  .hamburger-btn:hover {
+    background: #ff7a1a !important;
+    border-color: #ffffff !important;
+  }
+  .hamburger-btn .ham-svg {
+    width: 22px !important;
+    height: 18px !important;
+    overflow: visible !important;
+  }
+  .hamburger-btn .ham-line {
+    transform-origin: center center !important;
+    transition: transform 0.4s cubic-bezier(0.68, -0.6, 0.32, 1.6), opacity 0.3s ease, fill 0.3s ease !important;
+  }
+  .hamburger-btn.active {
+    background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+    border-color: #ffffff !important;
+    transform: rotate(180deg) scale(1.05) !important;
+    box-shadow: 0 0 25px rgba(239, 68, 68, 0.85) !important;
+  }
+  .hamburger-btn.active .ham-top {
+    transform: translateY(7.75px) rotate(45deg) !important;
+  }
+  .hamburger-btn.active .ham-mid {
+    opacity: 0 !important;
+    transform: scaleX(0) !important;
+  }
+  .hamburger-btn.active .ham-bot {
+    transform: translateY(-7.75px) rotate(-45deg) !important;
+  }
+
+  .mobile-nav-drawer {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 20px;
+    width: 320px;
+    background: linear-gradient(145deg, rgba(15, 23, 42, 0.96), rgba(30, 41, 59, 0.96));
+    border: 1px solid rgba(255, 122, 26, 0.4);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-radius: 16px;
+    padding: 16px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 30px rgba(255, 107, 0, 0.2);
+    z-index: 9999;
+    flex-direction: column;
+    gap: 6px;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+  .mobile-nav-drawer.active {
+    display: flex !important;
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+  }
+  .mobile-nav-drawer a {
+    color: #f8fafc;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 13.5px;
+    padding: 9px 12px;
+    border-radius: 10px;
+    transition: background 0.2s ease, color 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .mobile-nav-drawer a:hover {
+    background: rgba(255, 122, 26, 0.18);
+    color: #ff9e00;
+  }
+</style>
 {% block extra_style %}{% endblock %}
 </head>
 
@@ -25,12 +114,57 @@
     </a>
     <div class="nav-links">
       <a href="{% url 'home' %}">Home</a>
-      <a href="{% url 'home' %}#services">Services</a>
+      <a href="{% url 'services' %}">Services</a>
       <a href="{% url 'home' %}#booking">Booking</a>
       <a href="{% url 'about' %}">About Us</a>
-      <a href="{% url 'home' %}#contact">Contact</a>
+      <a href="{% url 'contact_us' %}">Contact</a>
     </div>
-    <button class="call-btn" onclick="callNow()">📞 Call Now</button>
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <a href="tel:+916264588894" class="call-btn"><span class="phone-shake">📞</span> Call Now</a>
+
+      {% if not user.is_authenticated %}
+        <a href="{% url 'login' %}" class="animated-login-btn">
+          <span>🔑</span> Login
+        </a>
+      {% else %}
+        <div class="user-badge-glowing">
+          <span>👤</span> <strong style="color:#ffffff;">{{ user.first_name|default:user.username }}</strong>
+          <form method="post" action="{% url 'logout' %}" style="display: inline; margin-left: 4px;">
+            {% csrf_token %}
+            <button type="submit" style="background: rgba(239, 68, 68, 0.25); border: 1px solid #ef4444; color: #fca5a5; padding: 2px 8px; border-radius: 8px; font-size: 11px; cursor: pointer; font-weight: bold;" title="Logout">
+              🚪
+            </button>
+          </form>
+        </div>
+      {% endif %}
+
+      <button class="hamburger-btn" id="hamburgerBtn" onclick="toggleMobileMenu(event)" aria-label="Toggle Navigation Menu" style="display: inline-flex !important; align-items: center !important; justify-content: center !important; width: 44px !important; height: 38px !important; background: linear-gradient(135deg, #FF6B00, #ff8c00) !important; border: 2px solid #ffffff !important; border-radius: 10px !important; cursor: pointer !important; padding: 0 !important; z-index: 999999 !important; box-shadow: 0 4px 16px rgba(255, 107, 0, 0.7), 0 0 10px rgba(255, 107, 0, 0.4) !important; flex-shrink: 0 !important;">
+        <svg width="24" height="18" viewBox="0 0 24 18" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: block !important;">
+          <rect y="0" width="24" height="3" rx="1.5" fill="#FFFFFF"/>
+          <rect y="7.5" width="24" height="3" rx="1.5" fill="#FFFFFF"/>
+          <rect y="15" width="24" height="3" rx="1.5" fill="#FFFFFF"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mega Slide-Down Drawer Navigation Menu -->
+  <div class="mobile-nav-drawer" id="mobileNavDrawer" style="display: none !important;">
+    <div style="font-size: 11px; font-weight: 800; letter-spacing: 1.5px; color: #ff7a1a; padding: 6px 12px 2px; text-transform: uppercase;">📍 Main Pages</div>
+    <a href="{% url 'home' %}">🏠 Home</a>
+    <a href="{% url 'services' %}">🛠️ Services</a>
+    <a href="{% url 'home' %}#booking">📦 Book Transport</a>
+    <a href="{% url 'about' %}">ℹ️ About Us</a>
+    <a href="{% url 'contact_us' %}">🕿 Contact Us</a>
+
+    <div style="height: 1px; background: rgba(255, 255, 255, 0.1); margin: 8px 0;"></div>
+
+    <div style="font-size: 11px; font-weight: 800; letter-spacing: 1.5px; color: #00d2ff; padding: 6px 12px 2px; text-transform: uppercase;">⚡ Special Features & Tools</div>
+    <a href="{% url 'occasions_dashboard' %}" style="color: #00f2fe; font-weight: 700;">🎉 Smart Occasions Dashboard</a>
+    <a href="{% url 'home' %}#360-viewer" style="color: #ff9e00; font-weight: 700;">🏎️ 360° Vehicle View</a>
+    <a href="{% url 'quotations:quote_request' %}">💰 Check Fare & Rate Quote</a>
+    <a href="{% url 'business_card' %}">🪪 Digital Business Card</a>
+    <a href="{% url 'status' %}">💳 Check Booking Status & Payment</a>
   </div>
 
   <!-- ===== Page-specific content goes here ===== -->
@@ -43,6 +177,37 @@
         window.location.href = "tel:+916264588894";
       }
     }
+
+    function toggleMobileMenu(event) {
+      if (event) event.stopPropagation();
+      var drawer = document.getElementById('mobileNavDrawer');
+      var btn = document.getElementById('hamburgerBtn');
+      if (!drawer) return;
+
+      var isVisible = drawer.classList.contains('active') || drawer.style.display === 'flex';
+
+      if (isVisible) {
+        drawer.classList.remove('active');
+        drawer.style.setProperty('display', 'none', 'important');
+        if (btn) btn.classList.remove('active');
+      } else {
+        drawer.style.setProperty('display', 'flex', 'important');
+        drawer.classList.add('active');
+        if (btn) btn.classList.add('active');
+      }
+    }
+
+    document.addEventListener('click', function(e) {
+      var drawer = document.getElementById('mobileNavDrawer');
+      var btn = document.getElementById('hamburgerBtn');
+      if (drawer && (drawer.classList.contains('active') || drawer.style.display === 'flex')) {
+        if (!drawer.contains(e.target) && (!btn || !btn.contains(e.target))) {
+          drawer.classList.remove('active');
+          drawer.style.setProperty('display', 'none', 'important');
+          if (btn) btn.classList.remove('active');
+        }
+      }
+    });
   </script>
 
   {% block extra_script %}{% endblock %}

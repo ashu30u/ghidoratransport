@@ -1,0 +1,58 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ quotation.quote_number }} - Admin</title>
+    <link rel="stylesheet" href="{% static 'quotations/css/quotations.css' %}">
+</head>
+<body>
+<div class="quo-page">
+    <h1>📋 {{ quotation.quote_number }}</h1>
+
+    {% if messages %}
+        {% for m in messages %}<p style="text-align:center;color:#22c55e;">{{ m }}</p>{% endfor %}
+    {% endif %}
+
+    <div class="quo-card">
+        <div class="quo-row"><span>Customer</span><b>{{ quotation.name }} ({{ quotation.phone }})</b></div>
+        <div class="quo-row"><span>Route</span><b>{{ quotation.pickup }} → {{ quotation.destination }}</b></div>
+        <div class="quo-row"><span>Vehicle</span><b>{{ quotation.vehicle_type }}</b></div>
+        <div class="quo-row"><span>Distance</span><b>{{ quotation.distance }} KM</b></div>
+        <div class="quo-row"><span>Status</span><b>{{ quotation.status }}</b></div>
+
+        {% if quotation.needs_admin_approval %}
+        <p style="text-align:center;color:#ff8a80;margin:14px 0;">
+            ⚠️ Ye amount ₹{{ quotation.final_amount }} hai — Admin approval zaroori hai customer ke accept karne se pehle.
+        </p>
+        {% endif %}
+
+        <form method="post">
+            {% csrf_token %}
+            <label>Base Fare (₹)</label>
+            {{ form.base_fare }}
+
+            <label>Discount (₹) — jaise "Festival Discount"</label>
+            {{ form.discount }}
+
+            <label style="display:flex;align-items:center;gap:8px;margin:10px 0;">
+                {{ form.is_approved }} Admin Approved (bade amount ke liye)
+            </label>
+
+            <div class="quo-amount">Final: ₹{{ quotation.final_amount }}</div>
+
+            <div class="quo-actions">
+                <button type="submit" class="btn-accept">💾 Save Changes</button>
+                <button type="submit" name="resend" value="1" class="btn-pdf">📧 Save & Resend Email</button>
+            </div>
+        </form>
+
+        <div class="quo-actions">
+            <a class="btn-pdf" href="{% url 'quotations:quote_pdf' quotation.quote_number %}" target="_blank">📄 PDF Dekhein</a>
+            <a class="btn-wa" href="{{ wa_link }}" target="_blank">💬 WhatsApp Bhejo</a>
+            <a class="btn-pdf" href="{% url 'quotations:quote_detail' quotation.quote_number %}" target="_blank">🔗 Customer Page</a>
+        </div>
+    </div>
+</div>
+</body>
+</html>

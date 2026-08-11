@@ -1,0 +1,64 @@
+{% extends "payments/base.html" %}
+{% block title %}Payment Settings | Ghidora Transport{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <div class="glass-card p-4">
+      <h5 class="font-display mb-4"><i class="bi bi-gear me-2"></i>Payment Settings</h5>
+
+      <form method="post" enctype="multipart/form-data" class="glass-form">
+        {% csrf_token %}
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label small text-muted-soft">Company Name</label>
+            {{ form.company_name }}
+          </div>
+          <div class="col-md-6">
+            <label class="form-label small text-muted-soft">QR Code Image</label>
+            {{ form.qr_code_image }}
+          </div>
+          <div class="col-md-6">
+            <label class="form-label small text-muted-soft">UPI ID</label>
+            {{ form.upi_id }}
+          </div>
+          <div class="col-md-6">
+            <label class="form-label small text-muted-soft">Active Gateway</label>
+            {{ form.active_gateway }}
+            <div class="form-text text-muted-soft">Keep as "Manual Verification" unless a paid gateway has been integrated.</div>
+          </div>
+
+          <div class="col-12"><hr class="border-secondary-subtle"></div>
+          <div class="col-md-6"><label class="form-label small text-muted-soft">Bank Name</label>{{ form.bank_name }}</div>
+          <div class="col-md-6"><label class="form-label small text-muted-soft">Branch</label>{{ form.bank_branch }}</div>
+          <div class="col-md-6"><label class="form-label small text-muted-soft">Account Holder Name</label>{{ form.account_holder_name }}</div>
+          <div class="col-md-6"><label class="form-label small text-muted-soft">Account Number</label>{{ form.account_number }}</div>
+          <div class="col-md-6"><label class="form-label small text-muted-soft">IFSC Code</label>{{ form.ifsc_code }}</div>
+
+          <div class="col-12"><hr class="border-secondary-subtle"></div>
+          <div class="col-md-4">
+            <label class="form-label small text-muted-soft">Default Advance %</label>
+            {{ form.default_advance_percentage }}
+          </div>
+          <div class="col-md-4">
+            <label class="form-label small text-muted-soft">Payment Deadline (hrs)</label>
+            {{ form.payment_deadline_hours }}
+          </div>
+          <div class="col-md-4">
+            <label class="form-label small text-muted-soft">Reminder Hours (comma-separated)</label>
+            {{ form.reminder_hours }}
+          </div>
+          <div class="col-12">
+            <label class="form-label small text-muted-soft">Payment Instructions</label>
+            {{ form.payment_instructions }}
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-route mt-4">
+          <i class="bi bi-check2-circle me-1"></i>Save Settings
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

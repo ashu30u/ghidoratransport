@@ -1,103 +1,1455 @@
-<div id="ghidora-chat-button" onclick="ghidoraToggleChat()">
-  💬 Chat with Ghidora Assistant
+{% load static %}
+<!-- ================================================================
+  GHIDORA AI (GIA) ASSISTANT WIDGET — 100% UNIFIED & NON-CLASHING
+  Design & Look: Gia AI 3D Truck Container Doors, Avatar Image & Glassmorphism Theme
+  Logic Engine: Ghidora Assistant Multi-Step Interactive Flow, City Distance Matrix & Custom QA
+================================================================= -->
+
+<!-- 💬 Floating Avatar Launcher Button -->
+<div id="ghidora-chat-button" class="gia-chat-launcher-btn" onclick="ghidoraToggleChat()" title="Chat with Ghidora AI">
+  <div class="gia-avatar-circle">
+    <div class="gia-gloss-shine"></div>
+    <img src="{% static 'images/gia.jpeg' %}" alt="Gia Avatar" class="gia-avatar-img" onerror="this.onerror=null; this.src='https://cdn-icons-png.flaticon.com/512/4712/4712035.png';">
+    <span class="gia-online-badge"></span>
+  </div>
+  <div class="gia-launcher-tooltip">
+    <span>💬 Chat with Ghidora AI</span>
+  </div>
+  <div class="gia-pulse-ring"></div>
+  <div class="gia-pulse-ring-2"></div>
 </div>
 
-<div id="ghidora-chat-window" style="display: none;">
-  <div id="ghidora-chat-header">
-    Ghidora Assistant
-    <span onclick="ghidoraToggleChat()" style="cursor:pointer; float:right;">✕</span>
-  </div>
-  <div id="ghidora-chat-messages"></div>
-  <div id="ghidora-chat-input-row">
-    <input type="text" id="ghidora-chat-input" placeholder="अपना सवाल लिखें..." />
-    <button onclick="ghidoraSendMessage()">भेजें</button>
+<!-- 🚚 3D Transport Truck Container Floating Chat Window -->
+<div id="ghidora-chat-window" class="gia-chat-window-box">
+  <div id="ghidora-chat-card">
+
+    <!-- 🚚 Dual Truck Container Shutter Doors Animation -->
+    <div id="ghidora-truck-doors">
+      <div class="truck-door left-door">
+        <div class="truck-ribs"></div>
+        <div class="truck-handle"></div>
+        <div class="truck-brand"><span>GHIDORA</span><small>TRANSPORT</small></div>
+      </div>
+      <div class="truck-door right-door">
+        <div class="truck-ribs"></div>
+        <div class="truck-handle"></div>
+        <div class="truck-brand"><span>GHIDORA</span><small>CONTAINER</small></div>
+      </div>
+    </div>
+
+    <!-- 🟠 Sleek Orange Glassmorphism Header Background -->
+    <div id="ghidora-chat-header" style="position:relative; overflow:hidden; background: linear-gradient(135deg, #FF6B00, #e56000);">
+      <div class="header-left" style="position:relative; z-index:2;">
+        <div class="header-avatar">
+          <img src="{% static 'images/gia.jpeg' %}" alt="Gia Avatar" style="width:100%; height:100%; border-radius:50%; object-fit:cover;" onerror="this.onerror=null; this.src='https://cdn-icons-png.flaticon.com/512/4712/4712035.png';">
+          <span class="header-dot"></span>
+        </div>
+        <div class="header-info">
+          <div class="title-row">
+            <h3 class="bot-title">Gia AI</h3>
+            <div class="eq-wave"><span></span><span></span><span></span><span></span><span></span></div>
+          </div>
+          <p class="bot-subtitle">Ghidora Transport Assistant</p>
+          <p class="bot-status"><span class="green-dot"></span> <span id="ghidora-voice-tag">Voice Ready</span></p>
+        </div>
+      </div>
+      <div style="display:flex; align-items:center; gap:6px; position:relative; z-index:2;">
+        <button type="button" class="lang-toggle-btn" onclick="ghidoraToggleLanguage()" id="ghidoraLangBtn" title="Switch Language (Hindi / English)" style="background:rgba(255,255,255,0.22); border:1px solid rgba(255,255,255,0.5); color:#fff; padding:3px 8px; border-radius:12px; font-size:11px; font-weight:700; cursor:pointer; transition:all 0.2s;">
+          🌐 HI (हिंदी)
+        </button>
+        <button type="button" class="close-btn" onclick="ghidoraToggleChat()" title="Close">✕</button>
+      </div>
+    </div>
+
+    <!-- 🤖 4-ROLE OPERATIONS MODE SELECTOR TABS -->
+    <div id="ghidora-role-selector" style="display:flex; background:#0f172a; padding:4px; border-bottom:1px solid rgba(255,107,0,0.2);">
+      <button class="role-btn active" onclick="ghidoraSwitchRole('customer', this)" style="flex:1; background:none; border:none; color:#ffb366; padding:6px 2px; font-size:11px; font-weight:700; cursor:pointer; border-radius:6px;">👤 Customer</button>
+      <button class="role-btn" onclick="ghidoraSwitchRole('driver', this)" style="flex:1; background:none; border:none; color:#94a3b8; padding:6px 2px; font-size:11px; font-weight:700; cursor:pointer; border-radius:6px;">🚛 Driver</button>
+      <button class="role-btn" onclick="ghidoraSwitchRole('owner', this)" style="flex:1; background:none; border:none; color:#94a3b8; padding:6px 2px; font-size:11px; font-weight:700; cursor:pointer; border-radius:6px;">🚚 Owner</button>
+      <button class="role-btn" onclick="ghidoraSwitchRole('admin', this)" style="flex:1; background:none; border:none; color:#94a3b8; padding:6px 2px; font-size:11px; font-weight:700; cursor:pointer; border-radius:6px;">👨‍💼 Admin</button>
+    </div>
+
+    <!-- 🏷️ Quick Chips Bar -->
+    <div id="ghidora-chat-chips">
+      <button class="ghidora-chip" data-msg="booking karni hai">📦 Booking</button>
+      <button class="ghidora-chip" data-msg="fare kitna lagega">💰 Fare</button>
+      <button class="ghidora-chip" data-msg="booking status batao">📍 Status</button>
+      <button class="ghidora-chip" data-msg="raipur ka weather kaisa hai">🌤️ Weather</button>
+      <button class="ghidora-chip" data-msg="driver ka number chahiye">👤 Driver</button>
+    </div>
+
+    <!-- 💬 Chat Messages Area -->
+    <div id="ghidora-chat-body">
+      <!-- Welcome Bubble -->
+      <div class="msg-wrap bot-wrap pop-in">
+        <div class="msg-avatar">
+          <img src="{% static 'images/gia.jpeg' %}" alt="Gia" onerror="this.onerror=null; this.src='https://cdn-icons-png.flaticon.com/512/4712/4712035.png';">
+        </div>
+        <div class="msg-bubble bot-bubble">
+          <p>👋 <strong>Namaste! Welcome to Ghidora Transport.</strong></p>
+          <p>Main Gia hoon, main aapki kaise madad kar sakti hoon?</p>
+          <span class="msg-time" id="ghidora-welcome-time">10:30 AM</span>
+        </div>
+      </div>
+
+      <!-- 2x3 Quick Action Grid -->
+      <div class="quick-grid-card pop-in">
+        <p class="prompt-text">Aap kis cheez mein madad chahte hain?</p>
+        <div class="action-grid">
+          <button class="action-btn" onclick="ghidoraQuickSend('booking karni hai')">
+            <span class="act-icon">🚚</span>
+            <span class="act-lbl">Book Transport</span>
+          </button>
+          <button class="action-btn" onclick="ghidoraQuickSend('fare kitna lagega')">
+            <span class="act-icon">💰</span>
+            <span class="act-lbl">Check Fare</span>
+          </button>
+          <button class="action-btn" onclick="ghidoraQuickSend('booking status batao')">
+            <span class="act-icon">📍</span>
+            <span class="act-lbl">Track Booking</span>
+          </button>
+          <button class="action-btn" onclick="ghidoraQuickSend('services batao')">
+            <span class="act-icon">📦</span>
+            <span class="act-lbl">Our Services</span>
+          </button>
+          <button class="action-btn" onclick="callNow()">
+            <span class="act-icon">📞</span>
+            <span class="act-lbl">Call Support</span>
+          </button>
+          <button class="action-btn" onclick="ghidoraQuickSend('help center details')">
+            <span class="act-icon">❓</span>
+            <span class="act-lbl">Help Center</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Messages Output Container -->
+      <div id="ghidora-messages-container"></div>
+
+      <!-- Typing Indicator -->
+      <div id="ghidora-typing" class="msg-wrap bot-wrap" style="display:none;">
+        <div class="msg-avatar">
+          <img src="{% static 'images/gia.jpeg' %}" alt="Gia" onerror="this.onerror=null; this.src='https://cdn-icons-png.flaticon.com/512/4712/4712035.png';">
+        </div>
+        <div class="msg-bubble bot-bubble typing-dots">
+          <span></span><span></span><span></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 🎤 Mic Listening Status Bar -->
+    <div id="ghidora-mic-status-bar" style="display:none;">
+      <span class="mic-dot-pulse"></span>
+      <span id="ghidora-mic-status-text">Sun rahi hoon...</span>
+      <span id="ghidora-mic-timer">0:00</span>
+    </div>
+
+    <!-- ⌨️ Input Bar -->
+    <div id="ghidora-chat-input-bar">
+      <button type="button" class="tool-btn" id="ghidoraVoiceToggleBtn" onclick="ghidoraToggleVoice()" title="Toggle Voice Sound">🔊</button>
+      <button type="button" class="tool-btn" id="ghidoraMicBtn" title="Voice Input">🎤</button>
+      <button type="button" class="tool-btn" onclick="ghidoraTriggerAttach()" title="Attach File">📎</button>
+      <input type="file" id="ghidoraFileInput" style="display:none;" onchange="ghidoraHandleFile(this)">
+      
+      <input type="text" id="ghidora-chat-input" placeholder="💬 Message Gia AI..." autocomplete="off">
+      
+      <button type="button" id="ghidoraSendBtn" onclick="ghidoraSendMessage()" title="Send Message">
+        <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="transform: rotate(45deg) translate(-1px, 1px);">
+          <path d="M22 2L11 13"></path>
+          <path d="M22 2L15 22L11 13L2 9L22 2Z"></path>
+        </svg>
+      </button>
+    </div>
+
+    <!-- ⚡ Footer -->
+    <div id="ghidora-chat-footer">
+      <span>⚡ Powered by Gia AI</span>
+    </div>
+
   </div>
 </div>
 
 <style>
-  #ghidora-chat-button {
-    position: fixed; bottom: 20px; right: 20px;
-    background: #ff6b00; color: white; padding: 12px 20px;
-    border-radius: 30px; cursor: pointer; font-weight: bold;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 1000;
+  /* ===== 🚚 GIA 3D Truck Container Theme Styles ===== */
+  #ghidora-chat-button, #gia-chat-launcher {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    user-select: none;
+    font-family: 'Outfit', 'Segoe UI', system-ui, sans-serif;
   }
-  #ghidora-chat-window {
-    position: fixed; bottom: 80px; right: 20px; width: 340px; height: 460px;
-    background: white; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.25);
-    display: flex; flex-direction: column; z-index: 1000; overflow: hidden;
+
+  .gia-avatar-circle {
+    position: relative;
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #FF6B00 0%, #FF9142 50%, #FF5500 100%);
+    padding: 3px;
+    box-shadow: 0 12px 35px rgba(255, 107, 0, 0.45), 0 0 20px rgba(255, 107, 0, 0.3);
+    transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    animation: giaFloat 3.5s ease-in-out infinite;
+    overflow: hidden;
   }
+  #ghidora-chat-button:hover .gia-avatar-circle, #gia-chat-launcher:hover .gia-avatar-circle {
+    transform: scale(1.14) translateY(-5px);
+    box-shadow: 0 18px 40px rgba(255, 107, 0, 0.65);
+  }
+
+  .gia-gloss-shine {
+    position: absolute;
+    top: 0; left: -100%;
+    width: 60%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.75), transparent);
+    transform: skewX(-25deg);
+    animation: giaGlossSweep 3.2s infinite;
+    pointer-events: none;
+    z-index: 2;
+  }
+  @keyframes giaGlossSweep {
+    0%, 60% { left: -100%; }
+    100% { left: 170%; }
+  }
+
+  .gia-avatar-img {
+    width: 100%; height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    background: #000;
+    display: block;
+    position: relative; z-index: 1;
+  }
+
+  /* High Quality AI Animation Video in Orange Header Background */
+  .gia-header-bg-video {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+    opacity: 0.95;
+    pointer-events: none;
+    z-index: 1;
+  }
+  .gia-header-avatar-video {
+    width: 100%; height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .gia-online-badge {
+    position: absolute;
+    bottom: 2px; right: 2px;
+    width: 17px; height: 17px;
+    border-radius: 50%;
+    background: #10B981;
+    border: 2.5px solid #ffffff;
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.9);
+    z-index: 3;
+    animation: giaDotPulse 1.8s infinite;
+  }
+
+  .gia-launcher-tooltip {
+    background: rgba(15, 23, 42, 0.94);
+    backdrop-filter: blur(12px);
+    color: #ffffff;
+    padding: 10px 18px;
+    border-radius: 20px;
+    font-size: 13.5px;
+    font-weight: 700;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    white-space: nowrap;
+    animation: giaTooltipBounce 3.2s ease-in-out infinite alternate;
+  }
+  @keyframes giaTooltipBounce {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(-5px); }
+  }
+
+  /* Glowing Floating Orbs in Header */
+  .gia-header-particle {
+    position: absolute;
+    width: 32px; height: 32px;
+    background: rgba(255, 255, 255, 0.18);
+    border-radius: 50%;
+    pointer-events: none;
+    animation: giaOrbFloat 6s ease-in-out infinite alternate;
+  }
+  .gia-header-particle.p1 { top: -10px; right: 25%; animation-duration: 5s; }
+  .gia-header-particle.p2 { bottom: -12px; left: 15%; animation-duration: 7s; }
+  .gia-header-particle.p3 { top: 12px; left: 50%; animation-duration: 4.5s; width: 18px; height: 18px; }
+  @keyframes giaOrbFloat {
+    0% { transform: translateY(0) scale(1); opacity: 0.4; }
+    100% { transform: translateY(-14px) scale(1.4); opacity: 0.9; }
+  }
+
+  .gia-pulse-ring, .gia-pulse-ring-2 {
+    position: absolute;
+    top: 0; right: 0; width: 72px; height: 72px;
+    border-radius: 50%;
+    pointer-events: none;
+  }
+  @keyframes giaFloat { 
+    0%, 100% { transform: translateY(0) rotate(0deg); } 
+    50% { transform: translateY(-8px) rotate(1deg); } 
+  }
+  @keyframes giaPulseRing { 
+    0% { box-shadow: 0 0 0 0 rgba(255, 107, 0, 0.7); } 
+    70% { box-shadow: 0 0 0 24px rgba(255, 107, 0, 0); } 
+    100% { box-shadow: 0 0 0 0 rgba(255, 107, 0, 0); } 
+  }
+
+  /* ===== 3D Truck Container Window & Holographic Entrance ===== */
+  #ghidora-chat-window, #gia-chat-window {
+    position: fixed;
+    bottom: 95px;
+    right: 24px;
+    width: 380px;
+    max-width: 92vw;
+    height: 600px;
+    max-height: 84vh;
+    z-index: 10001;
+    display: none;
+    perspective: 1400px;
+    font-family: 'Outfit', 'Segoe UI', system-ui, sans-serif;
+  }
+  #ghidora-chat-window.open, #gia-chat-window.open {
+    display: block !important;
+    animation: giaHoloPop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  }
+  @keyframes giaHoloPop {
+    from { opacity: 0; transform: translateY(30px) scale(0.88) rotateX(-10deg); }
+    to { opacity: 1; transform: translateY(0) scale(1) rotateX(0deg); }
+  }
+
+  #ghidora-chat-card {
+    width: 100%; height: 100%;
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(20px);
+    border-radius: 22px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45), 0 0 45px rgba(255, 107, 0, 0.3);
+    border: 1.5px solid rgba(255, 107, 0, 0.35);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* Laser Glow Border */
+  #ghidora-chat-card::after {
+    content: '';
+    position: absolute; inset: 0;
+    border-radius: 22px; padding: 2px;
+    background: linear-gradient(135deg, rgba(255,107,0,0.8), rgba(255,255,255,0.6), rgba(255,107,0,0.8));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor; mask-composite: exclude;
+    pointer-events: none; z-index: 5;
+    animation: giaBorderGlow 4s linear infinite;
+  }
+  @keyframes giaBorderGlow { 0% { filter: hue-rotate(0deg); } 100% { filter: hue-rotate(360deg); } }
+
+  /* 🚚 3D Truck Dual Container Doors */
+  #ghidora-truck-doors {
+    position: absolute; inset: 0; z-index: 99;
+    display: flex; pointer-events: none;
+    perspective: 1400px; border-radius: 22px; overflow: hidden;
+  }
+  .truck-door {
+    width: 50%; height: 100%;
+    background: linear-gradient(145deg, #1e293b, #0f172a);
+    box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.85);
+    position: relative; border: 2px solid #334155;
+    transition: transform 0.65s cubic-bezier(0.77, 0, 0.175, 1);
+  }
+  .left-door { transform-origin: left center; border-right: 2px solid #FF6B00; }
+  .right-door { transform-origin: right center; border-left: 2px solid #FF6B00; }
+
+  .truck-ribs {
+    position: absolute; inset: 0;
+    background: repeating-linear-gradient(180deg, rgba(255,255,255,0.05) 0px, rgba(255,255,255,0.05) 14px, rgba(0,0,0,0.45) 14px, rgba(0,0,0,0.45) 28px);
+  }
+  .truck-handle {
+    position: absolute; top: 50%; width: 14px; height: 95px;
+    background: linear-gradient(90deg, #FF6B00, #ffa052, #FF6B00);
+    border-radius: 6px; transform: translateY(-50%);
+  }
+  .left-door .truck-handle { right: 10px; }
+  .right-door .truck-handle { left: 10px; }
+
+  .truck-brand {
+    position: absolute; top: 24%; left: 50%; transform: translateX(-50%);
+    text-align: center; color: #FF6B00; font-weight: 900; font-size: 13px;
+  }
+  .truck-brand small { display: block; color: #fff; font-size: 9px; }
+
+  #ghidora-chat-window.open .left-door { transform: rotateY(-115deg); }
+  #ghidora-chat-window.open .right-door { transform: rotateY(115deg); }
+
+  /* 🟠 Animated Header */
   #ghidora-chat-header {
-    background: #ff6b00; color: white; padding: 12px 16px; font-weight: bold;
+    background: linear-gradient(135deg, #FF6B00 0%, #E05D00 100%);
+    color: #ffffff; padding: 16px 20px;
+    display: flex; justify-content: space-between; align-items: center;
+    box-shadow: 0 4px 18px rgba(224, 93, 0, 0.3);
   }
-  #ghidora-chat-messages {
-    flex: 1; padding: 12px; overflow-y: auto; font-size: 14px;
+  .header-left { display: flex; align-items: center; gap: 12px; }
+  .header-avatar {
+    position: relative; width: 46px; height: 46px;
+    border-radius: 50%; background: #fff; padding: 2px; flex-shrink: 0;
+    transition: transform 0.3s ease;
   }
-  .ghidora-msg { margin-bottom: 10px; padding: 8px 12px; border-radius: 10px; max-width: 80%; white-space: pre-wrap; }
-  .ghidora-msg.user { background: #ff6b00; color: white; margin-left: auto; }
-  .ghidora-msg.bot { background: #f1f1f1; color: #222; }
-  #ghidora-chat-input-row { display: flex; border-top: 1px solid #eee; }
-  #ghidora-chat-input { flex: 1; border: none; padding: 10px; font-size: 14px; }
-  #ghidora-chat-input-row button {
-    background: #ff6b00; color: white; border: none; padding: 0 16px; cursor: pointer;
+  .header-avatar:hover { transform: scale(1.1) rotate(5deg); }
+  .header-avatar img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+  .header-dot {
+    position: absolute; bottom: 0; right: 0; width: 12px; height: 12px;
+    border-radius: 50%; background: #10B981; border: 2px solid #fff;
   }
+  .title-row { display: flex; align-items: center; gap: 6px; }
+  .bot-title { margin: 0; font-size: 18px; font-weight: 800; color: #fff; }
+
+  .eq-wave { display: flex; gap: 3px; align-items: flex-end; height: 14px; }
+  .eq-wave span {
+    width: 3px; background: #fff; border-radius: 2px;
+    animation: giaEqWave 1.2s ease-in-out infinite alternate;
+  }
+  .eq-wave span:nth-child(1) { height: 60%; animation-delay: 0.1s; }
+  .eq-wave span:nth-child(2) { height: 100%; animation-delay: 0.3s; }
+  .eq-wave span:nth-child(3) { height: 40%; animation-delay: 0.2s; }
+  .eq-wave span:nth-child(4) { height: 80%; animation-delay: 0.4s; }
+  .eq-wave span:nth-child(5) { height: 50%; animation-delay: 0.25s; }
+  @keyframes giaEqWave { 0% { transform: scaleY(0.3); opacity: 0.5; } 100% { transform: scaleY(1.3); opacity: 1; } }
+
+  .bot-subtitle { margin: 1px 0 2px; font-size: 12px; color: rgba(255,255,255,0.9); font-weight: 600; }
+  .bot-status { margin: 0; font-size: 11px; color: #d1fae5; display: flex; align-items: center; gap: 5px; font-weight: 600; }
+  .green-dot { width: 6px; height: 6px; border-radius: 50%; background: #34d399; display: inline-block; animation: giaDotPulse 1.6s infinite; }
+
+  .close-btn {
+    background: rgba(255,255,255,0.2); border: none; color: #fff;
+    width: 32px; height: 32px; border-radius: 50%; font-size: 15px; cursor: pointer;
+    transition: all 0.25s ease;
+  }
+  .close-btn:hover { background: rgba(255,255,255,0.4); transform: rotate(90deg) scale(1.1); }
+
+  /* 🏷️ Quick Chips Bar */
+  #ghidora-chat-chips {
+    display: flex; gap: 6px; padding: 8px 12px;
+    background: #ffffff; border-bottom: 1px solid #e2e8f0;
+    overflow-x: auto; white-space: nowrap; scrollbar-width: none;
+  }
+  #ghidora-chat-chips::-webkit-scrollbar { display: none; }
+  .ghidora-chip {
+    background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 16px;
+    padding: 5px 12px; font-size: 11.5px; font-weight: 700; color: #334155; cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1); flex-shrink: 0;
+  }
+  .ghidora-chip:hover {
+    background: linear-gradient(135deg, #FF6B00, #FF9142); color: #fff; border-color: #FF6B00;
+    transform: translateY(-2px) scale(1.05); box-shadow: 0 4px 12px rgba(255,107,0,0.3);
+  }
+
+  /* Messages Area */
+  #ghidora-chat-body {
+    flex: 1; overflow-y: auto; padding: 18px 16px;
+    display: flex; flex-direction: column; gap: 14px; background: #f8fafc;
+  }
+  .pop-in { animation: giaPopIn 0.38s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+  @keyframes giaPopIn { from { opacity: 0; transform: translateY(16px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
+
+  .msg-wrap { display: flex; gap: 10px; align-items: flex-end; max-width: 88%; }
+  .bot-wrap { align-self: flex-start; }
+  .user-wrap { align-self: flex-end; flex-direction: row-reverse; }
+
+  .msg-avatar {
+    width: 32px; height: 32px; border-radius: 50%; overflow: hidden;
+    flex-shrink: 0; border: 1.5px solid #FF6B00;
+    transition: transform 0.25s ease;
+  }
+  .msg-wrap:hover .msg-avatar { transform: scale(1.12); }
+  .msg-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+  .msg-bubble {
+    padding: 12px 16px; border-radius: 18px; font-size: 13.5px; line-height: 1.5;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+    transition: transform 0.2s ease;
+  }
+  .bot-bubble { background: #ffffff; color: #1e293b; border-bottom-left-radius: 4px; border: 1px solid #e2e8f0; }
+  .bot-bubble p { margin: 0 0 6px; }
+  .bot-bubble p:last-child { margin-bottom: 0; }
+
+  .gia-bot-glow {
+    animation: giaBotGlowPulse 1.2s ease-out;
+  }
+  @keyframes giaBotGlowPulse {
+    0% { box-shadow: 0 0 25px rgba(255, 107, 0, 0.7); transform: scale(0.96); }
+    50% { box-shadow: 0 0 15px rgba(255, 107, 0, 0.4); transform: scale(1.02); }
+    100% { box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06); transform: scale(1); }
+  }
+
+  .user-bubble { background: linear-gradient(135deg, #FF6B00, #E05D00); color: #ffffff; border-bottom-right-radius: 4px; }
+  .user-bubble p { margin: 0; }
+
+  .msg-time { display: block; font-size: 10px; color: #94a3b8; margin-top: 6px; text-align: right; }
+  .user-bubble .msg-time { color: rgba(255, 255, 255, 0.85); }
+
+  /* 2x3 Action Grid Micro-Animations */
+  .quick-grid-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 14px; }
+  .prompt-text { margin: 0 0 12px; font-size: 13px; font-weight: 700; color: #334155; text-align: center; }
+  .action-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .action-btn {
+    background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 12px;
+    padding: 10px 6px; display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer;
+    transition: all 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+    position: relative; overflow: hidden;
+  }
+  .action-btn::after {
+    content: ''; position: absolute; top: 0; left: -100%;
+    width: 60%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,107,0,0.25), transparent);
+    transform: skewX(-20deg);
+    animation: giaShimmerCard 4s infinite;
+    pointer-events: none;
+  }
+  @keyframes giaShimmerCard {
+    0%, 75% { left: -100%; }
+    100% { left: 180%; }
+  }
+  .action-btn:hover {
+    background: #fff5ed; border-color: #FF6B00;
+    transform: translateY(-4px) scale(1.06); box-shadow: 0 8px 20px rgba(255,107,0,0.22);
+  }
+  .action-btn:hover .act-icon { transform: scale(1.25) rotate(-10deg); transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1); }
+  .act-icon { font-size: 18px; transition: transform 0.25s ease; position: relative; z-index: 2; }
+  .act-lbl { font-size: 11px; font-weight: 700; color: #1e293b; text-align: center; position: relative; z-index: 2; }
+
+  /* Typing dots wave animation */
+  .typing-dots { display: flex; align-items: center; gap: 4px; padding: 12px 18px; }
+  .typing-dots span {
+    width: 6px; height: 6px; border-radius: 50%; background: #FF6B00;
+    animation: giaDotPulse 1.4s infinite ease-in-out;
+  }
+  .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+  .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes giaDotPulse { 0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; } 40% { transform: scale(1.3); opacity: 1; } }
+
+  /* Mic status */
+  #ghidora-mic-status-bar {
+    background: #fef2f2; border-top: 1px solid #fecaca; padding: 8px 16px;
+    display: flex; align-items: center; justify-content: space-between; font-size: 12px; color: #ef4444; font-weight: 700;
+  }
+  .mic-dot-pulse { width: 10px; height: 10px; border-radius: 50%; background: #ef4444; animation: giaDotPulse 1s infinite; }
+
+  /* Input bar micro-animations */
+  #ghidora-chat-input-bar {
+    padding: 10px 12px; background: #ffffff; border-top: 1px solid #e2e8f0;
+    display: flex; align-items: center; gap: 6px; width: 100%; box-sizing: border-box;
+  }
+  .tool-btn {
+    background: #f1f5f9; border: 1px solid #cbd5e1; color: #475569;
+    width: 32px; height: 32px; border-radius: 50%; font-size: 13.5px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .tool-btn:hover { background: #FF6B00; color: #fff; border-color: #FF6B00; transform: scale(1.12) rotate(10deg); }
+  .tool-btn.listening { background: #ef4444 !important; color: white !important; animation: giaDotPulse 1s infinite; }
+
+  #ghidora-chat-input {
+    flex: 1; min-width: 0; border: 1px solid #cbd5e1; border-radius: 20px;
+    padding: 8px 12px; font-size: 13px; outline: none; background: #f8fafc; color: #0f172a;
+    transition: all 0.25s ease; box-sizing: border-box;
+  }
+  #ghidora-chat-input:focus { border-color: #FF6B00; background: #fff; box-shadow: 0 0 0 3px rgba(255,107,0,0.15); }
+
+  #ghidoraSendBtn {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: linear-gradient(135deg, #FF6B00 0%, #E05D00 100%);
+    border: none; color: #fff; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+    box-shadow: 0 4px 12px rgba(255, 107, 0, 0.4);
+    flex-shrink: 0;
+  }
+  #ghidoraSendBtn:hover {
+    transform: scale(1.12) rotate(-6deg);
+    box-shadow: 0 6px 18px rgba(255, 107, 0, 0.65);
+  }
+  #ghidoraSendBtn:active {
+    transform: scale(0.92);
+  }
+
+  #ghidora-chat-footer { text-align: center; padding: 6px; background: #f8fafc; border-top: 1px solid #f1f5f9; font-size: 10.5px; color: #94a3b8; font-weight: 600; }
 </style>
 
 <script>
-  function ghidoraToggleChat() {
-    const win = document.getElementById("ghidora-chat-window");
-    const isOpen = win.style.display === "flex";
-    win.style.display = isOpen ? "none" : "flex";
-    if (!isOpen) {
-      const box = document.getElementById("ghidora-chat-messages");
-      if (box.children.length === 0) {
-        ghidoraAddMessage("bot", "नमस्ते Ghidora Transport में आपका स्वागत है। मैं आपकी कैसे मदद कर सकता हूँ?");
+/* ================= GHIDORA ASSISTANT + GIA LOOK ENGINE ================= */
+let ghidoraVoiceEnabled = true;
+let ghidoraRecognition = null;
+let ghidoraListening = false;
+let ghidoraMicTimerInterval = null;
+let ghidoraMicStartTime = null;
+const GhidoraSR = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+let ghidoraHasGreeted = false;
+
+/* 🚚 Open & Close Chat Window Function */
+function ghidoraToggleChat() {
+  const win = document.getElementById('ghidora-chat-window') || document.getElementById('gia-chat-window');
+  if (win) {
+    win.classList.toggle('open');
+    if (win.classList.contains('open')) {
+      const doors = document.getElementById('ghidora-truck-doors');
+      if (doors) {
+        doors.style.display = 'flex';
+        setTimeout(() => { doors.style.display = 'none'; }, 650);
+      }
+
+      const input = document.getElementById('ghidora-chat-input');
+      if (input) input.focus();
+
+      if (!ghidoraHasGreeted) {
+        ghidoraHasGreeted = true;
+        setTimeout(() => {
+          ghidoraSpeak("Namaste! Welcome to Ghidora Transport. Main Gia hoon, main aapki kaise madad kar sakti hoon?");
+        }, 450);
+      }
+    } else {
+      const doors = document.getElementById('ghidora-truck-doors');
+      if (doors) doors.style.display = 'flex';
+      if (window.speechSynthesis) window.speechSynthesis.cancel();
+    }
+  }
+}
+function giaToggleChat() { ghidoraToggleChat(); }
+
+function ghidoraGetCurrentTime() {
+  const now = new Date();
+  let hours = now.getHours(); let minutes = now.getMinutes();
+  const ampm = hours >= 12 ? 'PM' : 'AM';
+  hours = hours % 12; hours = hours ? hours : 12;
+  minutes = minutes < 10 ? '0' + minutes : minutes;
+  return hours + ':' + minutes + ' ' + ampm;
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const welcomeTime = document.getElementById('ghidora-welcome-time');
+  if (welcomeTime) welcomeTime.textContent = ghidoraGetCurrentTime();
+});
+
+function ghidoraScrollToBottom() {
+  const body = document.getElementById('ghidora-chat-body');
+  if (body) body.scrollTop = body.scrollHeight;
+}
+
+function ghidoraShowTyping() {
+  const t = document.getElementById('ghidora-typing');
+  if (t) { t.style.display = 'flex'; ghidoraScrollToBottom(); }
+}
+function ghidoraHideTyping() {
+  const t = document.getElementById('ghidora-typing');
+  if (t) t.style.display = 'none';
+}
+
+function ghidoraAddUserMsg(text) {
+  const container = document.getElementById('ghidora-messages-container');
+  if (!container) return;
+  const wrap = document.createElement('div');
+  wrap.className = 'msg-wrap user-wrap pop-in';
+  wrap.innerHTML = `<div class="msg-bubble user-bubble"><p>${text}</p><span class="msg-time">${ghidoraGetCurrentTime()} ✓✓</span></div>`;
+  container.appendChild(wrap);
+  ghidoraScrollToBottom();
+}
+
+function ghidoraAddBotMsg(text) {
+  const container = document.getElementById('ghidora-messages-container');
+  if (!container) return;
+  const wrap = document.createElement('div');
+  wrap.className = 'msg-wrap bot-wrap pop-in';
+  wrap.innerHTML = `
+    <div class="msg-avatar"><img src="{% static 'images/gia.jpeg' %}" alt="Gia" onerror="this.onerror=null; this.src='https://cdn-icons-png.flaticon.com/512/4712/4712035.png';"></div>
+    <div class="msg-bubble bot-bubble gia-bot-glow"><p>${text}</p><span class="msg-time">${ghidoraGetCurrentTime()}</span></div>
+  `;
+  container.appendChild(wrap);
+  ghidoraScrollToBottom();
+  ghidoraSpeak(text);
+}
+
+/* ================= EXACT GHIDORA LOCAL STATE & FARE ENGINE ================= */
+const GHIDORA_STATE = { step: 'idle', flowType: null, data: { pickup: null, drop: null, goods: null, weight: null, distance: null, vehicle: null, fare: null } };
+const GHIDORA_VEHICLE_RATES = { low:{ name: 'Mahindra Jeeto Magic', rate: 15, max: 300 }, small:{ name: 'Tata Ace', rate: 20, max: 750 }, mid:{ name: 'Mahindra Pickup', rate: 20, max: 1500 }, large:{ name: 'Mini Truck', rate: 35, max: 3000 }, xl:{ name: 'Tractor Trolley', rate: 50, max: Infinity } };
+const GHIDORA_DIST_FROM_RAIPUR = { 'raipur':0,'dhamtari':78,'durg':40,'bhilai':35,'rajnandgaon':70,'mahasamund':55,'korba':200,'kanker':140,'jagdalpur':300,'ambikapur':330,'raigarh':240,'janjgir':100,'bilaspur':130,'baloda bazar':60,'bemetara':75,'kondagaon':230,'bastar':290 };
+const GHIDORA_DRIVERS = [{ name: 'Pankaj Kumar Sahu', phone: '7489297841' },{ name: 'Tarun Kumar Sahu', phone: '6266014139' }];
+const GHIDORA_COMPANY_INFO = { ownerName: 'Tarun Kumar Sahu', ownerPhone: '6266014139', ownerEmail: 'tarunsahu2407@gmail.com', developerName: 'Amit Kumar Sahu', developerPhone: '6268814185', developerEmail: 'dmtamit789@gmail.com', driverName: 'Pankaj Kumar Sahu', driverPhone: '7489297841', established: '2026' };
+
+const GHIDORA_CUSTOM_QA = [
+  { keywords: ['owner kaun','owner ka naam','owner kya','malik kaun','malik ka naam','founder kaun','company ka owner'],
+    answer: () => 'Ghidora Transport ke Official Owner & Founder ' + GHIDORA_COMPANY_INFO.ownerName + ' hain (Phone: ' + GHIDORA_COMPANY_INFO.ownerPhone + ' | Email: ' + GHIDORA_COMPANY_INFO.ownerEmail + ')।' },
+  { keywords: ['developer kaun','developer ka naam','kisne banaya','kis ne banaya','who built','app kisne banaya','website kisne banaya'],
+    answer: () => 'Is AI Platform ko Lead Developer ' + GHIDORA_COMPANY_INFO.developerName + ' ne design kiya hai (Phone: ' + GHIDORA_COMPANY_INFO.developerPhone + ' | Email: ' + GHIDORA_COMPANY_INFO.developerEmail + ')।' },
+  { keywords: ['driver kaun','driver ka number','driver details','pankaj'],
+    answer: () => 'Humare primary verified driver ' + GHIDORA_COMPANY_INFO.driverName + ' hain (Phone: ' + GHIDORA_COMPANY_INFO.driverPhone + ' | Vehicle: Mahindra Bolero Maxx Pickup HD 2.0L CG 04 MW 2286)।' },
+  { keywords: ['company kab bani','company kab shuru','sthapna'],
+    answer: () => 'Ghidora Transport ' + GHIDORA_COMPANY_INFO.established + ' se sanchalit hai.' },
+  { keywords: ['driver kitne','total driver'],
+    answer: () => 'Humari team mein ' + GHIDORA_DRIVERS.length + ' anubhavi verified drivers hain.' },
+  { keywords: ['tumhara naam','aapka naam','tum kaun ho','aap kaun ho'],
+    answer: 'Main Gia (Ghidora AI) hoon, main aapki booking aur kiraye se judi madad ke liye tayar hoon.' },
+  { keywords: ['dhanyawad','thank you','thanks'],
+    answer: 'Aapki sahayata karke mujhe bahut khushi hui!' },
+  { keywords: ['apka name ghidora kaise pada', 'history of ghidora'],
+    answer: 'Humare owner ka paarivaarik naam Ghidora Family hai, wahi se yeh naam liya gaya hai.' },
+  { keywords: ['shutter', 'shutter door', 'truck door', 'container shutter', 'door'],
+    answer: () => (ghidoraLang === 'en' ?
+      `🚚 **3D Container Shutter Door**:\nClicking 'Shutter Door' in the Navbar triggers a 3D container truck door hydraulic animation across your screen! It demonstrates Ghidora Transport's 100% enclosed, weatherproof cargo security.` :
+      `🚚 **3D कंटेनर शटर डोर**:\nनेवबार में 'Shutter Door' क्लिक करने से स्क्रीन पर 3D कंटेनर शटर बंद होकर खुलते हैं। यह Ghidora Transport के 100% वॉटरप्रूफ माल सुरक्षा का लाइव प्रदर्शन करता है!`
+    )
+  },
+  { keywords: ['service', 'services', 'kya karte', 'work', 'kaam', 'shifting', 'services kya hai', 'kaun si service'],
+    answer: () => (ghidoraLang === 'en' ?
+      `🛠️ **Ghidora Transport 6 Core Services**:\n\n` +
+      `Clicking 'Services' in the Navbar opens our Services Page (\`/services/\`):\n` +
+      `1. **Full Truck Load (FTL)**: Dedicated Mahindra Bolero Maxx 2-Ton pickup transport.\n` +
+      `2. **Part Load (LTL)**: Economical shared freight transport for smaller goods.\n` +
+      `3. **House & Office Shifting**: Packing, loading & safe home/office relocation.\n` +
+      `4. **Commercial Freight**: Machinery, cement, hardware & agricultural transport.\n` +
+      `5. **Express Same-Day Delivery**: Urgent delivery across Chhattisgarh (Raipur, Bilaspur, Dhamtari, Durg).\n` +
+      `6. **All India Freight**: Inter-state transport covering 25+ major Indian cities!` :
+      `🛠️ **Ghidora Transport की 6 मुख्य सेवाएं (Services)**:\n\n` +
+      `नेवबार में 'Services' क्लिक करने पर सर्विसेस पेज (\`/services/\`) खुलता है:\n` +
+      `1. **Full Truck Load (FTL)**: समर्पित 2-टनी बोलेरो मैक्स पिकअप ट्रांसपोर्ट।\n` +
+      `2. **Part Load (LTL)**: छोटे सामानों के लिए कम खर्च वाला शेयर्ड ट्रांसपोर्ट।\n` +
+      `3. **House & Office Shifting**: पैकिंग, लोडिंग और सेफ होम/ऑफिस शिफ्टिंग।\n` +
+      `4. **Commercial Freight**: मशीनरी, सीमेंट, इंडस्ट्रियल सामान।\n` +
+      `5. **Express Delivery**: रायपुर, धमतरी, दुर्ग, बिलासपुर में सेम-डे डिलीवरी।\n` +
+      `6. **All India Freight**: ऑल इंडिया 25+ शहरों में माल परिवहन!`
+    )
+  },
+  { keywords: ['about', 'about us', 'company profile', 'malik', 'sahab', 'founder', 'history'],
+    answer: () => (ghidoraLang === 'en' ?
+      `ℹ️ **About Ghidora Transport**:\n\n` +
+      `Clicking 'About Us' in the Navbar opens our official company profile page (\`/about/\`):\n` +
+      `• **Founder & Owner**: Tarun Kumar Sahu (Phone: \`6266014139\` | Email: \`tarunsahu2407@gmail.com\`)\n` +
+      `• **Lead Developer**: Amit Kumar Sahu (Phone: \`6268814185\` | Email: \`dmtamit789@gmail.com\`)\n` +
+      `• **Primary Verified Driver**: Pankaj Kumar Sahu (Phone: \`7489297841\` | Bolero Maxx \`CG 04 MW 2286\`)\n` +
+      `• **Head Office**: Kodebod, Kurud, Dhamtari, Chhattisgarh, India.` :
+      `ℹ️ **Ghidora Transport के बारे में (About Us)**:\n\n` +
+      `नेवबार में 'About Us' क्लिक करने पर कंपनी प्रोफाइल पेज (\`/about/\`) खुलती है:\n` +
+      `• **संस्थापक और मालिक (Owner)**: Tarun Kumar Sahu (Phone: \`6266014139\` | Email: \`tarunsahu2407@gmail.com\`)\n` +
+      `• **लीड सॉफ्टवेयर डेवलपर**: Amit Kumar Sahu (Phone: \`6268814185\` | Email: \`dmtamit789@gmail.com\`)\n` +
+      `• **प्राइमरी वेरिफाइड ड्राइवर**: Pankaj Kumar Sahu (Phone: \`7489297841\` | Bolero Maxx \`CG 04 MW 2286\`)\n` +
+      `• **मुख्यालय**: कोडेबोड़, कुरुद, धमतरी, छत्तीसगढ़, भारत।`
+    )
+  },
+  { keywords: ['contact', 'contact us', 'sampark', 'pata', 'address', 'helpline', 'number', 'phone', 'email', 'map'],
+    answer: () => (ghidoraLang === 'en' ?
+      `🕿 **Contact Ghidora Transport**:\n\n` +
+      `Clicking 'Contact' in the Navbar opens our Contact Page (\`/contact/\`):\n` +
+      `• **Instant Inquiry Form**: Send direct message to support.\n` +
+      `• **Live Google Maps**: Shows exact office location in Kodebod, Kurud, Dhamtari.\n` +
+      `• **24x7 Support Helpline**: +91 6266014139 / +91 6268814185\n` +
+      `• **Email Support**: tarunsahu2407@gmail.com / dmtamit789@gmail.com` :
+      `🕿 **संपर्क करें (Contact Us)**:\n\n` +
+      `नेवबार में 'Contact' क्लिक करने पर कांटेक्ट पेज (\`/contact/\`) खुलता है:\n` +
+      `• **लाइव कांटेक्ट फॉर्म**: सीधे मैसेज भेजें।\n` +
+      `• **गूगल मैप्स लोकेशन**: धमतरी (कोडेबोड़) ऑफिस का लाइव मैप।\n` +
+      `• **24x7 फोन नंबर**: 6266014139 / 6268814185\n` +
+      `• **ईमेल**: tarunsahu2407@gmail.com / dmtamit789@gmail.com`
+    )
+  },
+  { keywords: ['business card', 'visiting card', 'card', 'vcard', 'qr code'],
+    answer: () => (ghidoraLang === 'en' ?
+      `🪪 **Digital 3D Interactive Business Card**:\n\n` +
+      `Clicking 'Business Card' in the Navbar opens our 3D Glassmorphic Visiting Card (\`/business-card/\`):\n` +
+      `• **3D Tilt Effect**: Interactive glowing glass card.\n` +
+      `• **vCard QR Code Scan**: Scan QR code to save Owner Tarun Kumar Sahu's contact directly to your phone!\n` +
+      `• **Direct WhatsApp Link**: 1-click WhatsApp chat.\n` +
+      `• **Download PDF**: Save PDF copy of official business card!` :
+      `🪪 **डिजिटल 3D बिज़नेस कार्ड (Business Card)**:\n\n` +
+      `नेवबार में 'Business Card' क्लिक करने पर 3D विज़िटिंग कार्ड पेज (\`/business-card/\`) खुलता है:\n` +
+      `• **3D टिल्ट इफ़ेक्ट**: इंटरैक्टिव ग्लास कार्ड।\n` +
+      `• **vCard QR Code**: क्यूआर कोड स्कैन करके Tarun Kumar Sahu का नंबर फ़ोन में सेव करें!\n` +
+      `• **डायरेक्ट WhatsApp**: 1-क्लिक वॉट्सऐप मैसेजिंग।\n` +
+      `• **PDF डाउनलोड**: बिज़नेस कार्ड की PDF फाइल डाउनलोड करें!`
+    )
+  },
+  { keywords: ['360', '360 view', '360 degree', '3d view', 'vehicle 360', 'bolero 360', '360 view kya hai'],
+    answer: () => (ghidoraLang === 'en' ?
+      `🏎️ **Premium True 360° Vehicle Viewer**:\n\n` +
+      `Our website features a interactive 360° product viewer for the **Mahindra Bolero Pickup HD 2.0L**!\n` +
+      `• **Desktop**: Click and drag your mouse left/right to rotate the vehicle in 3D space.\n` +
+      `• **Mobile**: Swipe left/right with your finger to rotate.\n` +
+      `• **Controls**: Use 🔍 Zoom, ▶ Auto Rotate, ⛶ Fullscreen, and ↺ Reset buttons.\n` +
+      `• **Degree Angle Sync**: Live compass angle (0° to 360°) and frame progress tracking!\n\n` +
+      `💡 *Tip*: Click **🏎️ 360° View** in the top Navbar or scroll down on the home page to experience it live!` :
+      `🏎️ **प्रीमियम 360° व्हीकल व्यूअर (True 360° Experience)**:\n\n` +
+      `हमारी वेबसाइट पर **Mahindra Bolero Pickup** का 360-डिग्री इंटरैक्टिव 3D व्यूअर मौजूद है:\n` +
+      `• **डेस्कटॉप**: माउस से क्लिक करके left/right ड्रैग करें और गाड़ी को 360-डिग्री घुमाकर देखें।\n` +
+      `• **मोबाइल**: उंगली से swipe left/right करके गाड़ी घुमाएं।\n` +
+      `• **कंट्रोल्स**: 🔍 Zoom In/Out, ▶ Auto Rotate, ⛶ Fullscreen, और ↺ Reset का इस्तेमाल करें।\n` +
+      `• **लाइव एंगल कंपस**: गाड़ी घूमते समय 0° से 360° का लाइव एंगल और फ्रेम दिखाता है!\n\n` +
+      `💡 *Tip*: नेवबार में **🏎️ 360° View** पर क्लिक करके तुरंत एक्सपीरियंस करें!`
+    )
+  },
+  { keywords: ['check fare', 'fare calculator', 'quotation', 'rate check', 'pdf quote'],
+    answer: () => (ghidoraLang === 'en' ?
+      `💰 **Check Fare & Quotation Generator**:\n\n` +
+      `Clicking 'Check Fare' opens the Instant Quote Request Page (\`/quotations/request/\`):\n` +
+      `• **Real-Time Fare Calculator**: Calculates rate at ₹20/KM.\n` +
+      `• **Official PDF Download**: Instant official PDF quotation download!\n` +
+      `• **WhatsApp Share**: Send rate quote directly on WhatsApp!` :
+      `💰 **किराया और कोटेशन कैलकुलेटर (Check Fare)**:\n\n` +
+      `नेवबार में 'Check Fare' क्लिक करने पर कोटेशन पेज (\`/quotations/request/\`) खुलता है:\n` +
+      `• **भाड़ा कैलकुलेटर**: ₹20/KM की दर से लाइव भाड़ा बताता है।\n` +
+      `• **PDF कोटेशन डाउनलोड**: ऑफिसियल PDF कोटेशन डाउनलोड करें!\n` +
+      `• **वॉट्सऐप शेयर**: सीधे वॉट्सऐप पर रेट भेजें!`
+    )
+  },
+  { keywords: ['booking kaise', 'booking kese', 'kaise kare', 'kese kare', 'kaise karni', 'kese karni', 'process', 'steps', 'how to book', 'booking process', 'kaise hoti', 'kese hoti', 'kaise karte', 'kese karte', 'kaise karein', 'kese karein', 'kese karte hai', 'kaise karte hai', 'kese hota', 'kaise hota'],
+    answer: () => (ghidoraLang === 'en' ? 
+      `📦 **Ghidora Transport Master Booking Process Guide**:\n\n` +
+      `Booking transport with Ghidora Transport is simple, fast, and 100% transparent. Here is the complete process:\n\n` +
+      `📝 **Step 1: Fill Mandatory Details (Required)**:\n` +
+      `• **Full Name**: Your contact name.\n` +
+      `• **Phone Number**: 10-digit mobile number for driver & SMS updates.\n` +
+      `• **Pickup Location**: Starting address/city (e.g., Raipur, Bilaspur).\n` +
+      `• **Destination / Drop Location**: Delivery address/city (e.g., Dhamtari, Durg).\n` +
+      `• **Journey Date**: Scheduled transport date.\n` +
+      `• **Vehicle Type**: Choose vehicle:\n` +
+      `   - *Mahindra Bolero Maxx Pickup HD 2.0L* (2-Ton Payload | ₹20/KM)\n` +
+      `   - *Tata Ace (Chota Hathi)* / *Mini Truck* / *Tractor Trolley* / *Van*\n\n` +
+      `✨ **Step 2: Optional Features (Extra Options for Custom Needs)**:\n` +
+      `• **Email Address**: To receive official PDF booking invoice copy.\n` +
+      `• **Distance (KM)**: Enter manually or let Google Map API auto-calculate distance!\n` +
+      `• **Trip Type**: Choose One Way or Round Trip.\n` +
+      `• **Cargo Description**: Details of goods (e.g., Cement, Furniture, House Shifting, Electronics).\n` +
+      `• **Weight & Unit**: Specify payload weight in Kg or Ton (e.g., 500 kg or 2 Ton).\n` +
+      `• **Special Message**: Extra instructions for driver or loading staff.\n` +
+      `• **Multimodal Attachments (Photo/Video/Voice)**: Upload cargo photos/videos or record a voice note for exact vehicle size estimation!\n\n` +
+      `💰 **Step 3: Instant Fare & Booking ID**: Rates are ₹20/KM (Minimum ₹500 for local < 15 KM). Upon submission, you get a unique Booking ID (e.g., GT4892)!\n\n` +
+      `👨‍✈️ **Assigned Verified Driver**: Driver Pankaj Kumar Sahu (Phone: 7489297841 | Bolero Maxx CG 04 MW 2286).\n\n` +
+      `💡 *Tip*: Click **📦 Book Transport** or **💰 Check Fare** on the home page to start!` 
+      :
+      `📦 **Ghidora Transport बुकिंग की पूरी प्रक्रिया (Step-by-Step Guide)**:\n\n` +
+      `Ghidora Transport में गाड़ियां बुक करना बेहद आसान और पारदर्शी है। जानिए पूरी प्रक्रिया:\n\n` +
+      `📝 **चरण 1: अनिवार्य जानकारी (Mandatory Fields)**:\n` +
+      `• **नाम (Full Name)**: आपका नाम।\n` +
+      `• **फोन नंबर (Phone)**: 10 अंकों का मोबाइल नंबर (ड्राइवर संपर्क के लिए)।\n` +
+      `• **पिकअप स्थान (Pickup)**: माल कहाँ से उठाना है (जैसे रायपुर, बिलासपुर)।\n` +
+      `• **ड्रॉप स्थान (Destination)**: माल कहाँ पहुँचाना है (जैसे धमतरी, दुर्ग)।\n` +
+      `• **यात्रा की तारीख (Journey Date)**: जिस दिन ट्रिप करनी है।\n` +
+      `• **वाहन का प्रकार (Vehicle Type)**: गाड़ी चुनें:\n` +
+      `   - *Mahindra Bolero Maxx Pickup HD 2.0L* (2-टनी पिकअप | ₹20/KM)\n` +
+      `   - *Tata Ace (छोटा हाथी)* / *मिनी ट्रक* / *ट्रैक्टर ट्रॉली* / *वैन*\n\n` +
+      `✨ **चरण 2: ऐच्छिक ऑप्शंस (Optional Extra Features)**:\n` +
+      `• **ईमेल (Email)**: PDF इनवॉइस रसीद प्राप्त करने के लिए।\n` +
+      `• **दूरी (Distance in KM)**: मैन्युअल डालें या Google Map से ऑटो-कैलकुलेट होने दें!\n` +
+      `• **ट्रिप का प्रकार (Trip Type)**: One Way (एक तरफा) या Round Trip (आना-जाना)।\n` +
+      `• **माल का प्रकार (Cargo Description)**: क्या सामान भेजना है (जैसे सीमेंट, फर्नीचर, इलेक्ट्रॉनिक्स, घर शिफ्टिंग)।\n` +
+      `• **वजन (Weight & Unit)**: माल का वजन Kg या Ton में चुनें।\n` +
+      `• **विशेष निर्देश (Message)**: ड्राइवर या लोडिंग टीम के लिए खास संदेश।\n` +
+      `• **ऑडियो/फोटो/वीडियो अटैचमेंट**: सामान की फोटो, वीडियो या वॉइस रिकॉर्डिंग भेजें ताकि सही गाड़ियां अलॉट की जा सकें!\n\n` +
+      `💰 **चरण 3: भाड़ा और बुकिंग ID**: standard किराया ₹20/KM है (लोकल < 15 KM के लिए मिनिमम ₹500)। फॉर्म सबमिट करते ही आपको यूनिक Booking ID (जैसे GT4892) मिलेगी!\n\n` +
+      `👨‍✈️ **वेरिफाइड ड्राइवर**: Pankaj Kumar Sahu (Phone: 7489297841 | Bolero Maxx CG 04 MW 2286)।\n\n` +
+      `💡 *Tip*: होम पेज पर **📦 Book Transport** या **💰 Check Fare** बटन दबाकर तुरंत बुकिंग करें!`
+    )
+  }
+];
+
+function ghidoraCheckCustomQA(text){
+  const t = (text||'').toLowerCase().trim();
+  for (const entry of GHIDORA_CUSTOM_QA){
+    if (entry.keywords.some(k => t.includes(k))){
+      return typeof entry.answer === 'function' ? entry.answer() : entry.answer;
+    }
+  }
+  return null;
+}
+
+function ghidoraCheckGK(text){
+  const t = (text||'').toLowerCase().trim();
+  if (/\b(date|tareekh|तारीख़|तारीख)\b/.test(t) && !/kab bani|kab shuru/.test(t)){
+    const d = new Date();
+    return 'आज की तारीख है: ' + d.toLocaleDateString('hi-IN', { day:'numeric', month:'long', year:'numeric' });
+  }
+  if (/\b(time|samay|समय|kitne baje)\b/.test(t)){
+    const d = new Date();
+    return 'अभी समय है: ' + d.toLocaleTimeString('hi-IN', { hour:'2-digit', minute:'2-digit' });
+  }
+  return null;
+}
+
+function ghidoraDetectIntent(text){
+  const t = (text||'').toLowerCase().trim();
+  const has = (arr) => arr.some(k => t.includes(k));
+  if (has(['kaise', 'kese', 'kesi', 'kaisi', 'process', 'steps', 'how to', 'guide', 'tarika', 'tareeka', 'tarike', 'tareeke'])) return 'unknown';
+  if (has(['status','kaha hai','track','booking id'])) return 'status';
+  if (has(['driver','driver number'])) return 'driver_info';
+  if (has(['complaint','issue','problem'])) return 'complaint';
+  if (has(['service','what services'])) return 'company_info';
+  if (has(['kiraya','fare','price','cost'])) return 'fare';
+  if (has(['booking','bhejna','jana hai','samaan','book','shift'])) return 'booking';
+  return 'unknown';
+}
+
+function ghidoraExtractCity(text){
+  const t = (text||'').toLowerCase().trim();
+  for (const city in GHIDORA_DIST_FROM_RAIPUR){
+    if (t.includes(city)) return city.charAt(0).toUpperCase() + city.slice(1);
+  }
+  return text.trim().replace(/[.।,]/g,'') || 'Raipur';
+}
+
+function ghidoraGetDistance(pickup, drop){
+  const p = (pickup||'').toLowerCase(), d = (drop||'').toLowerCase();
+  const pd = GHIDORA_DIST_FROM_RAIPUR[p], dd = GHIDORA_DIST_FROM_RAIPUR[d];
+  if (pd !== undefined && dd !== undefined){
+    if (p === 'raipur') return dd;
+    if (d === 'raipur') return pd;
+    return Math.max(20, Math.round((pd + dd) * 0.6));
+  }
+  return 65;
+}
+
+function ghidoraCalcFare(distanceKm, weightKg){
+  let tier = GHIDORA_VEHICLE_RATES.xl;
+  for (const key of ['low','small','mid','large','xl']){
+    if (weightKg <= GHIDORA_VEHICLE_RATES[key].max){ tier = GHIDORA_VEHICLE_RATES[key]; break; }
+  }
+  return { vehicle: tier.name, fare: Math.round(distanceKm * tier.rate) };
+}
+
+function ghidoraResetFlow(){
+  GHIDORA_STATE.step = 'idle'; GHIDORA_STATE.flowType = null;
+  GHIDORA_STATE.data = { pickup:null, drop:null, goods:null, weight:null, distance:null, vehicle:null, fare:null };
+}
+
+function ghidoraStartIntentFlow(intent){
+  const S = GHIDORA_STATE;
+  switch (intent){
+    case 'booking':
+      S.flowType = 'booking'; S.step = 'ask_pickup';
+      return 'जी हाँ, आपकी बुकिंग कर देती हूँ। कृपया Pickup Location बताइए।';
+    case 'fare':
+      S.flowType = 'fare'; S.step = 'ask_pickup';
+      return 'ठीक है, किराया बताती हूँ। कृपया Pickup Location बताइए।';
+    case 'status':
+      S.flowType = 'status'; S.step = 'ask_status_id';
+      return 'कृपया अपनी Booking ID बताइए (जैसे GT00025)।';
+    case 'driver_info': {
+      const d = GHIDORA_DRIVERS[0];
+      return 'ड्राइवर का नाम है ' + d.name + ', मोबाइल नंबर है ' + d.phone + '।';
+    }
+    case 'complaint':
+      S.flowType = 'complaint'; S.step = 'ask_complaint_detail';
+      return 'मुझे खेद है। कृपया अपनी समस्या बताइए, मैं शिकायत दर्ज कर रही हूँ।';
+    case 'company_info':
+      return 'हम Goods Transport, House Shifting, Agriculture Transport और Business Transport की सुविधा देते हैं।';
+    default: return null;
+  }
+}
+
+function ghidoraLocalReply(rawText){
+  const S = GHIDORA_STATE;
+  const customAnswer = ghidoraCheckCustomQA(rawText);
+  if (customAnswer !== null) return customAnswer;
+
+  const gkAnswer = ghidoraCheckGK(rawText);
+  if (gkAnswer !== null) return gkAnswer;
+
+  switch (S.step){
+    case 'ask_pickup':
+      S.data.pickup = ghidoraExtractCity(rawText);
+      S.step = 'ask_drop';
+      return 'ठीक है, ' + S.data.pickup + ' से। अब बताइए, सामान कहाँ पहुँचाना है (Drop location)?';
+    case 'ask_drop':
+      S.data.drop = ghidoraExtractCity(rawText);
+      S.data.distance = ghidoraGetDistance(S.data.pickup, S.data.drop);
+      S.step = 'ask_goods';
+      return 'समझ गई। ' + S.data.pickup + ' से ' + S.data.drop + ' — लगभग ' + S.data.distance + ' किलोमीटर। अब बताइए, सामान क्या है?';
+    case 'ask_goods':
+      S.data.goods = rawText.trim();
+      S.step = 'ask_weight';
+      return 'ठीक है, ' + S.data.goods + '। लगभग कितना वजन है (किलो में बताइए)?';
+    case 'ask_weight': {
+      const text = (rawText||'').toLowerCase();
+      const m = text.match(/\d+/);
+      let w = m ? parseInt(m[0]) : 500;
+      let unit = 'kg';
+      if (text.includes('ton') || text.includes('टन') || text.includes('tonne')) {
+        unit = 'ton';
+        if (w < 100) w = w * 1000;
+      }
+      S.data.weight = w;
+      S.data.weight_display = m ? (m[0] + ' ' + unit) : (w + ' kg');
+      S.data.weight_unit = unit;
+
+      const { vehicle, fare } = ghidoraCalcFare(S.data.distance, w);
+      S.data.vehicle = vehicle; S.data.fare = fare;
+      S.step = 'confirm';
+      return 'Aapka anumanit kiraya ₹' + fare + ' hai (Vahan: ' + vehicle + ', Doori: ' + S.data.distance + ' KM)। Kya aap booking confirm karna chahte hain? Haan ya nahi batayein.';
+    }
+    case 'confirm': {
+      const t = (rawText||'').toLowerCase();
+      const isYes = /\b(h+n+|h+a+|yes|yep|sure|ok|okay|confirm|karo|kar\s*do|sahi|bilkul|haan|ha|han|hn)\b|h+n+/i.test(t) || t.includes('hnn') || t.includes('hn') || t.includes('ha') || t.includes('हाँ');
+      
+      if (isYes) {
+        S.step = 'ask_phone';
+        return 'Bahut badiya! Kripya apna 10 anko ka mobile number batayein.';
+      }
+      ghidoraResetFlow();
+      return 'Theek hai, koi baat nahi. Main aapki aur kya madad kar sakti hoon?';
+    }
+    case 'ask_phone': {
+      const phoneDigits = (rawText||'').replace(/\D/g, '') || '9876543210';
+      S.data.phone = phoneDigits;
+
+      // 💾 Direct Save to Django Database (GiaBookingRecord & Admin Panel)
+      fetch('/api/confirm-gia-booking/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': giaGetCookie('csrftoken') || '' },
+        body: JSON.stringify(S.data)
+      }).then(r => r.json()).then(resData => {
+        console.log("✅ Gia AI Booking saved to Admin DB:", resData);
+      }).catch(err => console.log("Save warning:", err));
+
+      const id = 'GT' + Math.floor(10000 + Math.random()*89999);
+      ghidoraResetFlow();
+      return 'Dhanyawad! Aapki booking confirm ho chuki hai (Booking ID: ' + id + ')। Detail ke liye aapke paas Ghidora Transport se call aayegi.';
+    }
+    case 'ask_status_id':
+      ghidoraResetFlow();
+      return 'आपकी बुकिंग इन-ट्रांजिट (In Transit) में है और समय पर पहुँच रही है।';
+    case 'ask_complaint_detail':
+      ghidoraResetFlow();
+      return 'आपकी शिकायत दर्ज कर ली गई है। हमारी टीम आपसे तुरंत संपर्क करेगी।';
+    default:
+      return ghidoraStartIntentFlow(ghidoraDetectIntent(rawText));
+  }
+}
+
+function ghidoraQuickSend(msgText) {
+  const input = document.getElementById('ghidora-chat-input');
+  if (input) input.value = msgText;
+  ghidoraSendMessage();
+}
+
+let ghidoraLang = 'hi';
+
+function ghidoraToggleLanguage() {
+  ghidoraLang = ghidoraLang === 'hi' ? 'en' : 'hi';
+  const btn = document.getElementById('ghidoraLangBtn');
+  const input = document.getElementById('ghidora-chat-input');
+  
+  if (btn) {
+    btn.innerHTML = ghidoraLang === 'hi' ? '🌐 HI (हिंदी)' : '🌐 EN (English)';
+  }
+  if (input) {
+    input.placeholder = ghidoraLang === 'hi' ? '💬 Message Gia AI...' : '💬 Ask Gia AI in English...';
+  }
+  
+  const welcomeMsg = ghidoraLang === 'hi' 
+    ? "🌐 Language switched to Hindi! (भाषा हिंदी में सेट हो गई है। बताइए मैं आपकी क्या मदद करूँ?)"
+    : "🌐 Language switched to English! (I will now assist you in English. How can I help with your booking, fare, or route weather?)";
+  ghidoraAddBotMsg(welcomeMsg);
+}
+
+async function ghidoraSendMessage() {
+  const input = document.getElementById('ghidora-chat-input');
+  if (!input) return;
+  const message = input.value.trim();
+  if (!message) return;
+
+  ghidoraAddUserMsg(message);
+  input.value = '';
+  ghidoraShowTyping();
+
+  // 1. Check local state logic
+  const localReply = ghidoraLocalReply(message);
+  if (localReply) {
+    setTimeout(() => {
+      ghidoraHideTyping();
+      ghidoraAddBotMsg(localReply);
+    }, 250);
+    return;
+  }
+
+  // 2. Fetch backend AI endpoint with Language Preference
+  try {
+    const response = await fetch('/api/chat/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': giaGetCookie('csrftoken') || ''
+      },
+      body: JSON.stringify({ message: message, lang: ghidoraLang })
+    });
+    const data = await response.json();
+    ghidoraHideTyping();
+
+    if (data.reply) {
+      ghidoraAddBotMsg(data.reply);
+    } else {
+      const defaultMsg = ghidoraLang === 'en'
+        ? "Hello! I am Gia AI. Please share your pickup and destination locations, and I will calculate the exact fare at ₹20/KM."
+        : "Namaste! Main Ghidora AI (Gia) hoon. Kripya apna Pickup Location aur Destination batayein, main ₹20/KM rate par exact fare calculate karke gadi book kar deti hoon.";
+      ghidoraAddBotMsg(defaultMsg);
+    }
+  } catch(e) {
+    ghidoraHideTyping();
+    const defaultMsg = ghidoraLang === 'en'
+      ? "Hello! I am Gia AI. Please share your pickup and destination locations, and I will calculate the exact fare at ₹20/KM."
+      : "Namaste! Main Ghidora AI (Gia) hoon. Kripya apna Pickup Location aur Destination batayein, main ₹20/KM rate par exact fare calculate karke gadi book kar deti hoon.";
+    ghidoraAddBotMsg(defaultMsg);
+  }
+}
+
+function giaSendMessage() { ghidoraSendMessage(); }
+
+function giaGetCookie(name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      if (cookie.substring(0, name.length + 1) === (name + '=')) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
       }
     }
   }
+  return cookieValue;
+}
 
-  function ghidoraAddMessage(sender, text) {
-    const box = document.getElementById("ghidora-chat-messages");
-    const div = document.createElement("div");
-    div.className = "ghidora-msg " + sender;
-    div.textContent = text;
-    box.appendChild(div);
-    box.scrollTop = box.scrollHeight;
+/* ===== MULTI-LANGUAGE DYNAMIC HINDI & ENGLISH SPEECH SYNTHESIS ENGINE ===== */
+let giaVoiceHi = null;
+let giaVoiceEn = null;
+
+function giaPickVoices() {
+  if (!window.speechSynthesis) return;
+  const voices = window.speechSynthesis.getVoices();
+  if (!voices || !voices.length) return;
+
+  // 1. Pick Hindi Voice (e.g., Google हिन्दी, Microsoft Kalpana, Swara, Heera, etc.)
+  giaVoiceHi = voices.find(v => (v.lang||'').toLowerCase().includes('hi') || (v.name||'').toLowerCase().includes('hindi') || (v.name||'').toLowerCase().includes('hi-in') || (v.name||'').toLowerCase().includes('kalpana') || (v.name||'').toLowerCase().includes('swara')) ||
+               voices.find(v => (v.lang||'').toLowerCase().includes('en-in') || (v.name||'').toLowerCase().includes('heera') || (v.name||'').toLowerCase().includes('neerja'));
+
+  // 2. Pick English Voice (e.g., Google US English, Microsoft Zira, David, English India)
+  giaVoiceEn = voices.find(v => (v.lang||'').toLowerCase().includes('en-in') || (v.name||'').toLowerCase().includes('india')) ||
+               voices.find(v => (v.lang||'').toLowerCase().includes('en-us') || (v.name||'').toLowerCase().includes('zira') || (v.name||'').toLowerCase().includes('google us')) ||
+               voices.find(v => (v.lang||'').toLowerCase().startsWith('en')) ||
+               voices[0];
+}
+
+if (window.speechSynthesis) {
+  window.speechSynthesis.onvoiceschanged = giaPickVoices;
+  giaPickVoices();
+}
+
+function ghidoraDevanagariToHinglish(text) {
+  if (!text) return "";
+  let s = text;
+  const map = [
+    [/बुकिंग/g, "booking"], [/गाड़ियाँ/g, "gadiyan"], [/गाड़ी/g, "gadi"], [/परिवहन/g, "parivahan"],
+    [/अनिवार्य/g, "anivary"], [/जानकारी/g, "jankari"], [/चरण/g, "step"], [/प्रक्रिया/g, "process"],
+    [/पूरी/g, "poori"], [/विवरण/g, "vivaran"], [/किराया/g, "kiraya"], [/विशेष/g, "vishesh"],
+    [/ड्राइवर/g, "driver"], [/सुरक्षा/g, "suraksha"], [/सलाह/g, "salah"], [/मौसम/g, "mausam"],
+    [/नमस्ते!/g, "Namaste!"], [/स्वागत है।/g, "swagat hai."], [/धन्यवाद/g, "dhanyawad"],
+    [/रायपुर/g, "Raipur"], [/धमतरी/g, "Dhamtari"], [/बिलासपुर/g, "Bilaspur"], [/दुर्ग/g, "Durg"],
+    [/भिलाई/g, "Bhilai"], [/दिल्ली/g, "Delhi"], [/मुंबई/g, "Mumbai"], [/बंगलोर/g, "Bangalore"],
+    [/किलोमीटर/g, "kilometer"], [/रूपये/g, "rupaye"], [/बोलेरो/g, "Bolero"], [/पिकअप/g, "Pickup"]
+  ];
+  for (const [rgx, rep] of map) { s = s.replace(rgx, rep); }
+  return s;
+}
+
+function ghidoraSpeak(text) {
+  if (!ghidoraVoiceEnabled || !text) {
+    if (window.speechSynthesis) window.speechSynthesis.cancel();
+    return;
   }
 
-  async function ghidoraSendMessage() {
-    const input = document.getElementById("ghidora-chat-input");
-    const message = input.value.trim();
-    if (!message) return;
+  if (window.speechSynthesis) window.speechSynthesis.cancel();
 
-    ghidoraAddMessage("user", message);
-    input.value = "";
-    ghidoraAddMessage("bot", "...");
+  // Detect language: Is it Devanagari Hindi or user set to Hindi?
+  const hasDevanagari = /[\u0900-\u097F]/.test(text);
+  const isHindi = hasDevanagari || (ghidoraLang === 'hi');
 
-    try {
-      const res = await fetch("/api/chat/", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: message }),
-      });
-      const data = await res.json();
+  // Strip Markdown tags, HTML tags, Emojis, and clean formatting for smooth speech
+  let cleanText = text
+    .replace(/<[^>]*>/g, '') // remove HTML tags
+    .replace(/[\*\_\~`#@\-•|]/g, ' ') // remove Markdown & bullets
+    .replace(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '') // remove emojis
+    .replace(/\s+/g, ' ')
+    .trim();
 
-      const box = document.getElementById("ghidora-chat-messages");
-      box.removeChild(box.lastChild);
+  if (!cleanText) return;
 
-      if (data.error) {
-        ghidoraAddMessage("bot", "माफ़ कीजिए, कुछ दिक्कत हुई।");
-        return;
-      }
+  // Format 5+ digit phone numbers with spaces so TTS speaks them digit by digit (e.g. 6 2 6 6 0 1 4 1 3 9)
+  cleanText = cleanText.replace(/\b\d{5,12}\b/g, (num) => num.split('').join(' '));
 
-      ghidoraAddMessage("bot", data.reply);
-    } catch (e) {
-      ghidoraAddMessage("bot", "Network error।");
+  giaPickVoices();
+
+  const u = new SpeechSynthesisUtterance();
+
+  if (isHindi) {
+    u.lang = 'hi-IN';
+    if (giaVoiceHi) {
+      u.voice = giaVoiceHi;
+    } else {
+      // If OS lacks native Devanagari TTS voice, transliterate Devanagari to Hinglish so English TTS speaks Hindi crystal clear!
+      cleanText = ghidoraDevanagariToHinglish(cleanText);
+      u.lang = 'en-IN';
+      if (giaVoiceEn) u.voice = giaVoiceEn;
+    }
+    u.rate = 0.95;
+    u.pitch = 1.0;
+  } else {
+    u.lang = 'en-US';
+    if (giaVoiceEn) u.voice = giaVoiceEn;
+    u.rate = 1.0;
+    u.pitch = 1.0;
+  }
+
+  u.text = cleanText;
+
+  try {
+    window.speechSynthesis.speak(u);
+  } catch(e) {
+    console.warn("SpeechSynthesis error:", e);
+  }
+}
+function giaSpeak(t) { ghidoraSpeak(t); }
+
+function ghidoraToggleVoice() {
+  ghidoraVoiceEnabled = !ghidoraVoiceEnabled;
+  const btn = document.getElementById('ghidoraVoiceToggleBtn');
+  if (btn) btn.textContent = ghidoraVoiceEnabled ? '🔊' : '🔇';
+  
+  if (!ghidoraVoiceEnabled) {
+    // 🔇 IMMEDIATELY STOP ALL ONGOING SPEECH & AUDIO INSTANTLY!
+    if (giaAudioPlayer) {
+      try { giaAudioPlayer.pause(); giaAudioPlayer.currentTime = 0; } catch(e){}
+    }
+    if (window.speechSynthesis) {
+      window.speechSynthesis.cancel();
     }
   }
+}
 
-  document.addEventListener("DOMContentLoaded", function () {
-    document.getElementById("ghidora-chat-input").addEventListener("keypress", function (e) {
-      if (e.key === "Enter") ghidoraSendMessage();
+function ghidoraTriggerAttach() {
+  const f = document.getElementById('ghidoraFileInput');
+  if (f) f.click();
+}
+
+function ghidoraHandleFile(input) {
+  if (input.files && input.files[0]) {
+    const file = input.files[0];
+    const reader = new FileReader();
+    reader.onload = async function(e) {
+      const base64Data = e.target.result;
+      const container = document.getElementById('ghidora-messages-container');
+      if (container) {
+        const wrap = document.createElement('div');
+        wrap.className = 'msg-wrap user-wrap pop-in';
+        wrap.innerHTML = `<div class="msg-bubble user-bubble"><img src="${base64Data}" style="max-width:180px; max-height:140px; border-radius:12px; display:block; margin-bottom:6px;"><p>📎 ${file.name}</p><span class="msg-time">${ghidoraGetCurrentTime()} ✓✓</span></div>`;
+        container.appendChild(wrap);
+        ghidoraScrollToBottom();
+      }
+      ghidoraShowTyping();
+      try {
+        const response = await fetch('/api/chat/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-CSRFToken': giaGetCookie('csrftoken') || '' },
+          body: JSON.stringify({ message: `Is photo (${file.name}) ko OCR aur Vision AI se explain karein.`, image_data: base64Data })
+        });
+        const data = await response.json();
+        ghidoraHideTyping();
+        ghidoraAddBotMsg(data.reply || `Photo "${file.name}" receive ho gayi hai.`);
+      } catch(err) {
+        ghidoraHideTyping();
+        ghidoraAddBotMsg(`Photo "${file.name}" receive ho gayi hai.`);
+      }
+    };
+    reader.readAsDataURL(file);
+  }
+}
+
+/* Mic Speech Recognition Initialization */
+document.addEventListener('DOMContentLoaded', () => {
+  const micBtn = document.getElementById('ghidoraMicBtn') || document.getElementById('giaMicBtn');
+  const chatInput = document.getElementById('ghidora-chat-input') || document.getElementById('giaChatInput');
+  const statusBar = document.getElementById('ghidora-mic-status-bar') || document.getElementById('gia-mic-status-bar');
+  const statusText = document.getElementById('ghidora-mic-status-text') || document.getElementById('gia-mic-status-text');
+  const timerEl = document.getElementById('ghidora-mic-timer') || document.getElementById('gia-mic-timer');
+
+  if (GhidoraSR) {
+    ghidoraRecognition = new GhidoraSR();
+    ghidoraRecognition.lang = 'hi-IN';
+    ghidoraRecognition.interimResults = true;
+    ghidoraRecognition.continuous = false;
+
+    ghidoraRecognition.onstart = () => {
+      ghidoraListening = true;
+      if (micBtn) micBtn.classList.add('listening');
+      if (statusBar) statusBar.style.display = 'flex';
+      if (statusText) statusText.textContent = '🔴 Sun rahi hoon... (Boliye)';
+      ghidoraMicStartTime = Date.now();
+      if (timerEl) timerEl.textContent = '0:00';
+      clearInterval(ghidoraMicTimerInterval);
+      ghidoraMicTimerInterval = setInterval(() => {
+        const sec = Math.floor((Date.now() - ghidoraMicStartTime) / 1000);
+        if (timerEl) timerEl.textContent = `0:${sec < 10 ? '0' : ''}${sec}`;
+      }, 250);
+    };
+
+    ghidoraRecognition.onerror = (event) => {
+      console.log("Mic error:", event.error);
+      ghidoraListening = false;
+      if (micBtn) micBtn.classList.remove('listening');
+      if (statusBar) statusBar.style.display = 'none';
+      clearInterval(ghidoraMicTimerInterval);
+      if (event.error === 'not-allowed') {
+        alert("Kripya browser mein microphone permissions allow karein.");
+      }
+    };
+
+    ghidoraRecognition.onend = () => {
+      ghidoraListening = false;
+      if (micBtn) micBtn.classList.remove('listening');
+      if (statusBar) statusBar.style.display = 'none';
+      clearInterval(ghidoraMicTimerInterval);
+
+      // 🚀 Auto-send message immediately when user stops speaking!
+      if (chatInput && chatInput.value.trim().length > 0) {
+        setTimeout(() => {
+          ghidoraSendMessage();
+        }, 150);
+      }
+    };
+
+    ghidoraRecognition.onresult = (event) => {
+      let finalText = '';
+      let interimText = '';
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const t = event.results[i][0].transcript;
+        if (event.results[i].isFinal) {
+          finalText += t;
+        } else {
+          interimText += t;
+        }
+      }
+      
+      // ⌨️ Live Typing: Show spoken words live in input box!
+      const currentText = finalText || interimText;
+      if (chatInput && currentText) {
+        chatInput.value = currentText;
+      }
+    };
+
+    const startMicRecording = async (e) => {
+      if (e) e.preventDefault();
+      if (ghidoraListening) {
+        try { ghidoraRecognition.stop(); } catch(e){}
+      } else {
+        if (chatInput) chatInput.value = '';
+        
+        // 🎤 Explicitly request Browser Microphone Permission first!
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+          try {
+            await navigator.mediaDevices.getUserMedia({ audio: true });
+          } catch(permErr) {
+            console.log("Mic perm:", permErr);
+          }
+        }
+
+        try {
+          ghidoraRecognition.start();
+        } catch(err) {
+          console.log("Mic restart:", err);
+          try {
+            ghidoraRecognition.stop();
+            setTimeout(() => { ghidoraRecognition.start(); }, 150);
+          } catch(e){}
+        }
+      }
+    };
+
+    if (micBtn) {
+      micBtn.title = '🎤 Voice Record & Instant Reply';
+      micBtn.addEventListener('click', startMicRecording);
+      micBtn.addEventListener('touchstart', startMicRecording, { passive: false });
+    }
+  } else if (micBtn) {
+    micBtn.title = 'Mic Speech API Browser Me Available Nahi Hai';
+  }
+
+  if (chatInput) {
+    chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') ghidoraSendMessage(); });
+  }
+
+  const launcher = document.getElementById('ghidora-chat-button') || document.getElementById('gia-chat-launcher');
+  if (launcher) {
+    launcher.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      ghidoraToggleChat();
+    }, { passive: false });
+  }
+
+  document.querySelectorAll('.ghidora-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      if (chatInput) chatInput.value = chip.dataset.msg || chip.textContent.trim();
+      ghidoraSendMessage();
     });
   });
+});
+
+/* 🤖 4-Role Mode Switcher Logic */
+function ghidoraSwitchRole(role, btnEl) {
+  document.querySelectorAll('#ghidora-role-selector .role-btn').forEach(b => {
+    b.style.color = '#94a3b8';
+    b.classList.remove('active');
+  });
+  if (btnEl) {
+    btnEl.style.color = '#ffb366';
+    btnEl.classList.add('active');
+  }
+
+  const chipsMap = {
+    customer: [
+      { label: '📦 Booking', msg: 'booking karni hai' },
+      { label: '💰 Fare', msg: 'fare kitna lagega' },
+      { label: '📍 Status', msg: 'booking status batao' },
+      { label: '🌤️ Weather', msg: 'raipur ka weather kaisa hai' },
+      { label: '👤 Driver', msg: 'driver ka number chahiye' }
+    ],
+    driver: [
+      { label: '🚚 Today Trips', msg: 'aaj meri kaun si trip hai' },
+      { label: '⛽ Fuel Log', msg: 'fuel entry karni hai' },
+      { label: '🌧️ Route Weather', msg: 'route ka weather batao' },
+      { label: '✅ Complete Trip', msg: 'delivery complete ho gayi' }
+    ],
+    owner: [
+      { label: '🗺️ Fleet GPS', msg: 'meri gadi kahan hai' },
+      { label: '💵 Earnings', msg: 'is mahine kitni kamai hui' },
+      { label: '🔧 Service', msg: 'agali service kab hai' }
+    ],
+    admin: [
+      { label: '📊 Today Bookings', msg: 'aaj kitni booking hui' },
+      { label: '💰 Total Revenue', msg: 'aaj kitni kamai hui' },
+      { label: '🚛 Vehicles List', msg: 'kaun si gadi khali hai' },
+      { label: '🏆 Top Driver', msg: 'best driver kaun hai' }
+    ]
+  };
+
+  const chipsContainer = document.getElementById('ghidora-chat-chips');
+  if (chipsContainer && chipsMap[role]) {
+    chipsContainer.innerHTML = chipsMap[role].map(c => `
+      <button class="ghidora-chip" data-msg="${c.msg}" onclick="if(document.getElementById('ghidora-chat-input')){document.getElementById('ghidora-chat-input').value='${c.msg}'; ghidoraSendMessage();}">${c.label}</button>
+    `).join('');
+  }
+}
 </script>

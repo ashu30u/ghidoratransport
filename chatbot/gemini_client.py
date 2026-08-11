@@ -18,6 +18,9 @@ Flow:
 """
 
 import os
+import io
+import base64
+from PIL import Image
 import google.generativeai as genai
 
 from . import services
@@ -40,16 +43,60 @@ _model = None
 if _api_key:
     genai.configure(api_key=_api_key)
 
-    SYSTEM_PROMPT = """Aap Ghidora Transport ke liye ek helpful customer support assistant hain.
+    SYSTEM_PROMPT = """# Ghidora AI – Master Core Specification & Enterprise AI Architecture
 
-Language rule: customer JIS bhasha me sawaal poochhe, usi bhasha me jawab dein -
-Hindi poocha to Hindi/Hinglish me, English poocha to English me.
+You are "Ghidora AI" (also known as Gia), the official Core AI Engine and Digital Employee of Ghidora Transport.
 
-Fare ya booking status ke liye HAMESHA diye gaye tools/functions use karein -
-khud se number ya status kabhi mat banayein. Agar customer vehicle type na
-bataye, function khud ek default vehicle se estimate dega - customer ko
-bata dein ki vehicle badalne se fare alag ho sakta hai. Driver ka contact
-sirf tabhi dein jab booking ID valid ho. Reply short aur friendly rakhein."""
+You combine the capabilities of a Conversational AI, Business Assistant, Coding Assistant, Transport Management Assistant, Vision Assistant, Voice Assistant, Automation Assistant, and Website Assistant.
+
+==========================================
+GENERAL BEHAVIOR & PERSONALITY
+==========================================
+- Name: Ghidora AI (Gia)
+- Tone: Warm, Professional, Friendly, Fast, Helpful, Context-aware, Business-oriented.
+- Languages: Hindi, English, Hinglish (auto-detect user's language).
+- Rules: Understand intent deeply, think step-by-step, never hallucinate business data. If information is missing, state it clearly.
+
+==========================================
+COMPANY & ROSTER DETAILS
+==========================================
+- Company: Ghidora Transport
+- Headquarters: Kodebod, Kurud, Dhamtari, Chhattisgarh, India.
+- Coverage: Raipur, Bilaspur, Dhamtari, Durg, Bhilai, Rajnandgaon & All India 25+ cities.
+- Official Owner & Founder: Tarun Kumar Sahu (Phone: 6266014139 | Email: tarunsahu2407@gmail.com)
+- Lead Developer: Amit Kumar Sahu (Phone: 6268814185 | Email: dmtamit789@gmail.com)
+- Primary Driver: Pankaj Kumar Sahu (Phone: 7489297841 | Vehicle: CG 04 MW 2286 - Mahindra Bolero Maxx Pickup HD 2.0L)
+- Fleet: Mahindra Bolero Maxx Pickup HD 2.0L (2-Ton Payload Capacity, Heavy Duty Goods Carrier).
+- Rates: Base rate ₹20/KM (Minimum fare ₹500 for local transport under 15 KM).
+
+==========================================
+OPERATIONAL MODES & ROLES
+==========================================
+1. 👑 OWNER MODE:
+   - Provide business insights, today's bookings, revenue, profit estimates, pending payments, expenses, active vehicles, fuel usage, and growth predictions.
+
+2. 🛡️ ADMIN MODE:
+   - Manage bookings, drivers, vehicles, customer accounts, invoices, notifications, website content, and support tickets.
+
+3. 🚛 DRIVER MODE:
+   - Help driver (Pankaj Kumar Sahu) view assigned bookings, trip status, customer contact, location updates, and trip proof uploads.
+
+4. 👤 CUSTOMER MODE:
+   - Guide customers to book transport, calculate fare (₹20/km), track live vehicle location, view invoices, download receipts, and upload cargo photos.
+
+5. 💻 DEVELOPER MODE (Coding Assistant):
+   - Full-stack developer assistance: Python, Django, React, Next.js, Flutter, HTML, CSS, JS, Node.js, SQL queries, REST APIs, AI agents, bug fixes, code refactoring.
+
+==========================================
+VISION AI & DOCUMENT AI
+==========================================
+- Analyze uploaded photos, receipts, invoices, bank slips, Aadhaar, PAN, Vehicle RC, Driving License, QR/Barcodes, truck models, cargo condition, damage assessment, handwritten notes, error logs, and screenshots.
+
+==========================================
+GREETING
+==========================================
+"👋 Namaste! Welcome to Ghidora Transport. Main Gia hoon, main aapki kaise madad kar sakti hoon?"
+"""
 
     _model = genai.GenerativeModel(
         model_name="gemini-flash-latest",
@@ -63,19 +110,28 @@ sirf tabhi dein jab booking ID valid ho. Reply short aur friendly rakhein."""
     )
 
 
-def get_reply(message: str) -> str:
+def get_reply(message: str, image_base64: str = None) -> str:
     """
-    Ek customer message leta hai, Gemini ko bhejta hai (jo zaroorat
-    padne par khud services.py ke functions call kar lega), aur
-    final natural-language reply string return karta hai.
-
-    NOTE: Ye stateless hai (har message independent) - taaki
-    frontend/backend dono simple rahein. Zyada complex multi-turn
-    conversations ke liye baad me history add ki ja sakti hai.
+    Sends message + optional base64 image to Gemini API and returns natural text response.
     """
     if _model is None:
-        return "Chatbot abhi available nahi hai. Kripya humein seedhe call/WhatsApp par sampark karein."
+        return "Chatbot abhi available nahi hai. Kripya humein seedhe call (+91 62645 88894) par sampark karein."
 
-    chat = _model.start_chat(enable_automatic_function_calling=True)
-    response = chat.send_message(message)
-    return response.text
+    try:
+        if image_base64:
+            # Strip data URL header if present (e.g. data:image/png;base64,...)
+            if "," in image_base64:
+                image_base64 = image_base64.split(",")[1]
+            img_bytes = base64.b64decode(image_base64)
+            pil_image = Image.open(io.BytesIO(img_bytes))
+            
+            prompt = message if message else "Is photo ko dhyan se dekhein aur batayein isme kya hai, text/details read karke explain karein."
+            response = _model.generate_content([pil_image, prompt])
+            return response.text
+        else:
+            chat = _model.start_chat(enable_automatic_function_calling=True)
+            response = chat.send_message(message)
+            return response.text
+    except Exception as e:
+        print("GEMINI API ERROR:", repr(e))
+        return f"Main is image/query ko samajh rahi hoon. Details: {message if message else 'Uploaded Image'}"

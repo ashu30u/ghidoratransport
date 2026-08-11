@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WhatsApp Bhejo - {{ occasion.name }}</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5; }
+        h2 { color: #333; }
+        table { width: 100%; border-collapse: collapse; background: white; }
+        th, td { padding: 10px; border-bottom: 1px solid #ddd; text-align: left; }
+        a.btn {
+            background: #25D366; color: white; padding: 8px 16px;
+            border-radius: 5px; text-decoration: none; font-weight: bold;
+        }
+        a.btn:hover { background: #1da851; }
+    </style>
+</head>
+<body>
+    <h2>{{ occasion.name }} - WhatsApp Bhejo</h2>
+    <p>Kul customers: {{ customer_links|length }}</p>
+    <table>
+        <tr><th>Naam</th><th>Phone</th><th>Action</th></tr>
+        {% for c in customer_links %}
+        <tr>
+            <td>{{ c.name }}</td>
+            <td>{{ c.phone }}</td>
+            <td><a class="btn" href="{{ c.link }}" target="_blank">Send on WhatsApp</a></td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

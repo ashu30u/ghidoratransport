@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'social/css/social.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="gs-wrap">
+  <div class="gs-composer">
+    <p>Delete this post? This can't be undone.</p>
+    <form method="post">
+      {% csrf_token %}
+      <button type="submit" class="gs-btn" style="background:#dc2626;">Delete</button>
+      <a href="{% url 'social:feed' %}" class="gs-btn gs-btn-ghost">Cancel</a>
+    </form>
+  </div>
+</div>
+{% endblock %}

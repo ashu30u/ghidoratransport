@@ -1,0 +1,535 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Occasions Dashboard - Ghidora Transport</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        @property --angle { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
+        @keyframes borderRotate { to { --angle: 360deg; } }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: #060911;
+            color: #ffffff;
+            min-height: 100vh;
+            padding: 30px 20px 60px;
+        }
+
+        .dashboard-container { max-width: 1200px; margin: 0 auto; }
+
+        /* Top Header */
+        .dash-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .dash-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 26px;
+            font-weight: 900;
+            background: linear-gradient(135deg, #ffffff 20%, #00f2fe 60%, #ff007f 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header-actions { display: flex; gap: 12px; }
+        .btn-dash {
+            padding: 10px 18px;
+            border-radius: 12px;
+            font-weight: 800;
+            font-size: 13px;
+            text-transform: uppercase;
+            text-decoration: none;
+            cursor: pointer;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+            transition: all 0.25s ease;
+        }
+        .btn-sync { background: linear-gradient(135deg, #0ea5e9, #0284c7); color: #fff; }
+        .btn-settings { background: linear-gradient(135deg, #7c3aed, #6d28d9); color: #fff; }
+        .btn-home { background: linear-gradient(135deg, #475569, #334155); color: #fff; }
+        .btn-dash:hover { transform: translateY(-3px); box-shadow: 0 10px 24px rgba(0, 0, 0, 0.6); }
+
+        /* Alert Box */
+        .alert-box {
+            padding: 14px 20px;
+            border-radius: 14px;
+            margin-bottom: 25px;
+            font-weight: 700;
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            color: #34d399;
+        }
+
+        /* Stat Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+            gap: 16px;
+            margin-bottom: 35px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(30, 41, 59, 0.95));
+            border: 1.5px solid rgba(0, 242, 254, 0.25);
+            border-radius: 18px;
+            padding: 18px;
+            text-align: center;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+            transition: transform 0.25s ease;
+        }
+        .stat-card:hover { transform: translateY(-4px); border-color: #00f2fe; }
+
+        .stat-num { font-family: 'Orbitron', sans-serif; font-size: 30px; font-weight: 900; color: #00f2fe; margin-top: 4px; }
+        .stat-label { font-size: 11.5px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        /* Section Headlines */
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            margin-top: 15px;
+        }
+        .section-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 18px;
+            font-weight: 900;
+            color: #00f2fe;
+            letter-spacing: 0.8px;
+        }
+        .section-tag {
+            background: rgba(0, 242, 254, 0.15);
+            border: 1px solid rgba(0, 242, 254, 0.4);
+            color: #38bdf8;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        /* 🌟 Festival Cards Grid */
+        .festivals-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+            gap: 22px;
+            margin-bottom: 40px;
+        }
+
+        .fest-card-wrap {
+            position: relative;
+            padding: 2.5px;
+            border-radius: 22px;
+            background: conic-gradient(from var(--angle), #00f2fe, #7928ca, #ff007f, #00f2fe);
+            animation: borderRotate 7s linear infinite;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
+        }
+
+        .fest-card-inner {
+            background: linear-gradient(135deg, rgba(11, 17, 30, 0.98), rgba(20, 29, 47, 0.99));
+            border-radius: 20px;
+            padding: 24px 22px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .fest-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .fest-name {
+            font-size: 20px;
+            font-weight: 900;
+            color: #ffffff;
+            letter-spacing: 0.4px;
+        }
+
+        .fest-date-badge {
+            background: rgba(56, 189, 248, 0.15);
+            border: 1px solid rgba(56, 189, 248, 0.4);
+            color: #38bdf8;
+            padding: 5px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+        .badges-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+        }
+
+        .badge { padding: 4px 10px; border-radius: 8px; font-weight: 800; font-size: 11px; text-transform: uppercase; }
+        .badge-google { background: rgba(2, 132, 199, 0.25); color: #38bdf8; border: 1px solid rgba(2, 132, 199, 0.5); }
+        .badge-manual { background: rgba(16, 185, 129, 0.25); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.5); }
+        .badge-auto { background: rgba(124, 58, 237, 0.25); color: #c084fc; border: 1px solid rgba(124, 58, 237, 0.5); }
+
+        .badge-pending { background: rgba(245, 158, 11, 0.25); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.5); }
+        .badge-approved { background: rgba(16, 185, 129, 0.25); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.5); }
+        .badge-rejected { background: rgba(239, 68, 68, 0.25); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.5); }
+
+        /* 💬 AI Greeting Box on Card */
+        .ai-msg-box {
+            background: rgba(15, 23, 42, 0.85);
+            border: 1px solid rgba(0, 242, 254, 0.3);
+            border-radius: 14px;
+            padding: 14px;
+            font-size: 13.5px;
+            line-height: 1.5;
+            color: #f1f5f9;
+            margin-bottom: 18px;
+            position: relative;
+        }
+
+        .ai-msg-header {
+            font-size: 11px;
+            font-weight: 800;
+            color: #00f2fe;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            margin-bottom: 6px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* Poster Thumbnail */
+        .poster-thumb {
+            width: 100%;
+            max-height: 160px;
+            object-fit: cover;
+            border-radius: 12px;
+            margin-bottom: 14px;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.4);
+        }
+
+        /* Action Buttons */
+        .card-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .act-btn {
+            flex: 1;
+            min-width: 90px;
+            padding: 9px 12px;
+            border-radius: 10px;
+            font-size: 11.5px;
+            font-weight: 800;
+            text-decoration: none;
+            color: #fff;
+            text-align: center;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.3);
+            transition: all 0.2s ease;
+        }
+        .act-btn:hover { transform: translateY(-2px); }
+        .act-approve { background: linear-gradient(135deg, #10b981, #059669); }
+        .act-reject { background: linear-gradient(135deg, #ef4444, #dc2626); }
+        .act-ai { background: linear-gradient(135deg, #0284c7, #0369a1); }
+        .act-send { background: linear-gradient(135deg, #2563eb, #1d4ed8); }
+        .act-preview { background: linear-gradient(135deg, #7c3aed, #6d28d9); }
+        .act-wa { background: linear-gradient(135deg, #22c55e, #15803d); }
+
+        /* Master Table Actions Non-Overlapping Grid */
+        .tbl-actions-cell {
+            min-width: 270px;
+            white-space: nowrap;
+        }
+
+        .tbl-actions-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            align-items: center;
+        }
+
+        .tbl-actions-grid .act-btn {
+            flex: 0 0 auto;
+            min-width: auto;
+            padding: 6px 11px;
+            font-size: 11.5px;
+            white-space: nowrap;
+        }
+
+        /* Master Table Wrap */
+        .table-wrap {
+            position: relative;
+            padding: 2.5px;
+            border-radius: 22px;
+            background: conic-gradient(from var(--angle), #00f2fe, #7928ca, #ff007f, #00f2fe);
+            animation: borderRotate 7s linear infinite;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8);
+            margin-top: 15px;
+        }
+
+        .table-inner {
+            background: rgba(11, 17, 30, 0.97);
+            border-radius: 20px;
+            padding: 22px 18px;
+            overflow-x: auto;
+        }
+
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th { padding: 14px 12px; font-size: 12px; font-weight: 800; color: #38bdf8; text-transform: uppercase; letter-spacing: 0.6px; border-bottom: 1.5px solid rgba(255, 255, 255, 0.1); }
+        td { padding: 14px 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.07); font-size: 13.5px; color: #cbd5e1; }
+    </style>
+</head>
+<body>
+
+<div class="dashboard-container">
+    <!-- Top Header -->
+    <div class="dash-header">
+        <div>
+            <h1 class="dash-title">SMART OCCASIONS DASHBOARD</h1>
+            <p style="color: #94a3b8; font-size: 13.5px; margin-top: 4px;">Ghidora Transport Enterprise Occasion & Customer Greeting System</p>
+        </div>
+        <div class="header-actions">
+            <a href="{% url 'occasions_sync' %}" class="btn-dash btn-sync">🔄 Sync Google Calendar</a>
+            <a href="{% url 'occasions_settings' %}" class="btn-dash btn-settings">⚙️ Settings</a>
+            <a href="{% url 'home' %}" class="btn-dash btn-home">🏠 Back to Home</a>
+        </div>
+    </div>
+
+    {% if messages %}
+        {% for m in messages %}
+            <div class="alert-box">{{ m }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- 📊 Stat Cards -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-label">Upcoming</div>
+            <div class="stat-num">{{ upcoming_count }}</div>
+        </div>
+        <div class="stat-card" style="border-color: #f59e0b;">
+            <div class="stat-label">Pending Approval</div>
+            <div class="stat-num" style="color: #fbbf24;">{{ pending_approval_count }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">AI Messages Ready</div>
+            <div class="stat-num" style="color: #38bdf8;">{{ ai_ready_count }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Scheduled</div>
+            <div class="stat-num" style="color: #c084fc;">{{ scheduled_count }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Messages Sent</div>
+            <div class="stat-num" style="color: #34d399;">{{ sent_count }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Failed</div>
+            <div class="stat-num" style="color: #fca5a5;">{{ failed_count }}</div>
+        </div>
+    </div>
+
+    <!-- 🌟 SECTION 1: IS MAHINE KE TYOHAR (THIS MONTH'S OCCASIONS) -->
+    <div class="section-header">
+        <h2 class="section-title">🌟 IS MAHINE KE TYOHAR</h2>
+        <span class="section-tag">{{ current_month_name }}</span>
+    </div>
+
+    <div class="festivals-grid">
+        {% for occ in this_month_occasions %}
+        <div class="fest-card-wrap">
+            <div class="fest-card-inner">
+                <div>
+                    <div class="fest-top">
+                        <div class="fest-name">{{ occ.name }}</div>
+                        <div class="fest-date-badge">📅 {{ occ.date|date:"d M Y" }} (8:35 AM)</div>
+                    </div>
+
+                    <div class="badges-row">
+                        <span class="badge {% if occ.source == 'google_calendar' %}badge-google{% elif occ.source == 'manual' %}badge-manual{% else %}badge-auto{% endif %}">
+                            {{ occ.get_source_display }}
+                        </span>
+                        <span class="badge {% if occ.approval_status == 'approved' %}badge-approved{% elif occ.approval_status == 'pending' %}badge-pending{% else %}badge-rejected{% endif %}">
+                            {{ occ.get_approval_status_display }}
+                        </span>
+                    </div>
+
+                    {% if occ.poster %}
+                        <img src="{{ occ.poster.url }}" class="poster-thumb" alt="{{ occ.name }}">
+                    {% endif %}
+
+                    <!-- 💬 Live AI Greeting Message Box -->
+                    <div class="ai-msg-box">
+                        <div class="ai-msg-header">
+                            <span>🤖 AI Generated Greeting Message:</span>
+                            <span style="color: #34d399;">Ghidora Brand Tone</span>
+                        </div>
+                        <p style="white-space: pre-line;">{{ occ.message|default:occ.ai_message|default:"Generating message..." }}</p>
+                    </div>
+                </div>
+
+                <div class="card-actions">
+                    {% if occ.approval_status == 'pending' %}
+                        <a href="{% url 'occasions_approve' occ.id %}" class="act-btn act-approve">✅ Approve</a>
+                        <a href="{% url 'occasions_reject' occ.id %}" class="act-btn act-reject">❌ Reject</a>
+                    {% endif %}
+                    <a href="{% url 'occasions_generate_ai' occ.id %}" class="act-btn act-ai">🤖 Regenerate</a>
+                    <a href="{% url 'occasions_send_now' occ.id %}" class="act-btn act-send" onclick="return confirm('Send greeting to all booking customers now?')">🚀 Send Now</a>
+                    <a href="{% url 'occasions_preview' occ.id %}" target="_blank" class="act-btn act-preview">👁️ Preview</a>
+                    <a href="{% url 'whatsapp_links' occ.id %}" class="act-btn act-wa">💬 WhatsApp</a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div style="grid-column: 1 / -1; padding: 25px; background: rgba(15,23,42,0.8); border-radius: 16px; border: 1px solid rgba(255,255,255,0.1); text-align: center; color: #94a3b8;">
+            Is mahine me koi festival/occasion nahi mila. Nayi list import karne ke liye <b>"Sync Google Calendar"</b> button par click karein!
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- 📅 SECTION 2: AGLE ANE WALE TYOHAR (UPCOMING FUTURE MONTHS) -->
+    <div class="section-header">
+        <h2 class="section-title">📅 AGLE ANE WALE TYOHAR</h2>
+        <span class="section-tag">Upcoming Festivals Timeline</span>
+    </div>
+
+    <div class="festivals-grid">
+        {% for occ in upcoming_future_occasions %}
+        <div class="fest-card-wrap" style="animation-duration: 9s;">
+            <div class="fest-card-inner">
+                <div>
+                    <div class="fest-top">
+                        <div class="fest-name">{{ occ.name }}</div>
+                        <div class="fest-date-badge">📅 {{ occ.date|date:"d M Y" }} (8:35 AM)</div>
+                    </div>
+
+                    <div class="badges-row">
+                        <span class="badge {% if occ.source == 'google_calendar' %}badge-google{% elif occ.source == 'manual' %}badge-manual{% else %}badge-auto{% endif %}">
+                            {{ occ.get_source_display }}
+                        </span>
+                        <span class="badge {% if occ.approval_status == 'approved' %}badge-approved{% elif occ.approval_status == 'pending' %}badge-pending{% else %}badge-rejected{% endif %}">
+                            {{ occ.get_approval_status_display }}
+                        </span>
+                    </div>
+
+                    <!-- 💬 Live AI Greeting Message Box -->
+                    <div class="ai-msg-box">
+                        <div class="ai-msg-header">
+                            <span>🤖 AI Generated Greeting Message:</span>
+                            <span style="color: #38bdf8;">Ready for Review</span>
+                        </div>
+                        <p style="white-space: pre-line;">{{ occ.message|default:occ.ai_message|default:"Generating message..." }}</p>
+                    </div>
+                </div>
+
+                <div class="card-actions">
+                    {% if occ.approval_status == 'pending' %}
+                        <a href="{% url 'occasions_approve' occ.id %}" class="act-btn act-approve">✅ Approve</a>
+                        <a href="{% url 'occasions_reject' occ.id %}" class="act-btn act-reject">❌ Reject</a>
+                    {% endif %}
+                    <a href="{% url 'occasions_generate_ai' occ.id %}" class="act-btn act-ai">🤖 AI Msg</a>
+                    <a href="{% url 'occasions_preview' occ.id %}" target="_blank" class="act-btn act-preview">👁️ Preview</a>
+                    <a href="{% url 'whatsapp_links' occ.id %}" class="act-btn act-wa">💬 WhatsApp</a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div style="grid-column: 1 / -1; padding: 25px; background: rgba(15,23,42,0.8); border-radius: 16px; border: 1px solid rgba(255,255,255,0.1); text-align: center; color: #94a3b8;">
+            Aage ke months ke liye koi occasion nahi mila.
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- 📋 SECTION 3: ALL OCCASIONS MASTER TABLE -->
+    <div class="section-header">
+        <h2 class="section-title">📋 ALL OCCASIONS MASTER TABLE</h2>
+        <span class="section-tag">Total: {{ all_occasions.count }}</span>
+    </div>
+
+    <div class="table-wrap">
+        <div class="table-inner">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Occasion Name</th>
+                        <th>Date & Time</th>
+                        <th>Source</th>
+                        <th>Status</th>
+                        <th>Approval</th>
+                        <th>AI Message</th>
+                        <th>Poster</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for occ in all_occasions %}
+                    <tr>
+                        <td><b style="color: #fff;">{{ occ.name }}</b></td>
+                        <td>{{ occ.date|date:"d M Y" }} (8:35 AM)</td>
+                        <td>
+                            <span class="badge {% if occ.source == 'google_calendar' %}badge-google{% elif occ.source == 'manual' %}badge-manual{% else %}badge-auto{% endif %}">
+                                {{ occ.get_source_display }}
+                            </span>
+                        </td>
+                        <td><b style="color: #38bdf8;">{{ occ.get_status_display }}</b></td>
+                        <td>
+                            <span class="badge {% if occ.approval_status == 'approved' %}badge-approved{% elif occ.approval_status == 'pending' %}badge-pending{% else %}badge-rejected{% endif %}">
+                                {{ occ.get_approval_status_display }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if occ.ai_message or occ.message %}
+                                <span style="color: #34d399; font-size: 12px;">✅ Ready</span>
+                            {% else %}
+                                <span style="color: #94a3b8; font-size: 12px;">-</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if occ.poster %}
+                                <span style="color: #38bdf8; font-size: 12px;">🖼️ Uploaded</span>
+                            {% else %}
+                                <span style="color: #94a3b8; font-size: 12px;">-</span>
+                            {% endif %}
+                        </td>
+                        <td class="tbl-actions-cell">
+                            <div class="tbl-actions-grid">
+                                <a href="{% url 'occasions_preview' occ.id %}" target="_blank" class="act-btn act-preview">Preview</a>
+                                {% if occ.approval_status == 'pending' %}
+                                    <a href="{% url 'occasions_approve' occ.id %}" class="act-btn act-approve">Approve</a>
+                                    <a href="{% url 'occasions_reject' occ.id %}" class="act-btn act-reject">Reject</a>
+                                {% endif %}
+                                <a href="{% url 'occasions_generate_ai' occ.id %}" class="act-btn act-ai">AI Msg</a>
+                                <a href="{% url 'occasions_send_now' occ.id %}" class="act-btn act-send" onclick="return confirm('Send greeting to all booking customers now?')">Send</a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" style="text-align: center; padding: 30px; color: #94a3b8;">
+                            No occasions found.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
