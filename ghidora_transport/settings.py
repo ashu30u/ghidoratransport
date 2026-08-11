@@ -16,7 +16,7 @@ SECRET_KEY = os.environ.get(
     'django-insecure-07kifmlf3r+js5e00dp@1#old47f6cjudsc0a@lq1mb&c*p$i%'
 )
 
-DEBUG = os.environ.get('DEBUG', 'True') == 'True'
+DEBUG = True
 
 # 🌟 Allow all hosts (Mobile, Ngrok, Local Network, Render)
 ALLOWED_HOSTS = ['*']
