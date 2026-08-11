@@ -537,8 +537,11 @@ def calculate_distance_api(request):
 def home(request):
 
     context = {}
-    reviews = Review.objects.filter(is_approved=True).order_by("-created_at")
-    if not reviews.exists():
+    try:
+        reviews = Review.objects.filter(is_approved=True).order_by("-created_at")
+        if not reviews.exists():
+            reviews = Review.objects.all().order_by("-created_at")
+    except Exception:
         reviews = Review.objects.all().order_by("-created_at")
 
     average_rating = Review.objects.aggregate(
