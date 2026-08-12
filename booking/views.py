@@ -624,133 +624,182 @@ def home(request):
 
 
     if request.method == "POST":
-
-        name = request.POST.get('name', '').strip()
-        phone = request.POST.get('phone', '').strip()
-        email = request.POST.get('email', '').strip()
-        pickup = request.POST.get('pickup', '').strip()
-        destination = request.POST.get('destination', '').strip()
-        journey_date = request.POST.get('journey_date', '').strip()
-        dist_raw = request.POST.get('distance', '').strip()
         try:
-            distance = float(dist_raw) if dist_raw else 50.0
-        except ValueError:
-            distance = 50.0
+            name = request.POST.get('name', '').strip()
+            phone = request.POST.get('phone', '').strip()
+            email = request.POST.get('email', '').strip()
+            pickup = request.POST.get('pickup', '').strip()
+            destination = request.POST.get('destination', '').strip()
 
-        if distance <= 0:
-            distance = 50.0
+            journey_date_str = request.POST.get('journey_date', '').strip()
+            if journey_date_str:
+                try:
+                    from datetime import datetime
+                    journey_date = datetime.strptime(journey_date_str, '%Y-%m-%d').date()
+                except Exception:
+                    journey_date = timezone.now().date()
+            else:
+                journey_date = timezone.now().date()
 
-        vehicle_type = request.POST.get('vehicle_type', 'Mahindra Pickup').strip()
-        trip_type = request.POST.get('trip_type', 'One Way').strip()
+            dist_raw = request.POST.get('distance', '').strip()
+            try:
+                distance = float(dist_raw) if dist_raw else 50.0
+            except ValueError:
+                distance = 50.0
 
-        cargo_type = request.POST.get('cargo_type', '').strip()
-        weight_value = request.POST.get('weight_value', '').strip()
-        weight_unit = request.POST.get('weight_unit', 'kg')
-        message = request.POST.get('message', '').strip()
+            if distance <= 0:
+                distance = 50.0
 
-        distance_source = request.POST.get('distance_source', 'Manual Entered')
+            vehicle_type = request.POST.get('vehicle_type', 'Mahindra Pickup').strip()
+            trip_type = request.POST.get('trip_type', 'One Way').strip()
 
-        pickup_lat_raw = request.POST.get('pickup_lat', '').strip()
-        pickup_lng_raw = request.POST.get('pickup_lng', '').strip()
-        destination_lat_raw = request.POST.get('destination_lat', '').strip()
-        destination_lng_raw = request.POST.get('destination_lng', '').strip()
-        duration_text = request.POST.get('duration_text', '').strip()
+            cargo_type = request.POST.get('cargo_type', '').strip()
+            weight_value = request.POST.get('weight_value', '').strip()
+            weight_unit = request.POST.get('weight_unit', 'kg')
+            message = request.POST.get('message', '').strip()
 
-        try: pickup_lat = float(pickup_lat_raw) if pickup_lat_raw else None
-        except: pickup_lat = None
+            distance_source = request.POST.get('distance_source', 'Manual Entered')
 
-        try: pickup_lng = float(pickup_lng_raw) if pickup_lng_raw else None
-        except: pickup_lng = None
+            pickup_lat_raw = request.POST.get('pickup_lat', '').strip()
+            pickup_lng_raw = request.POST.get('pickup_lng', '').strip()
+            destination_lat_raw = request.POST.get('destination_lat', '').strip()
+            destination_lng_raw = request.POST.get('destination_lng', '').strip()
+            duration_text = request.POST.get('duration_text', '').strip()
 
-        try: destination_lat = float(destination_lat_raw) if destination_lat_raw else None
-        except: destination_lat = None
+            try: pickup_lat = float(pickup_lat_raw) if pickup_lat_raw else None
+            except: pickup_lat = None
 
-        try: destination_lng = float(destination_lng_raw) if destination_lng_raw else None
-        except: destination_lng = None
+            try: pickup_lng = float(pickup_lng_raw) if pickup_lng_raw else None
+            except: pickup_lng = None
 
-        # Priority 1: Admin Predefined Route Fare
-        predefined_route = get_predefined_route_fare(pickup, destination)
+            try: destination_lat = float(destination_lat_raw) if destination_lat_raw else None
+            except: destination_lat = None
 
-        if predefined_route:
-            fare = predefined_route.get_fare_for_trip_type(trip_type)
-            fare_type = 'Predefined Route Fare'
-        else:
-            # Priority 2: Normal Distance Based Fare
-            vehicle_rates = {
-                'Mahindra Pickup': 20,
-                'Mahindra Bolero': 30,
-                'Mahindra Cruiser': 30,
-                'Magic': 15,
-                'Van': 22,
-                'Mini Bus': 40,
-                'Tata Ace': 20,
-                'Mini Truck': 35,
-                'Tractor Trolley': 50,
-            }
+            try: destination_lng = float(destination_lng_raw) if destination_lng_raw else None
+            except: destination_lng = None
 
-            rate = vehicle_rates.get(vehicle_type, 20)
-            calc_distance = distance * 2 if trip_type == "Round Trip" else distance
-            fare = calc_distance * rate
-            fare_type = 'Distance Based Fare'
+            # Priority 1: Admin Predefined Route Fare
+            predefined_route = get_predefined_route_fare(pickup, destination)
 
-        booking = Booking.objects.create(
-            user=request.user if request.user.is_authenticated else None,
-            name=name,
-            phone=phone,
-            email=email if email else None,
-            pickup=pickup,
-            destination=destination,
-            pickup_lat=pickup_lat,
-            pickup_lng=pickup_lng,
-            destination_lat=destination_lat,
-            destination_lng=destination_lng,
-            duration_text=duration_text if duration_text else None,
-            journey_date=journey_date,
-            distance=distance,
-            distance_source=distance_source,
-            fare=fare,
-            fare_type=fare_type,
-            vehicle_type=vehicle_type,
-            trip_type=trip_type,
-            cargo_type=cargo_type if cargo_type else None,
-            weight_value=weight_value if weight_value else None,
-            weight_unit=weight_unit,
-            message=message if message else None,
-        )
+            if predefined_route:
+                fare = predefined_route.get_fare_for_trip_type(trip_type)
+                fare_type = 'Predefined Route Fare'
+            else:
+                # Priority 2: Normal Distance Based Fare
+                vehicle_rates = {
+                    'Mahindra Pickup': 20,
+                    'Mahindra Bolero': 30,
+                    'Mahindra Cruiser': 30,
+                    'Magic': 15,
+                    'Van': 22,
+                    'Mini Bus': 40,
+                    'Tata Ace': 20,
+                    'Mini Truck': 35,
+                    'Tractor Trolley': 50,
+                }
 
-        voice_file = request.FILES.get('voice_message')
-        if voice_file:
-            BookingAttachment.objects.create(
-                booking=booking,
-                attachment_type='voice',
-                file=voice_file
+                rate = vehicle_rates.get(vehicle_type, 20)
+                calc_distance = distance * 2 if trip_type == "Round Trip" else distance
+                fare = calc_distance * rate
+                fare_type = 'Distance Based Fare'
+
+            booking = Booking.objects.create(
+                user=request.user if request.user.is_authenticated else None,
+                name=name,
+                phone=phone,
+                email=email if email else None,
+                pickup=pickup,
+                destination=destination,
+                pickup_lat=pickup_lat,
+                pickup_lng=pickup_lng,
+                destination_lat=destination_lat,
+                destination_lng=destination_lng,
+                duration_text=duration_text if duration_text else None,
+                journey_date=journey_date,
+                distance=distance,
+                distance_source=distance_source,
+                fare=fare,
+                fare_type=fare_type,
+                vehicle_type=vehicle_type,
+                trip_type=trip_type,
+                cargo_type=cargo_type if cargo_type else None,
+                weight_value=weight_value if weight_value else None,
+                weight_unit=weight_unit,
+                message=message if message else None,
             )
 
-        for f in request.FILES.getlist('media_files'):
-            attachment_type = 'video' if f.content_type.startswith('video') else 'photo'
-            BookingAttachment.objects.create(
-                booking=booking,
-                attachment_type=attachment_type,
-                file=f
-            )
+            voice_file = request.FILES.get('voice_message')
+            if voice_file:
+                BookingAttachment.objects.create(
+                    booking=booking,
+                    attachment_type='voice',
+                    file=voice_file
+                )
 
-        auto_assign_driver_to_booking(booking)
+            for f in request.FILES.getlist('media_files'):
+                attachment_type = 'video' if f.content_type.startswith('video') else 'photo'
+                BookingAttachment.objects.create(
+                    booking=booking,
+                    attachment_type=attachment_type,
+                    file=f
+                )
 
-        context = {
-            "success": True,
-            "booking_id": booking.booking_id,
-            "status": booking.status,
-            "name": name,
-            "phone": phone,
-            "pickup": pickup,
-            "destination": destination,
-            "journey_date": journey_date,
-            "distance": distance,
-            "fare": fare,
-            "fare_type": fare_type,
-            "vehicle_type": vehicle_type,
-            "trip_type": trip_type
-        }
+            auto_assign_driver_to_booking(booking)
+
+            # Instant Background Async Admin Email Notification (Zero UI Blocking)
+            def _send_admin_booking_email_async(b):
+                try:
+                    from django.core.mail import EmailMessage
+                    from django.conf import settings
+                    subj = f"🚚 NEW BOOKING [{b.booking_id}] — {b.name} ({b.phone})"
+                    msg_body = f"""New Booking Received on Ghidora Transport!
+
+Booking ID: {b.booking_id}
+Customer Name: {b.name}
+Phone: {b.phone}
+Email: {b.email or 'N/A'}
+Pickup: {b.pickup}
+Destination: {b.destination}
+Vehicle Type: {b.vehicle_type}
+Trip Type: {b.trip_type}
+Journey Date: {b.journey_date}
+Distance: {b.distance} KM
+Total Fare: ₹{b.fare}
+Status: {b.status}
+
+Render Admin Link: https://ghidoratransport.onrender.com/admin/booking/booking/{b.id}/change/
+"""
+                    mail = EmailMessage(
+                        subject=subj,
+                        body=msg_body,
+                        from_email=settings.DEFAULT_FROM_EMAIL,
+                        to=[settings.EMAIL_HOST_USER, 'ghidoratransport@gmail.com'],
+                    )
+                    mail.send(fail_silently=True)
+                except Exception as ex:
+                    print("❌ Async booking email exception:", ex)
+
+            import threading
+            threading.Thread(target=_send_admin_booking_email_async, args=(booking,), daemon=True).start()
+
+            context.update({
+                "success": True,
+                "booking_id": booking.booking_id,
+                "status": booking.status,
+                "name": name,
+                "phone": phone,
+                "pickup": pickup,
+                "destination": destination,
+                "journey_date": str(journey_date),
+                "distance": distance,
+                "fare": fare,
+                "fare_type": fare_type,
+                "vehicle_type": vehicle_type,
+                "trip_type": trip_type
+            })
+        except Exception as e:
+            print("❌ Booking submission exception:", e)
+            context["error"] = f"Booking submission issue: {e}. Please check your phone number and pickup details."
 
     # Pre-calculate counts and user's like state for each review
     session_key = request.session.session_key or ""
@@ -1596,5 +1645,41 @@ def submit_user_review(request):
 
     except Exception as e:
         return JsonResponse({"status": "error", "message": f"Error submitting review: {str(e)}"}, status=500)
+
 def control_tower(request):
     return render(request, "booking/control_tower.html")
+
+
+@csrf_exempt
+def export_bookings_api(request):
+    """Export all customer bookings created on Render in JSON format."""
+    bookings = Booking.objects.all().order_by('-id')
+    data = []
+    for b in bookings:
+        data.append({
+            "booking_id": b.booking_id,
+            "name": b.name,
+            "phone": b.phone,
+            "email": b.email or "",
+            "pickup": b.pickup,
+            "destination": b.destination,
+            "pickup_lat": b.pickup_lat,
+            "pickup_lng": b.pickup_lng,
+            "destination_lat": b.destination_lat,
+            "destination_lng": b.destination_lng,
+            "duration_text": b.duration_text or "",
+            "journey_date": str(b.journey_date),
+            "distance": b.distance,
+            "distance_source": b.distance_source,
+            "fare": b.fare,
+            "fare_type": b.fare_type,
+            "vehicle_type": b.vehicle_type,
+            "trip_type": b.trip_type,
+            "cargo_type": b.cargo_type or "",
+            "weight_value": str(b.weight_value) if b.weight_value else "",
+            "weight_unit": b.weight_unit,
+            "message": b.message or "",
+            "status": b.status,
+            "created_at": b.booking_date.strftime("%Y-%m-%d %H:%M:%S") if b.booking_date else "",
+        })
+    return JsonResponse({"success": True, "count": len(data), "bookings": data})

@@ -79,6 +79,7 @@ urlpatterns = [
     path('api/review/<int:review_id>/comment/', views.add_review_comment, name='add_review_comment'),
     path('api/review/<int:review_id>/share/', views.record_review_share, name='record_review_share'),
     path('api/submit-user-review/', views.submit_user_review, name='submit_user_review'),
+    path('api/export-bookings/', views.export_bookings_api, name='export_bookings_api'),
 ]
 
 if settings.DEBUG:
