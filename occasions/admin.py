@@ -99,8 +99,8 @@ class OccasionAdmin(admin.ModelAdmin):
 
     def website_status_badge(self, obj):
         if obj.is_active:
-            return format_html('<span style="background:#10B981; color:#fff; padding:4px 10px; border-radius:12px; font-weight:800; font-size:11px;">🟢 ON (Showing)</span>')
-        return format_html('<span style="background:#EF4444; color:#fff; padding:4px 10px; border-radius:12px; font-weight:800; font-size:11px;">🔴 OFF (Hidden)</span>')
+            return mark_safe('<span style="background:#10B981; color:#fff; padding:4px 10px; border-radius:12px; font-weight:800; font-size:11px;">🟢 ON (Showing)</span>')
+        return mark_safe('<span style="background:#EF4444; color:#fff; padding:4px 10px; border-radius:12px; font-weight:800; font-size:11px;">🔴 OFF (Hidden)</span>')
     website_status_badge.short_description = "Website Status"
 
     def source_badge(self, obj):
@@ -155,6 +155,6 @@ class OccasionSettingsAdmin(admin.ModelAdmin):
 
     def website_banner_badge(self, obj):
         if getattr(obj, 'show_on_website', True):
-            return format_html('<span style="background:#10B981; color:#fff; padding:4px 10px; border-radius:12px; font-weight:800; font-size:11px;">🟢 ON (Website Display Active)</span>')
-        return format_html('<span style="background:#EF4444; color:#fff; padding:4px 10px; border-radius:12px; font-weight:800; font-size:11px;">🔴 OFF (Website Display Disabled)</span>')
+            return mark_safe('<span style="background:#10B981; color:#fff; padding:4px 10px; border-radius:12px; font-weight:800; font-size:11px;">🟢 ON (Website Display Active)</span>')
+        return mark_safe('<span style="background:#EF4444; color:#fff; padding:4px 10px; border-radius:12px; font-weight:800; font-size:11px;">🔴 OFF (Website Display Disabled)</span>')
     website_banner_badge.short_description = "Global Banner Display"
