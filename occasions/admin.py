@@ -100,33 +100,33 @@ class OccasionAdmin(admin.ModelAdmin):
 
     def website_status_badge(self, obj):
         if obj.is_active:
-            return mark_safe('<span style="background:#10B981; color:#fff; padding:4px 10px; border-radius:12px; font-weight:800; font-size:11px;">🟢 ON (Showing)</span>')
-        return mark_safe('<span style="background:#EF4444; color:#fff; padding:4px 10px; border-radius:12px; font-weight:800; font-size:11px;">🔴 OFF (Hidden)</span>')
+            return mark_safe('<span style="background:#10B981; color:#ffffff; padding:4px 10px; border-radius:12px; font-weight:700; font-size:11px; white-space:nowrap; display:inline-block;">🟢 ON</span>')
+        return mark_safe('<span style="background:#EF4444; color:#ffffff; padding:4px 10px; border-radius:12px; font-weight:700; font-size:11px; white-space:nowrap; display:inline-block;">🔴 OFF</span>')
     website_status_badge.short_description = "Website Status"
 
     def source_badge(self, obj):
         colors = {
-            'google_calendar': '#0284c7',
-            'automatic': '#7c3aed',
-            'manual': '#059669',
+            'google_calendar': ('#0284c7', '#ffffff'),
+            'automatic': ('#7c3aed', '#ffffff'),
+            'manual': ('#059669', '#ffffff'),
         }
-        color = colors.get(obj.source, '#475569')
+        bg, fg = colors.get(obj.source, ('#475569', '#ffffff'))
         return format_html(
-            '<span style="background:{}; color:#fff; padding:4px 8px; border-radius:6px; font-weight:700; font-size:11px;">{}</span>',
-            color, obj.get_source_display()
+            '<span style="background:{}; color:{}; padding:4px 10px; border-radius:12px; font-weight:700; font-size:11px; white-space:nowrap; display:inline-block;">{}</span>',
+            bg, fg, obj.get_source_display()
         )
     source_badge.short_description = "Source"
 
     def approval_badge(self, obj):
         colors = {
-            'approved': '#10b981',
-            'pending': '#f59e0b',
-            'rejected': '#ef4444',
+            'approved': ('#10b981', '#ffffff', '✅ Approved'),
+            'pending': ('#f59e0b', '#ffffff', '⏳ Pending Review'),
+            'rejected': ('#ef4444', '#ffffff', '❌ Rejected'),
         }
-        color = colors.get(obj.approval_status, '#64748b')
+        bg, fg, label = colors.get(obj.approval_status, ('#64748b', '#ffffff', obj.get_approval_status_display()))
         return format_html(
-            '<span style="background:{}; color:#fff; padding:4px 8px; border-radius:6px; font-weight:700; font-size:11px;">{}</span>',
-            color, obj.get_approval_status_display()
+            '<span style="background:{}; color:{}; padding:4px 10px; border-radius:12px; font-weight:700; font-size:11px; white-space:nowrap; display:inline-block;">{}</span>',
+            bg, fg, label
         )
     approval_badge.short_description = "Approval Status"
 
@@ -142,9 +142,12 @@ class OccasionAdmin(admin.ModelAdmin):
 
     def action_buttons(self, obj):
         return format_html(
-            '<a class="button" href="/occasions/dashboard/" style="margin-right:5px; background:#0284c7; color:#fff;">Dashboard</a>'
-            '<a class="button" href="/occasions/preview/{}/" target="_blank" style="background:#7c3aed; color:#fff;">Preview</a>',
-            obj.id
+            '<div style="display:flex; gap:6px; align-items:center; white-space:nowrap;">'
+            '<a class="button" href="/occasions/send-now/{}/" style="background:#10b981 !important; color:#ffffff !important; padding:4px 10px !important; border-radius:8px !important; font-weight:700 !important; font-size:11px !important; text-decoration:none !important;" onclick="return confirm(\'Send greeting email to ALL customers now?\');">🚀 Send Now</a>'
+            '<a class="button" href="/occasions/dashboard/" style="background:#0284c7 !important; color:#ffffff !important; padding:4px 10px !important; border-radius:8px !important; font-weight:700 !important; font-size:11px !important; text-decoration:none !important;">📊 Dashboard</a>'
+            '<a class="button" href="/occasions/preview/{}/" target="_blank" style="background:#7c3aed !important; color:#ffffff !important; padding:4px 10px !important; border-radius:8px !important; font-weight:700 !important; font-size:11px !important; text-decoration:none !important;">👁️ Preview</a>'
+            '</div>',
+            obj.id, obj.id
         )
     action_buttons.short_description = "Actions"
 

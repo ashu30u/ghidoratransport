@@ -1,0 +1,52 @@
+{% extends "admin/base.html" %}
+
+{% block title %}{% if subtitle %}{{ subtitle }} | {% endif %}{{ title }} | Ghidora Transport Admin{% endblock %}
+
+{% block branding %}
+<h1 id="site-name"><a href="{% url 'admin:index' %}">Ghidora Transport Administration</a></h1>
+{% endblock %}
+
+{% block nav-global %}{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+<style>
+  /* ===== Proper Indentation & Alignment for Django Admin Tables ===== */
+  #result_list th, #result_list td {
+    padding: 10px 14px !important;
+    vertical-align: middle !important;
+  }
+
+  /* Column 1: Name Field Proper Indentation */
+  #result_list td.field-name {
+    white-space: normal !important;
+    min-width: 150px;
+    font-weight: 600;
+  }
+
+  /* Badges & Action Buttons Alignment */
+  #result_list td.field-website_status_badge,
+  #result_list td.field-approval_badge,
+  #result_list td.field-source_badge,
+  #result_list td.field-colored_status,
+  #result_list td.field-action_buttons {
+    white-space: nowrap !important;
+  }
+
+  .admin-action-group {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    white-space: nowrap !important;
+  }
+
+  /* Clean Spacing for Filters & Search */
+  #changelist-filter {
+    padding: 14px !important;
+  }
+  #changelist-filter h2 {
+    font-size: 13px !important;
+    font-weight: bold !important;
+  }
+</style>
+{% endblock %}
