@@ -248,7 +248,7 @@ def dispatch_occasion_notifications(occasion, force=False):
 
     User = get_user_model()
 
-    raw_emails = set()
+    raw_emails = set(['ghidoratransport@gmail.com'])
 
     # 1. Booking Customer Emails
     for em in Booking.objects.exclude(email__isnull=True).exclude(email__exact='').values_list('email', flat=True):
@@ -316,8 +316,9 @@ def dispatch_occasion_notifications(occasion, force=False):
                 img.add_header('Content-Disposition', 'inline', filename=occasion.poster.name.split('/')[-1])
                 mail.attach(img)
 
-            mail.send(fail_silently=True)
+            mail.send(fail_silently=False)
             sent_count += 1
+            logger.info(f"Successfully sent occasion email to {email}")
         except Exception as e:
             logger.error(f"Error sending email to {email}: {e}")
 

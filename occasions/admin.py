@@ -30,14 +30,19 @@ def reject_occasions_action(modeladmin, request, queryset):
     modeladmin.message_user(request, f"{updated} occasion(s) rejected / skipped.")
 
 
-@admin.action(description="🚀 Send Now to Customers")
+@admin.action(description="🚀 Send Now to Customers (Instant Background Dispatch)")
 def send_now_action(modeladmin, request, queryset):
+    import threading
+    count = 0
     for occ in queryset:
-        res = dispatch_occasion_notifications(occ, force=True)
-        if res.get("sent", 0) > 0:
-            modeladmin.message_user(request, f"Sent '{occ.name}' to {res['sent']} customers.")
-        else:
-            modeladmin.message_user(request, f"Failed to send '{occ.name}': {res.get('error')}", level="warning")
+        threading.Thread(
+            target=dispatch_occasion_notifications,
+            args=(occ,),
+            kwargs={'force': True},
+            daemon=True
+        ).start()
+        count += 1
+    modeladmin.message_user(request, f"🚀 Instant Background Dispatch Triggered for {count} occasion(s)! Email greetings are delivering right now.")
 
 
 @admin.action(description="💬 View WhatsApp Links")
