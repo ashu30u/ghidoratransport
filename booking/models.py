@@ -1,5 +1,8 @@
 from django.db import models
 from django.conf import settings
+from django.db.models.signals import pre_save, post_save, post_delete
+from django.dispatch import receiver
+from django.core.cache import cache
 import random
 
 
@@ -270,8 +273,6 @@ class Review(models.Model):
     def __str__(self):
         return f"{self.display_name} - {self.rating}⭐ ({'Approved' if self.is_approved else 'Pending'})"
 
-
-from django.core.cache import cache
 
 @receiver([post_save, post_delete], sender=Review)
 def _clear_home_reviews_cache(sender, instance, **kwargs):
