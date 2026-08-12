@@ -1302,40 +1302,48 @@
       </div>
     </div>
 
-    <!-- Mega Slide-Down Drawer Navigation Menu (Exact About Us Copy) -->
-    <div class="mobile-nav-drawer" id="mobileNavDrawer" style="display: none !important;">
-      <div style="font-size: 11px; font-weight: 800; letter-spacing: 1.5px; color: #ff7a1a; padding: 6px 12px 2px; text-transform: uppercase;">📍 Main Pages</div>
-      <a href="{% url 'home' %}" class="active">🏠 Home</a>
-      <a href="{% url 'services' %}">🛠️ Services</a>
-      <a href="{% url 'home' %}#booking">📦 Book Transport</a>
-      <a href="{% url 'about' %}">ℹ️ About Us</a>
-      <a href="{% url 'contact_us' %}">🕿 Contact Us</a>
+    <!-- Dark Backdrop Overlay (Closes menu on outside click) -->
+    <div class="mobile-nav-overlay" id="mobileNavOverlay" onclick="closeMobileMenu()"></div>
 
-      <div style="height: 1px; background: rgba(255, 255, 255, 0.1); margin: 8px 0;"></div>
+    <!-- 60% Width Responsive Side Drawer Navigation Menu -->
+    <div class="mobile-nav-drawer" id="mobileNavDrawer">
+      <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 6px;">
+        <div style="font-size: 11px; font-weight: 800; letter-spacing: 1.5px; color: #ff7a1a; text-transform: uppercase;">📍 Navigation Menu</div>
+        <button onclick="closeMobileMenu()" aria-label="Close Menu" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #ffffff; width: 28px; height: 28px; border-radius: 50%; font-size: 14px; display: flex; align-items: center; justify-content: center; cursor: pointer;">✕</button>
+      </div>
 
-      <div style="font-size: 11px; font-weight: 800; letter-spacing: 1.5px; color: #00d2ff; padding: 6px 12px 2px; text-transform: uppercase;">⚡ Special Features & Tools</div>
+      <div style="font-size: 11px; font-weight: 800; letter-spacing: 1.5px; color: #ff7a1a; padding: 4px 6px 2px; text-transform: uppercase;">📍 Main Pages</div>
+      <a href="{% url 'home' %}" class="active" onclick="closeMobileMenu()">🏠 Home</a>
+      <a href="{% url 'services' %}" onclick="closeMobileMenu()">🛠️ Services</a>
+      <a href="{% url 'home' %}#booking" onclick="closeMobileMenu()">📦 Book Transport</a>
+      <a href="{% url 'about' %}" onclick="closeMobileMenu()">ℹ️ About Us</a>
+      <a href="{% url 'contact_us' %}" onclick="closeMobileMenu()">🕿 Contact Us</a>
+
+      <div style="height: 1px; background: rgba(255, 255, 255, 0.1); margin: 6px 0;"></div>
+
+      <div style="font-size: 11px; font-weight: 800; letter-spacing: 1.5px; color: #00d2ff; padding: 4px 6px 2px; text-transform: uppercase;">⚡ Special Features & Tools</div>
       {% if user.is_staff or user.is_superuser %}
-        <a href="{% url 'control_tower' %}" style="color: #00f2fe; font-weight: 800; background: rgba(0, 242, 254, 0.15); border: 1px solid rgba(0, 242, 254, 0.4); padding: 10px 14px; border-radius: 10px; margin-bottom: 4px;">🧠 AI Transport Control Tower (Admin)</a>
+        <a href="{% url 'control_tower' %}" onclick="closeMobileMenu()" style="color: #00f2fe; font-weight: 800; background: rgba(0, 242, 254, 0.15); border: 1px solid rgba(0, 242, 254, 0.4); padding: 10px 14px; border-radius: 10px; margin-bottom: 4px;">🧠 AI Transport Control Tower (Admin)</a>
       {% endif %}
-      <a href="#360-viewer" style="color: #ff9e00; font-weight: 700;">🏎️ 360° Vehicle View</a>
-      <a href="javascript:void(0)" onclick="ghidoraOpenWeatherModal();" style="color: #00d2ff; font-weight: 700;">🌤️ Weather AI Radar</a>
-      <a href="javascript:void(0)" onclick="toggleSiteTruckDoors();" style="color: #FF6B00; font-weight: 700;">🚚 3D Shutter Door Animation</a>
-      <a href="{% url 'quotations:quote_request' %}">💰 Check Fare & Rate Quote</a>
-      <a href="{% url 'business_card' %}">🪪 Digital Business Card</a>
-      <a href="{% url 'status' %}">💳 Check Booking Status & Payment</a>
+      <a href="{% url 'home' %}#360-viewer" onclick="closeMobileMenu()" style="color: #ff9e00; font-weight: 700;">🏎️ 360° Vehicle View</a>
+      <a href="javascript:void(0)" onclick="closeMobileMenu(); ghidoraOpenWeatherModal();" style="color: #00d2ff; font-weight: 700;">🌤️ Weather AI Radar</a>
+      <a href="javascript:void(0)" onclick="closeMobileMenu(); toggleSiteTruckDoors();" style="color: #FF6B00; font-weight: 700;">🚚 3D Shutter Door Animation</a>
+      <a href="{% url 'quotations:quote_request' %}" onclick="closeMobileMenu()">💰 Check Fare & Rate Quote</a>
+      <a href="{% url 'business_card' %}" onclick="closeMobileMenu()">🪪 Digital Business Card</a>
+      <a href="{% url 'status' %}" onclick="closeMobileMenu()">💳 Check Booking Status & Payment</a>
 
       {% if user.is_authenticated %}
-        <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 14px; background: rgba(255,122,26,0.12); border: 1px solid rgba(255,122,26,0.3); border-radius: 12px; margin-top: 10px;">
-          <span style="color: #ff7a1a; font-weight: 700; font-size: 14px;">👤 {{ user.first_name|default:user.username }}</span>
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; background: rgba(255,122,26,0.12); border: 1px solid rgba(255,122,26,0.3); border-radius: 12px; margin-top: 8px;">
+          <span style="color: #ff7a1a; font-weight: 700; font-size: 13px;">👤 {{ user.first_name|default:user.username }}</span>
           <form method="post" action="{% url 'logout' %}" style="margin: 0;">
             {% csrf_token %}
-            <button type="submit" style="background: #ef4444; color: white; border: none; padding: 6px 14px; border-radius: 8px; font-size: 12.5px; font-weight: bold; cursor: pointer;">
+            <button type="submit" style="background: #ef4444; color: white; border: none; padding: 5px 12px; border-radius: 8px; font-size: 12px; font-weight: bold; cursor: pointer;">
               🚪 Logout
             </button>
           </form>
         </div>
       {% else %}
-        <a href="{% url 'login' %}" style="background: linear-gradient(135deg, #ff7a1a, #e5670f); color: white; justify-content: center; font-weight: bold; margin-top: 10px;">
+        <a href="{% url 'login' %}" onclick="closeMobileMenu()" style="background: linear-gradient(135deg, #ff7a1a, #e5670f); color: white; justify-content: center; font-weight: bold; margin-top: 8px;">
           🔑 Login / Sign In
         </a>
       {% endif %}
@@ -1346,30 +1354,38 @@
     function toggleMobileMenu(event) {
       if (event) event.stopPropagation();
       var drawer = document.getElementById('mobileNavDrawer');
+      var overlay = document.getElementById('mobileNavOverlay');
       var btn = document.getElementById('hamburgerBtn');
       if (!drawer) return;
 
-      var isVisible = drawer.classList.contains('active') || drawer.style.display === 'flex';
+      var isVisible = drawer.classList.contains('active');
 
       if (isVisible) {
-        drawer.classList.remove('active');
-        drawer.style.setProperty('display', 'none', 'important');
-        if (btn) btn.classList.remove('active');
+        closeMobileMenu();
       } else {
-        drawer.style.setProperty('display', 'flex', 'important');
         drawer.classList.add('active');
+        if (overlay) overlay.classList.add('active');
         if (btn) btn.classList.add('active');
+        document.body.style.overflow = 'hidden';
       }
+    }
+
+    function closeMobileMenu() {
+      var drawer = document.getElementById('mobileNavDrawer');
+      var overlay = document.getElementById('mobileNavOverlay');
+      var btn = document.getElementById('hamburgerBtn');
+      if (drawer) drawer.classList.remove('active');
+      if (overlay) overlay.classList.remove('active');
+      if (btn) btn.classList.remove('active');
+      document.body.style.overflow = '';
     }
 
     document.addEventListener('click', function(e) {
       var drawer = document.getElementById('mobileNavDrawer');
       var btn = document.getElementById('hamburgerBtn');
-      if (drawer && (drawer.classList.contains('active') || drawer.style.display === 'flex')) {
+      if (drawer && drawer.classList.contains('active')) {
         if (!drawer.contains(e.target) && (!btn || !btn.contains(e.target))) {
-          drawer.classList.remove('active');
-          drawer.style.setProperty('display', 'none', 'important');
-          if (btn) btn.classList.remove('active');
+          closeMobileMenu();
         }
       }
     });

@@ -440,22 +440,30 @@
       </div>
     </div>
 
-    <!-- Mega Slide-Down Drawer Navigation Menu -->
-    <div class="mobile-nav-drawer" id="mobileNavDrawer" style="display: none !important;">
-      <div style="font-size: 11px; font-weight: 800; letter-spacing: 1.5px; color: #ff7a1a; padding: 6px 12px 2px; text-transform: uppercase;">📍 Main Pages</div>
-      <a href="{% url 'home' %}">🏠 Home</a>
-      <a href="{% url 'services' %}">🛠️ Services</a>
-      <a href="{% url 'home' %}#booking">📦 Book Transport</a>
-      <a href="{% url 'about' %}" class="active">ℹ️ About Us</a>
-      <a href="{% url 'contact_us' %}">🕿 Contact Us</a>
+    <!-- Dark Backdrop Overlay (Closes menu on outside click) -->
+    <div class="mobile-nav-overlay" id="mobileNavOverlay" onclick="closeMobileMenu()"></div>
 
-      <div style="height: 1px; background: rgba(255, 255, 255, 0.1); margin: 8px 0;"></div>
+    <!-- 60% Width Responsive Side Drawer Navigation Menu -->
+    <div class="mobile-nav-drawer" id="mobileNavDrawer">
+      <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 6px;">
+        <div style="font-size: 11px; font-weight: 800; letter-spacing: 1.5px; color: #ff7a1a; text-transform: uppercase;">📍 Navigation Menu</div>
+        <button onclick="closeMobileMenu()" aria-label="Close Menu" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #ffffff; width: 28px; height: 28px; border-radius: 50%; font-size: 14px; display: flex; align-items: center; justify-content: center; cursor: pointer;">✕</button>
+      </div>
 
-      <div style="font-size: 11px; font-weight: 800; letter-spacing: 1.5px; color: #00d2ff; padding: 6px 12px 2px; text-transform: uppercase;">⚡ Special Features & Tools</div>
-      <a href="{% url 'home' %}#360-viewer" style="color: #ff9e00; font-weight: 700;">🏎️ 360° Vehicle View</a>
-      <a href="{% url 'quotations:quote_request' %}">💰 Check Fare & Rate Quote</a>
-      <a href="{% url 'business_card' %}">🪪 Digital Business Card</a>
-      <a href="{% url 'status' %}">💳 Check Booking Status & Payment</a>
+      <div style="font-size: 11px; font-weight: 800; letter-spacing: 1.5px; color: #ff7a1a; padding: 4px 6px 2px; text-transform: uppercase;">📍 Main Pages</div>
+      <a href="{% url 'home' %}" onclick="closeMobileMenu()">🏠 Home</a>
+      <a href="{% url 'services' %}" onclick="closeMobileMenu()">🛠️ Services</a>
+      <a href="{% url 'home' %}#booking" onclick="closeMobileMenu()">📦 Book Transport</a>
+      <a href="{% url 'about' %}" class="active" onclick="closeMobileMenu()">ℹ️ About Us</a>
+      <a href="{% url 'contact_us' %}" onclick="closeMobileMenu()">🕿 Contact Us</a>
+
+      <div style="height: 1px; background: rgba(255, 255, 255, 0.1); margin: 6px 0;"></div>
+
+      <div style="font-size: 11px; font-weight: 800; letter-spacing: 1.5px; color: #00d2ff; padding: 4px 6px 2px; text-transform: uppercase;">⚡ Special Features & Tools</div>
+      <a href="{% url 'home' %}#360-viewer" onclick="closeMobileMenu()" style="color: #ff9e00; font-weight: 700;">🏎️ 360° Vehicle View</a>
+      <a href="{% url 'quotations:quote_request' %}" onclick="closeMobileMenu()">💰 Check Fare & Rate Quote</a>
+      <a href="{% url 'business_card' %}" onclick="closeMobileMenu()">🪪 Digital Business Card</a>
+      <a href="{% url 'status' %}" onclick="closeMobileMenu()">💳 Check Booking Status & Payment</a>
     </div>
   </nav>
 
@@ -463,30 +471,38 @@
     function toggleMobileMenu(event) {
       if (event) event.stopPropagation();
       var drawer = document.getElementById('mobileNavDrawer');
+      var overlay = document.getElementById('mobileNavOverlay');
       var btn = document.getElementById('hamburgerBtn');
       if (!drawer) return;
 
-      var isVisible = drawer.classList.contains('active') || drawer.style.display === 'flex';
+      var isVisible = drawer.classList.contains('active');
 
       if (isVisible) {
-        drawer.classList.remove('active');
-        drawer.style.setProperty('display', 'none', 'important');
-        if (btn) btn.classList.remove('active');
+        closeMobileMenu();
       } else {
-        drawer.style.setProperty('display', 'flex', 'important');
         drawer.classList.add('active');
+        if (overlay) overlay.classList.add('active');
         if (btn) btn.classList.add('active');
+        document.body.style.overflow = 'hidden';
       }
+    }
+
+    function closeMobileMenu() {
+      var drawer = document.getElementById('mobileNavDrawer');
+      var overlay = document.getElementById('mobileNavOverlay');
+      var btn = document.getElementById('hamburgerBtn');
+      if (drawer) drawer.classList.remove('active');
+      if (overlay) overlay.classList.remove('active');
+      if (btn) btn.classList.remove('active');
+      document.body.style.overflow = '';
     }
 
     document.addEventListener('click', function(e) {
       var drawer = document.getElementById('mobileNavDrawer');
       var btn = document.getElementById('hamburgerBtn');
-      if (drawer && (drawer.classList.contains('active') || drawer.style.display === 'flex')) {
+      if (drawer && drawer.classList.contains('active')) {
         if (!drawer.contains(e.target) && (!btn || !btn.contains(e.target))) {
-          drawer.classList.remove('active');
-          drawer.style.setProperty('display', 'none', 'important');
-          if (btn) btn.classList.remove('active');
+          closeMobileMenu();
         }
       }
     });
