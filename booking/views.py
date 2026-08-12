@@ -536,6 +536,7 @@ def calculate_distance_api(request):
 
 def home(request):
 
+    context = {}
     try:
         try:
             reviews_qs = Review.objects.filter(is_approved=True).order_by("-created_at")
