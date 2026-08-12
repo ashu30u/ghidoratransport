@@ -927,45 +927,7 @@
         transform: translateY(-7.75px) rotate(-45deg) !important;
       }
 
-      /* 🌟 Mobile Slide-Down Drawer Navigation Menu (Exact Surge Deployment Style) */
-      .mobile-nav-drawer {
-        display: none;
-        position: fixed !important;
-        top: 58px !important;
-        right: 12px !important;
-        width: 310px !important;
-        max-width: calc(100vw - 24px) !important;
-        background: linear-gradient(145deg, rgba(15, 23, 42, 0.98), rgba(30, 41, 59, 0.98)) !important;
-        border: 1.5px solid #ff7a1a !important;
-        backdrop-filter: blur(20px) !important;
-        -webkit-backdrop-filter: blur(20px) !important;
-        border-radius: 16px !important;
-        padding: 14px !important;
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.95), 0 0 35px rgba(255, 107, 0, 0.3) !important;
-        z-index: 100001 !important;
-        flex-direction: column !important;
-        gap: 6px !important;
-      }
-      .mobile-nav-drawer.active {
-        display: flex !important;
-      }
-      .mobile-nav-drawer a {
-        color: #f8fafc !important;
-        text-decoration: none !important;
-        font-weight: 600 !important;
-        font-size: 13.5px !important;
-        padding: 9px 12px !important;
-        border-radius: 10px !important;
-        display: flex !important;
-        align-items: center !important;
-        gap: 8px !important;
-        background: rgba(255, 255, 255, 0.04);
-        border: 1px solid rgba(255, 255, 255, 0.06);
-      }
-      .mobile-nav-drawer a:hover {
-        background: rgba(255, 122, 26, 0.18) !important;
-        color: #ff9e00 !important;
-      }
+
 
       @media (max-width: 900px) {
         .nav-links { display: none !important; }
@@ -1351,8 +1313,11 @@
   </nav>
 
   <script>
-    function toggleMobileMenu(event) {
-      if (event) event.stopPropagation();
+    window.toggleMobileMenu = function(event) {
+      if (event) {
+        try { event.preventDefault(); } catch(e){}
+        try { event.stopPropagation(); } catch(e){}
+      }
       var drawer = document.getElementById('mobileNavDrawer');
       var overlay = document.getElementById('mobileNavOverlay');
       var btn = document.getElementById('hamburgerBtn');
@@ -1361,16 +1326,16 @@
       var isVisible = drawer.classList.contains('active');
 
       if (isVisible) {
-        closeMobileMenu();
+        window.closeMobileMenu();
       } else {
         drawer.classList.add('active');
         if (overlay) overlay.classList.add('active');
         if (btn) btn.classList.add('active');
         document.body.style.overflow = 'hidden';
       }
-    }
+    };
 
-    function closeMobileMenu() {
+    window.closeMobileMenu = function() {
       var drawer = document.getElementById('mobileNavDrawer');
       var overlay = document.getElementById('mobileNavOverlay');
       var btn = document.getElementById('hamburgerBtn');
@@ -1378,14 +1343,23 @@
       if (overlay) overlay.classList.remove('active');
       if (btn) btn.classList.remove('active');
       document.body.style.overflow = '';
-    }
+    };
+
+    document.addEventListener('DOMContentLoaded', function() {
+      var btn = document.getElementById('hamburgerBtn');
+      if (btn) {
+        btn.onclick = function(e) {
+          window.toggleMobileMenu(e);
+        };
+      }
+    });
 
     document.addEventListener('click', function(e) {
       var drawer = document.getElementById('mobileNavDrawer');
       var btn = document.getElementById('hamburgerBtn');
       if (drawer && drawer.classList.contains('active')) {
         if (!drawer.contains(e.target) && (!btn || !btn.contains(e.target))) {
-          closeMobileMenu();
+          window.closeMobileMenu();
         }
       }
     });

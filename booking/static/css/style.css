@@ -175,35 +175,37 @@ body{ margin:0; font-family: Arial, Helvetica, sans-serif; background:#f3f4f6; }
   box-shadow: 0 6px 18px rgba(255, 107, 0, 0.8) !important;
 }
 
-/* 🌟 Mobile 60% Width Responsive Side Drawer Navigation Menu */
+/* 🌟 Universal Responsive Side Drawer Navigation Menu (Desktop, Laptop & Mobile) */
 .mobile-nav-drawer {
   display: flex !important;
   position: fixed !important;
   top: 0 !important;
   right: 0 !important;
-  width: 60vw !important;
-  max-width: 320px !important;
+  width: 320px !important;
+  max-width: 80vw !important;
   min-width: 250px !important;
   height: 100vh !important;
   height: 100dvh !important;
-  background: linear-gradient(150deg, rgba(10, 14, 23, 0.98), rgba(26, 31, 46, 0.98)) !important;
-  border-left: 1.5px solid rgba(255, 107, 0, 0.5) !important;
+  background: linear-gradient(150deg, rgba(10, 14, 23, 0.98), rgba(26, 31, 46, 0.99)) !important;
+  border-left: 1.5px solid rgba(255, 107, 0, 0.6) !important;
   backdrop-filter: blur(24px) !important;
   -webkit-backdrop-filter: blur(24px) !important;
-  padding: 16px !important;
-  box-shadow: -10px 0 40px rgba(0, 0, 0, 0.85) !important;
-  z-index: 1000001 !important;
+  padding: 18px 16px !important;
+  box-shadow: -10px 0 50px rgba(0, 0, 0, 0.9) !important;
+  z-index: 10000001 !important;
   flex-direction: column !important;
   gap: 6px !important;
   overflow-y: auto !important;
   box-sizing: border-box !important;
-  transform: translateX(100%);
-  opacity: 0;
-  pointer-events: none;
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease !important;
+  visibility: hidden !important;
+  transform: translateX(105%) !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease, visibility 0.3s ease !important;
 }
 .mobile-nav-drawer.active {
   display: flex !important;
+  visibility: visible !important;
   transform: translateX(0) !important;
   opacity: 1 !important;
   pointer-events: auto !important;
@@ -212,16 +214,18 @@ body{ margin:0; font-family: Arial, Helvetica, sans-serif; background:#f3f4f6; }
 .mobile-nav-overlay {
   position: fixed !important;
   inset: 0 !important;
-  background: rgba(0, 0, 0, 0.65) !important;
+  background: rgba(0, 0, 0, 0.7) !important;
   backdrop-filter: blur(4px) !important;
   -webkit-backdrop-filter: blur(4px) !important;
-  z-index: 1000000 !important;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.3s ease !important;
+  z-index: 10000000 !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transition: opacity 0.3s ease, visibility 0.3s ease !important;
 }
 .mobile-nav-overlay.active {
   display: block !important;
+  visibility: visible !important;
   opacity: 1 !important;
   pointer-events: auto !important;
 }

@@ -369,8 +369,11 @@
   </nav>
 
   <script>
-    function toggleMobileMenu(event) {
-      if (event) event.stopPropagation();
+    window.toggleMobileMenu = function(event) {
+      if (event) {
+        try { event.preventDefault(); } catch(e){}
+        try { event.stopPropagation(); } catch(e){}
+      }
       var drawer = document.getElementById('mobileNavDrawer');
       var overlay = document.getElementById('mobileNavOverlay');
       var btn = document.getElementById('hamburgerBtn');
@@ -379,16 +382,16 @@
       var isVisible = drawer.classList.contains('active');
 
       if (isVisible) {
-        closeMobileMenu();
+        window.closeMobileMenu();
       } else {
         drawer.classList.add('active');
         if (overlay) overlay.classList.add('active');
         if (btn) btn.classList.add('active');
         document.body.style.overflow = 'hidden';
       }
-    }
+    };
 
-    function closeMobileMenu() {
+    window.closeMobileMenu = function() {
       var drawer = document.getElementById('mobileNavDrawer');
       var overlay = document.getElementById('mobileNavOverlay');
       var btn = document.getElementById('hamburgerBtn');
@@ -396,14 +399,23 @@
       if (overlay) overlay.classList.remove('active');
       if (btn) btn.classList.remove('active');
       document.body.style.overflow = '';
-    }
+    };
+
+    document.addEventListener('DOMContentLoaded', function() {
+      var btn = document.getElementById('hamburgerBtn');
+      if (btn) {
+        btn.onclick = function(e) {
+          window.toggleMobileMenu(e);
+        };
+      }
+    });
 
     document.addEventListener('click', function(e) {
       var drawer = document.getElementById('mobileNavDrawer');
       var btn = document.getElementById('hamburgerBtn');
       if (drawer && drawer.classList.contains('active')) {
         if (!drawer.contains(e.target) && (!btn || !btn.contains(e.target))) {
-          closeMobileMenu();
+          window.closeMobileMenu();
         }
       }
     });
