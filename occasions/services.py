@@ -243,8 +243,19 @@ def dispatch_occasion_notifications(occasion, force=False):
         return {"sent": 0, "error": f"Occasion already sent for year {current_year}"}
 
     from quotations.models import Quotation
-    from booking.models import Review
+    from booking.models import Booking, ContactMessage, GiaAIBookingRecord, Review
     from django.contrib.auth import get_user_model
+    try:
+        from allauth.account.models import EmailAddress
+    except ImportError:
+        EmailAddress = None
+
+    # Auto-sync live customer bookings from Render server before collecting email addresses
+    try:
+        from sync_render_bookings import sync_bookings_from_render
+        sync_bookings_from_render()
+    except Exception as sync_err:
+        logger.warning(f"Live Render customer auto-sync skipped: {sync_err}")
 
     User = get_user_model()
 
@@ -260,15 +271,31 @@ def dispatch_occasion_notifications(occasion, force=False):
         if em and em.strip():
             raw_emails.add(em.strip().lower())
 
-    # 3. Review Guest Emails
+    # 3. Contact Us Messages Customer Emails
+    for em in ContactMessage.objects.exclude(email__isnull=True).exclude(email__exact='').values_list('email', flat=True):
+        if em and em.strip():
+            raw_emails.add(em.strip().lower())
+
+    # 4. Gia AI Booking Records Customer Emails
+    for em in GiaAIBookingRecord.objects.exclude(email__isnull=True).exclude(email__exact='').values_list('email', flat=True):
+        if em and em.strip():
+            raw_emails.add(em.strip().lower())
+
+    # 5. Review Guest Emails
     for em in Review.objects.exclude(guest_email__isnull=True).exclude(guest_email__exact='').values_list('guest_email', flat=True):
         if em and em.strip():
             raw_emails.add(em.strip().lower())
 
-    # 4. Registered User Account Emails
+    # 6. Registered User Account Emails
     for em in User.objects.exclude(email__isnull=True).exclude(email__exact='').values_list('email', flat=True):
         if em and em.strip():
             raw_emails.add(em.strip().lower())
+
+    # 7. Allauth EmailAddress Model Emails
+    if EmailAddress:
+        for em in EmailAddress.objects.exclude(email__isnull=True).exclude(email__exact='').values_list('email', flat=True):
+            if em and em.strip():
+                raw_emails.add(em.strip().lower())
 
     emails = sorted(list(raw_emails))
 
