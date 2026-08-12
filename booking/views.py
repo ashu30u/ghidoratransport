@@ -1634,12 +1634,28 @@ def submit_user_review(request):
         if not comment:
             return JsonResponse({"status": "error", "message": "Please write a review comment."})
 
-        ip_address = request.META.get('REMOTE_ADDR')
+        # Extract clean single IP address safely for Render proxies
+        raw_ip = request.META.get('HTTP_X_FORWARDED_FOR') or request.META.get('REMOTE_ADDR') or ''
+        ip_candidate = raw_ip.split(',')[0].strip() if raw_ip else ''
+        
+        clean_ip = None
+        if ip_candidate:
+            import ipaddress
+            try:
+                clean_ip = str(ipaddress.ip_address(ip_candidate))
+            except Exception:
+                clean_ip = None
 
-        # Check rate limiting: max 5 reviews per IP per 10 minutes
-        recent_count = Review.objects.filter(ip_address=ip_address, created_at__gte=timezone.now() - timezone.timedelta(minutes=10)).count()
-        if recent_count >= 5:
-            return JsonResponse({"status": "error", "message": "Aapne abhi bohot saare reviews submit kiye hain. Kripya thoda wahi rukiye."})
+        if clean_ip:
+            try:
+                recent_count = Review.objects.filter(
+                    ip_address=clean_ip,
+                    created_at__gte=timezone.now() - timezone.timedelta(minutes=10)
+                ).count()
+                if recent_count >= 5:
+                    return JsonResponse({"status": "error", "message": "Aapne abhi bohot saare reviews submit kiye hain. Kripya thoda wahi rukiye."})
+            except Exception:
+                pass
 
         if request.user.is_authenticated:
             user = request.user
@@ -1654,7 +1670,7 @@ def submit_user_review(request):
             guest_phone = request.POST.get('phone', '').strip()
             is_verified = False
 
-        # Stage 1: Try creating review directly
+        # Attempt 1: Direct creation
         try:
             review_obj = Review.objects.create(
                 user=user,
@@ -1665,13 +1681,12 @@ def submit_user_review(request):
                 comment=comment,
                 review=comment,
                 service_used=service_used,
-                photo=photo,
+                photo=photo if photo else None,
                 is_approved=True,
                 is_verified=is_verified,
-                ip_address=ip_address
+                ip_address=clean_ip
             )
         except Exception as stage1_err:
-            # Stage 2: Attach to dummy booking record
             import random
             dummy = Booking.objects.first()
             if not dummy:
@@ -1698,10 +1713,10 @@ def submit_user_review(request):
                 comment=comment,
                 review=comment,
                 service_used=service_used,
-                photo=photo,
+                photo=photo if photo else None,
                 is_approved=True,
                 is_verified=is_verified,
-                ip_address=ip_address
+                ip_address=clean_ip
             )
 
         # Clear home reviews summary cache immediately
@@ -1720,7 +1735,8 @@ def submit_user_review(request):
         })
 
     except Exception as e:
-        logger.error(f"Error in submit_user_review: {e}")
+        import traceback
+        traceback.print_exc()
         return JsonResponse({"status": "error", "message": f"Review submission issue: {str(e)}"})
 
 def control_tower(request):
