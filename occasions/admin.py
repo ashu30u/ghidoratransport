@@ -54,13 +54,28 @@ def sync_google_calendar_action(modeladmin, request, queryset):
     modeladmin.message_user(request, f"Synced Google Calendar: {res.get('imported', 0)} new occasion(s) imported.")
 
 
+@admin.action(description="🟢 Turn ON selected occasion(s) for Website Display")
+def turn_on_website_action(modeladmin, request, queryset):
+    updated = queryset.update(is_active=True)
+    modeladmin.message_user(request, f"🟢 {updated} occasion(s) turned ON for Website display.")
+
+
+@admin.action(description="🔴 Turn OFF selected occasion(s) from Website Display")
+def turn_off_website_action(modeladmin, request, queryset):
+    updated = queryset.update(is_active=False)
+    modeladmin.message_user(request, f"🔴 {updated} occasion(s) turned OFF (hidden from Website).")
+
+
 @admin.register(Occasion)
 class OccasionAdmin(admin.ModelAdmin):
-    list_display = ('name', 'date', 'source_badge', 'approval_badge', 'has_ai_message', 'has_poster', 'is_active', 'last_sent_year', 'action_buttons')
-    list_filter = ('source', 'approval_status', 'status', 'is_active', 'date')
+    list_display = ('name', 'date', 'source_badge', 'approval_badge', 'website_status_badge', 'is_active', 'last_sent_year', 'action_buttons')
+    list_editable = ('is_active',)
+    list_filter = ('is_active', 'source', 'approval_status', 'status', 'date')
     search_fields = ('name', 'description', 'message', 'ai_message')
     date_hierarchy = 'date'
     actions = [
+        turn_on_website_action,
+        turn_off_website_action,
         generate_ai_message_action,
         approve_occasions_action,
         reject_occasions_action,
@@ -70,8 +85,9 @@ class OccasionAdmin(admin.ModelAdmin):
     ]
 
     fieldsets = (
-        ("📌 Occasion Details", {
-            'fields': ('name', 'date', 'description', 'source', 'external_event_id', 'is_active')
+        ("📌 Occasion Details & Website Status", {
+            'fields': ('name', 'date', 'description', 'source', 'is_active', 'external_event_id'),
+            'description': "Set 'Is Active' to ON (checked) to display this occasion banner on the website."
         }),
         ("💬 Messaging & AI Generator", {
             'fields': ('ai_message', 'message', 'poster')
@@ -80,6 +96,12 @@ class OccasionAdmin(admin.ModelAdmin):
             'fields': ('approval_status', 'status', 'scheduled_at', 'sent_at', 'last_sent_year')
         }),
     )
+
+    def website_status_badge(self, obj):
+        if obj.is_active:
+            return format_html('<span style="background:#10B981; color:#fff; padding:4px 10px; border-radius:12px; font-weight:800; font-size:11px;">🟢 ON (Showing)</span>')
+        return format_html('<span style="background:#EF4444; color:#fff; padding:4px 10px; border-radius:12px; font-weight:800; font-size:11px;">🔴 OFF (Hidden)</span>')
+    website_status_badge.short_description = "Website Status"
 
     def source_badge(self, obj):
         colors = {
@@ -128,4 +150,11 @@ class OccasionAdmin(admin.ModelAdmin):
 
 @admin.register(OccasionSettings)
 class OccasionSettingsAdmin(admin.ModelAdmin):
-    list_display = ('__str__', 'auto_sync_enabled', 'advance_import_days', 'ai_generation_enabled', 'admin_approval_required', 'auto_sending_enabled', 'customer_sending_enabled')
+    list_display = ('__str__', 'show_on_website', 'website_banner_badge', 'auto_sync_enabled', 'advance_import_days', 'ai_generation_enabled', 'admin_approval_required', 'auto_sending_enabled', 'customer_sending_enabled')
+    list_editable = ('show_on_website', 'auto_sync_enabled', 'advance_import_days', 'ai_generation_enabled', 'admin_approval_required', 'auto_sending_enabled', 'customer_sending_enabled')
+
+    def website_banner_badge(self, obj):
+        if getattr(obj, 'show_on_website', True):
+            return format_html('<span style="background:#10B981; color:#fff; padding:4px 10px; border-radius:12px; font-weight:800; font-size:11px;">🟢 ON (Website Display Active)</span>')
+        return format_html('<span style="background:#EF4444; color:#fff; padding:4px 10px; border-radius:12px; font-weight:800; font-size:11px;">🔴 OFF (Website Display Disabled)</span>')
+    website_banner_badge.short_description = "Global Banner Display"

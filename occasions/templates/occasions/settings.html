@@ -148,6 +148,17 @@
             <form method="post">
                 {% csrf_token %}
 
+                <div class="setting-row" style="background: rgba(16, 185, 129, 0.1); padding: 16px 12px; border-radius: 14px; margin-bottom: 15px; border: 1.5px solid rgba(16, 185, 129, 0.4);">
+                    <div>
+                        <div class="setting-label" style="color: #34d399; font-size: 15px;">🌐 Display Occasion Banner on Website (ON / OFF)</div>
+                        <div class="setting-desc" style="color: #cbd5e1;">Master switch to show or hide Special Occasion banners on the website homepage</div>
+                    </div>
+                    <label class="switch">
+                        <input type="checkbox" name="show_on_website" {% if setting.show_on_website %}checked{% endif %}>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
                 <div class="setting-row">
                     <div>
                         <div class="setting-label">Automatic Occasion Sync</div>

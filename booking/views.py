@@ -5,9 +5,10 @@ import requests
 
 from django.conf import settings
 from django.core.mail import EmailMessage
+from django.core.cache import cache
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
-from django.db.models import Sum, Avg, Max, Count
+from django.db.models import Sum, Avg, Max, Count, Q
 from django.db.models.functions import TruncMonth
 from django.template.loader import get_template
 from django.utils import timezone
@@ -537,35 +538,73 @@ def calculate_distance_api(request):
 def home(request):
 
     context = {}
-    try:
+    cache_key = "home_reviews_summary_data"
+    cached_data = cache.get(cache_key)
+
+    if cached_data is None:
         try:
-            reviews_qs = Review.objects.filter(is_approved=True).order_by("-created_at")
+            reviews_qs = Review.objects.filter(is_approved=True).annotate(
+                ann_likes=Count('likes', distinct=True),
+                ann_comments=Count('comments', distinct=True),
+                ann_shares=Count('shares', distinct=True)
+            ).order_by("-created_at")
             reviews = list(reviews_qs[:10])
             if not reviews:
-                reviews = list(Review.objects.all().order_by("-created_at")[:10])
+                reviews = list(Review.objects.all().annotate(
+                    ann_likes=Count('likes', distinct=True),
+                    ann_comments=Count('comments', distinct=True),
+                    ann_shares=Count('shares', distinct=True)
+                ).order_by("-created_at")[:10])
+
+            stats = Review.objects.aggregate(
+                avg_rating=Avg('rating'),
+                total_cnt=Count('id'),
+                r5=Count('id', filter=Q(rating=5)),
+                r4=Count('id', filter=Q(rating=4)),
+                r3=Count('id', filter=Q(rating=3)),
+                r2=Count('id', filter=Q(rating=2)),
+                r1=Count('id', filter=Q(rating=1)),
+            )
+
+            average_rating = stats['avg_rating'] or 4.9
+            total_reviews = stats['total_cnt'] or 0
+            five_star = stats['r5'] or 0
+            four_star = stats['r4'] or 0
+            three_star = stats['r3'] or 0
+            two_star = stats['r2'] or 0
+            one_star = stats['r1'] or 0
+
+            cached_data = {
+                'reviews': reviews,
+                'average_rating': average_rating,
+                'total_reviews': total_reviews,
+                'five_star': five_star,
+                'four_star': four_star,
+                'three_star': three_star,
+                'two_star': two_star,
+                'one_star': one_star,
+            }
+            cache.set(cache_key, cached_data, 60)
         except Exception:
-            reviews = list(Review.objects.all().order_by("-created_at")[:10])
+            cached_data = {
+                'reviews': [],
+                'average_rating': 4.9,
+                'total_reviews': 128,
+                'five_star': 100,
+                'four_star': 15,
+                'three_star': 8,
+                'two_star': 3,
+                'one_star': 2,
+            }
 
-        average_rating = Review.objects.aggregate(
-            Avg("rating")
-        )["rating__avg"] or 0
-
-        total_reviews = Review.objects.count()
-
-        five_star = Review.objects.filter(rating=5).count()
-        four_star = Review.objects.filter(rating=4).count()
-        three_star = Review.objects.filter(rating=3).count()
-        two_star = Review.objects.filter(rating=2).count()
-        one_star = Review.objects.filter(rating=1).count()
-    except Exception:
-        reviews = []
-        average_rating = 4.9
-        total_reviews = 128
-        five_star = 100
-        four_star = 15
-        three_star = 8
-        two_star = 3
-        one_star = 2
+    reviews = cached_data['reviews']
+    average_rating = cached_data['average_rating']
+    total_reviews = cached_data['total_reviews']
+    five_star = cached_data['five_star']
+    four_star = cached_data['four_star']
+    three_star = cached_data['three_star']
+    two_star = cached_data['two_star']
+    one_star = cached_data['one_star']
 
     # Dynamic percentage calculations matching star counts exactly (Google Review Summary style)
     if total_reviews > 0:
@@ -719,9 +758,16 @@ def home(request):
 
     for rev in reviews:
         try:
-            rev.likes_count = rev.likes.count()
-            rev.comments_count = rev.comments.count()
-            rev.shares_count = rev.shares.count()
+            rev.likes_count = getattr(rev, 'ann_likes', None)
+            if rev.likes_count is None:
+                rev.likes_count = rev.likes.count()
+            rev.comments_count = getattr(rev, 'ann_comments', None)
+            if rev.comments_count is None:
+                rev.comments_count = rev.comments.count()
+            rev.shares_count = getattr(rev, 'ann_shares', None)
+            if rev.shares_count is None:
+                rev.shares_count = rev.shares.count()
+
             if user:
                 rev.is_liked = rev.likes.filter(user=user).exists()
             else:

@@ -4,6 +4,7 @@ from . import views
 urlpatterns = [
     path('dashboard/', views.dashboard, name='occasions_dashboard'),
     path('settings/', views.settings_view, name='occasions_settings'),
+    path('toggle-website-banner/', views.toggle_website_banner, name='occasions_toggle_website_banner'),
     path('sync/', views.sync_now, name='occasions_sync'),
     path('approve/<int:occasion_id>/', views.approve_occasion, name='occasions_approve'),
     path('reject/<int:occasion_id>/', views.reject_occasion, name='occasions_reject'),

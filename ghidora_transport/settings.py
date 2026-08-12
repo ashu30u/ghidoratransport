@@ -155,6 +155,17 @@ STORAGES = {
     },
 }
 
+# ================================
+# Performance Caching & WhiteNoise Optimization
+# ================================
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'ghidora-local-cache',
+    }
+}
+WHITENOISE_MAX_AGE = 31536000  # Cache static assets in browser for 1 year
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # ================================

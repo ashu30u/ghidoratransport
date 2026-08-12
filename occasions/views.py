@@ -74,6 +74,7 @@ def settings_view(request):
     setting = get_occasion_settings()
 
     if request.method == 'POST':
+        setting.show_on_website = request.POST.get('show_on_website') == 'on'
         setting.auto_sync_enabled = request.POST.get('auto_sync_enabled') == 'on'
         setting.advance_import_days = int(request.POST.get('advance_import_days', 30))
         setting.ai_generation_enabled = request.POST.get('ai_generation_enabled') == 'on'
@@ -87,6 +88,17 @@ def settings_view(request):
         return redirect('occasions_settings')
 
     return render(request, 'occasions/settings.html', {'setting': setting})
+
+
+@staff_member_required
+def toggle_website_banner(request):
+    """Toggle displaying special occasion banners on the website ON or OFF."""
+    setting = get_occasion_settings()
+    setting.show_on_website = not getattr(setting, 'show_on_website', True)
+    setting.save()
+    status_msg = "🟢 ON (Showing on Website)" if setting.show_on_website else "🔴 OFF (Hidden from Website)"
+    messages.success(request, f"Website Special Occasion Banner is now {status_msg}.")
+    return redirect(request.META.get('HTTP_REFERER', 'occasions_dashboard'))
 
 
 @staff_member_required

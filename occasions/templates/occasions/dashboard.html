@@ -304,6 +304,11 @@
             <p style="color: #94a3b8; font-size: 13.5px; margin-top: 4px;">Ghidora Transport Enterprise Occasion & Customer Greeting System</p>
         </div>
         <div class="header-actions">
+            {% if settings.show_on_website %}
+                <a href="{% url 'occasions_toggle_website_banner' %}" class="btn-dash" style="background: linear-gradient(135deg, #10b981, #059669); color: #fff;" title="Click to Turn OFF website banner">🟢 Website Display: ON</a>
+            {% else %}
+                <a href="{% url 'occasions_toggle_website_banner' %}" class="btn-dash" style="background: linear-gradient(135deg, #ef4444, #dc2626); color: #fff;" title="Click to Turn ON website banner">🔴 Website Display: OFF</a>
+            {% endif %}
             <a href="{% url 'occasions_sync' %}" class="btn-dash btn-sync">🔄 Sync Google Calendar</a>
             <a href="{% url 'occasions_settings' %}" class="btn-dash btn-settings">⚙️ Settings</a>
             <a href="{% url 'home' %}" class="btn-dash btn-home">🏠 Back to Home</a>

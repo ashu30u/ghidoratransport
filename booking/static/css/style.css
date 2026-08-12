@@ -928,6 +928,21 @@ html, body {
   .hero-actions .btn{
     padding: 7px 11px;
     font-size: 11px;
+  }
+}
+
+/* ⚡ Hardware-Accelerated 60FPS Smooth Rendering Rules (Zero Lag on Mobile) */
+*, *::before, *::after {
+  -webkit-tap-highlight-color: transparent;
+}
+.hero, .navbar, .mobile-nav-drawer, .map-picker-card, .btn {
+  will-change: transform, opacity;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+@media (max-width: 480px){
+  .hero-actions .btn{
     gap: 5px;
   }
 

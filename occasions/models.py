@@ -68,7 +68,21 @@ class Occasion(models.Model):
         return f"{self.name} ({self.date or f'{self.day}/{self.month}'})"
 
 
+from django.db import connection
+
+try:
+    with connection.cursor() as cursor:
+        cursor.execute("ALTER TABLE occasions_occasionsettings ADD COLUMN show_on_website BOOLEAN DEFAULT 1")
+except Exception:
+    pass
+
+
 class OccasionSettings(models.Model):
+    show_on_website = models.BooleanField(
+        default=True,
+        verbose_name="Show Occasion Banner on Website",
+        help_text="Global ON/OFF toggle switch to show or hide Special Occasion banners on the website homepage."
+    )
     auto_sync_enabled = models.BooleanField(default=True, help_text="Auto-sync upcoming occasions from Google Calendar")
     advance_import_days = models.IntegerField(default=1, help_text="Import occasions ~1 day in advance")
     ai_generation_enabled = models.BooleanField(default=True, help_text="Generate AI greetings for imported occasions")
@@ -80,7 +94,8 @@ class OccasionSettings(models.Model):
     default_source = models.CharField(max_length=50, default="Google Calendar")
 
     def __str__(self):
-        return "Smart Occasion Global Settings"
+        status_str = "ON" if getattr(self, 'show_on_website', True) else "OFF"
+        return f"Smart Occasion Global Settings (Website Banner: {status_str})"
 
     class Meta:
         verbose_name = "Occasion System Setting"
