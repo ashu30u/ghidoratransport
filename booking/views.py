@@ -1688,23 +1688,22 @@ def submit_user_review(request):
             )
         except Exception as stage1_err:
             import random
-            dummy = Booking.objects.first()
-            if not dummy:
-                dummy = Booking.objects.create(
-                    booking_id=f"REV-{random.randint(1000000, 9999999)}",
-                    name=guest_name[:90],
-                    phone=guest_phone[:15] if guest_phone else "0000000000",
-                    email=guest_email or None,
-                    pickup="Dhamtari",
-                    destination="Raipur",
-                    journey_date=timezone.now().date(),
-                    distance=50.0,
-                    fare=1500.0,
-                    vehicle_type="Mahindra Pickup",
-                    status="Completed"
-                )
+            unique_b_id = f"REV-{random.randint(10000000, 99999999)}"
+            new_dummy_booking = Booking.objects.create(
+                booking_id=unique_b_id,
+                name=f"Customer - {guest_name[:50]}",
+                phone=guest_phone[:15] if guest_phone else "0000000000",
+                email=guest_email or None,
+                pickup="Dhamtari",
+                destination="Raipur",
+                journey_date=timezone.now().date(),
+                distance=50.0,
+                fare=1500.0,
+                vehicle_type="Mahindra Pickup",
+                status="Completed"
+            )
             review_obj = Review.objects.create(
-                booking=dummy,
+                booking=new_dummy_booking,
                 user=user,
                 guest_name=guest_name,
                 guest_email=guest_email or None,
