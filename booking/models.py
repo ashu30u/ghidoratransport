@@ -345,6 +345,47 @@ def _track_previous_status(sender, instance, **kwargs):
 
 
 @receiver(post_save, sender=Booking)
+def _send_admin_new_booking_alert(sender, instance, created, **kwargs):
+    if created:
+        from django.core.mail import send_mail
+        from django.conf import settings
+        try:
+            subject = f"🚨 NEW BOOKING RECEIVED #{instance.booking_id} - {instance.name}"
+            message = f"""New Booking Received on Ghidora Transport Live Site!
+
+Booking ID   : {instance.booking_id}
+Customer Name: {instance.name}
+Phone        : {instance.phone}
+Email        : {instance.email or 'N/A'}
+
+Pickup       : {instance.pickup}
+Destination  : {instance.destination}
+Journey Date : {instance.journey_date}
+
+Distance     : {instance.distance} KM
+Vehicle      : {instance.vehicle_type} ({instance.trip_type})
+Total Fare   : ₹{instance.fare} ({getattr(instance, 'fare_type', 'Calculated Fare')})
+Status       : {instance.status}
+
+Cargo Type   : {instance.cargo_type or 'Standard'}
+Weight       : {instance.weight_value or ''} {instance.weight_unit or ''}
+Message      : {instance.message or 'None'}
+
+Please check Live Admin Panel: https://ghidoratransport.onrender.com/admin/
+"""
+            send_mail(
+                subject=subject,
+                message=message,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=['ghidoratransport@gmail.com'],
+                fail_silently=True
+            )
+            print(f"✅ Admin new booking alert email sent for #{instance.booking_id}")
+        except Exception as e:
+            print("❌ Admin email notification failed:", e)
+
+
+@receiver(post_save, sender=Booking)
 def _send_email_on_completion(sender, instance, created, **kwargs):
 
     previous_status = getattr(instance, '_previous_status', None)
