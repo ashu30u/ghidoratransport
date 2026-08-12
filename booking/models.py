@@ -271,6 +271,16 @@ class Review(models.Model):
         return f"{self.display_name} - {self.rating}⭐ ({'Approved' if self.is_approved else 'Pending'})"
 
 
+from django.core.cache import cache
+
+@receiver([post_save, post_delete], sender=Review)
+def _clear_home_reviews_cache(sender, instance, **kwargs):
+    try:
+        cache.delete("home_reviews_summary_data")
+    except Exception:
+        pass
+
+
 # ============================================================
 # Review Social Interactions (Likes, Comments, Shares in DB)
 # ============================================================

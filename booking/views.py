@@ -543,20 +543,14 @@ def home(request):
 
     if cached_data is None:
         try:
-            reviews_qs = Review.objects.filter(is_approved=True).annotate(
+            approved_qs = Review.objects.filter(is_approved=True).annotate(
                 ann_likes=Count('likes', distinct=True),
                 ann_comments=Count('comments', distinct=True),
                 ann_shares=Count('shares', distinct=True)
             ).order_by("-created_at")
-            reviews = list(reviews_qs[:10])
-            if not reviews:
-                reviews = list(Review.objects.all().annotate(
-                    ann_likes=Count('likes', distinct=True),
-                    ann_comments=Count('comments', distinct=True),
-                    ann_shares=Count('shares', distinct=True)
-                ).order_by("-created_at")[:10])
+            reviews = list(approved_qs[:30])
 
-            stats = Review.objects.aggregate(
+            stats = Review.objects.filter(is_approved=True).aggregate(
                 avg_rating=Avg('rating'),
                 total_cnt=Count('id'),
                 r5=Count('id', filter=Q(rating=5)),
@@ -566,7 +560,7 @@ def home(request):
                 r1=Count('id', filter=Q(rating=1)),
             )
 
-            average_rating = stats['avg_rating'] or 4.9
+            average_rating = round(stats['avg_rating'] or 4.9, 1)
             total_reviews = stats['total_cnt'] or 0
             five_star = stats['r5'] or 0
             four_star = stats['r4'] or 0
@@ -584,17 +578,17 @@ def home(request):
                 'two_star': two_star,
                 'one_star': one_star,
             }
-            cache.set(cache_key, cached_data, 60)
+            cache.set(cache_key, cached_data, 120)
         except Exception:
             cached_data = {
                 'reviews': [],
                 'average_rating': 4.9,
-                'total_reviews': 128,
-                'five_star': 100,
-                'four_star': 15,
-                'three_star': 8,
-                'two_star': 3,
-                'one_star': 2,
+                'total_reviews': 0,
+                'five_star': 0,
+                'four_star': 0,
+                'three_star': 0,
+                'two_star': 0,
+                'one_star': 0,
             }
 
     reviews = cached_data['reviews']

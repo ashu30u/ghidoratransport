@@ -407,22 +407,38 @@ class ReviewAdmin(admin.ModelAdmin):
     short_comment.short_description = "Review Text"
 
     def approve_reviews(self, request, queryset):
-        rows = queryset.update(is_approved=True)
-        self.message_user(request, f"✅ {rows} review(s) approved successfully!")
+        rows = 0
+        for rev in queryset:
+            rev.is_approved = True
+            rev.save()
+            rows += 1
+        from django.core.cache import cache
+        cache.delete("home_reviews_summary_data")
+        self.message_user(request, f"✅ {rows} review(s) approved and published on Home Page!")
     approve_reviews.short_description = "✅ Approve Selected Reviews"
 
     def unapprove_reviews(self, request, queryset):
-        rows = queryset.update(is_approved=False)
-        self.message_user(request, f"⏳ {rows} review(s) set to Pending!")
+        rows = 0
+        for rev in queryset:
+            rev.is_approved = False
+            rev.save()
+            rows += 1
+        from django.core.cache import cache
+        cache.delete("home_reviews_summary_data")
+        self.message_user(request, f"⏳ {rows} review(s) hidden / set to Pending!")
     unapprove_reviews.short_description = "⏳ Set Selected Reviews to Pending"
 
     def mark_verified(self, request, queryset):
         rows = queryset.update(is_verified=True)
+        from django.core.cache import cache
+        cache.delete("home_reviews_summary_data")
         self.message_user(request, f"🟢 {rows} review(s) marked as Verified Customer!")
     mark_verified.short_description = "🟢 Mark as Verified Customer"
 
     def unmark_verified(self, request, queryset):
         rows = queryset.update(is_verified=False)
+        from django.core.cache import cache
+        cache.delete("home_reviews_summary_data")
         self.message_user(request, f"⚪ {rows} review(s) un-marked from Verified!")
     unmark_verified.short_description = "⚪ Unmark Verified Status"
 
