@@ -1623,7 +1623,7 @@ from django.views.decorators.csrf import csrf_exempt
 @csrf_exempt
 def submit_user_review(request):
     if request.method != "POST":
-        return JsonResponse({"status": "error", "message": "Invalid request method."}, status=400)
+        return JsonResponse({"status": "error", "message": "Invalid request method."})
 
     try:
         rating = int(request.POST.get('rating', 5))
@@ -1632,14 +1632,14 @@ def submit_user_review(request):
         photo = request.FILES.get('photo')
 
         if not comment:
-            return JsonResponse({"status": "error", "message": "Pleaas write a review comment."}, status=400)
+            return JsonResponse({"status": "error", "message": "Please write a review comment."})
 
         ip_address = request.META.get('REMOTE_ADDR')
 
-        # Check rate limiting: max 3 reviews per IP per 10 minutes
+        # Check rate limiting: max 5 reviews per IP per 10 minutes
         recent_count = Review.objects.filter(ip_address=ip_address, created_at__gte=timezone.now() - timezone.timedelta(minutes=10)).count()
-        if recent_count >= 3:
-            return JsonResponse({"status": "error", "message": "Aapne abhi bohot saare reviews submit kiye hain. Kripya thoda wahi rukiye."}, status=429)
+        if recent_count >= 5:
+            return JsonResponse({"status": "error", "message": "Aapne abhi bohot saare reviews submit kiye hain. Kripya thoda wahi rukiye."})
 
         if request.user.is_authenticated:
             user = request.user
@@ -1654,12 +1654,13 @@ def submit_user_review(request):
             guest_phone = request.POST.get('phone', '').strip()
             is_verified = False
 
+        # Stage 1: Try creating review directly
         try:
             review_obj = Review.objects.create(
                 user=user,
                 guest_name=guest_name,
-                guest_email=guest_email,
-                guest_phone=guest_phone,
+                guest_email=guest_email or None,
+                guest_phone=guest_phone or None,
                 rating=rating,
                 comment=comment,
                 review=comment,
@@ -1669,28 +1670,30 @@ def submit_user_review(request):
                 is_verified=is_verified,
                 ip_address=ip_address
             )
-        except Exception as err_create:
+        except Exception as stage1_err:
+            # Stage 2: Attach to dummy booking record
             import random
-            unique_b_id = f"REV-{random.randint(1000000, 9999999)}"
-            dummy_booking = Booking.objects.create(
-                booking_id=unique_b_id,
-                name=f"Customer - {guest_name}",
-                phone=guest_phone or "0000000000",
-                email=guest_email or None,
-                pickup="Chhattisgarh",
-                destination="Chhattisgarh",
-                journey_date=timezone.now().date(),
-                distance=0.0,
-                fare=0.0,
-                vehicle_type="Mahindra Pickup",
-                status="Completed"
-            )
+            dummy = Booking.objects.first()
+            if not dummy:
+                dummy = Booking.objects.create(
+                    booking_id=f"REV-{random.randint(1000000, 9999999)}",
+                    name=guest_name[:90],
+                    phone=guest_phone[:15] if guest_phone else "0000000000",
+                    email=guest_email or None,
+                    pickup="Dhamtari",
+                    destination="Raipur",
+                    journey_date=timezone.now().date(),
+                    distance=50.0,
+                    fare=1500.0,
+                    vehicle_type="Mahindra Pickup",
+                    status="Completed"
+                )
             review_obj = Review.objects.create(
-                booking=dummy_booking,
+                booking=dummy,
                 user=user,
                 guest_name=guest_name,
-                guest_email=guest_email,
-                guest_phone=guest_phone,
+                guest_email=guest_email or None,
+                guest_phone=guest_phone or None,
                 rating=rating,
                 comment=comment,
                 review=comment,
@@ -1701,9 +1704,15 @@ def submit_user_review(request):
                 ip_address=ip_address
             )
 
+        # Clear home reviews summary cache immediately
+        try:
+            cache.delete("home_reviews_summary_data")
+        except Exception:
+            pass
+
         return JsonResponse({
             "status": "success",
-            "message": "✅ Thank you! Your review has been submitted successfully.",
+            "message": "✅ Thank you! Your review has been submitted & published successfully.",
             "review_id": review_obj.id,
             "display_name": review_obj.display_name,
             "rating": review_obj.rating,
@@ -1711,7 +1720,8 @@ def submit_user_review(request):
         })
 
     except Exception as e:
-        return JsonResponse({"status": "error", "message": f"Error submitting review: {str(e)}"}, status=500)
+        logger.error(f"Error in submit_user_review: {e}")
+        return JsonResponse({"status": "error", "message": f"Review submission issue: {str(e)}"})
 
 def control_tower(request):
     return render(request, "booking/control_tower.html")

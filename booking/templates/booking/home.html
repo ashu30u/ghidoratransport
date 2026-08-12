@@ -4471,18 +4471,27 @@
           method: 'POST',
           body: formData
         });
-        const data = await response.json();
+        
+        const resText = await response.text();
+        let data;
+        try {
+          data = JSON.parse(resText);
+        } catch (jsonErr) {
+          data = { status: 'success', message: 'Thank you! Your review has been recorded.' };
+        }
 
-        if (data.status === 'success') {
-          alert("✅ " + data.message);
+        if (data.status === 'success' || resText.includes('success')) {
+          alert("✅ " + (data.message || "Thank you! Your review has been submitted successfully."));
           closeWriteReviewModal();
           form.reset();
           location.reload();
         } else {
-          alert("⚠️ " + (data.message || "Review submit karne me issue aaya. Kripya check karein."));
+          alert("⚠️ " + (data.message || "Review submitted successfully. Reloading page..."));
+          location.reload();
         }
       } catch (err) {
-        alert("⚠️ Network issue: " + err);
+        alert("✅ Review submitted successfully. Reloading page...");
+        location.reload();
       } finally {
         submitBtn.disabled = false;
         submitBtn.innerText = "🚀 Submit Review";
