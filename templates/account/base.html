@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>{% block head_title %}Ghidora Transport — Account{% endblock %}</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --bg-0:#04060b;
+    --bg-1:#070b16;
+    --bg-2:#0c1324;
+    --blue:#3fa4ff;
+    --blue-soft:#7cc4ff;
+    --cyan:#1fe6c8;
+    --amber:#ff9142;
+    --amber-soft:#ffb578;
+    --text-hi:#eef3fb;
+    --text-mid:#aab7cf;
+    --text-lo:#647192;
+    --glass-fill: rgba(14,22,40,0.88);
+    --glass-border: rgba(130,185,255,0.28);
+    --danger:#ff5f6d;
+    --radius-card: 22px;
+    --radius-field: 12px;
+    --ff-display:'Space Grotesk', sans-serif;
+    --ff-body:'Inter', sans-serif;
+  }
+
+  *{box-sizing:border-box; margin:0; padding:0;}
+
+  html,body{
+    min-height:100%;
+    background:var(--bg-0);
+    color:var(--text-hi);
+    font-family:var(--ff-body);
+    overflow-x:hidden;
+  }
+
+  body{ position:relative; min-height: 100vh; }
+
+  .scene-grade{
+    position:fixed; inset:0; z-index:1; pointer-events:none;
+    background:
+      radial-gradient(120% 90% at 18% 30%, rgba(63,164,255,0.15), transparent 60%),
+      radial-gradient(90% 70% at 78% 70%, rgba(31,230,200,0.1), transparent 55%),
+      radial-gradient(150% 120% at 50% 100%, rgba(0,0,0,0.85), transparent 45%);
+  }
+
+  .topbar{
+    position:fixed; top:0; left:0; right:0; z-index:10;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:20px clamp(20px,4vw,56px);
+  }
+
+  .logo{
+    display:flex; align-items:center; gap:11px;
+    font-family:var(--ff-display); font-weight:700; font-size:20px; color: #fff; text-decoration: none;
+  }
+  .logo-mark{
+    width:36px; height:36px; border-radius:10px;
+    background:conic-gradient(from 220deg, var(--blue), var(--cyan), var(--amber), var(--blue));
+    position:relative; box-shadow:0 0 22px rgba(63,164,255,0.55);
+  }
+  .logo-mark::before{ content:''; position:absolute; inset:5px; background:var(--bg-0); border-radius:6px; }
+
+  .card-stage{
+    min-height: 100vh;
+    display:flex; align-items:center; justify-content:center;
+    padding:90px 20px 50px;
+    position: relative; z-index: 5;
+  }
+
+  .allauth-card{
+    width:min(480px, 100%);
+    padding:38px 34px 30px;
+    border-radius:var(--radius-card);
+    background:var(--glass-fill);
+    border:1px solid var(--glass-border);
+    backdrop-filter:blur(22px);
+    box-shadow: 0 30px 70px -20px rgba(0,0,0,0.85);
+  }
+
+  .allauth-card h1, .allauth-card h2{ font-family:var(--ff-display); font-weight:700; margin-bottom:16px; color:#fff; }
+  .allauth-card p{ color:var(--text-mid); font-size:14.5px; line-height:1.5; margin-bottom:18px; }
+  .allauth-card a{ color:var(--blue-soft); text-decoration:none; font-weight:600; }
+  .allauth-card a:hover{ text-decoration:underline; }
+
+  .allauth-card form input[type="text"],
+  .allauth-card form input[type="email"],
+  .allauth-card form input[type="password"]{
+    width:100%; padding:12px 14px; margin-bottom:14px;
+    background:rgba(6,10,20,0.75); border:1.5px solid rgba(255,255,255,0.12);
+    border-radius:var(--radius-field); color:#fff; font-size:14.5px; outline:none;
+  }
+
+  .allauth-card form button, .allauth-card form input[type="submit"]{
+    width:100%; border:none; border-radius:var(--radius-field);
+    font-family:var(--ff-body); font-weight:700; font-size:15px;
+    padding:14px 18px; cursor:pointer; background:linear-gradient(135deg, var(--blue), var(--cyan));
+    color:#04060b; margin-top:10px; box-shadow:0 10px 24px rgba(63,164,255,0.4);
+  }
+
+  .allauth-card ul{ margin-left:20px; margin-bottom:16px; color:var(--text-mid); }
+</style>
+</head>
+<body>
+
+<div class="scene-grade"></div>
+
+<header class="topbar">
+  <a href="/" class="logo">
+    <div class="logo-mark"></div>
+    <div>GHIDORA <small style="display:block; font-size:9.5px; color:var(--text-lo);">TRANSPORT</small></div>
+  </a>
+  <a href="/" style="color: var(--cyan); text-decoration: none; font-size: 13px; font-weight: 700;">🏠 Back to Home</a>
+</header>
+
+<main class="card-stage">
+  <div class="allauth-card">
+    {% block content %}{% endblock %}
+  </div>
+</main>
+
+</body>
+</html>
