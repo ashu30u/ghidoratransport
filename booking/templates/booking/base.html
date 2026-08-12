@@ -53,6 +53,86 @@
     transform: translateY(-7.75px) rotate(-45deg) !important;
   }
 
+  .nav-right-actions {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    flex-shrink: 0 !important;
+  }
+
+  @media (max-width: 768px) {
+    .navbar {
+      padding: 10px 12px !important;
+      flex-wrap: nowrap !important;
+    }
+    .nav-logo {
+      font-size: 15px !important;
+      gap: 6px !important;
+    }
+    .nav-logo svg {
+      width: 30px !important;
+      height: 30px !important;
+    }
+    .nav-right-actions {
+      gap: 5px !important;
+    }
+    .call-btn {
+      padding: 6px 9px !important;
+      font-size: 11.5px !important;
+      gap: 4px !important;
+    }
+    .animated-login-btn {
+      padding: 6px 9px !important;
+      font-size: 11.5px !important;
+      gap: 4px !important;
+    }
+    .user-badge-glowing {
+      padding: 4px 8px !important;
+      font-size: 11px !important;
+    }
+    .hamburger-btn {
+      width: 36px !important;
+      height: 32px !important;
+    }
+  }
+
+  @media (max-width: 420px) {
+    .navbar {
+      padding: 8px 8px !important;
+    }
+    .nav-logo {
+      font-size: 13.5px !important;
+    }
+    .nav-logo svg {
+      width: 26px !important;
+      height: 26px !important;
+    }
+    .call-btn {
+      padding: 5px 7px !important;
+      font-size: 10.5px !important;
+      border-radius: 8px !important;
+    }
+    .animated-login-btn {
+      padding: 5px 7px !important;
+      font-size: 10.5px !important;
+      border-radius: 8px !important;
+    }
+    .hamburger-btn {
+      width: 34px !important;
+      height: 30px !important;
+    }
+    .hamburger-btn svg {
+      width: 20px !important;
+      height: 15px !important;
+    }
+  }
+
+  @media (max-width: 360px) {
+    .nav-logo .accent {
+      display: none !important;
+    }
+  }
+
   .mobile-nav-drawer {
     display: none;
     position: absolute;
@@ -119,7 +199,7 @@
       <a href="{% url 'about' %}">About Us</a>
       <a href="{% url 'contact_us' %}">Contact</a>
     </div>
-    <div style="display: flex; align-items: center; gap: 8px;">
+    <div class="nav-right-actions">
       <a href="tel:+916264588894" class="call-btn"><span class="phone-shake">📞</span> Call Now</a>
 
       {% if not user.is_authenticated %}
@@ -138,8 +218,8 @@
         </div>
       {% endif %}
 
-      <button class="hamburger-btn" id="hamburgerBtn" onclick="toggleMobileMenu(event)" aria-label="Toggle Navigation Menu" style="display: inline-flex !important; align-items: center !important; justify-content: center !important; width: 44px !important; height: 38px !important; background: linear-gradient(135deg, #FF6B00, #ff8c00) !important; border: 2px solid #ffffff !important; border-radius: 10px !important; cursor: pointer !important; padding: 0 !important; z-index: 999999 !important; box-shadow: 0 4px 16px rgba(255, 107, 0, 0.7), 0 0 10px rgba(255, 107, 0, 0.4) !important; flex-shrink: 0 !important;">
-        <svg width="24" height="18" viewBox="0 0 24 18" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: block !important;">
+      <button class="hamburger-btn" id="hamburgerBtn" onclick="toggleMobileMenu(event)" aria-label="Toggle Navigation Menu">
+        <svg width="24" height="18" viewBox="0 0 24 18" fill="none" xmlns="http://www.w3.org/2000/svg">
           <rect y="0" width="24" height="3" rx="1.5" fill="#FFFFFF"/>
           <rect y="7.5" width="24" height="3" rx="1.5" fill="#FFFFFF"/>
           <rect y="15" width="24" height="3" rx="1.5" fill="#FFFFFF"/>

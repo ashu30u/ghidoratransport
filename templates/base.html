@@ -98,7 +98,12 @@
     box-shadow:0 0 8px rgba(63,164,255,0.6);
   }
 
-  @media (max-width:920px){ .nav-links{ display:none; } }
+  @media (max-width:920px){
+    .nav{ padding: 10px 12px; flex-wrap: nowrap; overflow-x: hidden; }
+    .nav-left{ gap: 10px; }
+    .brand-text{ font-size: 14px; }
+    .nav-links{ display:none; }
+  }
 
   .nav-right{ display:flex; align-items:center; gap:14px; }
 
