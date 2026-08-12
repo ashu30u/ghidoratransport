@@ -1,1 +1,1 @@
-web: gunicorn --workers 3 --threads 2 --timeout 120 ghidora_transport.wsgi:application
+web: gunicorn --workers 1 --threads 4 --timeout 120 ghidora_transport.wsgi:application

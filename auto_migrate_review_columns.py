@@ -100,3 +100,31 @@ except Exception as e:
 conn.close()
 
 print("✅ booking_review table schema updated successfully!")
+
+def ensure_google_social_app():
+    try:
+        from django.contrib.sites.models import Site
+        from allauth.socialaccount.models import SocialApp
+        site, _ = Site.objects.get_or_create(id=1, defaults={'domain': 'ghidoratransport.onrender.com', 'name': 'Ghidora Transport'})
+        site.domain = 'ghidoratransport.onrender.com'
+        site.name = 'Ghidora Transport'
+        site.save()
+
+        client_id = '520482080238-ejsi630q0nv6na0de3if97ug73f5rmmt.apps.googleusercontent.com'
+
+        app, created = SocialApp.objects.get_or_create(
+            provider='google',
+            defaults={
+                'name': 'Google Login',
+                'client_id': client_id,
+                'secret': 'GOCSPX-dummy_secret',
+            }
+        )
+        app.client_id = client_id
+        app.sites.add(site)
+        app.save()
+        print(f"✅ Google SocialApp configured for Site 1 ({site.domain})")
+    except Exception as e:
+        print("❌ Error ensuring Google SocialApp:", e)
+
+ensure_google_social_app()

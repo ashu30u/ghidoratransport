@@ -225,6 +225,11 @@ SOCIALACCOUNT_PROVIDERS = {
     'google': {
         'SCOPE': ['profile', 'email'],
         'AUTH_PARAMS': {'access_type': 'online'},
+        'APP': {
+            'client_id': '520482080238-ejsi630q0nv6na0de3if97ug73f5rmmt.apps.googleusercontent.com',
+            'secret': os.environ.get('GOOGLE_CLIENT_SECRET', 'GOCSPX-dummy_secret'),
+            'key': ''
+        }
     }
 }
 
