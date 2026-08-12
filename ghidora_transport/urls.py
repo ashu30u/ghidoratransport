@@ -18,16 +18,12 @@ urlpatterns = [
     path('social/', include('social.urls')),
     path('payments/', include('payments.urls')),
 
-    # 🔑 Authentication Routes (3D Login & Logout)
-    path('accounts/login/', auth_views.LoginView.as_view(template_name='login.html'), name='login'),
-    path('accounts/logout/', auth_views.LogoutView.as_view(next_page='login'), name='logout'),
-    
-    # Direct short URL Aliases (/login/ and /logout/)
-    path('login/', auth_views.LoginView.as_view(template_name='login.html')),
-    path('logout/', auth_views.LogoutView.as_view(next_page='login')),
-
-    # Allauth Social Login (Google Auth)
+    # Allauth Social Login & Account Routes (Google Auth, Signup, Login)
     path('accounts/', include('allauth.urls')),
+
+    # Direct short URL Aliases (/login/ and /logout/)
+    path('login/', auth_views.LoginView.as_view(template_name='account/login.html'), name='login'),
+    path('logout/', auth_views.LogoutView.as_view(next_page='/'), name='logout'),
 ]
 
 # 🌟 Media & Static Files Access (Development Mode)

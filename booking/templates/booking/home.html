@@ -1255,7 +1255,7 @@
 
         <!-- 🌟 High-Contrast Glowing 3-Line Menu Button (Always Visible on Desktop, Laptop & Mobile) -->
         <button class="hamburger-btn" id="hamburgerBtn" onclick="toggleMobileMenu(event)" aria-label="Toggle Navigation Menu">
-          <svg width="24" height="18" viewBox="0 0 24 18" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: block; pointer-events: none;">
+          <svg width="22" height="16" viewBox="0 0 24 18" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: block; pointer-events: none;">
             <rect y="0" width="24" height="3" rx="1.5" fill="#FFFFFF"/>
             <rect y="7.5" width="24" height="3" rx="1.5" fill="#FFFFFF"/>
             <rect y="15" width="24" height="3" rx="1.5" fill="#FFFFFF"/>
@@ -1267,32 +1267,27 @@
     <!-- Dark Backdrop Overlay (Closes menu on outside click) -->
     <div class="mobile-nav-overlay" id="mobileNavOverlay" onclick="closeMobileMenu()"></div>
 
-    <!-- 60% Width Responsive Side Drawer Navigation Menu -->
+    <!-- Floating Side Drawer Navigation Menu (Exact surge.sh match) -->
     <div class="mobile-nav-drawer" id="mobileNavDrawer">
-      <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 6px;">
-        <div style="font-size: 11px; font-weight: 800; letter-spacing: 1.5px; color: #ff7a1a; text-transform: uppercase;">📍 Navigation Menu</div>
-        <button onclick="closeMobileMenu()" aria-label="Close Menu" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #ffffff; width: 28px; height: 28px; border-radius: 50%; font-size: 14px; display: flex; align-items: center; justify-content: center; cursor: pointer;">✕</button>
-      </div>
-
-      <div style="font-size: 11px; font-weight: 800; letter-spacing: 1.5px; color: #ff7a1a; padding: 4px 6px 2px; text-transform: uppercase;">📍 Main Pages</div>
+      <div style="font-size: 11px; font-weight: 800; letter-spacing: 1.2px; color: #ff7a1a; padding: 2px 4px 6px; text-transform: uppercase;">📍 MAIN PAGES</div>
       <a href="{% url 'home' %}" class="active" onclick="closeMobileMenu()">🏠 Home</a>
       <a href="{% url 'services' %}" onclick="closeMobileMenu()">🛠️ Services</a>
       <a href="{% url 'home' %}#booking" onclick="closeMobileMenu()">📦 Book Transport</a>
       <a href="{% url 'about' %}" onclick="closeMobileMenu()">ℹ️ About Us</a>
       <a href="{% url 'contact_us' %}" onclick="closeMobileMenu()">🕿 Contact Us</a>
 
-      <div style="height: 1px; background: rgba(255, 255, 255, 0.1); margin: 6px 0;"></div>
-
-      <div style="font-size: 11px; font-weight: 800; letter-spacing: 1.5px; color: #00d2ff; padding: 4px 6px 2px; text-transform: uppercase;">⚡ Special Features & Tools</div>
+      <div style="font-size: 11px; font-weight: 800; letter-spacing: 1.2px; color: #00d2ff; padding: 12px 4px 6px; text-transform: uppercase;">⚡ SPECIAL FEATURES & TOOLS</div>
       {% if user.is_staff or user.is_superuser %}
-        <a href="{% url 'control_tower' %}" onclick="closeMobileMenu()" style="color: #00f2fe; font-weight: 800; background: rgba(0, 242, 254, 0.15); border: 1px solid rgba(0, 242, 254, 0.4); padding: 10px 14px; border-radius: 10px; margin-bottom: 4px;">🧠 AI Transport Control Tower (Admin)</a>
+        <a href="{% url 'control_tower' %}" onclick="closeMobileMenu()" style="color: #00f2fe; font-weight: 800; background: rgba(0, 242, 254, 0.15) !important; border: 1px solid rgba(0, 242, 254, 0.4) !important;">🧠 AI Transport Control Tower (Admin)</a>
       {% endif %}
-      <a href="{% url 'home' %}#360-viewer" onclick="closeMobileMenu()" style="color: #ff9e00; font-weight: 700;">🏎️ 360° Vehicle View</a>
-      <a href="javascript:void(0)" onclick="closeMobileMenu(); ghidoraOpenWeatherModal();" style="color: #00d2ff; font-weight: 700;">🌤️ Weather AI Radar</a>
-      <a href="javascript:void(0)" onclick="closeMobileMenu(); toggleSiteTruckDoors();" style="color: #FF6B00; font-weight: 700;">🚚 3D Shutter Door Animation</a>
+      <a href="{% url 'home' %}#360-viewer" onclick="closeMobileMenu()">🏎️ 360° Vehicle View</a>
+      <a href="javascript:void(0)" onclick="closeMobileMenu(); ghidoraOpenWeatherModal();">🌤️ Weather AI Radar</a>
+      <a href="javascript:void(0)" onclick="closeMobileMenu(); toggleSiteTruckDoors();">🚚 3D Shutter Door Animation</a>
       <a href="{% url 'quotations:quote_request' %}" onclick="closeMobileMenu()">💰 Check Fare & Rate Quote</a>
       <a href="{% url 'business_card' %}" onclick="closeMobileMenu()">🪪 Digital Business Card</a>
       <a href="{% url 'status' %}" onclick="closeMobileMenu()">💳 Check Booking Status & Payment</a>
+
+      <a href="tel:+916264588894" class="drawer-call-support" onclick="closeMobileMenu()">📞 Call Support: +91 6264588894</a>
 
       {% if user.is_authenticated %}
         <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; background: rgba(255,122,26,0.12); border: 1px solid rgba(255,122,26,0.3); border-radius: 12px; margin-top: 8px;">
@@ -1305,7 +1300,7 @@
           </form>
         </div>
       {% else %}
-        <a href="{% url 'login' %}" onclick="closeMobileMenu()" style="background: linear-gradient(135deg, #ff7a1a, #e5670f); color: white; justify-content: center; font-weight: bold; margin-top: 8px;">
+        <a href="{% url 'login' %}" onclick="closeMobileMenu()" style="background: linear-gradient(135deg, #00d2ff, #0072ff) !important; color: white !important; justify-content: center; font-weight: bold; margin-top: 8px;">
           🔑 Login / Sign In
         </a>
       {% endif %}

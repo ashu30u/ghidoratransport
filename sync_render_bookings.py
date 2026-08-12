@@ -1,6 +1,9 @@
 import os
 import json
 import urllib.request
+import warnings
+warnings.filterwarnings('ignore')
+
 import django
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'ghidora_transport.settings')
@@ -11,31 +14,37 @@ from booking.models import Booking
 RENDER_EXPORT_URL = "https://ghidoratransport.onrender.com/api/export-bookings/"
 
 def sync_bookings_from_render():
-    print(f"📡 Fetching live customer bookings from Render: {RENDER_EXPORT_URL} ...")
+    print(f"📡 Connecting to Render Server: {RENDER_EXPORT_URL} ...")
     try:
         req = urllib.request.Request(
             RENDER_EXPORT_URL,
-            headers={'User-Agent': 'GhidoraTransportLocalSync/1.0'}
+            headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) GhidoraSync/1.0'}
         )
-        with urllib.request.urlopen(req, timeout=15) as response:
+        with urllib.request.urlopen(req, timeout=20) as response:
             if response.status != 200:
-                print(f"❌ Server returned HTTP {response.status}")
+                print(f"❌ Server returned HTTP status: {response.status}")
                 return
+
+            raw_data = response.read().decode('utf-8')
+            payload = json.loads(raw_data)
             
-            payload = json.loads(response.read().decode('utf-8'))
             if not payload.get('success'):
                 print("❌ API returned error payload:", payload)
                 return
-            
+
             bookings_data = payload.get('bookings', [])
-            print(f"📦 Total bookings received from Render: {len(bookings_data)}")
-            
+            print(f"🟢 Connected successfully! Total bookings on Render server: {len(bookings_data)}")
+
+            if len(bookings_data) == 0:
+                print("ℹ️ Currently there are 0 customer bookings on Render server. Test by submitting a new booking on https://ghidoratransport.onrender.com !")
+                return
+
             imported_count = 0
             for b in bookings_data:
                 booking_id = b.get('booking_id')
                 if not booking_id:
                     continue
-                
+
                 existing = Booking.objects.filter(booking_id=booking_id).first()
                 if not existing:
                     Booking.objects.create(
@@ -64,10 +73,12 @@ def sync_bookings_from_render():
                         status=b.get('status', 'Pending')
                     )
                     imported_count += 1
-            
-            print(f"✅ SUCCESSFULLY SYNCED! {imported_count} new customer booking(s) imported into Local Database.")
+
+            print(f"✅ SUCCESS! {imported_count} new customer booking(s) imported into Localhost database.")
             print(f"📊 Total Bookings in Local Database: {Booking.objects.count()}")
 
+    except urllib.error.HTTPError as he:
+        print(f"⚠️ Render server is still restarting/deploying (HTTP {he.code}). Please wait 15 seconds and try again!")
     except Exception as e:
         print("❌ Error syncing bookings from Render:", e)
 
