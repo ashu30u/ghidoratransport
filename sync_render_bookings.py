@@ -12,6 +12,7 @@ django.setup()
 from booking.models import Booking
 
 RENDER_EXPORT_URL = "https://ghidoratransport.onrender.com/api/export-bookings/"
+RENDER_REVIEWS_EXPORT_URL = "https://ghidoratransport.onrender.com/api/export-reviews/"
 
 def sync_bookings_from_render():
     print(f"📡 Connecting to Render Server: {RENDER_EXPORT_URL} ...")
@@ -82,5 +83,62 @@ def sync_bookings_from_render():
     except Exception as e:
         print("❌ Error syncing bookings from Render:", e)
 
+
+def sync_reviews_from_render():
+    print(f"📡 Connecting to Render Server Reviews: {RENDER_REVIEWS_EXPORT_URL} ...")
+    try:
+        req = urllib.request.Request(
+            RENDER_REVIEWS_EXPORT_URL,
+            headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) GhidoraSync/1.0'}
+        )
+        with urllib.request.urlopen(req, timeout=20) as response:
+            if response.status != 200:
+                print(f"❌ Reviews API returned HTTP status: {response.status}")
+                return
+
+            raw_data = response.read().decode('utf-8')
+            payload = json.loads(raw_data)
+            
+            if not payload.get('success'):
+                return
+
+            reviews_data = payload.get('reviews', [])
+            print(f"🟢 Total reviews on Render server: {len(reviews_data)}")
+
+            from booking.models import Review, Booking
+            dummy_booking = Booking.objects.first()
+
+            imported_count = 0
+            for r in reviews_data:
+                guest_email = r.get('guest_email', '').strip()
+                comment = r.get('comment', '').strip()
+                guest_name = r.get('guest_name', 'Customer').strip()
+
+                if not comment:
+                    continue
+
+                existing = Review.objects.filter(guest_name=guest_name, comment=comment).first()
+                if not existing:
+                    Review.objects.create(
+                        booking=dummy_booking,
+                        guest_name=guest_name,
+                        guest_email=guest_email or None,
+                        guest_phone=r.get('guest_phone') or None,
+                        rating=r.get('rating', 5),
+                        comment=comment,
+                        review=comment,
+                        service_used=r.get('service_used', 'Full Truck Transport'),
+                        is_approved=r.get('is_approved', True),
+                        is_verified=r.get('is_verified', True)
+                    )
+                    imported_count += 1
+
+            print(f"✅ SUCCESS! {imported_count} new customer review(s) imported into Localhost database.")
+
+    except Exception as e:
+        print("❌ Error syncing reviews from Render:", e)
+
+
 if __name__ == '__main__':
     sync_bookings_from_render()
+    sync_reviews_from_render()
