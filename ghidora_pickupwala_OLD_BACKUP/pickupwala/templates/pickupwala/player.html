@@ -1,0 +1,88 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Pickupwala — Ghidora Transport Radio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Poppins:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'pickupwala/css/player.css' %}">
+</head>
+<body>
+<div class="stage" id="stage">
+
+  <div class="hero-bg">
+    <img class="hero-img" src="{% static 'images/pikupwala.png' %}" alt="Ghidora Transport truck">
+    <div class="hero-overlay"></div>
+  </div>
+
+  <div class="topbar">
+    <div class="pill listeners"><span class="dot"></span><b id="listenerCount">614</b><span class="label">&nbsp;on the highway</span></div>
+    <div class="pill clock mono" id="clock">8:44<span class="ampm">am</span></div>
+  </div>
+
+  <div class="signage-wrap">
+    <div class="signage" id="signage"><span class="radio-tag">● FM RADIO</span><span id="signageText">लोड हो रहा है…</span></div>
+  </div>
+
+  <div class="player" id="player">
+    <div class="player-inner">
+      <div class="player-top">
+        <div class="cassette-wrap">
+          <div class="cassette" id="cassette"><img id="cassetteArt" alt="" /></div>
+        </div>
+        <div class="track-info">
+          <div class="track-title display" id="trackTitle">Loading playlist…</div>
+          <div class="track-artist" id="trackArtist">Ghidora Transport</div>
+          <div class="road-progress">
+            <div class="road-track">
+              <div class="road-fill" id="roadFill"></div>
+              <div class="road-dashes"></div>
+              <div class="progress-truck" id="progressTruck">🚚</div>
+            </div>
+            <div class="km-readout">
+              <span><span id="kmDone">0</span>/<span id="kmTotal">0</span> km</span>
+              <span id="timeReadout">0:00 / 0:00</span>
+            </div>
+          </div>
+        </div>
+        <button class="playlist-btn" id="playlistBtn" aria-label="Playlist">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h16M4 18h11" stroke="#fdf3e1" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+
+      <div class="controls">
+        <button class="ctrl-btn" id="hornBtn" title="Horn">🎺</button>
+        <button class="ctrl-btn" id="prevBtn" title="Previous">⏮</button>
+        <button class="ctrl-btn play-main" id="playBtn" title="Play/Pause">▶</button>
+        <button class="ctrl-btn" id="nextBtn" title="Next">⏭</button>
+        <button class="ctrl-btn" id="radioBtn" title="Radio shayari">📻</button>
+        <button class="ctrl-btn" id="teaBtn" title="Chai break — pause">☕</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="sheet-backdrop" id="sheetBackdrop"></div>
+  <div class="playlist-sheet" id="playlistSheet">
+    <div class="playlist-header">
+      <div class="titlewrap">
+        <h3 class="display">Pickupwala Playlist</h3>
+        <span class="count" id="trackCount">0 Tracks</span>
+      </div>
+      <button class="close-btn" id="closePlaylist">✕</button>
+    </div>
+    <ul class="playlist-list" id="playlistList"></ul>
+  </div>
+</div>
+
+<audio id="audioEl" loop></audio>
+<audio id="hornAudio" src="{% static 'pickupwala/audio/horn.wav' %}"></audio>
+<audio id="radioClickAudio" src="{% static 'pickupwala/audio/radio_click.wav' %}"></audio>
+
+<script>
+  window.PICKUPWALA_API = "{% url 'pickupwala:playlist-api' %}";
+</script>
+<script src="{% static 'pickupwala/js/player.js' %}"></script>
+</body>
+</html>

@@ -1,0 +1,151 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Pickupwala — Ghidora Transport Radio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Poppins:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'pickupwala/css/player.css' %}?v=300000">
+<style>
+  /* Full-Screen Pickup Background & Element Overlays */
+  html, body, .stage { width: 100vw !important; height: 100vh !important; height: 100dvh !important; margin: 0 !important; padding: 0 !important; overflow: hidden !important; background: #120c1d !important; }
+  
+  .bg-hero-wrap { position: absolute !important; inset: 0 !important; width: 100% !important; height: 100% !important; z-index: 1 !important; overflow: hidden !important; }
+  .bg-hero-img { width: 100% !important; height: 100% !important; object-fit: cover !important; object-position: center !important; display: block !important; }
+  .bg-overlay { position: absolute !important; inset: 0 !important; width: 100% !important; height: 100% !important; z-index: 2 !important; background: linear-gradient(180deg, rgba(12, 8, 20, 0.45) 0%, rgba(12, 8, 20, 0.15) 35%, rgba(12, 8, 20, 0.2) 65%, rgba(12, 8, 20, 0.75) 100%) !important; pointer-events: none !important; }
+
+  /* Top Bar & Hover Effects */
+  .topbar { position: absolute !important; top: 0 !important; left: 0 !important; right: 0 !important; display: flex !important; align-items: center !important; justify-content: space-between !important; padding: max(14px, env(safe-area-inset-top)) 24px 0 24px !important; z-index: 20 !important; }
+  .pill { background: rgba(18, 14, 28, 0.75) !important; backdrop-filter: blur(16px) saturate(180%) !important; -webkit-backdrop-filter: blur(16px) saturate(180%) !important; border: 1px solid rgba(255,255,255,0.22) !important; padding: 8px 18px !important; border-radius: 999px !important; color: #ffffff !important; font-size: 13px !important; transition: all 0.3s cubic-bezier(0.2, 0.9, 0.25, 1) !important; cursor: pointer !important; }
+  .listeners:hover { transform: translateY(-2px) scale(1.05) !important; background: rgba(20, 38, 30, 0.85) !important; border-color: rgba(63, 224, 160, 0.85) !important; box-shadow: 0 8px 24px rgba(0,0,0,0.6), 0 0 20px rgba(63, 224, 160, 0.45) !important; color: #3fe0a0 !important; }
+  .clock:hover { transform: translateY(-2px) scale(1.05) !important; background: rgba(38, 25, 48, 0.85) !important; border-color: rgba(255, 198, 92, 0.85) !important; box-shadow: 0 8px 24px rgba(0,0,0,0.6), 0 0 20px rgba(255, 198, 92, 0.45) !important; color: #ffdf9e !important; }
+
+  /* Shayari Glassmorphism Container (Subtle Dark-Translucent Glass + Perfect Center Text + Hover Glow) */
+  .signage-wrap { position: absolute !important; left: 50% !important; bottom: 94px !important; top: auto !important; transform: translateX(-50%) !important; width: max-content !important; max-width: 92vw !important; text-align: center !important; z-index: 25 !important; display: block !important; visibility: visible !important; }
+  .signage { display: inline-flex !important; align-items: center !important; justify-content: center !important; text-align: center !important; gap: 6px !important; background: rgba(18, 14, 28, 0.76) !important; backdrop-filter: blur(18px) saturate(180%) !important; -webkit-backdrop-filter: blur(18px) saturate(180%) !important; border: 1px solid rgba(255, 255, 255, 0.22) !important; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.2) !important; padding: 7px 22px !important; border-radius: 999px !important; font-family: 'Baloo 2', sans-serif !important; font-size: 14.5px !important; font-weight: 700 !important; color: #ffffff !important; opacity: 1 !important; cursor: pointer !important; pointer-events: auto !important; transition: all 0.35s cubic-bezier(0.2, 0.9, 0.25, 1) !important; text-shadow: 0 2px 4px rgba(0,0,0,0.6) !important; }
+  .signage:hover { transform: translateY(-2px) scale(1.04) !important; background: rgba(28, 22, 42, 0.88) !important; border-color: rgba(255, 198, 92, 0.8) !important; box-shadow: 0 12px 30px rgba(0, 0, 0, 0.7), 0 0 20px rgba(255, 198, 92, 0.4) !important; color: #ffdf9e !important; }
+  .radio-tag { display: none !important; font-family: 'Space Mono', monospace !important; font-size: 9.5px !important; color: #3fe0a0 !important; }
+  .signage.radio-on .radio-tag { display: inline-block !important; margin-right: 6px !important; }
+  #signageText { display: inline-block !important; text-align: center !important; margin: 0 auto !important; width: auto !important; }
+
+  /* Bottom Sound Bar */
+  .player { position: absolute !important; left: 50% !important; bottom: 20px !important; transform: translateX(-50%) !important; width: min(94vw, 760px) !important; z-index: 30 !important; }
+  .player-inner { position: relative !important; background: rgba(22, 16, 32, 0.85) !important; backdrop-filter: blur(22px) !important; -webkit-backdrop-filter: blur(22px) !important; border: 1px solid rgba(255, 255, 255, 0.2) !important; border-radius: 999px !important; box-shadow: 0 12px 36px rgba(0, 0, 0, 0.65) !important; padding: 10px 18px !important; display: flex !important; align-items: center !important; justify-content: space-between !important; flex-direction: row !important; gap: 14px !important; }
+  .play-main { width: 44px !important; height: 44px !important; border-radius: 50% !important; background: #ffffff !important; color: #120e1c !important; font-size: 16px !important; font-weight: bold !important; display: flex !important; align-items: center !important; justify-content: center !important; box-shadow: 0 4px 14px rgba(255,255,255,0.35) !important; border: none !important; cursor: pointer !important; }
+
+  @media (max-width: 680px) {
+    .signage-wrap { bottom: 82px !important; }
+    .signage { font-size: 13px !important; padding: 6px 16px !important; }
+    .player { bottom: 12px !important; }
+    .player-inner { padding: 8px 12px !important; gap: 8px !important; }
+    .play-main { width: 38px !important; height: 38px !important; font-size: 15px !important; }
+  }
+</style>
+</head>
+<body>
+<div class="stage" id="stage">
+  <!-- FULL SCREEN PICKUP BACKGROUND IMAGE -->
+  <div class="bg-hero-wrap">
+    <img class="bg-hero-img" src="{% static 'images/pikupwala.png' %}" alt="Ghidora Transport Pickup Background">
+  </div>
+  <!-- Vignette Gradient Overlay -->
+  <div class="bg-overlay"></div>
+
+  <!-- Top bar -->
+  <div class="topbar">
+    <div class="pill listeners"><span class="dot"></span><b id="listenerCount">537</b><span class="label">&nbsp;on the highway</span></div>
+    <div class="pill clock mono" id="clock">1:53<span class="ampm">pm</span></div>
+  </div>
+
+  <!-- Shayari Board (Overlaid in center of Pickup Background Scene) -->
+  <div class="signage-wrap">
+    <div class="signage" id="signage">
+      <span class="radio-tag">● FM RADIO</span>
+      <span id="signageText">दम है तो क्रॉस कर, वरना बर्दाश्त कर</span>
+    </div>
+  </div>
+
+  <!-- Chai Break Popup Card (Matching Reference Image directly above sound bar) -->
+  <div class="chai-popup" id="chaiPopup">
+    <div class="chai-icon-wrap">☕</div>
+    <div class="chai-text-wrap">
+      <div class="chai-title" id="chaiTitle">Chai pe charcha! ☕</div>
+      <div class="chai-sub" id="chaiSub">Music baad mein, pehle chai!</div>
+    </div>
+  </div>
+
+  <!-- ===================== FLOATING SOUND PLAYER PILL BAR ===================== -->
+  <div class="player" id="player">
+    <div class="player-inner">
+      <!-- Disc / Cover Art -->
+      <div class="cassette-wrap">
+        <div class="cassette" id="cassette">
+          <img id="cassetteArt" src="{% static 'media/pickupwala/covers/jagjitsingh.png' %}" alt="Cover" />
+        </div>
+      </div>
+
+      <!-- Track Info & Progress -->
+      <div class="track-info">
+        <div class="track-meta-row">
+          <span class="track-title display" id="trackTitle">Loading playlist…</span>
+          <span class="track-artist" id="trackArtist">Ghidora Transport</span>
+        </div>
+        <div class="road-progress">
+          <div class="road-track">
+            <div class="road-fill" id="roadFill"></div>
+            <div class="progress-truck" id="progressTruck">🚚</div>
+          </div>
+          <div class="km-readout">
+            <span id="timeReadout">0:04 / 5:04</span>
+            <span class="km-sub"><span id="kmDone">0</span>/<span id="kmTotal">0</span> km</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Control Buttons Group -->
+      <div class="controls">
+        <button class="ctrl-icon-btn" id="hornBtn" title="Horn">🎺</button>
+        <button class="ctrl-icon-btn" id="radioBtn" title="Radio shayari">📻</button>
+        <button class="ctrl-icon-btn" id="teaBtn" title="Chai break">☕</button>
+        <button class="ctrl-icon-btn" id="prevBtn" title="Previous">⏮</button>
+
+        <!-- Main White Round Play/Pause Button -->
+        <button class="play-main" id="playBtn" title="Play/Pause">▶</button>
+
+        <button class="ctrl-icon-btn" id="nextBtn" title="Next">⏭</button>
+        <button class="ctrl-icon-btn playlist-btn" id="playlistBtn" title="Playlist">
+          <svg viewBox="0 0 24 24" fill="none" width="18" height="18">
+            <path d="M4 6h16M4 12h16M4 18h11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+  <!-- =================== /FLOATING SOUND PLAYER PILL BAR ======================= -->
+
+  <!-- Playlist Drawer Sheet -->
+  <div class="sheet-backdrop" id="sheetBackdrop"></div>
+  <div class="playlist-sheet" id="playlistSheet">
+    <div class="playlist-header">
+      <div class="titlewrap">
+        <h3 class="display">Pickupwala Playlist</h3>
+        <span class="count" id="trackCount">0 Tracks</span>
+      </div>
+      <button class="close-btn" id="closePlaylist">✕</button>
+    </div>
+    <ul class="playlist-list" id="playlistList"></ul>
+  </div>
+</div>
+
+<audio id="audioEl" loop></audio>
+<audio id="hornAudio" src="{% static 'pickupwala/audio/horn.wav' %}"></audio>
+<audio id="radioClickAudio" src="{% static 'pickupwala/audio/radio_click.wav' %}"></audio>
+
+<script>
+  window.PICKUPWALA_API = "{% url 'pickupwala:playlist-api' %}";
+</script>
+<script src="{% static 'pickupwala/js/player.js' %}?v=1300000"></script>
+</body>
+</html>

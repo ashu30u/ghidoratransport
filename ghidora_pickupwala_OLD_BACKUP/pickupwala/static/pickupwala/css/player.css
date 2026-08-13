@@ -1,0 +1,278 @@
+:root{
+  --dusk-1:#171334;
+  --dusk-2:#5a2358;
+  --dusk-3:#a83a4a;
+  --sunset:#ff7a3d;
+  --gold:#ffc65c;
+  --marigold:#ff6b35;
+  --marigold-2:#e8492a;
+  --teal:#2f9e8f;
+  --teal-dark:#1d6d63;
+  --cream:#fdf3e1;
+  --ink:#1c1428;
+
+  /* glass tokens — the sound bar is built entirely from these */
+  --glass-bg: rgba(255,255,255,0.09);
+  --glass-bg-strong: rgba(255,255,255,0.14);
+  --glass-border: rgba(255,255,255,0.28);
+  --glass-highlight: rgba(255,255,255,0.55);
+  --glass-shadow: 0 8px 32px rgba(10,6,20,0.45);
+  --line: rgba(253,243,225,0.18);
+}
+*{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+html,body{margin:0;padding:0;height:100%;}
+body{
+  font-family:'Poppins',sans-serif;
+  color:var(--cream);
+  background:var(--dusk-1);
+  overflow:hidden;
+}
+button{font-family:inherit; border:none; background:none; color:inherit; cursor:pointer;}
+.mono{font-family:'Space Mono',monospace;}
+.display{font-family:'Baloo 2',sans-serif;}
+
+.stage{
+  position:relative;
+  width:100vw; height:100vh; height:100dvh;
+  overflow:hidden;
+  background:var(--dusk-1);
+}
+
+/* ---------- full-page hero image background ---------- */
+.hero-bg{
+  position:absolute; inset:0; width:100%; height:100%; z-index:0;
+}
+.hero-img{
+  width:100%; height:100%; object-fit:cover; object-position:center;
+  display:block;
+}
+.hero-overlay{
+  position:absolute; inset:0;
+  background:linear-gradient(180deg,
+    rgba(23,19,52,0.15) 0%,
+    rgba(23,19,52,0.05) 30%,
+    rgba(23,19,52,0.35) 68%,
+    rgba(23,19,52,0.85) 100%);
+  pointer-events:none;
+}
+
+/* ---------- top bar ---------- */
+.topbar{
+  position:absolute; top:0; left:0; right:0;
+  display:flex; align-items:center; justify-content:space-between;
+  padding: max(14px, env(safe-area-inset-top)) 18px 0 18px;
+  z-index:20;
+}
+.pill{
+  display:flex; align-items:center; gap:8px;
+  background:var(--glass-bg);
+  backdrop-filter:blur(14px) saturate(160%);
+  -webkit-backdrop-filter:blur(14px) saturate(160%);
+  border:1px solid var(--glass-border);
+  padding:9px 16px;
+  border-radius:999px;
+  font-size:13px;
+}
+.listeners .dot{
+  width:8px; height:8px; border-radius:50%; background:#3fe0a0;
+  animation:pulse 1.8s infinite; display:inline-block;
+}
+@keyframes pulse{
+  0%{box-shadow:0 0 0 0 rgba(63,224,160,0.55);}
+  70%{box-shadow:0 0 0 8px rgba(63,224,160,0);}
+  100%{box-shadow:0 0 0 0 rgba(63,224,160,0);}
+}
+.listeners b{font-family:'Space Mono',monospace; font-weight:700;}
+.listeners span.label{opacity:0.75;}
+.clock{font-family:'Space Mono',monospace; font-weight:700; letter-spacing:0.5px;}
+.clock .ampm{font-size:10px; opacity:0.7; margin-left:2px;}
+
+/* ---------- signage / shayari (glassy too) ---------- */
+.signage-wrap{
+  position:absolute; left:50%; bottom:calc(var(--player-h, 130px) + 18px);
+  transform:translateX(-50%);
+  width:min(92vw, 560px); text-align:center; z-index:15; pointer-events:none;
+}
+.signage{
+  display:inline-block;
+  background:var(--glass-bg);
+  backdrop-filter:blur(12px) saturate(160%);
+  -webkit-backdrop-filter:blur(12px) saturate(160%);
+  border:1px solid var(--glass-border);
+  box-shadow:var(--glass-shadow), inset 0 1px 0 rgba(255,255,255,0.18);
+  padding:10px 20px; border-radius:14px;
+  font-family:'Baloo 2',sans-serif; font-size:15px; font-weight:600;
+  max-width:100%;
+  transition:opacity 0.45s ease, transform 0.45s ease;
+}
+.signage.fade{opacity:0; transform:translateY(4px);}
+.signage.radio-on{border-color:rgba(63,224,160,0.55); box-shadow:var(--glass-shadow), 0 0 0 1px rgba(63,224,160,0.25) inset;}
+.radio-tag{display:inline-block; font-family:'Space Mono',monospace; font-size:9px; letter-spacing:1.5px; color:#3fe0a0; margin-right:8px; opacity:0; transition:opacity 0.3s;}
+.signage.radio-on .radio-tag{opacity:1;}
+
+/* =======================================================================
+   GLASS SOUND BAR — the whole player section is true glassmorphism:
+   translucent frosted panel, soft border highlight, blurred backdrop,
+   layered shadow + inner sheen. Background image stays visible through it.
+   ======================================================================= */
+.player{
+  position:absolute; left:50%; bottom:0; transform:translateX(-50%);
+  width:100%; z-index:30;
+}
+.player-inner{
+  position:relative;
+  background:linear-gradient(160deg, var(--glass-bg-strong), var(--glass-bg) 60%);
+  backdrop-filter:blur(22px) saturate(180%);
+  -webkit-backdrop-filter:blur(22px) saturate(180%);
+  border:1px solid var(--glass-border);
+  border-bottom:none;
+  box-shadow:var(--glass-shadow), inset 0 1px 0 rgba(255,255,255,0.25);
+  padding:10px 16px calc(8px + env(safe-area-inset-bottom)) 16px;
+  overflow:hidden;
+}
+/* top sheen line — the classic glass highlight */
+.player-inner::before{
+  content:''; position:absolute; top:0; left:0; right:0; height:60%;
+  background:linear-gradient(180deg, rgba(255,255,255,0.14), rgba(255,255,255,0) 100%);
+  pointer-events:none;
+}
+/* faint drifting light for extra depth, subtle — not distracting */
+.player-inner::after{
+  content:''; position:absolute; top:-40%; left:-20%; width:60%; height:180%;
+  background:linear-gradient(100deg, rgba(255,255,255,0.10), rgba(255,255,255,0) 55%);
+  transform:rotate(8deg);
+  pointer-events:none;
+}
+
+.player-top{display:flex; align-items:center; gap:12px; position:relative; z-index:1;}
+.cassette-wrap{width:40px; height:40px; flex:none; position:relative;}
+.cassette{
+  width:100%; height:100%; border-radius:50%;
+  background:conic-gradient(from 90deg, #2a2036, #4a3a5c, #2a2036 60%, #1c1628);
+  border:3px solid var(--glass-border);
+  display:flex; align-items:center; justify-content:center;
+  animation:spin 3.2s linear infinite; animation-play-state:paused;
+  box-shadow:0 4px 14px rgba(0,0,0,0.4);
+  overflow:hidden;
+}
+.cassette img{width:100%; height:100%; object-fit:cover; border-radius:50%;}
+.cassette.spin{animation-play-state:running;}
+.cassette::before{
+  content:''; position:absolute; width:38%; height:38%; border-radius:50%;
+  background:var(--marigold); box-shadow:0 0 0 3px rgba(253,243,225,0.12);
+}
+@keyframes spin{ to{transform:rotate(360deg);} }
+
+.track-info{flex:1; min-width:0;}
+.track-title{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+.track-artist{font-size:11px; opacity:0.7; margin-top:1px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+
+.road-progress{margin-top:4px;}
+.road-track{
+  position:relative; height:10px; border-radius:5px;
+  background:rgba(255,255,255,0.08);
+  border:1px solid var(--glass-border);
+  overflow:hidden;
+}
+.road-dashes{
+  position:absolute; inset:0; top:50%; height:2px; transform:translateY(-50%);
+  background-image:repeating-linear-gradient(90deg, rgba(253,243,225,0.55) 0 8px, transparent 8px 16px);
+}
+.road-fill{position:absolute; left:0; top:0; bottom:0; width:0%; background:linear-gradient(90deg, rgba(255,107,53,0.4), rgba(255,198,92,0.4));}
+.progress-truck{position:absolute; top:50%; left:0%; transform:translate(-50%,-50%); font-size:13px; line-height:1; filter:drop-shadow(0 1px 2px rgba(0,0,0,0.6)); transition:left 0.22s linear;}
+.km-readout{display:flex; justify-content:space-between; margin-top:4px; font-family:'Space Mono',monospace; font-size:10px; opacity:0.72;}
+
+.playlist-btn{
+  flex:none; width:32px; height:32px; border-radius:9px;
+  display:flex; align-items:center; justify-content:center;
+  background:var(--glass-bg); border:1px solid var(--glass-border);
+  backdrop-filter:blur(6px);
+}
+
+.controls{display:flex; align-items:center; justify-content:center; gap:8px; margin-top:8px; position:relative; z-index:1;}
+.ctrl-btn{
+  width:32px; height:32px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  background:var(--glass-bg); border:1px solid var(--glass-border);
+  backdrop-filter:blur(8px);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,0.2);
+  font-size:14px;
+  transition:transform 0.15s ease, background 0.15s ease;
+}
+.ctrl-btn:active{transform:scale(0.9);}
+.ctrl-btn.active{background:rgba(63,224,160,0.22); border-color:rgba(63,224,160,0.55); color:#3fe0a0;}
+.play-main{
+  width:44px; height:44px;
+  background:linear-gradient(160deg, var(--marigold), var(--marigold-2));
+  border-color:rgba(255,255,255,0.35);
+  box-shadow:0 6px 18px rgba(232,73,42,0.45), inset 0 1px 0 rgba(255,255,255,0.35);
+  font-size:17px;
+}
+.play-main:active{transform:scale(0.92);}
+/* ===================== /GLASS SOUND BAR ===================== */
+
+/* ---------- playlist sheet (matching glass language) ---------- */
+.sheet-backdrop{position:fixed; inset:0; background:rgba(8,5,14,0.5); backdrop-filter:blur(2px); opacity:0; pointer-events:none; transition:opacity 0.25s ease; z-index:40;}
+.sheet-backdrop.open{opacity:1; pointer-events:auto;}
+.playlist-sheet{
+  position:fixed; z-index:50;
+  background:linear-gradient(160deg, var(--glass-bg-strong), rgba(20,14,32,0.7));
+  backdrop-filter:blur(20px) saturate(180%);
+  -webkit-backdrop-filter:blur(20px) saturate(180%);
+  border:1px solid var(--glass-border);
+  box-shadow:var(--glass-shadow);
+  display:flex; flex-direction:column;
+  transition:transform 0.32s cubic-bezier(.2,.9,.25,1), opacity 0.25s ease;
+}
+.playlist-header{display:flex; align-items:center; justify-content:space-between; padding:16px 18px 10px 18px; border-bottom:1px solid var(--line);}
+.playlist-header h3{margin:0; font-family:'Baloo 2',sans-serif; font-size:16px;}
+.playlist-header .count{font-size:11px; opacity:0.65; font-family:'Space Mono',monospace;}
+.playlist-header .titlewrap{display:flex; flex-direction:column; gap:2px;}
+.close-btn{width:30px; height:30px; border-radius:50%; background:var(--glass-bg); border:1px solid var(--glass-border); display:flex; align-items:center; justify-content:center; font-size:16px;}
+.playlist-list{list-style:none; margin:0; padding:8px 8px 18px 8px; overflow-y:auto; flex:1;}
+.track-row{display:flex; align-items:center; gap:12px; padding:9px 10px; border-radius:12px; cursor:pointer; transition:background 0.15s ease;}
+.track-row:hover, .track-row:active{background:var(--glass-bg);}
+.track-row.current{background:rgba(255,107,53,0.16); border:1px solid rgba(255,107,53,0.4);}
+.track-thumb{width:38px; height:38px; border-radius:9px; flex:none; display:flex; align-items:center; justify-content:center; font-size:16px; overflow:hidden; background:linear-gradient(135deg, rgba(255,107,53,0.35), rgba(47,158,143,0.35));}
+.track-thumb img{width:100%; height:100%; object-fit:cover;}
+.track-idx{width:18px; text-align:center; font-family:'Space Mono',monospace; font-size:11px; opacity:0.55; flex:none;}
+.track-meta{flex:1; min-width:0;}
+.track-meta .t-title{font-size:13px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+.track-meta .t-artist{font-size:11px; opacity:0.65; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+.track-playing-icon{width:16px; flex:none; opacity:0; font-size:13px;}
+.track-row.current .track-playing-icon{opacity:1;}
+.playlist-empty{padding:24px 12px; text-align:center; opacity:0.6; font-size:13px;}
+
+/* ============ MOBILE (default) ============ */
+.playlist-sheet{left:0; right:0; bottom:0; max-height:66vh; border-radius:22px 22px 0 0; transform:translateY(100%);}
+.playlist-sheet.open{transform:translateY(0);}
+
+/* ============ DESKTOP ============ */
+@media (min-width:880px){
+  .topbar{padding:26px 34px 0 34px;}
+  .pill{font-size:14px; padding:10px 18px;}
+  .signage-wrap{bottom:calc(var(--player-h,110px) + 24px);}
+  .signage{font-size:17px; padding:12px 26px;}
+
+  .player{bottom:26px;}
+  .player-inner{
+    max-width:560px; margin:0 auto;
+    border:1px solid var(--glass-border);
+    border-radius:22px;
+    padding:12px 22px 12px 22px;
+    box-shadow:var(--glass-shadow), inset 0 1px 0 rgba(255,255,255,0.25);
+  }
+
+  .playlist-sheet{
+    left:50%; top:50%; bottom:auto; right:auto;
+    transform:translate(-50%,-46%) scale(0.96);
+    width:min(92vw, 480px); max-height:70vh; border-radius:20px;
+    opacity:0; pointer-events:none;
+    transition:transform 0.28s cubic-bezier(.2,.9,.25,1), opacity 0.22s ease;
+  }
+  .playlist-sheet.open{transform:translate(-50%,-50%) scale(1); opacity:1; pointer-events:auto;}
+}
+
+@media (max-width:879px){
+  .signage{font-size:13.5px;}
+}

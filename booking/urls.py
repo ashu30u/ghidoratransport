@@ -2,6 +2,7 @@ from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
 from . import views
+from django.urls import path, include
 
 urlpatterns = [
 
@@ -81,6 +82,7 @@ urlpatterns = [
     path('api/submit-user-review/', views.submit_user_review, name='submit_user_review'),
     path('api/export-bookings/', views.export_bookings_api, name='export_bookings_api'),
     path('api/export-reviews/', views.export_reviews_api, name='export_reviews_api'),
+    path('pickupwala/', include('pickupwala.urls')),
 ]
 
 if settings.DEBUG:

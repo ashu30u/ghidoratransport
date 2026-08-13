@@ -64,6 +64,7 @@ INSTALLED_APPS = [
     'quotations',
     'social',
     'payments',
+    'pickupwala',
 ]
 
 SITE_ID = 1  # Required by django.contrib.sites / allauth

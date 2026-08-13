@@ -4,7 +4,10 @@ from django.contrib.auth import views as auth_views
 from django.conf import settings
 from django.conf.urls.static import static
 
+from django.views.generic.base import RedirectView
+
 urlpatterns = [
+    path('favicon.ico', RedirectView.as_view(url='/static/images/logo5.jpeg', permanent=True)),
     # Admin Panel
     path('admin/', admin.site.urls),
 

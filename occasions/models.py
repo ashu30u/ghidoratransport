@@ -68,14 +68,6 @@ class Occasion(models.Model):
         return f"{self.name} ({self.date or f'{self.day}/{self.month}'})"
 
 
-from django.db import connection
-
-try:
-    with connection.cursor() as cursor:
-        cursor.execute("ALTER TABLE occasions_occasionsettings ADD COLUMN show_on_website BOOLEAN DEFAULT 1")
-except Exception:
-    pass
-
 
 class OccasionSettings(models.Model):
     show_on_website = models.BooleanField(

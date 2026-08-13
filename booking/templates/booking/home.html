@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" href="{% static 'css/style.css' %}?v=1000">
+<link rel="stylesheet" href="{% static 'css/style.css' %}?v=11000">
 
 <!-- Leaflet CSS & JS for Interactive Map Picker & Route Polyline rendering -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -16,28 +16,31 @@
 {% endif %}
 
 <style>
-  /* ===== Thin Outer Navbar Bar (Fixed 52px height) ===== */
+  /* ===== Slim & Compact Sticky Navbar Bar ===== */
   .navbar {
     position: sticky;
     top: 0;
     left: 0;
     width: 100%;
-    height: 52px; /* Fixed slim height for outer bar */
-    z-index: 1000;
-    background: rgba(12, 17, 29, 0.94);
+    min-height: 58px;
+    height: auto;
+    z-index: 10000;
+    background: rgba(12, 17, 29, 0.96);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
     box-sizing: border-box;
+    overflow: visible !important;
+    padding: 6px 0;
   }
 
   .navbar-inner {
     width: 100%;
     max-width: 1440px;
-    height: 100%;
+    min-height: 46px;
     margin: 0 auto;
-    padding: 0 28px; /* Zero vertical padding, height controlled by navbar height */
+    padding: 0 24px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -48,7 +51,7 @@
   .nav-logo {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
     text-decoration: none;
     color: #fff;
     font-weight: 800;
@@ -72,7 +75,7 @@
     transition: color 0.2s;
   }
   .nav-links a:hover, .nav-links a.active {
-    color: #ff7a1a;
+    color: #e77523;
   }
 
   /* ===== Mobile Hamburger Button ===== */
@@ -927,45 +930,166 @@
         transform: translateY(-7.75px) rotate(-45deg) !important;
       }
 
+      /* ===== Guaranteed 3D Floating Side Drawer Navigation Menu Card ===== */
+      .mobile-nav-overlay {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        background: rgba(4, 7, 15, 0.78) !important;
+        backdrop-filter: blur(10px) !important;
+        -webkit-backdrop-filter: blur(10px) !important;
+        z-index: 99998 !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+        transition: opacity 0.3s ease !important;
+      }
+      .mobile-nav-overlay.active {
+        opacity: 1 !important;
+        pointer-events: auto !important;
+      }
 
+      .mobile-nav-drawer {
+        position: fixed !important;
+        top: 60px !important;
+        right: 16px !important;
+        width: min(330px, calc(100vw - 32px)) !important;
+        max-height: calc(100vh - 80px) !important;
+        overflow-y: auto !important;
+        background: linear-gradient(145deg, rgba(12, 18, 32, 0.98), rgba(24, 34, 52, 0.98)) !important;
+        border: 1.5px solid rgba(255, 122, 26, 0.5) !important;
+        backdrop-filter: blur(20px) !important;
+        -webkit-backdrop-filter: blur(20px) !important;
+        border-radius: 18px !important;
+        padding: 18px 16px !important;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9), 0 0 35px rgba(255, 122, 26, 0.3) !important;
+        z-index: 99999 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 6px !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+        transform: translateY(-12px) scale(0.96) !important;
+        transition: opacity 0.28s cubic-bezier(0.16, 1, 0.3, 1), transform 0.28s cubic-bezier(0.16, 1, 0.3, 1) !important;
+      }
+      .mobile-nav-drawer.active {
+        opacity: 1 !important;
+        pointer-events: auto !important;
+        transform: translateY(0) scale(1) !important;
+      }
 
-      @media (max-width: 900px) {
+      .mobile-nav-drawer a {
+        color: #f8fafc !important;
+        text-decoration: none !important;
+        font-weight: 600 !important;
+        font-size: 13.5px !important;
+        padding: 9px 12px !important;
+        border-radius: 10px !important;
+        transition: background 0.2s ease, color 0.2s ease !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+      }
+      /* Zero Navbar Scrollbar Guarantee */
+      .navbar {
+        overflow: visible !important;
+        max-width: 100vw !important;
+        box-sizing: border-box !important;
+      }
+      .navbar-inner {
+        overflow: hidden !important;
+        overflow-x: hidden !important;
+        overflow-y: hidden !important;
+        max-width: 100vw !important;
+        box-sizing: border-box !important;
+        flex-wrap: nowrap !important;
+      }
+      .navbar::-webkit-scrollbar,
+      .navbar-inner::-webkit-scrollbar,
+      .navbar::-webkit-scrollbar-thumb,
+      .navbar-inner::-webkit-scrollbar-thumb,
+      .navbar::-webkit-scrollbar-track,
+      .navbar-inner::-webkit-scrollbar-track {
+        display: none !important;
+        width: 0 !important;
+        height: 0 !important;
+        background: transparent !important;
+      }
+
+      @media (max-width: 1150px) {
         .nav-links { display: none !important; }
-        .desktop-user-badge, .desktop-login-btn { display: none !important; }
 
         .navbar {
-          height: 54px !important;
+          min-height: 48px !important;
+          height: auto !important;
           width: 100% !important;
           max-width: 100vw !important;
           overflow: visible !important;
-          padding: 0 !important;
+          padding: 2px 0 !important;
         }
         .navbar-inner {
-          padding: 0 6px !important;
+          padding: 0 4px !important;
           width: 100% !important;
           max-width: 100% !important;
           justify-content: space-between !important;
+          flex-wrap: nowrap !important;
         }
         .nav-logo {
-          font-size: 12.5px !important;
-          gap: 4px !important;
+          font-size: 11.5px !important;
+          gap: 3px !important;
           margin-left: 0 !important;
           padding-left: 2px !important;
+          flex-shrink: 0 !important;
+        }
+        .nav-logo .accent {
+          font-size: 11.5px !important;
         }
         .logo-img {
-          height: 24px !important;
+          height: 23px !important;
+          width: auto !important;
         }
         .nav-actions {
-          gap: 5px !important;
+          gap: 3px !important;
           margin-right: 0 !important;
           padding-right: 2px !important;
+          flex-shrink: 0 !important;
         }
         .call-btn {
-          padding: 5px 8px !important;
-          font-size: 11px !important;
-          border-radius: 14px !important;
+          padding: 3px 6px !important;
+          font-size: 10px !important;
+          border-radius: 6px !important;
           white-space: nowrap !important;
         }
+        .desktop-user-badge, .desktop-login-btn, .animated-login-btn, .user-badge-glowing {
+          display: inline-flex !important;
+          align-items: center !important;
+          padding: 4px 7px !important;
+          font-size: 10.5px !important;
+          border-radius: 8px !important;
+          white-space: nowrap !important;
+        }
+        .hamburger-btn {
+          width: 34px !important;
+          height: 30px !important;
+          border-radius: 7px !important;
+          margin-left: 2px !important;
+          flex-shrink: 0 !important;
+        }
+
+        .mobile-nav-drawer {
+          top: 56px !important;
+          right: 8px !important;
+          width: min(300px, calc(100vw - 16px)) !important;
+          max-height: calc(100vh - 66px) !important;
+          padding: 14px 12px !important;
+          border-radius: 16px !important;
+          z-index: 9999999 !important;
+        }
+        .mobile-nav-overlay {
+          z-index: 9999998 !important;
+        }
+      }
 
         /* 🎥 Full HD Background Video Display - Perfect Mobile Framing (Reference Image 1) */
         .hero {
@@ -1219,7 +1343,7 @@
   <!-- ===== Slim & Compact Outer Sticky Navbar Bar ===== -->
   <nav class="navbar">
     <div class="navbar-inner">
-      <a href="#" class="nav-logo">
+      <a href="{% url 'home' %}" class="nav-logo">
         <img src="{% static 'images/logo6.png' %}" alt="Ghidora Transport Logo" class="logo-img">
         GHIDORA <span class="accent">TRANSPORT</span>
       </a>
@@ -1231,6 +1355,7 @@
         <a href="{% url 'home' %}#booking">Booking</a>
         <a href="{% url 'about' %}">About Us</a>
         <a href="{% url 'contact_us' %}">Contact</a>
+        <a href="{% url 'pickupwala:player' %}" title="Pickupwala Radio 📻" style="color: #ffb870; font-size: 18px; padding: 2px 7px; background: rgba(255, 184, 112, 0.18); border: 1.5px solid rgba(255, 184, 112, 0.5); border-radius: 8px; transition: transform 0.2s;" class="radio-emoji-link">📻</a>
       </div>
 
       <!-- Right Action Items -->
@@ -1263,49 +1388,56 @@
         </button>
       </div>
     </div>
-
-    <!-- Dark Backdrop Overlay (Closes menu on outside click) -->
-    <div class="mobile-nav-overlay" id="mobileNavOverlay" onclick="closeMobileMenu()"></div>
-
-    <!-- Floating Side Drawer Navigation Menu (Exact surge.sh match) -->
-    <div class="mobile-nav-drawer" id="mobileNavDrawer">
-      <div style="font-size: 11px; font-weight: 800; letter-spacing: 1.2px; color: #ff7a1a; padding: 2px 4px 6px; text-transform: uppercase;">📍 MAIN PAGES</div>
-      <a href="{% url 'home' %}" class="active" onclick="closeMobileMenu()">🏠 Home</a>
-      <a href="{% url 'services' %}" onclick="closeMobileMenu()">🛠️ Services</a>
-      <a href="{% url 'home' %}#booking" onclick="closeMobileMenu()">📦 Book Transport</a>
-      <a href="{% url 'about' %}" onclick="closeMobileMenu()">ℹ️ About Us</a>
-      <a href="{% url 'contact_us' %}" onclick="closeMobileMenu()">🕿 Contact Us</a>
-
-      <div style="font-size: 11px; font-weight: 800; letter-spacing: 1.2px; color: #00d2ff; padding: 12px 4px 6px; text-transform: uppercase;">⚡ SPECIAL FEATURES & TOOLS</div>
-      {% if user.is_staff or user.is_superuser %}
-        <a href="{% url 'control_tower' %}" onclick="closeMobileMenu()" style="color: #00f2fe; font-weight: 800; background: rgba(0, 242, 254, 0.15) !important; border: 1px solid rgba(0, 242, 254, 0.4) !important;">🧠 AI Transport Control Tower (Admin)</a>
-      {% endif %}
-      <a href="{% url 'home' %}#360-viewer" onclick="closeMobileMenu()">🏎️ 360° Vehicle View</a>
-      <a href="javascript:void(0)" onclick="closeMobileMenu(); ghidoraOpenWeatherModal();">🌤️ Weather AI Radar</a>
-      <a href="javascript:void(0)" onclick="closeMobileMenu(); toggleSiteTruckDoors();">🚚 3D Shutter Door Animation</a>
-      <a href="{% url 'quotations:quote_request' %}" onclick="closeMobileMenu()">💰 Check Fare & Rate Quote</a>
-      <a href="{% url 'business_card' %}" onclick="closeMobileMenu()">🪪 Digital Business Card</a>
-      <a href="{% url 'status' %}" onclick="closeMobileMenu()">💳 Check Booking Status & Payment</a>
-
-      <a href="tel:+916264588894" class="drawer-call-support" onclick="closeMobileMenu()">📞 Call Support: +91 6264588894</a>
-
-      {% if user.is_authenticated %}
-        <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; background: rgba(255,122,26,0.12); border: 1px solid rgba(255,122,26,0.3); border-radius: 12px; margin-top: 8px;">
-          <span style="color: #ff7a1a; font-weight: 700; font-size: 13px;">👤 {{ user.first_name|default:user.username }}</span>
-          <form method="post" action="{% url 'logout' %}" style="margin: 0;">
-            {% csrf_token %}
-            <button type="submit" style="background: #ef4444; color: white; border: none; padding: 5px 12px; border-radius: 8px; font-size: 12px; font-weight: bold; cursor: pointer;">
-              🚪 Logout
-            </button>
-          </form>
-        </div>
-      {% else %}
-        <a href="{% url 'login' %}" onclick="closeMobileMenu()" style="background: linear-gradient(135deg, #00d2ff, #0072ff) !important; color: white !important; justify-content: center; font-weight: bold; margin-top: 8px;">
-          🔑 Login / Sign In
-        </a>
-      {% endif %}
-    </div>
   </nav>
+
+  <!-- Dark Backdrop Overlay (Placed outside navbar for clean page-level blur) -->
+  <div class="mobile-nav-overlay" id="mobileNavOverlay" onclick="closeMobileMenu()"></div>
+
+  <!-- Floating Side Drawer Navigation Menu Card (Placed outside navbar to prevent clipping) -->
+  <div class="mobile-nav-drawer" id="mobileNavDrawer">
+    <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 6px;">
+      <div style="font-size: 11px; font-weight: 800; letter-spacing: 1.2px; color: #ff7a1a; text-transform: uppercase;">📍 NAVIGATION MENU</div>
+      <button onclick="closeMobileMenu()" aria-label="Close Menu" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #ffffff; width: 26px; height: 26px; border-radius: 50%; font-size: 13px; display: flex; align-items: center; justify-content: center; cursor: pointer;">✕</button>
+    </div>
+
+    <div style="font-size: 11px; font-weight: 800; letter-spacing: 1.2px; color: #ff7a1a; padding: 2px 4px 6px; text-transform: uppercase;">📍 MAIN PAGES</div>
+    <a href="{% url 'home' %}" class="active" onclick="closeMobileMenu()">🏠 Home</a>
+    <a href="{% url 'services' %}" onclick="closeMobileMenu()">🛠️ Services</a>
+    <a href="{% url 'home' %}#booking" onclick="closeMobileMenu()">📦 Book Transport</a>
+    <a href="{% url 'pickupwala:player' %}" onclick="closeMobileMenu()" style="color: #ffb870; font-weight: 800; background: rgba(255, 184, 112, 0.16) !important; border: 1.5px solid rgba(255, 184, 112, 0.45) !important;">📻 Pickupwala Radio</a>
+    <a href="{% url 'about' %}" onclick="closeMobileMenu()">ℹ️ About Us</a>
+    <a href="{% url 'contact_us' %}" onclick="closeMobileMenu()">🕿 Contact Us</a>
+
+    <div style="font-size: 11px; font-weight: 800; letter-spacing: 1.2px; color: #00d2ff; padding: 12px 4px 6px; text-transform: uppercase;">⚡ SPECIAL FEATURES & TOOLS</div>
+    <a href="{% url 'pickupwala:player' %}" onclick="closeMobileMenu()" style="color: #ffb870; font-weight: 800; background: rgba(255, 184, 112, 0.16) !important; border: 1.5px solid rgba(255, 184, 112, 0.45) !important; box-shadow: 0 0 16px rgba(255, 184, 112, 0.25);">🚚 Pickupwala Radio & Music FM 📻</a>
+    {% if user.is_staff or user.is_superuser %}
+      <a href="{% url 'control_tower' %}" onclick="closeMobileMenu()" style="color: #00f2fe; font-weight: 800; background: rgba(0, 242, 254, 0.15) !important; border: 1px solid rgba(0, 242, 254, 0.4) !important;">🧠 AI Transport Control Tower (Admin)</a>
+    {% endif %}
+    <a href="{% url 'home' %}#360-viewer" onclick="closeMobileMenu()">🏎️ 360° Vehicle View</a>
+    <a href="javascript:void(0)" onclick="closeMobileMenu(); ghidoraOpenWeatherModal();">🌤️ Weather AI Radar</a>
+    <a href="javascript:void(0)" onclick="closeMobileMenu(); toggleSiteTruckDoors();">🚚 3D Shutter Door Animation</a>
+    <a href="{% url 'quotations:quote_request' %}" onclick="closeMobileMenu()">💰 Check Fare & Rate Quote</a>
+    <a href="{% url 'business_card' %}" onclick="closeMobileMenu()">🪪 Digital Business Card</a>
+    <a href="{% url 'status' %}" onclick="closeMobileMenu()">💳 Check Booking Status & Payment</a>
+
+    <a href="tel:+916264588894" class="drawer-call-support" onclick="closeMobileMenu()">📞 Call Support: +91 6264588894</a>
+
+    {% if user.is_authenticated %}
+      <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; background: rgba(255,122,26,0.12); border: 1px solid rgba(255,122,26,0.3); border-radius: 12px; margin-top: 8px;">
+        <span style="color: #ff7a1a; font-weight: 700; font-size: 13px;">👤 {{ user.first_name|default:user.username }}</span>
+        <form method="post" action="{% url 'logout' %}" style="margin: 0;">
+          {% csrf_token %}
+          <button type="submit" style="background: #ef4444; color: white; border: none; padding: 5px 12px; border-radius: 8px; font-size: 12px; font-weight: bold; cursor: pointer;">
+            🚪 Logout
+          </button>
+        </form>
+      </div>
+    {% else %}
+      <a href="{% url 'login' %}" onclick="closeMobileMenu()" style="background: linear-gradient(135deg, #00d2ff, #0072ff) !important; color: white !important; justify-content: center; font-weight: bold; margin-top: 8px;">
+        🔑 Login / Sign In
+      </a>
+    {% endif %}
+  </div>
 
   <script>
     window.toggleMobileMenu = function(event) {
@@ -1313,47 +1445,64 @@
         try { event.preventDefault(); } catch(e){}
         try { event.stopPropagation(); } catch(e){}
       }
+      window._justToggledMenu = true;
+      setTimeout(function() { window._justToggledMenu = false; }, 350);
+
       var drawer = document.getElementById('mobileNavDrawer');
       var overlay = document.getElementById('mobileNavOverlay');
       var btn = document.getElementById('hamburgerBtn');
       if (!drawer) return;
 
-      var isVisible = drawer.classList.contains('active');
+      var isVisible = drawer.classList.contains('active') || drawer.style.opacity === '1';
 
       if (isVisible) {
+        window._justToggledMenu = false;
         window.closeMobileMenu();
       } else {
         drawer.classList.add('active');
-        if (overlay) overlay.classList.add('active');
+        drawer.style.opacity = '1';
+        drawer.style.pointerEvents = 'auto';
+        drawer.style.transform = 'translateY(0) scale(1)';
+        drawer.style.display = 'flex';
+        if (overlay) {
+          overlay.classList.add('active');
+          overlay.style.opacity = '1';
+          overlay.style.pointerEvents = 'auto';
+          overlay.style.display = 'block';
+        }
         if (btn) btn.classList.add('active');
         document.body.style.overflow = 'hidden';
       }
     };
 
     window.closeMobileMenu = function() {
+      if (window._justToggledMenu) return;
+
       var drawer = document.getElementById('mobileNavDrawer');
       var overlay = document.getElementById('mobileNavOverlay');
       var btn = document.getElementById('hamburgerBtn');
-      if (drawer) drawer.classList.remove('active');
-      if (overlay) overlay.classList.remove('active');
+      if (drawer) {
+        drawer.classList.remove('active');
+        drawer.style.opacity = '0';
+        drawer.style.pointerEvents = 'none';
+        drawer.style.transform = 'translateY(-12px) scale(0.96)';
+      }
+      if (overlay) {
+        overlay.classList.remove('active');
+        overlay.style.opacity = '0';
+        overlay.style.pointerEvents = 'none';
+      }
       if (btn) btn.classList.remove('active');
       document.body.style.overflow = '';
     };
 
-    document.addEventListener('DOMContentLoaded', function() {
-      var btn = document.getElementById('hamburgerBtn');
-      if (btn) {
-        btn.onclick = function(e) {
-          window.toggleMobileMenu(e);
-        };
-      }
-    });
-
     document.addEventListener('click', function(e) {
+      if (window._justToggledMenu) return;
       var drawer = document.getElementById('mobileNavDrawer');
-      var btn = document.getElementById('hamburgerBtn');
-      if (drawer && drawer.classList.contains('active')) {
-        if (!drawer.contains(e.target) && (!btn || !btn.contains(e.target))) {
+      if (drawer && (drawer.classList.contains('active') || drawer.style.opacity === '1')) {
+        var isInsideDrawer = drawer.contains(e.target);
+        var isBtnClick = e.target && e.target.closest && e.target.closest('#hamburgerBtn');
+        if (!isInsideDrawer && !isBtnClick) {
           window.closeMobileMenu();
         }
       }

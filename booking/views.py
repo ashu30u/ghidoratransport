@@ -1670,9 +1670,10 @@ def submit_user_review(request):
             guest_phone = request.POST.get('phone', '').strip()
             is_verified = False
 
-        # Attempt 1: Direct creation
+        # Attempt 1: Direct creation with booking=None (Standard ForeignKey behavior)
         try:
             review_obj = Review.objects.create(
+                booking=None,
                 user=user,
                 guest_name=guest_name,
                 guest_email=guest_email or None,
@@ -1687,23 +1688,29 @@ def submit_user_review(request):
                 ip_address=clean_ip
             )
         except Exception as stage1_err:
+            # Fallback for legacy DB schemas prior to migration execution where booking_id has OneToOne unique constraint:
             import random
-            unique_b_id = f"REV-{random.randint(10000000, 99999999)}"
-            new_dummy_booking = Booking.objects.create(
-                booking_id=unique_b_id,
-                name=f"Customer - {guest_name[:50]}",
-                phone=guest_phone[:15] if guest_phone else "0000000000",
-                email=guest_email or None,
-                pickup="Dhamtari",
-                destination="Raipur",
-                journey_date=timezone.now().date(),
-                distance=50.0,
-                fare=1500.0,
-                vehicle_type="Mahindra Pickup",
-                status="Completed"
-            )
+            used_booking_ids = set(Review.objects.filter(booking__isnull=False).values_list('booking_id', flat=True))
+            available_booking = Booking.objects.exclude(id__in=used_booking_ids).first()
+
+            if not available_booking:
+                unique_b_id = f"REV-{random.randint(10000000, 99999999)}"
+                available_booking = Booking.objects.create(
+                    booking_id=unique_b_id,
+                    name=f"Customer - {guest_name[:50]}",
+                    phone=guest_phone[:15] if guest_phone else "0000000000",
+                    email=guest_email or None,
+                    pickup="Dhamtari",
+                    destination="Raipur",
+                    journey_date=timezone.now().date(),
+                    distance=50.0,
+                    fare=1500.0,
+                    vehicle_type="Mahindra Pickup",
+                    status="Completed"
+                )
+
             review_obj = Review.objects.create(
-                booking=new_dummy_booking,
+                booking=available_booking,
                 user=user,
                 guest_name=guest_name,
                 guest_email=guest_email or None,

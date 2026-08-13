@@ -293,6 +293,40 @@
         position: relative;
         z-index: 1;
     }
+
+    /* Zero Navbar Scrollbar Guarantee & 1150px Responsive Breakpoint */
+    .navbar {
+        overflow: visible !important;
+        max-width: 100vw !important;
+        box-sizing: border-box !important;
+    }
+    .navbar-inner {
+        overflow: hidden !important;
+        overflow-x: hidden !important;
+        overflow-y: hidden !important;
+        max-width: 100vw !important;
+        box-sizing: border-box !important;
+        flex-wrap: nowrap !important;
+    }
+    .navbar::-webkit-scrollbar,
+    .navbar-inner::-webkit-scrollbar,
+    .navbar::-webkit-scrollbar-thumb,
+    .navbar-inner::-webkit-scrollbar-thumb,
+    .navbar::-webkit-scrollbar-track,
+    .navbar-inner::-webkit-scrollbar-track {
+        display: none !important;
+        width: 0 !important;
+        height: 0 !important;
+        background: transparent !important;
+    }
+    @media (max-width: 1150px) {
+        .nav-links {
+            display: none !important;
+        }
+        .navbar {
+            padding: 8px 12px !important;
+        }
+    }
 </style>
 </head>
 
@@ -311,6 +345,7 @@
         <a href="{% url 'home' %}#booking">Booking</a>
         <a href="{% url 'about' %}">About Us</a>
         <a href="{% url 'contact_us' %}" class="active">Contact</a>
+        <a href="{% url 'pickupwala:player' %}" title="Pickupwala Radio 📻" style="color: #ffb870; font-size: 18px; padding: 2px 7px; background: rgba(255, 184, 112, 0.18); border: 1.5px solid rgba(255, 184, 112, 0.5); border-radius: 8px; transition: transform 0.2s;" class="radio-emoji-link">📻</a>
       </div>
       <div class="nav-actions" style="display: flex; align-items: center; gap: 8px;">
         <a href="tel:+916264588894" class="call-btn"><span class="phone-shake">📞</span> Call Now</a>
@@ -340,33 +375,35 @@
         </button>
       </div>
     </div>
-
-    <!-- Dark Backdrop Overlay (Closes menu on outside click) -->
-    <div class="mobile-nav-overlay" id="mobileNavOverlay" onclick="closeMobileMenu()"></div>
-
-    <!-- 60% Width Responsive Side Drawer Navigation Menu -->
-    <div class="mobile-nav-drawer" id="mobileNavDrawer">
-      <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 6px;">
-        <div style="font-size: 11px; font-weight: 800; letter-spacing: 1.5px; color: #ff7a1a; text-transform: uppercase;">📍 Navigation Menu</div>
-        <button onclick="closeMobileMenu()" aria-label="Close Menu" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #ffffff; width: 28px; height: 28px; border-radius: 50%; font-size: 14px; display: flex; align-items: center; justify-content: center; cursor: pointer;">✕</button>
-      </div>
-
-      <div style="font-size: 11px; font-weight: 800; letter-spacing: 1.5px; color: #ff7a1a; padding: 4px 6px 2px; text-transform: uppercase;">📍 Main Pages</div>
-      <a href="{% url 'home' %}" onclick="closeMobileMenu()">🏠 Home</a>
-      <a href="{% url 'services' %}" onclick="closeMobileMenu()">🛠️ Services</a>
-      <a href="{% url 'home' %}#booking" onclick="closeMobileMenu()">📦 Book Transport</a>
-      <a href="{% url 'about' %}" onclick="closeMobileMenu()">ℹ️ About Us</a>
-      <a href="{% url 'contact_us' %}" class="active" onclick="closeMobileMenu()">🕿 Contact Us</a>
-
-      <div style="height: 1px; background: rgba(255, 255, 255, 0.1); margin: 6px 0;"></div>
-
-      <div style="font-size: 11px; font-weight: 800; letter-spacing: 1.5px; color: #00d2ff; padding: 4px 6px 2px; text-transform: uppercase;">⚡ Special Features & Tools</div>
-      <a href="{% url 'home' %}#360-viewer" onclick="closeMobileMenu()" style="color: #ff9e00; font-weight: 700;">🏎️ 360° Vehicle View</a>
-      <a href="{% url 'quotations:quote_request' %}" onclick="closeMobileMenu()">💰 Check Fare & Rate Quote</a>
-      <a href="{% url 'business_card' %}" onclick="closeMobileMenu()">🪪 Digital Business Card</a>
-      <a href="{% url 'status' %}" onclick="closeMobileMenu()">💳 Check Booking Status & Payment</a>
-    </div>
   </nav>
+
+  <!-- Dark Backdrop Overlay (Placed outside navbar at body level) -->
+  <div class="mobile-nav-overlay" id="mobileNavOverlay" onclick="closeMobileMenu()"></div>
+
+  <!-- Floating Side Drawer Navigation Menu Card (Placed outside navbar at body level) -->
+  <div class="mobile-nav-drawer" id="mobileNavDrawer">
+    <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 6px;">
+      <div style="font-size: 11px; font-weight: 800; letter-spacing: 1.5px; color: #ff7a1a; text-transform: uppercase;">📍 Navigation Menu</div>
+      <button onclick="closeMobileMenu()" aria-label="Close Menu" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #ffffff; width: 28px; height: 28px; border-radius: 50%; font-size: 14px; display: flex; align-items: center; justify-content: center; cursor: pointer;">✕</button>
+    </div>
+
+    <div style="font-size: 11px; font-weight: 800; letter-spacing: 1.5px; color: #ff7a1a; padding: 4px 6px 2px; text-transform: uppercase;">📍 Main Pages</div>
+    <a href="{% url 'home' %}" onclick="closeMobileMenu()">🏠 Home</a>
+    <a href="{% url 'services' %}" onclick="closeMobileMenu()">🛠️ Services</a>
+    <a href="{% url 'home' %}#booking" onclick="closeMobileMenu()">📦 Book Transport</a>
+    <a href="{% url 'pickupwala:player' %}" onclick="closeMobileMenu()" style="color: #ffb870; font-weight: 800; background: rgba(255, 184, 112, 0.16) !important; border: 1.5px solid rgba(255, 184, 112, 0.45) !important;">📻 Pickupwala Radio</a>
+    <a href="{% url 'about' %}" onclick="closeMobileMenu()">ℹ️ About Us</a>
+    <a href="{% url 'contact_us' %}" class="active" onclick="closeMobileMenu()">🕿 Contact Us</a>
+
+    <div style="height: 1px; background: rgba(255, 255, 255, 0.1); margin: 6px 0;"></div>
+
+    <div style="font-size: 11px; font-weight: 800; letter-spacing: 1.5px; color: #00d2ff; padding: 4px 6px 2px; text-transform: uppercase;">⚡ Special Features & Tools</div>
+    <a href="{% url 'pickupwala:player' %}" onclick="closeMobileMenu()" style="color: #ffb870; font-weight: 800; background: rgba(255, 184, 112, 0.16) !important; border: 1.5px solid rgba(255, 184, 112, 0.45) !important;">🚚 Pickupwala Radio & Music FM 📻</a>
+    <a href="{% url 'home' %}#360-viewer" onclick="closeMobileMenu()" style="color: #ff9e00; font-weight: 700;">🏎️ 360° Vehicle View</a>
+    <a href="{% url 'quotations:quote_request' %}" onclick="closeMobileMenu()">💰 Check Fare & Rate Quote</a>
+    <a href="{% url 'business_card' %}" onclick="closeMobileMenu()">🪪 Digital Business Card</a>
+    <a href="{% url 'status' %}" onclick="closeMobileMenu()">💳 Check Booking Status & Payment</a>
+  </div>
 
   <script>
     window.toggleMobileMenu = function(event) {
@@ -374,52 +411,71 @@
         try { event.preventDefault(); } catch(e){}
         try { event.stopPropagation(); } catch(e){}
       }
+      window._justToggledMenu = true;
+      setTimeout(function() { window._justToggledMenu = false; }, 350);
+
       var drawer = document.getElementById('mobileNavDrawer');
       var overlay = document.getElementById('mobileNavOverlay');
       var btn = document.getElementById('hamburgerBtn');
       if (!drawer) return;
 
-      var isVisible = drawer.classList.contains('active');
+      var isVisible = drawer.classList.contains('active') || drawer.style.opacity === '1';
 
       if (isVisible) {
+        window._justToggledMenu = false;
         window.closeMobileMenu();
       } else {
         drawer.classList.add('active');
-        if (overlay) overlay.classList.add('active');
+        drawer.style.opacity = '1';
+        drawer.style.pointerEvents = 'auto';
+        drawer.style.transform = 'translateY(0) scale(1)';
+        drawer.style.display = 'flex';
+        if (overlay) {
+          overlay.classList.add('active');
+          overlay.style.opacity = '1';
+          overlay.style.pointerEvents = 'auto';
+          overlay.style.display = 'block';
+        }
         if (btn) btn.classList.add('active');
         document.body.style.overflow = 'hidden';
       }
     };
 
     window.closeMobileMenu = function() {
+      if (window._justToggledMenu) return;
+
       var drawer = document.getElementById('mobileNavDrawer');
       var overlay = document.getElementById('mobileNavOverlay');
       var btn = document.getElementById('hamburgerBtn');
-      if (drawer) drawer.classList.remove('active');
-      if (overlay) overlay.classList.remove('active');
+      if (drawer) {
+        drawer.classList.remove('active');
+        drawer.style.opacity = '0';
+        drawer.style.pointerEvents = 'none';
+        drawer.style.transform = 'translateY(-12px) scale(0.96)';
+      }
+      if (overlay) {
+        overlay.classList.remove('active');
+        overlay.style.opacity = '0';
+        overlay.style.pointerEvents = 'none';
+      }
       if (btn) btn.classList.remove('active');
       document.body.style.overflow = '';
     };
 
-    document.addEventListener('DOMContentLoaded', function() {
-      var btn = document.getElementById('hamburgerBtn');
-      if (btn) {
-        btn.onclick = function(e) {
-          window.toggleMobileMenu(e);
-        };
-      }
-    });
-
     document.addEventListener('click', function(e) {
+      if (window._justToggledMenu) return;
       var drawer = document.getElementById('mobileNavDrawer');
-      var btn = document.getElementById('hamburgerBtn');
-      if (drawer && drawer.classList.contains('active')) {
-        if (!drawer.contains(e.target) && (!btn || !btn.contains(e.target))) {
+      if (drawer && (drawer.classList.contains('active') || drawer.style.opacity === '1')) {
+        var isInsideDrawer = drawer.contains(e.target);
+        var isBtnClick = e.target && e.target.closest && e.target.closest('#hamburgerBtn');
+        if (!isInsideDrawer && !isBtnClick) {
           window.closeMobileMenu();
         }
       }
     });
   </script>
+
+
 
   <div class="contact-hero">
     <h1>Contact Ghidora Transport</h1>
