@@ -20,6 +20,7 @@ urlpatterns = [
     path('', include('quotations.urls')),
     path('social/', include('social.urls')),
     path('payments/', include('payments.urls')),
+    path('pickupwala/', include('pickupwala.urls')),
 
     # Allauth Social Login & Account Routes (Google Auth, Signup, Login)
     path('accounts/', include('allauth.urls')),
