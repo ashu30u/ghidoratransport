@@ -4,7 +4,7 @@ from django.conf import settings
 from django.http import JsonResponse
 from django.shortcuts import render
 
-from .models import Shayari, Song, ChaiMessage
+from .models import Shayari, Song, ChaiMessage, HornSound
 
 DEFAULT_CHAI_MESSAGES = [
     {"title": "Chai ka time ho gaya! ☕", "message": "Safar ke beech ek garma-garam chai toh banti hai! 🚚☕"},
@@ -205,4 +205,12 @@ def playlist_api(request):
     if not chai:
         chai = DEFAULT_CHAI_MESSAGES
 
-    return JsonResponse({"tracks": tracks, "shayari": shayari, "chai": chai})
+    horns = []
+    try:
+        for h in HornSound.objects.filter(is_active=True).order_by("order", "id"):
+            if h.audio_file:
+                horns.append({"id": h.id, "title": h.title, "url": h.audio_file.url})
+    except Exception:
+        horns = []
+
+    return JsonResponse({"tracks": tracks, "shayari": shayari, "chai": chai, "horns": horns})

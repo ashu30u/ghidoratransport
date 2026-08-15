@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.utils.html import format_html
 
-from .models import Shayari, Song, ChaiMessage
+from .models import Shayari, Song, ChaiMessage, HornSound
 
 
 @admin.register(Song)
@@ -46,4 +46,22 @@ class ChaiMessageAdmin(admin.ModelAdmin):
     search_fields = ("title", "message")
     list_filter = ("is_active",)
     ordering = ("order", "id")
+
+
+@admin.register(HornSound)
+class HornSoundAdmin(admin.ModelAdmin):
+    list_display = ("order", "title", "is_active", "audio_preview")
+    list_display_links = ("title",)
+    list_editable = ("order", "is_active")
+    search_fields = ("title",)
+    list_filter = ("is_active",)
+    ordering = ("order", "id")
+
+    def audio_preview(self, obj):
+        if obj.audio_file:
+            return format_html('<audio controls style="height:28px;" src="{}"></audio>', obj.audio_file.url)
+        return "-"
+
+    audio_preview.short_description = "Audio Preview"
+
 

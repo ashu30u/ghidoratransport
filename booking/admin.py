@@ -204,6 +204,7 @@ class BookingAdmin(admin.ModelAdmin):
         'toll_charges',
         'parking_charges',
         'colored_status',
+        'colored_payment_status',
         'whatsapp_link',
         'booking_date'
     )
@@ -222,6 +223,7 @@ class BookingAdmin(admin.ModelAdmin):
         'vehicle_type',
         'trip_type',
         'status',
+        'payment_status',
         'distance_source',
         'booking_date'
     )
@@ -229,6 +231,8 @@ class BookingAdmin(admin.ModelAdmin):
     ordering = ('-booking_date',)
 
     list_per_page = 20
+
+    actions = ["mark_payments_paid", "mark_payments_pending"]
 
     fieldsets = (
         ("Customer Details", {
@@ -283,8 +287,9 @@ class BookingAdmin(admin.ModelAdmin):
                             "SMS/payment screenshot hai to proof ke taur "
                             "par upload kar sakte hain."
         }),
-        ("Booking Status", {
-            "fields": ("status", "booking_id")
+        ("💳 Booking & Payment Status (Admin Control)", {
+            "fields": ("status", "payment_status", "booking_id"),
+            "description": "Manage Booking Status & Payment Status. Admin can set Payment Status to 'Paid (Cash / Online)' if customer paid cash directly to owner or driver."
         }),
     )
 
@@ -339,6 +344,32 @@ class BookingAdmin(admin.ModelAdmin):
 
     colored_status.short_description = "Status"
 
+    def colored_payment_status(self, obj):
+        colors = {
+            "Paid": "#10B981",       # Green
+            "Pending": "#F59E0B",    # Amber/Orange
+            "Partial": "#3B82F6",    # Blue
+            "Failed": "#EF4444"      # Red
+        }
+        pay_st = getattr(obj, 'payment_status', 'Pending')
+        bg = colors.get(pay_st, "#6B7280")
+        label = obj.get_payment_status_display() if hasattr(obj, 'get_payment_status_display') else (pay_st or "Pending")
+        return format_html(
+            '<span style="background:{}; color:#ffffff; padding:4px 10px; border-radius:12px; font-weight:bold; font-size:11px; white-space:nowrap;">{}</span>',
+            bg, label
+        )
+    colored_payment_status.short_description = "Payment Status"
+
+    def mark_payments_paid(self, request, queryset):
+        rows = queryset.update(payment_status='Paid')
+        self.message_user(request, f"🟢 {rows} booking(s) marked as Paid (Cash / Verified)!")
+    mark_payments_paid.short_description = "🟢 Mark Selected as Paid (Cash / Verified)"
+
+    def mark_payments_pending(self, request, queryset):
+        rows = queryset.update(payment_status='Pending')
+        self.message_user(request, f"🟠 {rows} booking(s) set to Payment Pending!")
+    mark_payments_pending.short_description = "🟠 Mark Selected as Payment Pending"
+
     def whatsapp_link(self, obj):
 
         message = (
@@ -359,6 +390,29 @@ class BookingAdmin(admin.ModelAdmin):
         )
 
     whatsapp_link.short_description = "WhatsApp"
+
+    def save_model(self, request, obj, form, change):
+        previous_status = None
+        if change and obj.pk:
+            try:
+                previous_status = Booking.objects.get(pk=obj.pk).status
+            except Booking.DoesNotExist:
+                pass
+
+        super().save_model(request, obj, form, change)
+
+        if change and obj.status == 'Completed' and previous_status != 'Completed':
+            if obj.email and obj.email.strip():
+                self.message_user(
+                    request,
+                    f"✅ Booking #{obj.booking_id} marked as Completed! Receipt PDF email is delivering to '{obj.email}'."
+                )
+            else:
+                self.message_user(
+                    request,
+                    f"⚠️ Booking #{obj.booking_id} marked as Completed, BUT customer email address is MISSING! Enter email to send receipt PDF.",
+                    level="warning"
+                )
 
 
 @admin.register(Review)

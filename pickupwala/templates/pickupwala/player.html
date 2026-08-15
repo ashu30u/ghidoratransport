@@ -7,7 +7,7 @@
 <title>Pickupwala — Ghidora Transport Radio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Poppins:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="{% static 'pickupwala/css/player.css' %}?v=300000">
+<link rel="stylesheet" href="{% static 'pickupwala/css/player.css' %}?v=9999999999999">
 <style>
   /* Full-Screen Pickup Background & Element Overlays */
   html, body, .stage { width: 100vw !important; height: 100vh !important; height: 100dvh !important; margin: 0 !important; padding: 0 !important; overflow: hidden !important; background: #120c1d !important; }
@@ -16,19 +16,167 @@
   .bg-hero-img { width: 100% !important; height: 100% !important; object-fit: cover !important; object-position: center !important; display: block !important; }
   .bg-overlay { position: absolute !important; inset: 0 !important; width: 100% !important; height: 100% !important; z-index: 2 !important; background: linear-gradient(180deg, rgba(12, 8, 20, 0.45) 0%, rgba(12, 8, 20, 0.15) 35%, rgba(12, 8, 20, 0.2) 65%, rgba(12, 8, 20, 0.75) 100%) !important; pointer-events: none !important; }
 
+  /* Transparent Cassette Center Hole Overlay (On top of album art) */
+  .cassette-wrap {
+    position: relative !important;
+  }
+  .cassette-wrap::after {
+    content: '' !important;
+    position: absolute !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    width: 14px !important;
+    height: 14px !important;
+    border-radius: 50% !important;
+    background: #120e1c !important;
+    border: 2px solid rgba(255, 255, 255, 0.75) !important;
+    box-shadow: 0 0 4px rgba(0,0,0,0.9), inset 0 0 3px rgba(0,0,0,0.9) !important;
+    z-index: 25 !important;
+    pointer-events: none !important;
+  }
+
+  /* Large Forward Driving Truck Emoji (Interactive Drag & Seek) */
+  .road-progress {
+    cursor: pointer !important;
+    padding: 6px 0 !important;
+  }
+
+  .road-track {
+    overflow: visible !important;
+    position: relative !important;
+    cursor: pointer !important;
+  }
+
+  .progress-truck {
+    position: absolute !important;
+    top: 50% !important;
+    transform: translate(-50%, -65%) scaleX(-1) !important;
+    font-size: 26px !important;
+    line-height: 1 !important;
+    display: inline-block !important;
+    filter: drop-shadow(0 3px 6px rgba(0,0,0,0.95)) !important;
+    z-index: 30 !important;
+    pointer-events: auto !important;
+    cursor: grab !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    user-select: none !important;
+    -webkit-user-drag: none !important;
+    transition: left 0.1s linear !important;
+  }
+
+  .progress-truck:active {
+    cursor: grabbing !important;
+    transform: translate(-50%, -65%) scaleX(-1) scale(1.2) !important;
+  }
+
+  /* White Road Fill Line Matching truckpemusic.online Reference Screenshot */
+  .road-fill {
+    background: #ffffff !important;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.85) !important;
+  }
+
+  .road-progress.dragging .progress-truck,
+  .road-progress.dragging .road-fill {
+    transition: none !important;
+  }
+
   /* Top Bar & Hover Effects */
   .topbar { position: absolute !important; top: 0 !important; left: 0 !important; right: 0 !important; display: flex !important; align-items: center !important; justify-content: space-between !important; padding: max(14px, env(safe-area-inset-top)) 24px 0 24px !important; z-index: 20 !important; }
   .pill { background: rgba(18, 14, 28, 0.75) !important; backdrop-filter: blur(16px) saturate(180%) !important; -webkit-backdrop-filter: blur(16px) saturate(180%) !important; border: 1px solid rgba(255,255,255,0.22) !important; padding: 8px 18px !important; border-radius: 999px !important; color: #ffffff !important; font-size: 13px !important; transition: all 0.3s cubic-bezier(0.2, 0.9, 0.25, 1) !important; cursor: pointer !important; }
   .listeners:hover { transform: translateY(-2px) scale(1.05) !important; background: rgba(20, 38, 30, 0.85) !important; border-color: rgba(63, 224, 160, 0.85) !important; box-shadow: 0 8px 24px rgba(0,0,0,0.6), 0 0 20px rgba(63, 224, 160, 0.45) !important; color: #3fe0a0 !important; }
   .clock:hover { transform: translateY(-2px) scale(1.05) !important; background: rgba(38, 25, 48, 0.85) !important; border-color: rgba(255, 198, 92, 0.85) !important; box-shadow: 0 8px 24px rgba(0,0,0,0.6), 0 0 20px rgba(255, 198, 92, 0.45) !important; color: #ffdf9e !important; }
 
-  /* Shayari Glassmorphism Container (Subtle Dark-Translucent Glass + Perfect Center Text + Hover Glow) */
-  .signage-wrap { position: absolute !important; left: 50% !important; bottom: 94px !important; top: auto !important; transform: translateX(-50%) !important; width: max-content !important; max-width: 92vw !important; text-align: center !important; z-index: 25 !important; display: block !important; visibility: visible !important; }
-  .signage { display: inline-flex !important; align-items: center !important; justify-content: center !important; text-align: center !important; gap: 6px !important; background: rgba(18, 14, 28, 0.76) !important; backdrop-filter: blur(18px) saturate(180%) !important; -webkit-backdrop-filter: blur(18px) saturate(180%) !important; border: 1px solid rgba(255, 255, 255, 0.22) !important; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.2) !important; padding: 7px 22px !important; border-radius: 999px !important; font-family: 'Baloo 2', sans-serif !important; font-size: 14.5px !important; font-weight: 700 !important; color: #ffffff !important; opacity: 1 !important; cursor: pointer !important; pointer-events: auto !important; transition: all 0.35s cubic-bezier(0.2, 0.9, 0.25, 1) !important; text-shadow: 0 2px 4px rgba(0,0,0,0.6) !important; }
-  .signage:hover { transform: translateY(-2px) scale(1.04) !important; background: rgba(28, 22, 42, 0.88) !important; border-color: rgba(255, 198, 92, 0.8) !important; box-shadow: 0 12px 30px rgba(0, 0, 0, 0.7), 0 0 20px rgba(255, 198, 92, 0.4) !important; color: #ffdf9e !important; }
-  .radio-tag { display: none !important; font-family: 'Space Mono', monospace !important; font-size: 9.5px !important; color: #3fe0a0 !important; }
-  .signage.radio-on .radio-tag { display: inline-block !important; margin-right: 6px !important; }
-  #signageText { display: inline-block !important; text-align: center !important; margin: 0 auto !important; width: auto !important; }
+  /* Shayari Glassmorphism Container (Exact Reference Image 1 Match) */
+  .signage-wrap {
+    position: absolute !important;
+    left: 50% !important;
+    bottom: 92px !important;
+    top: auto !important;
+    transform: translateX(-50%) !important;
+    width: max-content !important;
+    max-width: 92vw !important;
+    text-align: center !important;
+    z-index: 25 !important;
+    display: block !important;
+    visibility: visible !important;
+  }
+
+  .signage {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+    gap: 6px !important;
+    background: rgba(18, 14, 28, 0.76) !important;
+    backdrop-filter: blur(18px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(18px) saturate(180%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.22) !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+    padding: 7px 22px !important;
+    border-radius: 999px !important;
+    font-family: 'Baloo 2', sans-serif !important;
+    font-size: 14.5px !important;
+    font-weight: 700 !important;
+    color: #ffffff !important;
+    opacity: 1 !important;
+    cursor: pointer !important;
+    pointer-events: auto !important;
+    transition: all 0.35s cubic-bezier(0.2, 0.9, 0.25, 1) !important;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.6) !important;
+  }
+
+  .signage.chai-active {
+    opacity: 0 !important;
+    pointer-events: none !important;
+    transform: translateY(6px) !important;
+  }
+
+  .signage:hover {
+    transform: translateY(-2px) scale(1.04) !important;
+    background: rgba(28, 22, 42, 0.88) !important;
+    border-color: rgba(255, 198, 92, 0.8) !important;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.7), 0 0 20px rgba(255, 198, 92, 0.4) !important;
+    color: #ffdf9e !important;
+  }
+
+  /* Chai Break Popup Card (Exact Reference Image 2 Match - Replaces Shayari Box on Chai Break) */
+  .chai-popup {
+    position: absolute !important;
+    left: 50% !important;
+    bottom: 86px !important;
+    transform: translateX(-50%) translateY(8px) scale(0.95) !important;
+    z-index: 28 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    background: rgba(44, 24, 18, 0.94) !important;
+    backdrop-filter: blur(18px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(18px) saturate(180%) !important;
+    border: 1.5px solid rgba(255, 170, 100, 0.55) !important;
+    box-shadow: 0 14px 35px rgba(0,0,0,0.8), 0 0 25px rgba(255, 140, 60, 0.35) !important;
+    padding: 9px 20px !important;
+    border-radius: 18px !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    transition: opacity 0.3s ease, transform 0.3s ease !important;
+  }
+
+  .chai-popup.active {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    transform: translateX(-50%) translateY(0) scale(1) !important;
+  }
+
+  /* Automatic CSS Rule: Hide Shayari Box whenever Chai Break Popup is active */
+  .chai-popup.active ~ .signage-wrap,
+  .chai-popup.active + .signage-wrap,
+  .stage:has(.chai-popup.active) .signage-wrap {
+    display: none !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
 
   /* Bottom Sound Bar */
   .player { position: absolute !important; left: 50% !important; bottom: 20px !important; transform: translateX(-50%) !important; width: min(94vw, 760px) !important; z-index: 30 !important; }
@@ -36,8 +184,9 @@
   .play-main { width: 44px !important; height: 44px !important; border-radius: 50% !important; background: #ffffff !important; color: #120e1c !important; font-size: 16px !important; font-weight: bold !important; display: flex !important; align-items: center !important; justify-content: center !important; box-shadow: 0 4px 14px rgba(255,255,255,0.35) !important; border: none !important; cursor: pointer !important; }
 
   @media (max-width: 680px) {
-    .signage-wrap { bottom: 82px !important; }
+    .signage-wrap { bottom: 78px !important; }
     .signage { font-size: 13px !important; padding: 6px 16px !important; }
+    .chai-popup { bottom: 74px !important; padding: 8px 16px !important; }
     .player { bottom: 12px !important; }
     .player-inner { padding: 8px 12px !important; gap: 8px !important; }
     .play-main { width: 38px !important; height: 38px !important; font-size: 15px !important; }
@@ -59,20 +208,20 @@
     <div class="pill clock mono" id="clock">1:53<span class="ampm">pm</span></div>
   </div>
 
-  <!-- Shayari Board (Overlaid in center of Pickup Background Scene) -->
-  <div class="signage-wrap">
-    <div class="signage" id="signage">
-      <span class="radio-tag">● FM RADIO</span>
-      <span id="signageText">दम है तो क्रॉस कर, वरना बर्दाश्त कर</span>
-    </div>
-  </div>
-
   <!-- Chai Break Popup Card (Matching Reference Image directly above sound bar) -->
   <div class="chai-popup" id="chaiPopup">
     <div class="chai-icon-wrap">☕</div>
     <div class="chai-text-wrap">
       <div class="chai-title" id="chaiTitle">Chai pe charcha! ☕</div>
       <div class="chai-sub" id="chaiSub">Music baad mein, pehle chai!</div>
+    </div>
+  </div>
+
+  <!-- Shayari Board (Overlaid in center of Pickup Background Scene) -->
+  <div class="signage-wrap">
+    <div class="signage" id="signage">
+      <span class="radio-tag">● FM RADIO</span>
+      <span id="signageText">दम है तो क्रॉस कर, वरना बर्दाश्त कर</span>
     </div>
   </div>
 
@@ -146,6 +295,6 @@
 <script>
   window.PICKUPWALA_API = "{% url 'pickupwala:playlist-api' %}";
 </script>
-<script src="{% static 'pickupwala/js/player.js' %}?v=1300000"></script>
+<script src="{% static 'pickupwala/js/player.js' %}?v=9999999999999"></script>
 </body>
 </html>

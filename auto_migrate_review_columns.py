@@ -105,10 +105,18 @@ def ensure_google_social_app():
     try:
         from django.contrib.sites.models import Site
         from allauth.socialaccount.models import SocialApp
-        site, _ = Site.objects.get_or_create(id=1, defaults={'domain': 'ghidoratransport.onrender.com', 'name': 'Ghidora Transport'})
-        site.domain = 'ghidoratransport.onrender.com'
-        site.name = 'Ghidora Transport'
-        site.save()
+        
+        # 1. Live Production Site (ID 1)
+        live_site, _ = Site.objects.get_or_create(id=1, defaults={'domain': 'ghidoratransport.onrender.com', 'name': 'Ghidora Transport (Live)'})
+        live_site.domain = 'ghidoratransport.onrender.com'
+        live_site.name = 'Ghidora Transport (Live)'
+        live_site.save()
+
+        # 2. Local Development Site (ID 2)
+        local_site, _ = Site.objects.get_or_create(id=2, defaults={'domain': '127.0.0.1:8000', 'name': 'Ghidora Transport (Local)'})
+        local_site.domain = '127.0.0.1:8000'
+        local_site.name = 'Ghidora Transport (Local)'
+        local_site.save()
 
         client_id = '520482080238-ejsi630q0nv6na0de3if97ug73f5rmmt.apps.googleusercontent.com'
 
@@ -121,9 +129,9 @@ def ensure_google_social_app():
             }
         )
         app.client_id = client_id
-        app.sites.add(site)
+        app.sites.add(live_site, local_site)
         app.save()
-        print(f"✅ Google SocialApp configured for Site 1 ({site.domain})")
+        print(f"✅ Google SocialApp configured for Live ({live_site.domain}) and Local ({local_site.domain})")
     except Exception as e:
         print("❌ Error ensuring Google SocialApp:", e)
 

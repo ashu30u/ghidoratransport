@@ -83,3 +83,32 @@ class ChaiMessage(models.Model):
     def __str__(self):
         return f"{self.title} — {self.message}"
 
+
+def horn_audio_path(instance, filename):
+    return f"pickupwala/horns/{filename}"
+
+
+class HornSound(models.Model):
+    """Horn sounds uploaded & managed by Admin for the Horn button (🎺)."""
+
+    title = models.CharField(
+        max_length=150,
+        default="Pickup Pressure Horn",
+        help_text="Horn sound name e.g. 'Pickup Pressure Horn 1'",
+    )
+    audio_file = models.FileField(
+        upload_to=horn_audio_path,
+        help_text="Upload custom horn audio file (mp3 / wav / ogg)",
+    )
+    is_active = models.BooleanField(default=True, help_text="Uncheck to hide without deleting")
+    order = models.PositiveIntegerField(default=0, help_text="Lower numbers play first")
+
+    class Meta:
+        ordering = ["order", "id"]
+        verbose_name = "Horn Sound"
+        verbose_name_plural = "Horn Sounds"
+
+    def __str__(self):
+        return self.title
+
+

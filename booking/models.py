@@ -144,10 +144,24 @@ class Booking(models.Model):
         help_text="Customer ka free-text message"
     )
 
+    PAYMENT_STATUS_CHOICES = [
+        ('Pending', 'Pending / Unpaid'),
+        ('Paid', 'Paid (Cash / Online)'),
+        ('Partial', 'Partially Paid'),
+        ('Failed', 'Failed / Cancelled'),
+    ]
+
     status = models.CharField(
         max_length=20,
         choices=STATUS_CHOICES,
         default='Pending'
+    )
+
+    payment_status = models.CharField(
+        max_length=30,
+        choices=PAYMENT_STATUS_CHOICES,
+        default='Pending',
+        help_text="Admin can manually update payment status (e.g. Paid via Cash to Owner/Driver)"
     )
 
     booking_date = models.DateTimeField(
@@ -355,14 +369,15 @@ def _track_previous_status(sender, instance, **kwargs):
         instance._previous_status = None
 
 
-@receiver(post_save, sender=Booking)
-def _send_admin_new_booking_alert(sender, instance, created, **kwargs):
-    if created:
-        from django.core.mail import send_mail
-        from django.conf import settings
-        try:
-            subject = f"🚨 NEW BOOKING RECEIVED #{instance.booking_id} - {instance.name}"
-            message = f"""New Booking Received on Ghidora Transport Live Site!
+def _send_admin_new_booking_alert_worker(booking_id):
+    from django.core.mail import send_mail
+    from django.conf import settings
+    try:
+        instance = Booking.objects.filter(pk=booking_id).first()
+        if not instance:
+            return
+        subject = f"🚨 NEW BOOKING RECEIVED #{instance.booking_id} - {instance.name}"
+        message = f"""New Booking Received on Ghidora Transport Live Site!
 
 Booking ID   : {instance.booking_id}
 Customer Name: {instance.name}
@@ -384,35 +399,42 @@ Message      : {instance.message or 'None'}
 
 Please check Live Admin Panel: https://ghidoratransport.onrender.com/admin/
 """
-            send_mail(
-                subject=subject,
-                message=message,
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=['ghidoratransport@gmail.com'],
-                fail_silently=True
-            )
-            print(f"✅ Admin new booking alert email sent for #{instance.booking_id}")
-        except Exception as e:
-            print("❌ Admin email notification failed:", e)
+        send_mail(
+            subject=subject,
+            message=message,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=['ghidoratransport@gmail.com'],
+            fail_silently=True
+        )
+        print(f"✅ Admin new booking alert email sent for #{instance.booking_id}")
+    except Exception as e:
+        print("❌ Admin email notification failed:", e)
 
 
 @receiver(post_save, sender=Booking)
-def _send_email_on_completion(sender, instance, created, **kwargs):
+def _send_admin_new_booking_alert(sender, instance, created, **kwargs):
+    if created:
+        import threading
+        threading.Thread(
+            target=_send_admin_new_booking_alert_worker,
+            args=(instance.pk,),
+            daemon=True
+        ).start()
 
-    previous_status = getattr(instance, '_previous_status', None)
 
-    if not created and instance.status == 'Completed' and previous_status != 'Completed':
+def _send_completion_email_worker(booking_id):
+    from .utils import generate_receipt_pdf
+    from django.core.mail import EmailMessage
+    from django.conf import settings
+    try:
+        instance = Booking.objects.filter(pk=booking_id).first()
+        if not instance or not instance.email:
+            return
 
-        if instance.email:
-            from .utils import generate_receipt_pdf
-            from django.core.mail import EmailMessage
-            from django.conf import settings
+        pdf_buffer = generate_receipt_pdf(instance)
 
-            try:
-                pdf_buffer = generate_receipt_pdf(instance)
-
-                subject = "🚚 Booking Confirmation - Ghidora Transport"
-                body = f"""Dear {instance.name},
+        subject = "🚚 Booking Confirmation - Ghidora Transport"
+        body = f"""Dear {instance.name},
 
 Thank you for choosing Ghidora Transport.
 
@@ -429,28 +451,42 @@ Please find your receipt attached.
 Thank You.
 Ghidora Transport
 """
-                mail = EmailMessage(
-                    subject=subject,
-                    body=body,
-                    from_email=settings.DEFAULT_FROM_EMAIL,
-                    to=[instance.email],
-                )
-                mail.attach(
-                    f"Receipt_{instance.booking_id}.pdf",
-                    pdf_buffer.getvalue(),
-                    "application/pdf"
-                )
-                mail.send(fail_silently=False)
-                print(f"✅ Email sent to {instance.email}")
+        mail = EmailMessage(
+            subject=subject,
+            body=body,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            to=[instance.email],
+        )
+        mail.attach(
+            f"Receipt_{instance.booking_id}.pdf",
+            pdf_buffer.getvalue(),
+            "application/pdf"
+        )
+        mail.send(fail_silently=False)
+        print(f"✅ Completion receipt email sent to {instance.email} for #{instance.booking_id}")
 
-            except Exception as e:
-                print("❌ Email send failed:", e)
+    except Exception as e:
+        print(f"❌ Completion email send failed for booking {booking_id}: {e}")
+
+
+@receiver(post_save, sender=Booking)
+def _send_email_on_completion(sender, instance, created, **kwargs):
+    previous_status = getattr(instance, '_previous_status', None)
+    if not created and instance.status == 'Completed' and previous_status != 'Completed':
+        if instance.email:
+            import threading
+            threading.Thread(
+                target=_send_completion_email_worker,
+                args=(instance.pk,),
+                daemon=True
+            ).start()
 
 
 class GiaBookingRecord(models.Model):
     booking_id = models.CharField(max_length=30, unique=True)
     customer_name = models.CharField(max_length=100, default="Gia AI Customer")
     phone = models.CharField(max_length=20)
+    email = models.EmailField(blank=True, null=True)
     pickup = models.CharField(max_length=200)
     destination = models.CharField(max_length=200)
     goods_type = models.CharField(max_length=200, blank=True, null=True)

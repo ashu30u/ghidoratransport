@@ -5,8 +5,13 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 from django.views.generic.base import RedirectView
+from .views import health_check
 
 urlpatterns = [
+    # Health Check Endpoint for Render & UptimeRobot Monitoring
+    path('health', health_check, name='health_check_no_slash'),
+    path('health/', health_check, name='health_check'),
+
     path('favicon.ico', RedirectView.as_view(url='/static/images/logo5.jpeg', permanent=True)),
     # Admin Panel
     path('admin/', admin.site.urls),

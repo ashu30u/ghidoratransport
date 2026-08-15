@@ -107,6 +107,9 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
+        'OPTIONS': {
+            'timeout': 30,
+        }
     }
 }
 
@@ -177,7 +180,8 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'ghidoratransport@gmail.com'
-EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', 'xmcqcdadvdljbypx')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', 'dvoigfiojlfhahoa')
+EMAIL_TIMEOUT = 15
 DEFAULT_FROM_EMAIL = 'Ghidora Transport <ghidoratransport@gmail.com>'
 
 MEDIA_URL = '/media/'

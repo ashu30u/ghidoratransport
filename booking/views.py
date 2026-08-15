@@ -1149,13 +1149,18 @@ def check_status(request):
 
         if booking_id:
             try:
-                booking = Booking.objects.get(booking_id=booking_id)
-                # Check for related payment requests
-                if hasattr(booking, 'payment_requests'):
-                    payments = booking.payment_requests.all().order_by('-created_at')
-                elif hasattr(booking, 'payments'):
-                    payments = booking.payments.all().order_by('-created_at')
-            except Booking.DoesNotExist:
+                # Use .filter().first() to safely handle duplicates without throwing MultipleObjectsReturned
+                booking = Booking.objects.filter(booking_id__iexact=booking_id).order_by('-booking_date').first()
+                if not booking and booking_id.isdigit():
+                    booking = Booking.objects.filter(id=booking_id).first()
+
+                if booking:
+                    # Check for related payment requests
+                    if hasattr(booking, 'payment_requests'):
+                        payments = booking.payment_requests.all().order_by('-created_at')
+                    elif hasattr(booking, 'payments'):
+                        payments = booking.payments.all().order_by('-created_at')
+            except Exception as e:
                 booking = None
 
     return render(

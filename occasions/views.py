@@ -142,19 +142,22 @@ def generate_ai_message_view(request, occasion_id):
 
 @staff_member_required
 def send_occasion_now(request, occasion_id):
-    """Trigger immediate background sending of an occasion to customers (Instant < 0.05s response)."""
+    """Trigger immediate sending of an occasion greeting to all customers."""
     occ = get_object_or_404(Occasion, id=occasion_id)
-    import threading
-    threading.Thread(
-        target=dispatch_occasion_notifications,
-        args=(occ,),
-        kwargs={'force': True},
-        daemon=True
-    ).start()
-    messages.success(
-        request,
-        f"🚀 Instant Dispatch Started! '{occ.name}' email greeting is sending in background to all customers right now."
-    )
+    res = dispatch_occasion_notifications(occ, force=True)
+    
+    sent_count = res.get('sent', 0)
+    if sent_count > 0:
+        messages.success(
+            request,
+            f"🚀 Success! Delivered '{occ.name}' email greeting to {sent_count} customer(s)."
+        )
+    else:
+        err_detail = res.get('error', 'Unknown email dispatch error.')
+        messages.error(
+            request,
+            f"❌ Mail Delivery Failed for '{occ.name}': {err_detail}"
+        )
     return redirect(request.META.get('HTTP_REFERER', 'occasions_dashboard'))
 
 

@@ -95,6 +95,11 @@ def generate_receipt_pdf(booking):
         fontName="Helvetica-Bold", fontSize=22, leading=26,
         textColor=colors.HexColor("#0F2A5C"),
     )
+    company_name_style_left = ParagraphStyle(
+        "company_name_style_left", parent=styles["Normal"], alignment=TA_LEFT,
+        fontName="Helvetica-Bold", fontSize=22, leading=26,
+        textColor=colors.HexColor("#0F2A5C"),
+    )
     address_style = ParagraphStyle(
         "address_style", parent=styles["Normal"], alignment=TA_CENTER, fontSize=9,
         leading=14, textColor=colors.HexColor("#181819"),
@@ -149,16 +154,36 @@ def generate_receipt_pdf(booking):
         elements.append(mantra_img)
         elements.append(Spacer(1, 6))
 
-    # 2. Logo Image Header
-    logo_path = os.path.join(settings.BASE_DIR, "booking", "static", "images", "logo.png")
-    if os.path.exists(logo_path):
-        logo = _fit_image(logo_path, max_width=1.8 * inch, max_height=1.0 * inch)
-        logo.hAlign = "CENTER"
-        elements.append(logo)
-        elements.append(Spacer(1, 6))
+    # 2. Logo & Company Title Side-by-Side Header
+    logo_candidates = ["logo6.png", "logo3.png", "logo.png", "logo5.jpeg", "pikupwala.png"]
+    found_logo_path = None
+    for cand in logo_candidates:
+        cand_path = os.path.join(settings.BASE_DIR, "booking", "static", "images", cand)
+        if os.path.exists(cand_path):
+            found_logo_path = cand_path
+            break
 
-    # 3. Company Title & Address
-    elements.append(Paragraph("GHIDORA TRANSPORT", company_name_style))
+    if found_logo_path:
+        logo = _fit_image(found_logo_path, max_width=0.85 * inch, max_height=0.65 * inch)
+        title_para = Paragraph("GHIDORA TRANSPORT", company_name_style_left)
+        header_table = Table(
+            [[logo, title_para]],
+            colWidths=[65, 270]
+        )
+        header_table.setStyle(TableStyle([
+            ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
+            ("ALIGN", (0, 0), (-1, -1), "CENTER"),
+            ("LEFTPADDING", (0, 0), (-1, -1), 4),
+            ("RIGHTPADDING", (0, 0), (-1, -1), 4),
+            ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
+            ("TOPPADDING", (0, 0), (-1, -1), 0),
+        ]))
+        header_table.hAlign = "CENTER"
+        elements.append(header_table)
+    else:
+        elements.append(Paragraph("GHIDORA TRANSPORT", company_name_style))
+
+    elements.append(Spacer(1, 4))
     elements.append(Spacer(1, 4))
     elements.append(Paragraph(
         "Kodebod, Kurud, Dhamtari, Chhattisgarh &nbsp;|&nbsp; "
@@ -262,27 +287,38 @@ def generate_receipt_pdf(booking):
     pay_status_text = "PENDING / UNPAID"
     pay_bg = colors.HexColor("#F59E0B")
 
-    latest_pay = None
-    if hasattr(booking, 'payment_requests') and booking.payment_requests.exists():
-        latest_pay = booking.payment_requests.order_by('-created_at').first()
-    elif hasattr(booking, 'payments') and booking.payments.exists():
-        latest_pay = booking.payments.order_by('-created_at').first()
-
-    if latest_pay:
-        st = str(latest_pay.status).upper()
-        method_str = f" ({latest_pay.payment_method})" if getattr(latest_pay, 'payment_method', None) else ""
-        if st in ['VERIFIED', 'COMPLETED', 'SUCCESS', 'PAID']:
-            pay_status_text = f"VERIFIED / PAID{method_str}"
-            pay_bg = colors.HexColor("#10B981")
-        elif st in ['REJECTED', 'FAILED']:
-            pay_status_text = f"FAILED{method_str}"
-            pay_bg = colors.HexColor("#EF4444")
-        else:
-            pay_status_text = f"PENDING{method_str}"
-            pay_bg = colors.HexColor("#F59E0B")
-    elif booking.status in ['Completed', 'Confirmed']:
-        pay_status_text = "CONFIRMED / PAID"
+    current_pay_status = getattr(booking, 'payment_status', 'Pending')
+    if current_pay_status == 'Paid':
+        pay_status_text = "VERIFIED / PAID (CASH / ONLINE)"
         pay_bg = colors.HexColor("#10B981")
+    elif current_pay_status == 'Partial':
+        pay_status_text = "PARTIALLY PAID"
+        pay_bg = colors.HexColor("#3B82F6")
+    elif current_pay_status == 'Failed':
+        pay_status_text = "FAILED / REJECTED"
+        pay_bg = colors.HexColor("#EF4444")
+    else:
+        latest_pay = None
+        if hasattr(booking, 'payment_requests') and booking.payment_requests.exists():
+            latest_pay = booking.payment_requests.order_by('-created_at').first()
+        elif hasattr(booking, 'payments') and booking.payments.exists():
+            latest_pay = booking.payments.order_by('-created_at').first()
+
+        if latest_pay:
+            st = str(latest_pay.status).upper()
+            method_str = f" ({latest_pay.payment_method})" if getattr(latest_pay, 'payment_method', None) else ""
+            if st in ['VERIFIED', 'COMPLETED', 'SUCCESS', 'PAID']:
+                pay_status_text = f"VERIFIED / PAID{method_str}"
+                pay_bg = colors.HexColor("#10B981")
+            elif st in ['REJECTED', 'FAILED']:
+                pay_status_text = f"FAILED{method_str}"
+                pay_bg = colors.HexColor("#EF4444")
+            else:
+                pay_status_text = f"PENDING{method_str}"
+                pay_bg = colors.HexColor("#F59E0B")
+        elif booking.status in ['Completed', 'Confirmed']:
+            pay_status_text = "CONFIRMED / PAID"
+            pay_bg = colors.HexColor("#10B981")
 
     status_table_data = [
         [Paragraph("BOOKING STATUS", label_style),
@@ -391,6 +427,8 @@ def generate_receipt_pdf(booking):
         ("ALIGN", (0, 0), (0, 0), "LEFT"),
         ("ALIGN", (1, 0), (1, 0), "CENTER"),
         ("ALIGN", (2, 0), (2, 0), "RIGHT"),
+        ("LEFTPADDING", (0, 0), (0, 0), 18),
+        ("RIGHTPADDING", (2, 0), (2, 0), 18),
     ]))
     elements.append(sig_row_table)
     elements.append(Spacer(1, 10))

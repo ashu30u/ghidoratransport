@@ -2,6 +2,8 @@
   var TRACKS = [];
   var SHAYARI = ["लोड हो रहा है…"];
   var CHAI_MESSAGES = [{ title: "Chai pe charcha! ☕", message: "Music baad mein, pehle chai!" }];
+  var HORNS = [];
+  var hornIdx = 0;
   var LIVE_RADIO_STREAMS = [
     { title: "Radio Mirchi 98.3 FM Live 📻", artist: "Mirchi Murga & Bollywood Hits", url: "http://peridot.streamguys.com:7150/Mirchi" },
     { title: "Mirchi Purani Jeans 98.3 FM 📻", artist: "Golden Retro Hits & RJ Naved", url: "https://node-19.zeno.fm/v34w8b6e618uv" },
@@ -118,28 +120,87 @@
     if (!TRACKS.length) return;
     var t = TRACKS[state.index];
     var duration = (els.audioEl.duration && !isNaN(els.audioEl.duration)) ? els.audioEl.duration : (t.duration || 200);
-    var currentTime = els.audioEl.currentTime || state.elapsed;
-    var pct = Math.min(100, (currentTime / duration) * 100);
-    els.roadFill.style.width = pct + "%";
-    els.progressTruck.style.left = pct + "%";
-    els.kmDone.textContent = Math.round((pct/100) * t.km);
-    els.timeReadout.textContent = fmtTime(currentTime) + " / " + fmtTime(duration);
+    var currentTime = (els.audioEl.currentTime !== undefined && !isNaN(els.audioEl.currentTime)) ? els.audioEl.currentTime : state.elapsed;
+    var pct = Math.min(100, Math.max(0, (currentTime / duration) * 100));
+    
+    if (els.roadFill) els.roadFill.style.width = pct + "%";
+    if (els.progressTruck) els.progressTruck.style.left = pct + "%";
+    if (els.kmDone) els.kmDone.textContent = Math.round((pct/100) * t.km);
+    if (els.timeReadout) els.timeReadout.textContent = fmtTime(currentTime) + " / " + fmtTime(duration);
   }
+
+  var isDraggingTruck = false;
+
+  function seekByEvent(e) {
+    if (state.radioOn || !TRACKS.length) return;
+    var trackEl = document.querySelector('.road-track') || (els.roadFill ? els.roadFill.parentElement : null);
+    if (!trackEl) return;
+    
+    var rect = trackEl.getBoundingClientRect();
+    var clientX = e.clientX;
+    if (e.touches && e.touches.length > 0) {
+      clientX = e.touches[0].clientX;
+    }
+    
+    var offsetX = clientX - rect.left;
+    var pct = Math.max(0, Math.min(1, offsetX / rect.width));
+    var t = TRACKS[state.index];
+    var duration = (els.audioEl.duration && !isNaN(els.audioEl.duration)) ? els.audioEl.duration : (t.duration || 200);
+    
+    var targetTime = pct * duration;
+    try {
+      els.audioEl.currentTime = targetTime;
+    } catch(err){}
+    state.elapsed = targetTime;
+    
+    if (els.roadFill) els.roadFill.style.width = (pct * 100) + "%";
+    if (els.progressTruck) els.progressTruck.style.left = (pct * 100) + "%";
+    if (els.kmDone) els.kmDone.textContent = Math.round(pct * t.km);
+    if (els.timeReadout) els.timeReadout.textContent = fmtTime(targetTime) + " / " + fmtTime(duration);
+  }
+
+  var lastAnimTime = performance.now();
 
   function tick(){
     if (state.radioOn || !TRACKS.length) return;
     if (!els.audioEl.paused) {
       state.elapsed = els.audioEl.currentTime;
-    } else {
-      state.elapsed += 0.25;
     }
     updateProgressUI();
   }
+
+  function smoothProgressLoop(now){
+    if (!now) now = performance.now();
+    var dt = (now - lastAnimTime) / 1000;
+    if (dt > 0.5) dt = 0.1;
+    lastAnimTime = now;
+
+    if (!state.radioOn && state.playing && TRACKS.length) {
+      if (els.audioEl.currentTime && !isNaN(els.audioEl.currentTime) && els.audioEl.currentTime > 0) {
+        state.elapsed = els.audioEl.currentTime;
+      } else {
+        state.elapsed += dt;
+      }
+
+      var t = TRACKS[state.index];
+      var duration = (els.audioEl.duration && !isNaN(els.audioEl.duration) && isFinite(els.audioEl.duration)) ? els.audioEl.duration : (t.duration || 200);
+
+      if (state.elapsed >= duration) {
+        state.elapsed = 0;
+        try { els.audioEl.currentTime = 0; } catch(e){}
+      }
+
+      updateProgressUI();
+    }
+    requestAnimationFrame(smoothProgressLoop);
+  }
+  requestAnimationFrame(smoothProgressLoop);
 
   function resetChaiState(){
     if (state.teaActive){
       state.teaActive = false;
       if (els.teaBtn) els.teaBtn.classList.remove('active');
+      if (els.signage) els.signage.classList.remove('chai-active');
       if (els.chaiPopup) els.chaiPopup.classList.remove('active');
     }
   }
@@ -212,11 +273,22 @@
   }
 
   function honk(){
-    els.hornAudio.currentTime = 0;
-    els.hornAudio.play().catch(function(){});
-    els.truckZone.classList.remove('honk');
-    void els.truckZone.offsetWidth;
-    els.truckZone.classList.add('honk');
+    if (HORNS.length > 0) {
+      var hItem = HORNS[hornIdx % HORNS.length];
+      hornIdx++;
+      var hAudio = new Audio(hItem.url);
+      hAudio.play().catch(function(){});
+    } else {
+      try {
+        els.hornAudio.currentTime = 0;
+        els.hornAudio.play().catch(function(){});
+      } catch(e){}
+    }
+    if (els.truckZone) {
+      els.truckZone.classList.remove('honk');
+      void els.truckZone.offsetWidth;
+      els.truckZone.classList.add('honk');
+    }
   }
 
   function toggleTea(){
@@ -224,6 +296,7 @@
     if (state.teaActive){
       pause();
       if (els.teaBtn) els.teaBtn.classList.add('active');
+      if (els.signage) els.signage.classList.add('chai-active');
       if (CHAI_MESSAGES.length && els.chaiTitle && els.chaiSub){
         var item = CHAI_MESSAGES[Math.floor(Math.random() * CHAI_MESSAGES.length)];
         els.chaiTitle.textContent = item.title || "Chai pe charcha! ☕";
@@ -232,6 +305,7 @@
       if (els.chaiPopup) els.chaiPopup.classList.add('active');
     } else {
       if (els.teaBtn) els.teaBtn.classList.remove('active');
+      if (els.signage) els.signage.classList.remove('chai-active');
       if (els.chaiPopup) els.chaiPopup.classList.remove('active');
       play();
     }
@@ -366,6 +440,71 @@
   els.closePlaylist.addEventListener('click', closeSheet);
   els.sheetBackdrop.addEventListener('click', closeSheet);
 
+  // Interactive Truck Emoji & Road Progress Click, Touch & Drag Seek
+  var roadProgressEl = document.querySelector('.road-progress');
+  var roadTrackEl = document.querySelector('.road-track');
+  var progressTruckEl = document.getElementById('progressTruck');
+
+  function handleSeekAction(e) {
+    if (e && e.preventDefault && e.type !== 'touchstart' && e.type !== 'touchmove') {
+      e.preventDefault();
+    }
+    seekByEvent(e);
+  }
+
+  [roadProgressEl, roadTrackEl, progressTruckEl].forEach(function(elem) {
+    if (!elem) return;
+    
+    elem.addEventListener('click', function(e) {
+      handleSeekAction(e);
+    });
+
+    elem.addEventListener('pointerdown', function(e) {
+      isDraggingTruck = true;
+      handleSeekAction(e);
+    });
+
+    elem.addEventListener('mousedown', function(e) {
+      isDraggingTruck = true;
+      handleSeekAction(e);
+    });
+
+    elem.addEventListener('touchstart', function(e) {
+      isDraggingTruck = true;
+      handleSeekAction(e);
+    }, { passive: true });
+  });
+
+  window.addEventListener('pointermove', function(e) {
+    if (isDraggingTruck) {
+      handleSeekAction(e);
+    }
+  });
+
+  window.addEventListener('mousemove', function(e) {
+    if (isDraggingTruck) {
+      handleSeekAction(e);
+    }
+  });
+
+  window.addEventListener('pointerup', function() {
+    isDraggingTruck = false;
+  });
+
+  window.addEventListener('mouseup', function() {
+    isDraggingTruck = false;
+  });
+
+  window.addEventListener('touchmove', function(e) {
+    if (isDraggingTruck) {
+      handleSeekAction(e);
+    }
+  }, { passive: true });
+
+  window.addEventListener('touchend', function() {
+    isDraggingTruck = false;
+  });
+
   updateClock();
   setInterval(updateClock, 1000);
   setInterval(driftListeners, 3200);
@@ -376,6 +515,7 @@
       TRACKS = data.tracks || [];
       if (data.shayari && data.shayari.length) SHAYARI = data.shayari;
       if (data.chai && data.chai.length) CHAI_MESSAGES = data.chai;
+      if (data.horns && data.horns.length) HORNS = data.horns;
       state.shayariIdx = 0;
       showShayari(0);
       startShayariCycle(5200);

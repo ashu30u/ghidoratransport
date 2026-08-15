@@ -412,51 +412,54 @@
         try { event.stopPropagation(); } catch(e){}
       }
       window._justToggledMenu = true;
-      setTimeout(function() { window._justToggledMenu = false; }, 350);
+      setTimeout(function() { window._justToggledMenu = false; }, 300);
 
       var drawer = document.getElementById('mobileNavDrawer');
       var overlay = document.getElementById('mobileNavOverlay');
       var btn = document.getElementById('hamburgerBtn');
       if (!drawer) return;
 
-      var isVisible = drawer.classList.contains('active') || drawer.style.opacity === '1';
+      var isOpening = !drawer.classList.contains('active');
 
-      if (isVisible) {
-        window._justToggledMenu = false;
-        window.closeMobileMenu();
-      } else {
+      if (isOpening) {
         drawer.classList.add('active');
-        drawer.style.opacity = '1';
-        drawer.style.pointerEvents = 'auto';
-        drawer.style.transform = 'translateY(0) scale(1)';
-        drawer.style.display = 'flex';
+        drawer.style.setProperty('display', 'flex', 'important');
+        drawer.style.setProperty('opacity', '1', 'important');
+        drawer.style.setProperty('visibility', 'visible', 'important');
+        drawer.style.setProperty('pointer-events', 'auto', 'important');
+        drawer.style.setProperty('transform', 'translateY(0) scale(1)', 'important');
+
         if (overlay) {
           overlay.classList.add('active');
-          overlay.style.opacity = '1';
-          overlay.style.pointerEvents = 'auto';
-          overlay.style.display = 'block';
+          overlay.style.setProperty('display', 'block', 'important');
+          overlay.style.setProperty('opacity', '1', 'important');
+          overlay.style.setProperty('pointer-events', 'auto', 'important');
         }
         if (btn) btn.classList.add('active');
         document.body.style.overflow = 'hidden';
+      } else {
+        window.closeMobileMenu(true);
       }
     };
 
-    window.closeMobileMenu = function() {
-      if (window._justToggledMenu) return;
+    window.closeMobileMenu = function(force) {
+      if (window._justToggledMenu && !force) return;
 
       var drawer = document.getElementById('mobileNavDrawer');
       var overlay = document.getElementById('mobileNavOverlay');
       var btn = document.getElementById('hamburgerBtn');
+
       if (drawer) {
         drawer.classList.remove('active');
-        drawer.style.opacity = '0';
-        drawer.style.pointerEvents = 'none';
-        drawer.style.transform = 'translateY(-12px) scale(0.96)';
+        drawer.style.setProperty('display', 'none', 'important');
+        drawer.style.setProperty('opacity', '0', 'important');
+        drawer.style.setProperty('pointer-events', 'none', 'important');
       }
       if (overlay) {
         overlay.classList.remove('active');
-        overlay.style.opacity = '0';
-        overlay.style.pointerEvents = 'none';
+        overlay.style.setProperty('display', 'none', 'important');
+        overlay.style.setProperty('opacity', '0', 'important');
+        overlay.style.setProperty('pointer-events', 'none', 'important');
       }
       if (btn) btn.classList.remove('active');
       document.body.style.overflow = '';
@@ -465,11 +468,11 @@
     document.addEventListener('click', function(e) {
       if (window._justToggledMenu) return;
       var drawer = document.getElementById('mobileNavDrawer');
-      if (drawer && (drawer.classList.contains('active') || drawer.style.opacity === '1')) {
+      if (drawer && drawer.classList.contains('active')) {
         var isInsideDrawer = drawer.contains(e.target);
         var isBtnClick = e.target && e.target.closest && e.target.closest('#hamburgerBtn');
         if (!isInsideDrawer && !isBtnClick) {
-          window.closeMobileMenu();
+          window.closeMobileMenu(true);
         }
       }
     });
@@ -615,6 +618,8 @@
   <div class="social-section">
     <h2 class="section-title">Follow <span class="accent">Us</span></h2>
     <div class="social-links">
+      <a href="https://youtube.com/@ghidoratransport?si=QUhjzBDTrNk0XbyV" target="_blank" class="glow-card" style="border-color: rgba(255, 0, 0, 0.4); color: #ff4d4d; background: rgba(255, 0, 0, 0.08);">▶️ YouTube Channel</a>
+      <a href="https://x.com/ghidora019" target="_blank" class="glow-card" style="border-color: rgba(29, 161, 242, 0.4); color: #1da1f2; background: rgba(29, 161, 242, 0.08);">𝕏 Twitter / X</a>
       <a href="https://instagram.com/hamar_kodebod05" target="_blank" class="glow-card">📸 Instagram</a>
       <a href="https://wa.me/916264588894" target="_blank" class="glow-card">💬 WhatsApp</a>
       <a href="mailto:ghidoratransport@gmail.com" class="glow-card">📧 Email</a>

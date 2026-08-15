@@ -243,7 +243,7 @@ def dispatch_occasion_notifications(occasion, force=False):
         return {"sent": 0, "error": f"Occasion already sent for year {current_year}"}
 
     from quotations.models import Quotation
-    from booking.models import Booking, ContactMessage, GiaAIBookingRecord, Review
+    from booking.models import Booking, ContactMessage, GiaBookingRecord, Review
     from django.contrib.auth import get_user_model
     try:
         from allauth.account.models import EmailAddress
@@ -262,40 +262,61 @@ def dispatch_occasion_notifications(occasion, force=False):
     raw_emails = set(['ghidoratransport@gmail.com'])
 
     # 1. Booking Customer Emails
-    for em in Booking.objects.exclude(email__isnull=True).exclude(email__exact='').values_list('email', flat=True):
-        if em and em.strip():
-            raw_emails.add(em.strip().lower())
+    try:
+        for em in Booking.objects.exclude(email__isnull=True).exclude(email__exact='').values_list('email', flat=True):
+            if em and em.strip():
+                raw_emails.add(em.strip().lower())
+    except Exception as e:
+        logger.warning(f"Error fetching Booking emails: {e}")
 
     # 2. Quotation (Get Instant Price Estimate) Customer Emails
-    for em in Quotation.objects.exclude(email__isnull=True).exclude(email__exact='').values_list('email', flat=True):
-        if em and em.strip():
-            raw_emails.add(em.strip().lower())
+    try:
+        for em in Quotation.objects.exclude(email__isnull=True).exclude(email__exact='').values_list('email', flat=True):
+            if em and em.strip():
+                raw_emails.add(em.strip().lower())
+    except Exception as e:
+        logger.warning(f"Error fetching Quotation emails: {e}")
 
     # 3. Contact Us Messages Customer Emails
-    for em in ContactMessage.objects.exclude(email__isnull=True).exclude(email__exact='').values_list('email', flat=True):
-        if em and em.strip():
-            raw_emails.add(em.strip().lower())
+    try:
+        for em in ContactMessage.objects.exclude(email__isnull=True).exclude(email__exact='').values_list('email', flat=True):
+            if em and em.strip():
+                raw_emails.add(em.strip().lower())
+    except Exception as e:
+        logger.warning(f"Error fetching ContactMessage emails: {e}")
 
     # 4. Gia AI Booking Records Customer Emails
-    for em in GiaAIBookingRecord.objects.exclude(email__isnull=True).exclude(email__exact='').values_list('email', flat=True):
-        if em and em.strip():
-            raw_emails.add(em.strip().lower())
+    try:
+        for em in GiaBookingRecord.objects.exclude(email__isnull=True).exclude(email__exact='').values_list('email', flat=True):
+            if em and em.strip():
+                raw_emails.add(em.strip().lower())
+    except Exception as e:
+        logger.warning(f"Error fetching GiaBookingRecord emails: {e}")
 
     # 5. Review Guest Emails
-    for em in Review.objects.exclude(guest_email__isnull=True).exclude(guest_email__exact='').values_list('guest_email', flat=True):
-        if em and em.strip():
-            raw_emails.add(em.strip().lower())
+    try:
+        for em in Review.objects.exclude(guest_email__isnull=True).exclude(guest_email__exact='').values_list('guest_email', flat=True):
+            if em and em.strip():
+                raw_emails.add(em.strip().lower())
+    except Exception as e:
+        logger.warning(f"Error fetching Review emails: {e}")
 
     # 6. Registered User Account Emails
-    for em in User.objects.exclude(email__isnull=True).exclude(email__exact='').values_list('email', flat=True):
-        if em and em.strip():
-            raw_emails.add(em.strip().lower())
+    try:
+        for em in User.objects.exclude(email__isnull=True).exclude(email__exact='').values_list('email', flat=True):
+            if em and em.strip():
+                raw_emails.add(em.strip().lower())
+    except Exception as e:
+        logger.warning(f"Error fetching User emails: {e}")
 
     # 7. Allauth EmailAddress Model Emails
     if EmailAddress:
-        for em in EmailAddress.objects.exclude(email__isnull=True).exclude(email__exact='').values_list('email', flat=True):
-            if em and em.strip():
-                raw_emails.add(em.strip().lower())
+        try:
+            for em in EmailAddress.objects.exclude(email__isnull=True).exclude(email__exact='').values_list('email', flat=True):
+                if em and em.strip():
+                    raw_emails.add(em.strip().lower())
+        except Exception as e:
+            logger.warning(f"Error fetching EmailAddress emails: {e}")
 
     emails = sorted(list(raw_emails))
 
@@ -305,7 +326,19 @@ def dispatch_occasion_notifications(occasion, force=False):
     subject = f"{occasion.name} Mubarak ho - Ghidora Transport"
     plain_text = occasion.message or occasion.ai_message or f"Happy {occasion.name} from Ghidora Transport!"
 
+    # Safely load poster image bytes once before recipient loop
+    img_data = None
+    poster_filename = None
     if occasion.poster:
+        try:
+            occasion.poster.open('rb')
+            img_data = occasion.poster.read()
+            occasion.poster.close()
+            poster_filename = os.path.basename(occasion.poster.name)
+        except Exception as img_err:
+            logger.error(f"Failed to read occasion poster image: {img_err}")
+
+    if img_data:
         html_body = f"""
         <div style="font-family: Arial, sans-serif; font-size: 15px; color: #333; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 12px;">
             <h2 style="color: #0284c7; text-align: center;">GHIDORA TRANSPORT</h2>
@@ -322,6 +355,7 @@ def dispatch_occasion_notifications(occasion, force=False):
         """
 
     sent_count = 0
+    last_error = None
     for email in emails:
         try:
             mail = EmailMultiAlternatives(
@@ -332,26 +366,30 @@ def dispatch_occasion_notifications(occasion, force=False):
             )
             mail.attach_alternative(html_body, "text/html")
 
-            if occasion.poster:
+            if img_data:
                 from email.mime.image import MIMEImage
-                occasion.poster.open('rb')
-                img_data = occasion.poster.read()
-                occasion.poster.close()
-
                 img = MIMEImage(img_data)
                 img.add_header('Content-ID', '<poster_image>')
-                img.add_header('Content-Disposition', 'inline', filename=occasion.poster.name.split('/')[-1])
+                img.add_header('Content-Disposition', 'inline', filename=poster_filename or 'poster.jpeg')
                 mail.attach(img)
 
             mail.send(fail_silently=False)
             sent_count += 1
             logger.info(f"Successfully sent occasion email to {email}")
+            print(f"✅ Sent occasion '{occasion.name}' email to {email}")
         except Exception as e:
+            last_error = str(e)
             logger.error(f"Error sending email to {email}: {e}")
+            print(f"❌ Error sending email to {email}: {e}")
 
-    occasion.last_sent_year = current_year
-    occasion.sent_at = datetime.now()
-    occasion.status = 'sent'
-    occasion.save()
-
-    return {"sent": sent_count, "status": "Success"}
+    if sent_count > 0:
+        occasion.last_sent_year = current_year
+        occasion.sent_at = datetime.now()
+        occasion.status = 'sent'
+        occasion.save()
+        return {"sent": sent_count, "status": f"Delivered to {sent_count} customer(s)"}
+    else:
+        occasion.status = 'failed'
+        occasion.save()
+        err_msg = last_error or "Could not deliver email to any customer."
+        return {"sent": 0, "error": f"Failed to send email: {err_msg}"}
