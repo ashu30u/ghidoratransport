@@ -20,6 +20,18 @@ from drivers.views import auto_assign_driver_to_booking
 from django.views.decorators.csrf import csrf_exempt
 
 
+def health_check(request):
+    """
+    Lightweight, public health endpoint for Render deployment & UptimeRobot monitoring.
+    Returns HTTP 200 OK with status and ISO timestamp.
+    No database queries or external API dependencies to ensure sub-millisecond response.
+    """
+    return JsonResponse({
+        "status": "ok",
+        "timestamp": timezone.now().isoformat()
+    })
+
+
 def _ors_get_with_retry(url, params, timeout=20, max_attempts=3):
     """
     OpenRouteService ka free server kabhi-kabhi slow ho jata hai aur

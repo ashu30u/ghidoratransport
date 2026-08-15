@@ -6,6 +6,9 @@ from django.urls import path, include
 
 urlpatterns = [
 
+    path('health', views.health_check, name='health_check_no_slash'),
+    path('health/', views.health_check, name='health_check'),
+
     path('', views.home, name='home'),
 
     path(
