@@ -308,6 +308,9 @@ class Receipt(models.Model):
     payment_request = models.OneToOneField(PaymentRequest, on_delete=models.CASCADE, related_name="receipt")
     pdf_file = models.FileField(upload_to=receipt_upload_path, blank=True, null=True)
     generated_at = models.DateTimeField(auto_now_add=True)
+    sent_to_email = models.EmailField(blank=True, null=True, verbose_name="Emailed To")
+    sent_at = models.DateTimeField(blank=True, null=True, verbose_name="Emailed At")
+    is_sent = models.BooleanField(default=False, verbose_name="Email Sent")
 
     def save(self, *args, **kwargs):
         if not self.receipt_id:

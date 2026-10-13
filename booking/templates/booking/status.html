@@ -1,803 +1,2814 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>GHIDORA TRANSPORT - Booking Status</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GHIDORA TRANSPORT - Live Booking &amp; Shipment Tracker</title>
 
     {% load static %}
 
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=99002">
 
+    <!-- Premium Google Fonts & Font Awesome 6 -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Barlow+Condensed:wght@600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
     <style>
-
+/* ==========================================================================
+   GLOBAL RESET & SLEEK SCROLLBAR
+   ========================================================================== */
 html {
     overflow-y: scroll;
     scrollbar-gutter: stable;
+    scroll-behavior: smooth;
 }
 
-/* Custom Sleek Dark Scrollbar */
 ::-webkit-scrollbar {
-    width: 10px;
-    height: 10px;
+    width: 8px;
+    height: 8px;
 }
 ::-webkit-scrollbar-track {
-    background: #050b18;
+    background: #060a14;
 }
 ::-webkit-scrollbar-thumb {
-    background: linear-gradient(180deg, #00e5ff, #2979ff);
-    border-radius: 5px;
-    border: 2px solid #050b18;
+    background: #1e293b;
+    border-radius: 4px;
+    border: 1px solid rgba(0, 242, 254, 0.2);
 }
 ::-webkit-scrollbar-thumb:hover {
-    background: #00e5ff;
+    background: #ff7a1a;
 }
 
-*{
-    box-sizing:border-box;
+* {
+    box-sizing: border-box;
 }
 
-body{
-    margin:0;
-    padding:0;
-    font-family:'Poppins',sans-serif;
-    min-height:100vh;
-    overflow-x:hidden;
-    background:linear-gradient(180deg,#050b18 0%,#0a1730 40%,#122447 70%,#1a3266 100%);
-    position:relative;
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', 'Poppins', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    background: radial-gradient(circle at 50% 0%, #0d1a36 0%, #070c18 45%, #03060c 100%);
+    color: #f8fafc;
+    position: relative;
 }
 
-/* =========================================
-   TWINKLING STARS (sky depth)
-========================================= */
+/* ==========================================================================
+   AMBIENT CYBER HIGHWAY GLOWS & STAR PARTICLES
+   ========================================================================== */
+.ambient-glow-1 {
+    position: fixed;
+    top: -10%;
+    left: 10%;
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, rgba(0, 242, 254, 0.14) 0%, rgba(0, 114, 255, 0.05) 60%, transparent 80%);
+    filter: blur(80px);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 0;
+    animation: glowFloat1 10s ease-in-out infinite alternate;
+}
 
-.stars{
-    position:fixed;
-    top:0;
-    left:0;
-    width:100%;
-    height:60%;
-    z-index:0;
+.ambient-glow-2 {
+    position: fixed;
+    bottom: 5%;
+    right: 5%;
+    width: 450px;
+    height: 450px;
+    background: radial-gradient(circle, rgba(255, 122, 26, 0.12) 0%, rgba(255, 0, 128, 0.04) 60%, transparent 80%);
+    filter: blur(85px);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 0;
+    animation: glowFloat2 12s ease-in-out infinite alternate;
+}
+
+@keyframes glowFloat1 {
+    0% { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(60px, 40px) scale(1.15); }
+}
+
+@keyframes glowFloat2 {
+    0% { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(-50px, -30px) scale(1.1); }
+}
+
+.stars-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
     background-image:
-        radial-gradient(2px 2px at 20px 30px, rgba(255,255,255,0.6), transparent),
-        radial-gradient(2px 2px at 140px 80px, rgba(255,255,255,0.5), transparent),
-        radial-gradient(1.5px 1.5px at 300px 150px, rgba(255,255,255,0.4), transparent),
-        radial-gradient(2px 2px at 420px 60px, rgba(255,255,255,0.5), transparent),
-        radial-gradient(1.5px 1.5px at 550px 200px, rgba(255,255,255,0.35), transparent),
-        radial-gradient(2px 2px at 700px 100px, rgba(255,255,255,0.5), transparent),
-        radial-gradient(1.5px 1.5px at 850px 40px, rgba(255,255,255,0.4), transparent);
-    background-repeat:repeat;
-    background-size:900px 300px;
-    animation:twinkle 4s ease-in-out infinite alternate;
+        radial-gradient(1.5px 1.5px at 40px 60px, rgba(255,255,255,0.45), transparent),
+        radial-gradient(1.5px 1.5px at 180px 120px, rgba(0,242,254,0.4), transparent),
+        radial-gradient(2px 2px at 320px 80px, rgba(255,255,255,0.5), transparent),
+        radial-gradient(1.5px 1.5px at 500px 240px, rgba(255,122,26,0.35), transparent),
+        radial-gradient(2px 2px at 720px 140px, rgba(255,255,255,0.45), transparent),
+        radial-gradient(1.5px 1.5px at 940px 90px, rgba(0,242,254,0.35), transparent),
+        radial-gradient(2px 2px at 1120px 200px, rgba(255,255,255,0.5), transparent);
+    background-repeat: repeat;
+    background-size: 1200px 400px;
+    opacity: 0.65;
 }
 
-@keyframes twinkle{
-    from{ opacity:0.4; }
-    to{ opacity:1; }
+/* ==========================================================================
+   STANDARDIZED ZERO-OVERFLOW UNIVERSAL NAVBAR
+   ========================================================================== */
+.navbar {
+    position: sticky !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 10000 !important;
+    background: rgba(8, 12, 20, 0.94) !important;
+    backdrop-filter: blur(16px) !important;
+    -webkit-backdrop-filter: blur(16px) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5) !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    overflow: visible !important;
+    padding: 7px 0 !important;
 }
 
-.moon{
-    position:fixed;
-    top:40px;
-    right:60px;
-    width:70px;
-    height:70px;
-    border-radius:50%;
-    background:radial-gradient(circle at 35% 35%, #fffde7, #ffe082 60%, #ffca28 100%);
-    box-shadow:0 0 40px 10px rgba(255,224,130,0.45);
-    z-index:0;
+.navbar-inner {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    width: 100% !important;
+    max-width: 1440px !important;
+    margin: 0 auto !important;
+    padding: 0 16px !important;
+    gap: 10px !important;
+    box-sizing: border-box !important;
+    flex-wrap: nowrap !important;
 }
 
-/* =========================================
-   MAIN CONTENT
-========================================= */
-
-.status-container{
-    position:relative;
-    z-index:2;
-    width:90%;
-    max-width:1000px;
-    margin:auto;
-    padding-top:40px;
-    padding-bottom:60px;
+.nav-logo {
+    display: flex !important;
+    align-items: center !important;
+    gap: 9px !important;
+    text-decoration: none !important;
+    color: #ffffff !important;
+    font-weight: 800 !important;
+    font-size: 15px !important;
+    letter-spacing: 0.5px !important;
+    flex-shrink: 0 !important;
+    white-space: nowrap !important;
 }
 
-h1{
-    text-align:center;
-    color:white;
-    font-size:40px;
-    font-weight:800;
-    letter-spacing:0.5px;
-    text-shadow:0 0 25px rgba(0,229,255,0.6);
-    margin-bottom:35px;
+.nav-logo .logo-img {
+    height: 38px !important;
+    width: auto !important;
+    object-fit: contain !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
+    filter: drop-shadow(0 0 1.2px #ffffff)
+            drop-shadow(0 0 6px rgba(0, 242, 254, 0.95))
+            drop-shadow(0 0 14px rgba(0, 242, 254, 0.55))
+            brightness(1.15) contrast(1.05) !important;
+    transition: all 0.25s ease !important;
+    display: block !important;
 }
 
-h1 span{
-    display:block;
-    font-size:15px;
-    font-weight:400;
-    color:rgba(255,255,255,0.55);
-    letter-spacing:2px;
-    margin-top:6px;
-    text-shadow:none;
+.nav-logo:hover .logo-img {
+    transform: scale(1.06) !important;
+    filter: drop-shadow(0 0 2px #ffffff)
+            drop-shadow(0 0 10px rgba(0, 242, 254, 1))
+            drop-shadow(0 0 20px rgba(0, 242, 254, 0.8)) !important;
 }
 
-form{
-    background:rgba(255,255,255,0.06);
-    backdrop-filter:blur(18px);
-    padding:30px;
-    border-radius:22px;
-    text-align:center;
-    border:1px solid rgba(255,255,255,0.12);
-    box-shadow:0 10px 40px rgba(0,0,0,0.35);
-    display:flex;
-    justify-content:center;
-    gap:14px;
-    flex-wrap:wrap;
+.nav-logo .accent {
+    color: #ff7a1a !important;
 }
 
-.input-wrap{
-    position:relative;
-    flex:1;
-    min-width:220px;
-    max-width:400px;
+.nav-links {
+    display: flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+    flex-wrap: nowrap !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    list-style: none !important;
 }
 
-.input-wrap span{
-    position:absolute;
-    left:18px;
-    top:50%;
-    transform:translateY(-50%);
-    font-size:18px;
-    opacity:0.7;
+.nav-links a {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 5px !important;
+    color: #94a3b8 !important;
+    text-decoration: none !important;
+    font-weight: 600 !important;
+    font-size: 12.5px !important;
+    padding: 6px 9px !important;
+    border-radius: 8px !important;
+    white-space: nowrap !important;
+    transition: all 0.2s ease !important;
 }
 
-input{
-    width:100%;
-    padding:16px 16px 16px 46px;
-    border:1px solid rgba(255,255,255,0.15);
-    border-radius:14px;
-    font-size:16px;
-    outline:none;
-    background:rgba(255,255,255,0.9);
-    font-family:'Poppins',sans-serif;
-    transition:.3s;
+.nav-links a i {
+    font-size: 13px !important;
+    color: #64748b !important;
+    transition: color 0.2s ease, transform 0.2s ease !important;
 }
 
-input:focus{
-    box-shadow:0 0 0 3px rgba(0,229,255,0.4);
+.nav-links a:hover {
+    color: #ffffff !important;
+    background: rgba(255, 255, 255, 0.08) !important;
 }
 
-button{
-    position:relative;
-    overflow:hidden;
-    padding:16px 38px;
-    border:none;
-    border-radius:14px;
-    background:linear-gradient(135deg,#00e5ff,#2979ff 60%,#1a56db);
-    color:white;
-    font-size:16px;
-    font-weight:700;
-    font-family:'Poppins',sans-serif;
-    cursor:pointer;
-    letter-spacing:0.3px;
-    box-shadow:0 8px 25px rgba(0,150,255,0.45);
-    transition:transform .3s, box-shadow .3s;
+.nav-links a:hover i {
+    color: #00f2fe !important;
+    transform: translateY(-1px) !important;
 }
 
-button:hover{
-    transform:translateY(-3px);
-    box-shadow:0 14px 35px rgba(0,180,255,0.6);
+.nav-links a.active {
+    color: #ffffff !important;
+    background: rgba(0, 242, 254, 0.12) !important;
+    border: 1px solid rgba(0, 242, 254, 0.35) !important;
+    box-shadow: 0 0 14px rgba(0, 242, 254, 0.2) !important;
 }
 
-button::after{
-    content:"";
-    position:absolute;
-    top:0;
-    left:-75%;
-    width:50%;
-    height:100%;
-    background:linear-gradient(120deg, transparent, rgba(255,255,255,0.55), transparent);
-    transform:skewX(-20deg);
-    transition:left .6s ease;
+.nav-links a.active i {
+    color: #00f2fe !important;
 }
 
-button:hover::after{
-    left:125%;
+.radio-emoji-link {
+    color: #ffb870 !important;
+    font-weight: 700 !important;
+    font-size: 12px !important;
+    padding: 5px 9px !important;
+    background: rgba(255, 184, 112, 0.14) !important;
+    border: 1.5px solid rgba(255, 184, 112, 0.45) !important;
+    border-radius: 8px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 5px !important;
+    white-space: nowrap !important;
+    text-decoration: none !important;
+    transition: all 0.2s ease !important;
 }
 
-.booking-card-wrap{
-    position:relative;
-    margin-top:35px;
-    border-radius:28px;
-    padding:2px;
-    overflow:hidden !important;
-    animation:cardShow .8s ease;
+.radio-emoji-link:hover {
+    background: rgba(255, 184, 112, 0.26) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 0 12px rgba(255, 184, 112, 0.3) !important;
 }
 
-.booking-card-wrap::before{
-    content:"";
-    position:absolute;
-    top:-50%;
-    left:-50%;
-    width:200%;
-    height:200%;
-    border-radius:28px;
-    background:conic-gradient(from 0deg,#00e5ff,#2979ff,#7c4dff,#00e5ff);
-    animation:rotateBorder 5s linear infinite;
-    z-index:0;
+.nav-actions {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    flex-shrink: 0 !important;
+    flex-wrap: nowrap !important;
+    margin: 0 !important;
 }
 
-@keyframes rotateBorder{
-    to{ transform:rotate(360deg); }
+.call-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    padding: 6px 13px !important;
+    border-radius: 20px !important;
+    background: linear-gradient(135deg, #ff7a1a 0%, #ff9e00 100%) !important;
+    color: #060911 !important;
+    font-weight: 800 !important;
+    font-size: 12px !important;
+    text-decoration: none !important;
+    box-shadow: 0 4px 14px rgba(255, 122, 26, 0.35) !important;
+    white-space: nowrap !important;
+    transition: all 0.2s ease !important;
+    border: none !important;
+    width: auto !important;
+    max-width: fit-content !important;
 }
 
-@keyframes cardShow{
-    from{ opacity:0; transform:translateY(40px); }
-    to{ opacity:1; transform:translateY(0); }
+.call-btn:hover {
+    transform: translateY(-2px) scale(1.02) !important;
+    box-shadow: 0 6px 18px rgba(255, 122, 26, 0.55) !important;
 }
 
-.booking-card{
-    position:relative;
+.phone-shake {
+    display: inline-block !important;
+    animation: phoneRing 2s infinite ease-in-out !important;
+}
+
+@keyframes phoneRing {
+    0%, 100% { transform: rotate(0deg); }
+    10%, 30% { transform: rotate(-14deg); }
+    20%, 40% { transform: rotate(14deg); }
+    50% { transform: rotate(0deg); }
+}
+
+.animated-login-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    padding: 6px 12px !important;
+    border-radius: 18px !important;
+    background: rgba(0, 242, 254, 0.12) !important;
+    border: 1px solid rgba(0, 242, 254, 0.35) !important;
+    color: #00f2fe !important;
+    font-weight: 700 !important;
+    font-size: 12px !important;
+    text-decoration: none !important;
+    white-space: nowrap !important;
+    transition: all 0.2s ease !important;
+    width: auto !important;
+}
+
+.animated-login-btn:hover {
+    background: #00f2fe !important;
+    color: #060911 !important;
+    box-shadow: 0 0 14px rgba(0, 242, 254, 0.4) !important;
+}
+
+.user-badge-glowing {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    background: rgba(15, 23, 42, 0.85) !important;
+    border: 1px solid rgba(0, 242, 254, 0.3) !important;
+    padding: 5px 10px !important;
+    border-radius: 18px !important;
+    font-size: 12px !important;
+    white-space: nowrap !important;
+    box-shadow: 0 0 10px rgba(0, 242, 254, 0.15) !important;
+    width: auto !important;
+}
+
+.user-badge-glowing .nav-logout-form {
+    display: inline-flex !important;
+    padding: 0 !important;
+    margin: 0 0 0 3px !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+.user-badge-glowing .nav-logout-btn {
+    background: rgba(239, 68, 68, 0.25) !important;
+    border: 1px solid #ef4444 !important;
+    color: #fca5a5 !important;
+    padding: 2px 7px !important;
+    border-radius: 6px !important;
+    font-size: 10.5px !important;
+    cursor: pointer !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-shadow: none !important;
+    transition: all 0.2s ease !important;
+}
+
+.user-badge-glowing .nav-logout-btn:hover {
+    background: #ef4444 !important;
+    color: #ffffff !important;
+}
+
+.hamburger-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 6px !important;
+    min-width: 38px !important;
+    width: auto !important;
+    height: 34px !important;
+    padding: 0 10px !important;
+    background: rgba(255, 122, 26, 0.18) !important;
+    border: 1.5px solid #ff7a1a !important;
+    border-radius: 9px !important;
+    cursor: pointer !important;
+    z-index: 10001 !important;
+    flex-shrink: 0 !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+    transition: all 0.2s ease !important;
+}
+
+.hamburger-btn .ham-text {
+    font-size: 11.5px !important;
+    font-weight: 800 !important;
+    color: #ffffff !important;
+    letter-spacing: 0.5px !important;
+    text-transform: uppercase !important;
+    display: inline-block !important;
+}
+
+.hamburger-btn:hover, .hamburger-btn.active {
+    background: #ff7a1a !important;
+    border-color: #ffffff !important;
+    box-shadow: 0 0 14px rgba(255, 122, 26, 0.6) !important;
+}
+
+@media (max-width: 600px) {
+    .hamburger-btn {
+        padding: 0 8px !important;
+    }
+    .hamburger-btn .ham-text {
+        display: none !important;
+    }
+}
+
+/* ==========================================================================
+   FLOATING SIDE NAVIGATION DRAWER
+   ========================================================================== */
+.mobile-nav-drawer {
+    display: flex !important;
+    position: fixed !important;
+    top: 0 !important;
+    right: 0 !important;
+    width: min(320px, 86vw) !important;
+    height: 100vh !important;
+    max-height: 100vh !important;
+    background: #080f1e !important;
+    border-left: 2px solid #ff7a1a !important;
+    border-top: none !important;
+    border-bottom: none !important;
+    border-right: none !important;
+    border-radius: 0 !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    padding: 22px 16px !important;
+    box-shadow: -10px 0 45px rgba(0, 0, 0, 0.95), 0 0 25px rgba(255, 122, 26, 0.3) !important;
+    z-index: 10000001 !important;
+    flex-direction: column !important;
+    gap: 6px !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    box-sizing: border-box !important;
+    visibility: hidden !important;
+    transform: translateX(110%) !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease, visibility 0.25s ease !important;
+}
+
+.mobile-nav-drawer.active {
+    display: flex !important;
+    visibility: visible !important;
+    transform: translateX(0) !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+}
+
+.mobile-nav-drawer::-webkit-scrollbar {
+    width: 4px !important;
+}
+.mobile-nav-drawer::-webkit-scrollbar-track {
+    background: transparent !important;
+}
+.mobile-nav-drawer::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.18) !important;
+    border-radius: 4px !important;
+}
+
+.drawer-close-btn {
+    background: rgba(255, 255, 255, 0.08) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    color: #ffffff !important;
+    width: 28px !important;
+    height: 28px !important;
+    min-width: 28px !important;
+    max-width: 28px !important;
+    border-radius: 50% !important;
+    font-size: 13px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+    transition: all 0.2s ease !important;
+}
+
+.drawer-close-btn:hover {
+    background: rgba(239, 68, 68, 0.5) !important;
+    border-color: #ef4444 !important;
+    transform: scale(1.08) !important;
+}
+
+.mobile-nav-drawer a {
+    color: #cbd5e1 !important;
+    text-decoration: none !important;
+    font-weight: 600 !important;
+    font-size: 13px !important;
+    padding: 9px 12px !important;
+    border-radius: 10px !important;
+    background: rgba(255, 255, 255, 0.04) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    transition: all 0.2s ease !important;
+    display: flex !important;
+    align-items: center !important;
+    cursor: pointer !important;
+}
+
+.mobile-nav-drawer a:hover {
+    background: rgba(255, 122, 26, 0.15) !important;
+    border-color: #ff7a1a !important;
+    color: #ffffff !important;
+    transform: translateX(-3px) !important;
+}
+
+.mobile-nav-drawer a.active {
+    background: rgba(0, 242, 254, 0.18) !important;
+    border-color: #00f2fe !important;
+    color: #ffffff !important;
+    box-shadow: 0 0 14px rgba(0, 242, 254, 0.3) !important;
+}
+
+.drawer-call-support {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    background: linear-gradient(135deg, #831843, #be185d) !important;
+    border: 1px solid #f43f5e !important;
+    color: #ffffff !important;
+    padding: 11px 14px !important;
+    border-radius: 10px !important;
+    font-weight: 700 !important;
+    font-size: 12.5px !important;
+    text-decoration: none !important;
+    margin-top: 8px !important;
+}
+
+.mobile-nav-overlay {
+    position: fixed !important;
+    inset: 0 !important;
+    background: rgba(4, 7, 15, 0.72) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    z-index: 10000000 !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    transition: opacity 0.25s ease, visibility 0.25s ease !important;
+}
+
+.mobile-nav-overlay.active {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+}
+
+/* ==========================================================================
+   RESPONSIVE NAVBAR BREAKPOINTS (Zero Overflow Protection)
+   ========================================================================== */
+@media (min-width: 1101px) and (max-width: 1400px) {
+    .nav-links {
+        gap: 2px !important;
+    }
+    .nav-links a {
+        font-size: 11.5px !important;
+        padding: 5px 6px !important;
+        gap: 3px !important;
+    }
+    .nav-logo {
+        font-size: 13.5px !important;
+    }
+    .nav-logo .logo-img {
+        height: 34px !important;
+    }
+    .call-btn {
+        font-size: 11px !important;
+        padding: 5px 9px !important;
+    }
+    .radio-emoji-link {
+        font-size: 11px !important;
+        padding: 4px 7px !important;
+    }
+}
+
+@media (max-width: 1100px) {
+    .nav-links {
+        display: none !important;
+    }
+    .navbar {
+        min-height: 52px !important;
+        height: auto !important;
+        width: 100% !important;
+        max-width: 100vw !important;
+        overflow: visible !important;
+        padding: 6px 12px !important;
+    }
+    .navbar-inner {
+        padding: 0 4px !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        flex-wrap: nowrap !important;
+        overflow: visible !important;
+        box-sizing: border-box !important;
+    }
+    .nav-logo {
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 6px !important;
+        font-size: 13.5px !important;
+        font-weight: 800 !important;
+        flex-shrink: 1 !important;
+        white-space: nowrap !important;
+    }
+    .nav-logo .accent {
+        font-size: 13px !important;
+        color: #ff7a1a !important;
+    }
+    .nav-logo .logo-img {
+        height: 32px !important;
+        width: auto !important;
+        max-width: 44px !important;
+        object-fit: contain !important;
+        padding: 0 !important;
+    }
+    .nav-actions {
+        display: flex !important;
+        align-items: center !important;
+        gap: 6px !important;
+        flex-shrink: 0 !important;
+    }
+    .call-btn {
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 5px !important;
+        padding: 6px 11px !important;
+        font-size: 11.5px !important;
+        font-weight: 800 !important;
+        border-radius: 20px !important;
+        background: linear-gradient(135deg, #ff7a1a 0%, #ff9e00 100%) !important;
+        color: #000000 !important;
+        white-space: nowrap !important;
+        flex-shrink: 0 !important;
+    }
+
+    /* 🚫 HIDE LOGIN/USER BADGE FROM CRAMPED MOBILE TOP NAVBAR */
+    .desktop-user-badge, .desktop-login-btn, .animated-login-btn, .user-badge-glowing {
+        display: none !important;
+    }
+
+    .hamburger-btn {
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 5px !important;
+        min-width: 42px !important;
+        height: 34px !important;
+        padding: 0 10px !important;
+        border-radius: 9px !important;
+        background: linear-gradient(135deg, #FF6B00 0%, #ff8c00 100%) !important;
+        border: 1.5px solid #ffffff !important;
+        box-shadow: 0 0 14px rgba(255, 107, 0, 0.6) !important;
+        flex-shrink: 0 !important;
+        cursor: pointer !important;
+        z-index: 1000002 !important;
+    }
+    .hamburger-btn .ham-text {
+        font-size: 11px !important;
+        font-weight: 800 !important;
+        color: #ffffff !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.5px !important;
+        display: inline-block !important;
+    }
+}
+
+@media (max-width: 420px) {
+    .hamburger-btn {
+        min-width: 36px !important;
+        width: 36px !important;
+        padding: 0 !important;
+    }
+    .hamburger-btn .ham-text {
+        display: none !important;
+    }
+    .call-btn {
+        padding: 5px 8px !important;
+        font-size: 10.5px !important;
+    }
+    .nav-logo {
+        font-size: 12px !important;
+        gap: 4px !important;
+    }
+    .nav-logo .logo-img {
+        height: 28px !important;
+    }
+}
+
+/* ==========================================================================
+   STATUS TRACKER HERO & SEARCH CONSOLE
+   ========================================================================== */
+.tracker-main-wrap {
+    position: relative;
+    z-index: 2;
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 38px 20px 80px;
+}
+
+.tracker-hero-header {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.live-beacon-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 18px;
+    background: rgba(0, 242, 254, 0.1);
+    border: 1px solid rgba(0, 242, 254, 0.35);
+    border-radius: 30px;
+    font-size: 11.5px;
+    font-weight: 700;
+    color: #00f2fe;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    box-shadow: 0 0 20px rgba(0, 242, 254, 0.15);
+    margin-bottom: 16px;
+    font-family: 'JetBrains Mono', monospace;
+}
+
+.pulse-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #00f2fe;
+    box-shadow: 0 0 10px #00f2fe;
+    animation: beaconPulse 1.6s infinite;
+}
+
+@keyframes beaconPulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.3; transform: scale(0.7); }
+}
+
+.tracker-title {
+    font-family: 'Outfit', 'Barlow Condensed', sans-serif;
+    font-size: clamp(30px, 4.5vw, 48px);
+    font-weight: 800;
+    margin: 0 0 10px;
+    color: #ffffff;
+    letter-spacing: -0.5px;
+    line-height: 1.15;
+}
+
+.tracker-title .accent-cyan {
+    background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.tracker-subtitle {
+    font-size: 15px;
+    color: #94a3b8;
+    max-width: 640px;
+    margin: 0 auto;
+    line-height: 1.6;
+}
+
+/* Search Input Container */
+.status-search-card {
+    background: rgba(15, 23, 42, 0.7);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 12px 14px;
+    max-width: 620px;
+    margin: 0 auto 36px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5), 0 0 25px rgba(0, 242, 254, 0.1);
+    transition: all 0.3s ease;
+}
+
+.status-search-card:focus-within {
+    border-color: rgba(0, 242, 254, 0.6);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6), 0 0 35px rgba(0, 242, 254, 0.25);
+}
+
+.status-search-form {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+    padding: 0;
+}
+
+.search-input-wrap {
+    position: relative;
+    flex: 1;
+    display: flex;
+    align-items: center;
+}
+
+.search-input-wrap i {
+    position: absolute;
+    left: 16px;
+    color: #38bdf8;
+    font-size: 16px;
+    pointer-events: none;
+}
+
+.status-search-form input {
+    width: 100%;
+    padding: 14px 16px 14px 44px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 14px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #ffffff;
+    outline: none;
+    font-family: inherit;
+    transition: all 0.25s ease;
+}
+
+.status-search-form input::placeholder {
+    color: #64748b;
+    font-weight: 500;
+}
+
+.status-search-form input:focus {
+    background: rgba(255, 255, 255, 0.09);
+    border-color: #38bdf8;
+}
+
+.status-search-form button {
+    background: linear-gradient(135deg, #0ea5e9, #0284c7, #2563eb);
+    color: #ffffff;
+    border: none;
+    border-radius: 14px;
+    padding: 14px 24px;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 16px rgba(14, 165, 233, 0.4);
+    transition: all 0.25s ease;
+    white-space: nowrap;
+    font-family: inherit;
+}
+
+.status-search-form button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 22px rgba(14, 165, 233, 0.6);
+    background: linear-gradient(135deg, #38bdf8, #0ea5e9, #1d4ed8);
+}
+
+@media (max-width: 580px) {
+    .status-search-form {
+        flex-direction: column;
+    }
+    .status-search-form button {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* Forgot Booking ID Hint & Recovered Banner */
+.tracker-forgot-hint {
+    margin-top: 14px;
+    padding: 10px 16px;
+    border-radius: 12px;
+    background: rgba(255, 145, 66, 0.1);
+    border: 1px dashed rgba(255, 145, 66, 0.35);
+    color: #ffd8bf;
+    font-size: 13px;
+    line-height: 1.5;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-align: left;
+}
+.tracker-forgot-hint strong {
+    color: #ff9142;
+}
+
+.recovered-id-pill {
+    background: rgba(34, 197, 94, 0.15);
+    border: 1.5px solid rgba(34, 197, 94, 0.45);
+    color: #86efac;
+    padding: 12px 20px;
+    border-radius: 16px;
+    font-size: 14px;
+    margin-bottom: 22px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 10px 25px rgba(34, 197, 94, 0.1);
+}
+.recovered-highlight {
+    color: #ffffff;
+    background: rgba(34, 197, 94, 0.3);
+    padding: 2px 10px;
+    border-radius: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.5px;
+}
+
+/* Alert / Error Card */
+.tracker-alert-card {
+    background: rgba(15, 23, 42, 0.85);
+    border-radius: 20px;
+    padding: 24px 28px;
+    margin: 0 auto 36px;
+    max-width: 680px;
+    display: flex;
+    gap: 18px;
+    align-items: flex-start;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+}
+.tracker-alert-card .alert-icon {
+    font-size: 28px;
+    color: #ef4444;
+    line-height: 1;
+}
+.tracker-alert-card h4 {
+    margin: 0 0 6px;
+    color: #ffffff;
+    font-size: 17px;
+}
+.tracker-alert-card p {
+    margin: 0 0 16px;
+    color: #cbd5e1;
+    font-size: 14px;
+    line-height: 1.5;
+}
+.tracker-alert-card .alert-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+.btn-support-call {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: #ffffff !important;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 13px;
+    padding: 9px 16px;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: transform 0.2s ease;
+}
+.btn-support-call:hover { transform: translateY(-2px); }
+.btn-dashboard-link {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #38bdf8 !important;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 13px;
+    padding: 9px 16px;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+.btn-dashboard-link:hover { background: rgba(255, 255, 255, 0.14); }
+
+/* Multiple Bookings Found Card & Grid */
+.multiple-bookings-card {
+    background: rgba(11, 19, 38, 0.88);
+    backdrop-filter: blur(24px);
+    border: 1px solid rgba(0, 242, 254, 0.28);
+    border-radius: 26px;
+    padding: 30px;
+    max-width: 900px;
+    margin: 0 auto 36px;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.7), 0 0 35px rgba(0, 242, 254, 0.12);
+}
+.multiple-bookings-header {
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+.mb-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+.mb-icon {
+    font-size: 26px;
+    color: #00f2fe;
+}
+.multiple-bookings-header h3 {
+    margin: 0 0 4px;
+    color: #ffffff;
+    font-size: 20px;
+}
+.multiple-bookings-header p {
+    margin: 0;
+    color: #94a3b8;
+    font-size: 13.5px;
+}
+.booking-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+}
+.booking-item-card {
+    background: rgba(15, 23, 42, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 18px;
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    transition: all 0.25s ease;
+}
+.booking-item-card:hover {
+    border-color: rgba(0, 242, 254, 0.5);
+    transform: translateY(-3px);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 242, 254, 0.15);
+}
+.bic-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.bic-id {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'JetBrains Mono', monospace;
+}
+.bic-id .label { font-size: 11px; color: #64748b; }
+.bic-id .id-val { font-size: 16px; color: #00f2fe; font-weight: 700; }
+.mini-copy-btn {
+    background: rgba(255, 255, 255, 0.08);
+    border: none;
+    color: #94a3b8;
+    cursor: pointer;
+    border-radius: 6px;
+    padding: 3px 6px;
+    font-size: 12px;
+}
+.mini-copy-btn:hover { color: #ffffff; background: rgba(255, 255, 255, 0.16); }
+.mini-pill {
+    padding: 3px 9px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+}
+.mini-pill.pill-confirmed { background: rgba(34, 197, 94, 0.2); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.35); }
+.mini-pill.pill-completed { background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.35); }
+.mini-pill.pill-pending { background: rgba(234, 179, 8, 0.2); color: #facc15; border: 1px solid rgba(234, 179, 8, 0.35); }
+.mini-pill.pill-cancelled { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.35); }
+.bic-route {
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 12px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.route-point {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #e2e8f0;
+}
+.pt-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+.pt-dot.green { background: #22c55e; box-shadow: 0 0 8px #22c55e; }
+.pt-dot.orange { background: #ff7a1a; box-shadow: 0 0 8px #ff7a1a; }
+.route-arrow {
+    font-size: 11px;
+    color: #64748b;
+    margin-left: 3px;
+}
+.bic-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    color: #94a3b8;
+}
+.bic-meta .price-tag {
+    color: #ff9142;
+    font-weight: 700;
+    font-size: 13px;
+}
+.btn-track-item {
+    width: 100%;
+    background: linear-gradient(135deg, #0ea5e9, #0284c7);
+    color: #ffffff;
+    border: none;
+    border-radius: 10px;
+    padding: 10px;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+}
+.btn-track-item:hover {
+    background: linear-gradient(135deg, #38bdf8, #0ea5e9);
+    transform: translateY(-2px);
+}
+
+/* ==========================================================================
+   PROFESSIONAL LOGISTICS TRACKING CARD (ENTERPRISE GRADE)
+   ========================================================================== */
+.shipment-dossier-card {
+    background: rgba(11, 19, 38, 0.88);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(0, 242, 254, 0.25);
+    border-radius: 26px;
+    padding: 32px 34px;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7), 0 0 35px rgba(0, 242, 254, 0.12);
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 30px;
+}
+
+.shipment-dossier-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent 0%, #00f2fe 30%, #ff7a1a 70%, transparent 100%);
+}
+
+/* Top Meta Header Bar */
+.shipment-header-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 16px;
+    padding-bottom: 22px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    margin-bottom: 28px;
+}
+
+.tracking-id-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.tracking-id-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    color: #64748b;
+    text-transform: uppercase;
+    font-family: 'JetBrains Mono', monospace;
+}
+
+.tracking-id-value {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.id-text {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 26px;
+    font-weight: 800;
+    color: #ffffff;
+    letter-spacing: 1px;
+}
+
+.btn-copy-id {
+    background: rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #38bdf8;
+    padding: 4px 10px;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.2s ease;
+}
+
+.btn-copy-id:hover {
+    background: rgba(56, 189, 248, 0.2);
+    border-color: #38bdf8;
+    color: #ffffff;
+}
+
+.status-badge-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+}
+
+.status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 18px;
+    border-radius: 30px;
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.status-pill.pill-confirmed {
+    background: rgba(16, 185, 129, 0.16);
+    border: 1.5px solid #10b981;
+    color: #34d399;
+    box-shadow: 0 0 16px rgba(16, 185, 129, 0.3);
+}
+
+.status-pill.pill-completed {
+    background: rgba(14, 165, 233, 0.16);
+    border: 1.5px solid #0ea5e9;
+    color: #38bdf8;
+    box-shadow: 0 0 16px rgba(14, 165, 233, 0.3);
+}
+
+.status-pill.pill-pending {
+    background: rgba(245, 158, 11, 0.16);
+    border: 1.5px solid #f59e0b;
+    color: #fbbf24;
+    box-shadow: 0 0 16px rgba(245, 158, 11, 0.3);
+}
+
+.status-pill.pill-cancelled {
+    background: rgba(239, 68, 68, 0.16);
+    border: 1.5px solid #ef4444;
+    color: #f87171;
+    box-shadow: 0 0 16px rgba(239, 68, 68, 0.3);
+}
+
+.meta-tags-strip {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 4px;
+}
+
+.meta-tag-item {
+    font-size: 12px;
+    color: #94a3b8;
+    background: rgba(255, 255, 255, 0.04);
+    padding: 4px 10px;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.meta-tag-item i {
+    color: #38bdf8;
+    font-size: 11px;
+}
+
+/* ==========================================================================
+   ENTERPRISE LOGISTICS JOURNEY PIPELINE (MILESTONE STEPPER)
+   ========================================================================== */
+.pipeline-section {
+    margin-bottom: 32px;
+    padding: 24px 20px;
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+}
+
+.pipeline-header {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: #38bdf8;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'JetBrains Mono', monospace;
+}
+
+.stepper-track {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    position: relative;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.step-node {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    position: relative;
+    z-index: 2;
+    flex: 1;
+}
+
+.step-icon-circle {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    margin-bottom: 10px;
+    transition: all 0.3s ease;
+    background: #0f172a;
+    border: 2px solid #334155;
+    color: #64748b;
+}
+
+.step-node.completed .step-icon-circle {
+    background: linear-gradient(135deg, #059669, #10b981);
+    border-color: #34d399;
+    color: #ffffff;
+    box-shadow: 0 0 16px rgba(16, 185, 129, 0.4);
+}
+
+.step-node.active .step-icon-circle {
+    background: linear-gradient(135deg, #0284c7, #00f2fe);
+    border-color: #ffffff;
+    color: #060911;
+    box-shadow: 0 0 22px rgba(0, 242, 254, 0.7);
+    transform: scale(1.1);
+    animation: activeHalo 2s infinite ease-in-out;
+}
+
+@keyframes activeHalo {
+    0%, 100% { box-shadow: 0 0 16px rgba(0, 242, 254, 0.5); }
+    50% { box-shadow: 0 0 28px rgba(0, 242, 254, 0.9); }
+}
+
+.step-node.pending-node .step-icon-circle {
+    background: linear-gradient(135deg, #d97706, #f59e0b);
+    border-color: #fbbf24;
+    color: #ffffff;
+    box-shadow: 0 0 18px rgba(245, 158, 11, 0.4);
+}
+
+.step-title {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: #e2e8f0;
+    margin-bottom: 3px;
+}
+
+.step-subtext {
+    font-size: 11px;
+    color: #64748b;
+    font-weight: 500;
+}
+
+.step-node.completed .step-title {
+    color: #34d399;
+}
+
+.step-node.active .step-title {
+    color: #00f2fe;
+}
+
+/* Connecting Line Between Steps */
+.stepper-connector {
+    position: absolute;
+    top: 24px;
+    left: 12%;
+    right: 12%;
+    height: 3px;
+    background: #1e293b;
     z-index: 1;
-    padding:32px;
-    border-radius:26px;
-    background:rgba(13,20,38,0.92);
-    backdrop-filter:blur(22px);
-    color:white;
-    border:1px solid rgba(255,255,255,0.1);
-    box-shadow:0 10px 40px rgba(0,0,0,0.35);
 }
 
-.booking-card h2{
-    text-align:center;
-    margin-bottom:25px;
-    color:#00e5ff;
-    font-weight:700;
-    letter-spacing:0.5px;
+.stepper-connector-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #10b981 0%, #00f2fe 100%);
+    box-shadow: 0 0 10px rgba(0, 242, 254, 0.5);
+    transition: width 0.5s ease;
 }
 
-.booking-card p{
-    padding:13px 16px;
-    margin:10px 0;
-    border-radius:12px;
-    background:rgba(255,255,255,0.05);
-    border:1px solid rgba(255,255,255,0.06);
-    font-size:15px;
-}
-
-.booking-card p b{
-    color:#8ecbff;
-    margin-right:6px;
-}
-
-.pending,
-.confirmed,
-.completed,
-.cancelled{
-    text-align:center;
-    padding:18px;
-    margin-top:25px;
-    border-radius:16px;
-    font-size:22px;
-    font-weight:700;
-    letter-spacing:0.5px;
-    animation:pulse 1.8s infinite;
-}
-
-.pending{
-    background:linear-gradient(135deg,#ffb300,#ff6f00);
-    box-shadow:0 0 30px rgba(255,152,0,0.55);
-}
-
-.confirmed{
-    background:linear-gradient(135deg,#00e676,#00b248);
-    box-shadow:0 0 30px rgba(0,230,118,0.5);
-}
-
-.completed{
-    background:linear-gradient(135deg,#2979ff,#1a56db);
-    box-shadow:0 0 30px rgba(41,121,255,0.55);
-}
-
-.cancelled{
-    background:linear-gradient(135deg,#ff5252,#c62828);
-    box-shadow:0 0 30px rgba(255,82,82,0.5);
-}
-
-@keyframes pulse{
-    0%{ transform:scale(1); opacity: 0.95; }
-    50%{ transform:scale(1.01); opacity: 1; filter: brightness(1.15); }
-    100%{ transform:scale(1); opacity: 0.95; }
-}
-
-/* =========================================
-   ANIMATED SPINNING OPEN BOOK
-========================================= */
-
-.book-loader-wrap{
-    display:flex;
-    justify-content:center;
-    margin-bottom:22px;
-    perspective:700px;
-}
-
-.book-loader{
-    position:relative;
-    width:90px;
-    height:64px;
-    transform-style:preserve-3d;
-    animation:bookSpin 3.5s linear infinite;
-}
-
-.book-loader .page{
-    position:absolute;
-    top:0;
-    width:45px;
-    height:64px;
-    background:linear-gradient(135deg,#ffffff,#dbe9ff 70%,#c3dcff);
-    border:1px solid rgba(0,150,255,0.45);
-    box-shadow:0 0 16px rgba(0,229,255,0.4);
-}
-
-.book-loader .page::before{
-    content:"";
-    position:absolute;
-    top:8px;
-    left:8px;
-    right:8px;
-    bottom:8px;
-    background:
-        repeating-linear-gradient(
-            180deg,
-            rgba(41,121,255,0.25) 0px,
-            rgba(41,121,255,0.25) 2px,
-            transparent 2px,
-            transparent 8px
-        );
-    border-radius:2px;
-}
-
-.book-loader .page.left{
-    left:0;
-    border-radius:6px 0 0 6px;
-    transform-origin:right center;
-    animation:pageFlipLeft 3.5s ease-in-out infinite;
-}
-
-.book-loader .page.right{
-    right:0;
-    border-radius:0 6px 6px 0;
-    transform-origin:left center;
-    animation:pageFlipRight 3.5s ease-in-out infinite;
-}
-
-.book-loader .spine{
-    position:absolute;
-    left:50%;
-    top:-2px;
-    width:6px;
-    height:68px;
-    background:linear-gradient(#00e5ff,#2979ff,#7c4dff);
-    transform:translateX(-50%);
-    box-shadow:0 0 14px rgba(0,229,255,0.7);
-    border-radius:3px;
-    z-index:3;
-}
-
-@keyframes bookSpin{
-    0%   { transform:rotateY(0deg); }
-    100% { transform:rotateY(360deg); }
-}
-
-@keyframes pageFlipLeft{
-    0%,100%{ transform:rotateY(0deg); }
-    50%{ transform:rotateY(-30deg); }
-}
-
-@keyframes pageFlipRight{
-    0%,100%{ transform:rotateY(0deg); }
-    50%{ transform:rotateY(30deg); }
-}
-
-/* =========================================
-   BOOKING PROGRESS — PREMIUM STEPPER
-========================================= */
-
-.progress-section{
-    margin-top:34px;
-}
-
-.timeline-title{
-    text-align:center;
-    color:#00e5ff;
-    font-weight:700;
-    font-size:16px;
-    margin:30px 0 20px 0;
-    letter-spacing:0.4px;
-}
-
-.timeline{
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    flex-wrap:wrap;
-}
-
-.timeline-step{
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    min-width:80px;
-}
-
-.timeline-circle{
-    width:44px;
-    height:44px;
-    border-radius:50%;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:18px;
-    background:rgba(255,255,255,0.06);
-    border:2px solid rgba(255,255,255,0.15);
-    transition:.4s;
-}
-
-.timeline-label{
-    margin-top:8px;
-    font-size:12px;
-    text-align:center;
-    color:rgba(255,255,255,0.55);
-    font-weight:600;
-}
-
-.timeline-line{
-    flex:1;
-    height:3px;
-    min-width:20px;
-    max-width:60px;
-    background:rgba(255,255,255,0.1);
-    margin:0 4px;
-    margin-bottom:26px;
-    border-radius:2px;
-}
-
-.timeline-line.line-completed{
-    background:linear-gradient(90deg,#00e5ff,#2979ff);
-}
-
-.timeline-step.completed .timeline-circle{
-    background:#00c853;
-    border-color:#00c853;
-    box-shadow:0 0 16px rgba(0,200,83,0.55);
-}
-
-.timeline-step.completed .timeline-label{
-    color:#69f0ae;
-}
-
-.timeline-step.current .timeline-circle{
-    animation:pulse 1.8s infinite;
-    transform:scale(1.1);
-}
-
-.timeline-step.current.stage-pending .timeline-circle{
-    background:#ff9800;
-    border-color:#ff9800;
-    box-shadow:0 0 20px rgba(255,152,0,0.6);
-}
-
-.timeline-step.current.stage-confirmed .timeline-circle{
-    background:#00c853;
-    border-color:#00c853;
-    box-shadow:0 0 20px rgba(0,255,102,0.6);
-}
-
-.timeline-step.current.stage-completed .timeline-circle{
-    background:#2979ff;
-    border-color:#2979ff;
-    box-shadow:0 0 20px rgba(41,121,255,0.6);
-}
-
-.timeline-step.current .timeline-label{
-    color:white;
-}
-
-.timeline-step.upcoming{
-    opacity:0.5;
-}
-
-/* =========================================
-   DRIVER DETAILS CARD
-========================================= */
-
-.driver-details-box{
-    margin-top:22px;
-    padding:20px;
-    border-radius:18px;
-    background:rgba(0,229,255,0.07);
-    border:1px solid rgba(0,229,255,0.25);
-}
-
-.driver-details-box h3{
-    font-size:17px;
-    margin-bottom:14px;
-    color:#00e5ff;
-    text-align:left;
-    font-weight:700;
-}
-
-.driver-contact-buttons{
-    display:flex;
-    gap:12px;
-    margin-top:14px;
-    flex-wrap:wrap;
-}
-
-.driver-contact-buttons a{
-    flex:1;
-    min-width:140px;
-    text-align:center;
-    padding:12px;
-    border-radius:12px;
-    text-decoration:none;
-    font-weight:700;
-    font-size:14px;
-}
-
-.btn-call-driver{
-    background:linear-gradient(135deg,#00e5ff,#2979ff);
-    color:white;
-}
-
-.btn-whatsapp-driver{
-    background:linear-gradient(135deg,#00e676,#00b248);
-    color:white;
-}
-
-/* =========================================
-   PAYMENT & RECEIPT CARD (UPDATED)
-========================================= */
-
-.payment-details-box{
-    margin-top:22px;
-    padding:22px;
-    border-radius:18px;
-    background:rgba(41,121,255,0.08);
-    border:1px solid rgba(0,229,255,0.3);
-    box-shadow:0 8px 32px rgba(0,0,0,0.3);
-}
-
-.payment-details-box h3{
-    font-size:18px;
-    margin-top:0;
-    margin-bottom:14px;
-    color:#00e5ff;
-    text-align:left;
-    font-weight:700;
-}
-
-.payment-item{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    padding:14px 18px;
-    margin-top:10px;
-    border-radius:14px;
-    background:rgba(255,255,255,0.05);
-    border:1px solid rgba(255,255,255,0.08);
-    flex-wrap:wrap;
-    gap:12px;
-}
-
-.payment-info p{
-    margin:3px 0 !important;
-    padding:0 !important;
-    background:none !important;
-    border:none !important;
-    font-size:14px !important;
-}
-
-.payment-status-badge{
-    padding:4px 12px;
-    border-radius:20px;
-    font-size:13px;
-    font-weight:700;
-    display:inline-block;
-}
-
-.badge-pending{
-    background:rgba(255,179,0,0.25);
-    color:#ffca28;
-    border:1px solid rgba(255,179,0,0.6);
-}
-
-.badge-verified{
-    background:rgba(0,230,118,0.25);
-    color:#69f0ae;
-    border:1px solid rgba(0,230,118,0.6);
-}
-
-.badge-failed{
-    background:rgba(255,82,82,0.25);
-    color:#ff8a80;
-    border:1px solid rgba(255,82,82,0.6);
-}
-
-.btn-pay-now{
-    background:linear-gradient(135deg,#00e5ff,#2979ff);
-    color:white;
-    padding:11px 22px;
-    border-radius:12px;
-    text-decoration:none;
-    font-weight:700;
-    font-size:14px;
-    box-shadow:0 4px 15px rgba(0,229,255,0.4);
-    transition:transform .3s, box-shadow .3s;
-    display:inline-block;
-}
-
-.btn-pay-now:hover{
-    transform:translateY(-2px);
-    box-shadow:0 8px 25px rgba(0,229,255,0.6);
-}
-
-.btn-download-receipt{
-    background:linear-gradient(135deg,#00e676,#00b248);
-    color:white;
-    padding:11px 22px;
-    border-radius:12px;
-    text-decoration:none;
-    font-weight:700;
-    font-size:14px;
-    box-shadow:0 4px 15px rgba(0,230,118,0.4);
-    transition:transform .3s, box-shadow .3s;
-    display:inline-block;
-}
-
-.btn-download-receipt:hover{
-    transform:translateY(-2px);
-    box-shadow:0 8px 25px rgba(0,230,118,0.6);
-}
-
-@media (max-width:600px){
-
-    h1{ font-size:30px; }
-
-    form{ flex-direction:column; }
-
-    .timeline{
-        flex-direction:column;
-        gap:10px;
+@media (max-width: 680px) {
+    .stepper-track {
+        flex-direction: column;
+        gap: 20px;
+        align-items: flex-start;
     }
-
-    .timeline-line{
-        width:3px;
-        height:20px;
-        max-width:none;
-        margin:0;
+    .step-node {
+        flex-direction: row;
+        gap: 16px;
+        text-align: left;
     }
-
-    .payment-item{
-        flex-direction:column;
-        align-items:flex-start;
+    .stepper-connector {
+        top: 24px;
+        bottom: 24px;
+        left: 24px;
+        width: 3px;
+        height: auto;
     }
-
-    .btn-pay-now, .btn-download-receipt{
-        width:100%;
-        text-align:center;
+    .stepper-connector-fill {
+        width: 100% !important;
+        height: 50%;
     }
-
 }
 
-</style>
+/* ==========================================================================
+   ROUTE CORRIDOR VISUALIZER (ORIGIN TO DESTINATION)
+   ========================================================================== */
+.route-corridor-card {
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    padding: 22px 24px;
+    margin-bottom: 30px;
+}
 
+.route-corridor-grid {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 20px;
+}
+
+.route-stop {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+}
+.route-stop.destination-stop {
+    justify-content: flex-end;
+}
+
+.route-pin {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+.route-pin.pin-pickup {
+    background: rgba(16, 185, 129, 0.15);
+    border: 1.5px solid #10b981;
+    color: #34d399;
+}
+
+.route-pin.pin-dest {
+    background: rgba(255, 122, 26, 0.15);
+    border: 1.5px solid #ff7a1a;
+    color: #ff9e00;
+}
+
+.stop-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    color: #64748b;
+    text-transform: uppercase;
+    font-family: 'JetBrains Mono', monospace;
+    margin-bottom: 4px;
+}
+
+.stop-address {
+    font-size: 15px;
+    font-weight: 700;
+    color: #ffffff;
+    line-height: 1.4;
+}
+
+.route-highway-visual {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 0 10px;
+}
+
+.highway-badge-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.highway-pill {
+    background: rgba(56, 189, 248, 0.15);
+    border: 1px solid rgba(56, 189, 248, 0.35);
+    color: #38bdf8;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    font-family: 'JetBrains Mono', monospace;
+    white-space: nowrap;
+}
+
+.highway-line-wrap {
+    width: 140px;
+    height: 2px;
+    background: repeating-linear-gradient(90deg, #38bdf8 0, #38bdf8 6px, transparent 6px, transparent 12px);
+    position: relative;
+    margin: 4px 0;
+}
+
+.highway-truck-icon {
+    position: absolute;
+    top: -10px;
+    left: 45%;
+    color: #ff7a1a;
+    font-size: 14px;
+    animation: truckDrive 3s infinite linear;
+}
+
+@keyframes truckDrive {
+    0% { transform: translateX(-30px); }
+    100% { transform: translateX(30px); }
+}
+
+@media (max-width: 860px) {
+    .route-corridor-grid {
+        grid-template-columns: 1fr;
+        gap: 14px;
+    }
+    .route-highway-visual {
+        align-items: flex-start;
+        padding-left: 0 !important;
+        width: 100%;
+    }
+    .highway-badge-wrap {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        width: 100%;
+    }
+    .highway-pill {
+        white-space: normal !important;
+        word-break: break-word;
+        font-size: 11px;
+        padding: 4px 10px;
+        max-width: 100%;
+    }
+    .highway-line-wrap {
+        width: 100%;
+        max-width: 220px;
+        margin: 6px 0;
+    }
+    .route-stop {
+        justify-content: flex-start !important;
+        width: 100%;
+    }
+    .route-stop.destination-stop {
+        justify-content: flex-start !important;
+    }
+    .stop-address {
+        word-break: break-word;
+        font-size: 14px;
+    }
+    .shipment-dossier-card {
+        margin-bottom: 75px !important;
+    }
+}
+
+/* ==========================================================================
+   2-COLUMN SPLIT DASHBOARD: SENDER DETAILS & DRIVER ASSIGNMENT
+   ========================================================================== */
+.details-split-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 22px;
+    margin-bottom: 30px;
+}
+
+@media (max-width: 820px) {
+    .details-split-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.sub-panel-card {
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+}
+
+.panel-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 15px;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.panel-header i {
+    color: #00f2fe;
+    font-size: 17px;
+}
+
+.dossier-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    flex: 1;
+}
+
+.dossier-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 14px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+}
+
+.dossier-label {
+    font-size: 12.5px;
+    color: #94a3b8;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.dossier-label i {
+    color: #38bdf8;
+    width: 16px;
+    text-align: center;
+}
+
+.dossier-val {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: #ffffff;
+    text-align: right;
+}
+
+/* Driver Allocation Card */
+.driver-profile-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    flex: 1;
+}
+
+.driver-info-box {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 14px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+}
+
+.driver-avatar {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: #1e293b;
+    border: 2px solid #38bdf8;
+    object-fit: cover;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    color: #38bdf8;
+    flex-shrink: 0;
+}
+
+.driver-meta-text h4 {
+    margin: 0 0 4px;
+    font-size: 16px;
+    font-weight: 800;
+    color: #ffffff;
+}
+
+.verified-driver-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #34d399;
+    background: rgba(16, 185, 129, 0.15);
+    padding: 2px 8px;
+    border-radius: 10px;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.vehicle-spec-strip {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 14px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 12px;
+}
+
+.number-plate-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13.5px;
+    font-weight: 800;
+    background: #fef08a;
+    color: #1c1917;
+    padding: 4px 10px;
+    border-radius: 6px;
+    border: 1.5px solid #ca8a04;
+    letter-spacing: 0.5px;
+}
+
+.driver-contact-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: auto;
+}
+
+.btn-driver-cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 16px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: all 0.25s ease;
+    cursor: pointer;
+    border: none;
+}
+
+.btn-cta-call {
+    background: linear-gradient(135deg, #0284c7, #0ea5e9);
+    color: #ffffff;
+    box-shadow: 0 4px 15px rgba(14, 165, 233, 0.35);
+}
+
+.btn-cta-call:hover {
+    background: linear-gradient(135deg, #0ea5e9, #38bdf8);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(14, 165, 233, 0.55);
+}
+
+.btn-cta-whatsapp {
+    background: linear-gradient(135deg, #059669, #10b981);
+    color: #ffffff;
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.35);
+}
+
+.btn-cta-whatsapp:hover {
+    background: linear-gradient(135deg, #10b981, #34d399);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.55);
+}
+
+/* Unassigned Driver Placeholder */
+.unassigned-driver-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 30px 20px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1.5px dashed rgba(56, 189, 248, 0.3);
+    border-radius: 16px;
+    flex: 1;
+}
+
+.radar-spinner {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 2px solid rgba(0, 242, 254, 0.2);
+    border-top-color: #00f2fe;
+    animation: radarSpin 1.4s infinite linear;
+    margin-bottom: 14px;
+}
+
+@keyframes radarSpin {
+    to { transform: rotate(360deg); }
+}
+
+.unassigned-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 6px;
+}
+
+.unassigned-desc {
+    font-size: 12.5px;
+    color: #94a3b8;
+    max-width: 320px;
+    line-height: 1.5;
+}
+
+/* ==========================================================================
+   FINANCIAL BREAKDOWN & OFFICIAL INVOICING CARD
+   ========================================================================== */
+.financial-invoicing-card {
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    padding: 24px;
+    margin-bottom: 30px;
+}
+
+.fare-breakdown-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    margin-bottom: 22px;
+}
+
+@media (max-width: 768px) {
+    .fare-breakdown-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+.fare-tile {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 14px;
+    padding: 14px;
+}
+
+.fare-tile-label {
+    font-size: 11.5px;
+    color: #94a3b8;
+    margin-bottom: 6px;
+    font-weight: 600;
+}
+
+.fare-tile-value {
+    font-size: 18px;
+    font-weight: 800;
+    color: #ffffff;
+    font-family: 'JetBrains Mono', monospace;
+}
+
+.fare-tile.tile-total {
+    background: rgba(0, 242, 254, 0.08);
+    border-color: rgba(0, 242, 254, 0.35);
+}
+
+.fare-tile.tile-total .fare-tile-label {
+    color: #38bdf8;
+    font-weight: 700;
+}
+
+.fare-tile.tile-total .fare-tile-value {
+    color: #00f2fe;
+    font-size: 22px;
+}
+
+.payment-actions-strip {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 14px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.payment-status-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12.5px;
+    font-weight: 700;
+}
+
+.tag-paid {
+    background: rgba(16, 185, 129, 0.15);
+    border: 1px solid #10b981;
+    color: #34d399;
+}
+
+.tag-pending {
+    background: rgba(245, 158, 11, 0.15);
+    border: 1px solid #f59e0b;
+    color: #fbbf24;
+}
+
+.billing-buttons-group {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.btn-bill-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 11px 20px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: all 0.25s ease;
+    cursor: pointer;
+    border: none;
+    font-family: inherit;
+}
+
+.btn-bill-pay {
+    background: linear-gradient(135deg, #0ea5e9, #0284c7, #2563eb);
+    color: #ffffff;
+    box-shadow: 0 4px 15px rgba(14, 165, 233, 0.35);
+}
+
+.btn-bill-pay:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(14, 165, 233, 0.6);
+}
+
+.btn-bill-slip {
+    background: linear-gradient(135deg, #059669, #10b981);
+    color: #ffffff;
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.35);
+}
+
+.btn-bill-slip:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.6);
+}
+
+/* Multi-payment history table */
+.payment-history-wrap {
+    margin-top: 18px;
+}
+
+.payment-history-title {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: #64748b;
+    margin-bottom: 10px;
+    font-family: 'JetBrains Mono', monospace;
+}
+
+.payment-item-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 14px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+/* ==========================================================================
+   24/7 SUPPORT BANNER (BOTTOM)
+   ========================================================================== */
+.support-strip-card {
+    background: rgba(15, 23, 42, 0.45);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 18px;
+    padding: 18px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 14px;
+}
+
+.support-strip-text {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.support-strip-text i {
+    color: #ff7a1a;
+    font-size: 24px;
+}
+
+.support-strip-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 2px;
+}
+
+.support-strip-sub {
+    font-size: 12px;
+    color: #94a3b8;
+}
+
+.support-call-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 18px;
+    background: rgba(255, 122, 26, 0.15);
+    border: 1.5px solid #ff7a1a;
+    color: #ffa154;
+    border-radius: 24px;
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: all 0.25s ease;
+}
+
+.support-call-btn:hover {
+    background: #ff7a1a;
+    color: #060911;
+    box-shadow: 0 0 16px rgba(255, 122, 26, 0.5);
+    transform: translateY(-2px);
+}
+
+@media (max-width: 768px) {
+    .status-container, .card, .lookup-card, .result-card {
+        padding: 18px 14px !important;
+        backdrop-filter: blur(8px) !important;
+        -webkit-backdrop-filter: blur(8px) !important;
+    }
+    input[type="text"], input[type="tel"] {
+        font-size: 16px !important;
+        min-height: 48px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .animated-login-btn {
+        display: none !important;
+    }
+    .status-grid {
+        grid-template-columns: 1fr !important;
+    }
+    .timeline-step {
+        padding: 10px 8px !important;
+    }
+}
+    </style>
 </head>
 
 <body>
 
-  <!-- Sticky Navbar -->
+  <!-- Ambient Glowing Orbs & Stars -->
+  <div class="ambient-glow-1"></div>
+  <div class="ambient-glow-2"></div>
+  <div class="stars-canvas"></div>
+
+  <!-- Sticky Universal Navbar -->
   <nav class="navbar">
-    <div class="navbar-inner" style="display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 1440px; margin: 0 auto; padding: 0 16px;">
+    <div class="navbar-inner">
       <a href="{% url 'home' %}" class="nav-logo">
         <img src="{% static 'images/logo6.png' %}" alt="Ghidora Transport Logo" class="logo-img">
         GHIDORA <span class="accent">TRANSPORT</span>
       </a>
+
       <div class="nav-links">
-        <a href="{% url 'home' %}">Home</a>
-        <a href="{% url 'services' %}">Services</a>
-        <a href="{% url 'home' %}#booking">Booking</a>
-        <a href="{% url 'about' %}">About Us</a>
-        <a href="{% url 'contact_us' %}">Contact</a>
+        <a href="{% url 'home' %}"><i class="fa-solid fa-house"></i> Home</a>
+        <a href="{% url 'home' %}#booking"><i class="fa-solid fa-truck-fast"></i> Book Transport</a>
+        <a href="{% url 'services' %}"><i class="fa-solid fa-truck-ramp-box"></i> Services</a>
+        <a href="{% url 'social:feed' %}"><i class="fa-solid fa-users"></i> Social</a>
+        <a href="{% url 'about' %}"><i class="fa-solid fa-circle-info"></i> About Us</a>
+        <a href="{% url 'contact_us' %}"><i class="fa-solid fa-headset"></i> Contact</a>
       </div>
-      <div class="nav-actions" style="display: flex; align-items: center; gap: 8px;">
-        <a href="tel:+916264588894" class="call-btn"><span class="phone-shake">📞</span> Call Now</a>
+
+      <div class="nav-actions">
+        <a href="tel:+917489297841" class="call-btn" title="Call Us: +91 7489 297 841">
+          <i class="fa-solid fa-phone-volume phone-shake"></i> Call Now
+        </a>
 
         {% if not user.is_authenticated %}
           <a href="{% url 'login' %}" class="animated-login-btn">
-            <span>🔑</span> Login
+            <i class="fa-solid fa-arrow-right-to-bracket"></i> Login / Sign Up
           </a>
         {% else %}
           <div class="user-badge-glowing">
-            <span>👤</span> <strong style="color:#ffffff;">{{ user.first_name|default:user.username }}</strong>
-            <form method="post" action="{% url 'logout' %}" style="display: inline; margin-left: 4px;">
+            <a href="{% url 'user_dashboard' %}" style="text-decoration: none; color: inherit; display: inline-flex; align-items: center; gap: 6px;" title="User Dashboard">
+              <i class="fa-solid fa-circle-user" style="color: #38bdf8;"></i>
+              <strong style="color:#ffffff; max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: inline-block; vertical-align: middle;">{{ user.first_name|default:user.username }}</strong>
+              {% if user.is_staff or user.is_superuser %}
+                <span style="background: #ffd700; color: #040814; font-size: 9px; padding: 1px 5px; border-radius: 4px; font-weight: 900;">ADMIN</span>
+              {% else %}
+                <span style="background: rgba(56, 189, 248, 0.2); color: #38bdf8; font-size: 9px; padding: 1px 5px; border-radius: 4px; font-weight: 700;">USER</span>
+              {% endif %}
+            </a>
+            <form method="post" action="{% url 'logout' %}" class="nav-logout-form">
               {% csrf_token %}
-              <button type="submit" style="background: rgba(239, 68, 68, 0.25); border: 1px solid #ef4444; color: #fca5a5; padding: 2px 8px; border-radius: 8px; font-size: 11px; cursor: pointer; font-weight: bold;" title="Logout">
-                🚪
+              <button type="submit" class="nav-logout-btn" title="Logout">
+                <i class="fa-solid fa-right-from-bracket"></i>
               </button>
             </form>
           </div>
         {% endif %}
 
-        <button class="hamburger-btn" id="hamburgerBtn" onclick="toggleMobileMenu(event)" aria-label="Toggle Navigation Menu">
-          <svg width="24" height="18" viewBox="0 0 24 18" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: block; pointer-events: none;">
-            <rect y="0" width="24" height="3" rx="1.5" fill="#FFFFFF"/>
-            <rect y="7.5" width="24" height="3" rx="1.5" fill="#FFFFFF"/>
-            <rect y="15" width="24" height="3" rx="1.5" fill="#FFFFFF"/>
+        <button class="hamburger-btn" id="hamburgerBtn" onclick="toggleMobileMenu(event)" aria-label="Toggle Navigation Menu" title="Open Navigation Menu" style="width: 36px; height: 34px; padding: 0; display: inline-flex; align-items: center; justify-content: center;">
+          <svg width="20" height="15" viewBox="0 0 24 18" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: block; pointer-events: none;">
+            <rect y="0" width="24" height="2.8" rx="1.4" fill="#FFFFFF"/>
+            <rect y="7.6" width="24" height="2.8" rx="1.4" fill="#FFFFFF"/>
+            <rect y="15.2" width="24" height="2.8" rx="1.4" fill="#FFFFFF"/>
           </svg>
         </button>
       </div>
     </div>
-
-    <!-- Dark Backdrop Overlay (Closes menu on outside click) -->
-    <div class="mobile-nav-overlay" id="mobileNavOverlay" onclick="closeMobileMenu()"></div>
-
-    <!-- 60% Width Responsive Side Drawer Navigation Menu -->
-    <div class="mobile-nav-drawer" id="mobileNavDrawer">
-      <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 6px;">
-        <div style="font-size: 11px; font-weight: 800; letter-spacing: 1.5px; color: #ff7a1a; text-transform: uppercase;">📍 Navigation Menu</div>
-        <button onclick="closeMobileMenu()" aria-label="Close Menu" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #ffffff; width: 28px; height: 28px; border-radius: 50%; font-size: 14px; display: flex; align-items: center; justify-content: center; cursor: pointer;">✕</button>
-      </div>
-
-      <div style="font-size: 11px; font-weight: 800; letter-spacing: 1.5px; color: #ff7a1a; padding: 4px 6px 2px; text-transform: uppercase;">📍 Main Pages</div>
-      <a href="{% url 'home' %}" onclick="closeMobileMenu()">🏠 Home</a>
-      <a href="{% url 'services' %}" onclick="closeMobileMenu()">🛠️ Services</a>
-      <a href="{% url 'home' %}#booking" onclick="closeMobileMenu()">📦 Book Transport</a>
-      <a href="{% url 'about' %}" onclick="closeMobileMenu()">ℹ️ About Us</a>
-      <a href="{% url 'contact_us' %}" onclick="closeMobileMenu()">🕿 Contact Us</a>
-
-      <div style="height: 1px; background: rgba(255, 255, 255, 0.1); margin: 6px 0;"></div>
-
-      <div style="font-size: 11px; font-weight: 800; letter-spacing: 1.5px; color: #00d2ff; padding: 4px 6px 2px; text-transform: uppercase;">⚡ Special Features & Tools</div>
-      <a href="{% url 'home' %}#360-viewer" onclick="closeMobileMenu()" style="color: #ff9e00; font-weight: 700;">🏎️ 360° Vehicle View</a>
-      <a href="{% url 'quotations:quote_request' %}" onclick="closeMobileMenu()">💰 Check Fare & Rate Quote</a>
-      <a href="{% url 'business_card' %}" onclick="closeMobileMenu()">🪪 Digital Business Card</a>
-      <a href="{% url 'status' %}" class="active" onclick="closeMobileMenu()">💳 Check Booking Status & Payment</a>
-    </div>
   </nav>
 
+  <!-- Dark Backdrop Overlay -->
+  <div class="mobile-nav-overlay" id="mobileNavOverlay" onclick="closeMobileMenu()"></div>
+
+  <!-- Floating Side Drawer Navigation Menu Card -->
+  <div class="mobile-nav-drawer" id="mobileNavDrawer">
+    <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 6px;">
+      <div style="font-size: 11px; font-weight: 800; letter-spacing: 1.5px; color: #ff7a1a; text-transform: uppercase;">
+        <i class="fa-solid fa-compass" style="margin-right: 6px;"></i> Navigation Menu
+      </div>
+      <button type="button" class="drawer-close-btn" onclick="closeMobileMenu()" aria-label="Close Menu">✕</button>
+    </div>
+
+    {% if user.is_staff or user.is_superuser %}
+      <a href="{% url 'dashboard' %}" onclick="closeMobileMenu()" style="color: #00f2fe !important; font-weight: 800 !important; background: rgba(0, 242, 254, 0.2) !important; border: 1.5px solid rgba(0, 242, 254, 0.5) !important; margin-bottom: 8px; border-radius: 10px; padding: 10px 14px; display: flex; align-items: center; text-decoration: none; box-shadow: 0 0 15px rgba(0, 242, 254, 0.25);">
+        <i class="fa-solid fa-crown" style="margin-right: 10px; color: #ffd700; font-size: 16px;"></i> Admin Dashboard
+      </a>
+    {% endif %}
+
+    <div style="font-size: 11px; font-weight: 800; letter-spacing: 1.5px; color: #ff7a1a; padding: 4px 6px 2px; text-transform: uppercase;">
+      <i class="fa-solid fa-layer-group" style="margin-right: 6px;"></i> Main Pages
+    </div>
+    <a href="{% url 'home' %}" onclick="closeMobileMenu()"><i class="fa-solid fa-house" style="margin-right: 8px;"></i> Home</a>
+    <a href="{% url 'home' %}#booking" onclick="closeMobileMenu()"><i class="fa-solid fa-boxes-packing" style="margin-right: 8px;"></i> Book Transport</a>
+    <a href="{% url 'status' %}" class="active" onclick="closeMobileMenu()" style="color: #38bdf8; font-weight: 700;">
+      <i class="fa-solid fa-magnifying-glass-location" style="margin-right: 8px; color: #38bdf8;"></i> Track Booking
+    </a>
+
+    {% if user.is_authenticated %}
+      <a href="{% url 'user_dashboard' %}#my-bookings" onclick="closeMobileMenu()" style="color: #38bdf8; font-weight: 700;">
+        <i class="fa-solid fa-clipboard-list" style="margin-right: 8px;"></i> My Bookings
+      </a>
+      <a href="{% url 'user_dashboard' %}" onclick="closeMobileMenu()" style="color: #38bdf8; font-weight: 700;">
+        <i class="fa-solid fa-gauge-high" style="margin-right: 8px;"></i> User Dashboard
+      </a>
+    {% endif %}
+
+    <a href="{% url 'services' %}" onclick="closeMobileMenu()"><i class="fa-solid fa-truck-ramp-box" style="margin-right: 8px;"></i> Services</a>
+    <a href="{% url 'social:feed' %}" onclick="closeMobileMenu()"><i class="fa-solid fa-users" style="margin-right: 8px;"></i> Ghidora Social</a>
+    <a href="{% url 'pickupwala:player' %}" onclick="closeMobileMenu()" style="color: #ffb870; font-weight: 800; background: rgba(255, 184, 112, 0.16) !important; border: 1.5px solid rgba(255, 184, 112, 0.45) !important;">
+      <i class="fa-solid fa-radio" style="margin-right: 8px;"></i> Pickupwala Radio
+    </a>
+    <a href="{% url 'about' %}" onclick="closeMobileMenu()"><i class="fa-solid fa-circle-info" style="margin-right: 8px;"></i> About Us</a>
+    <a href="{% url 'contact_us' %}" onclick="closeMobileMenu()"><i class="fa-solid fa-headset" style="margin-right: 8px;"></i> Contact Us</a>
+
+    <div style="height: 1px; background: rgba(255, 255, 255, 0.1); margin: 6px 0;"></div>
+
+    <div style="font-size: 11px; font-weight: 800; letter-spacing: 1.5px; color: #00d2ff; padding: 4px 6px 2px; text-transform: uppercase;">
+      <i class="fa-solid fa-bolt" style="margin-right: 6px;"></i> Special Features &amp; Tools
+    </div>
+    <a href="{% url 'social:feed' %}" onclick="closeMobileMenu()" style="color: #00d2ff; font-weight: 700;">
+      <i class="fa-solid fa-globe" style="margin-right: 8px;"></i> Ghidora Social Network
+    </a>
+    <a href="{% url 'pickupwala:player' %}" onclick="closeMobileMenu()" style="color: #ffb870; font-weight: 800; background: rgba(255, 184, 112, 0.16) !important; border: 1.5px solid rgba(255, 184, 112, 0.45) !important;">
+      <i class="fa-solid fa-music" style="margin-right: 8px;"></i> Pickupwala Radio &amp; FM
+    </a>
+    <a href="{% url 'home' %}#360-viewer" onclick="closeMobileMenu()" style="color: #ff9e00; font-weight: 700;">
+      <i class="fa-solid fa-rotate" style="margin-right: 8px;"></i> 360° Vehicle View
+    </a>
+    <a href="{% url 'quotations:quote_request' %}" onclick="closeMobileMenu()">
+      <i class="fa-solid fa-file-invoice-dollar" style="margin-right: 8px;"></i> Check Fare &amp; Rate Quote
+    </a>
+    <a href="{% url 'business_card' %}" onclick="closeMobileMenu()">
+      <i class="fa-solid fa-address-card" style="margin-right: 8px;"></i> Digital Business Card
+    </a>
+
+    {% if user.is_authenticated %}
+      <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: rgba(255,122,26,0.12); border: 1px solid rgba(255,122,26,0.3); border-radius: 12px; margin-top: 6px;">
+        <a href="{% url 'user_dashboard' %}" onclick="closeMobileMenu()" style="color: #ff7a1a; font-weight: 700; font-size: 13px; text-decoration: none;">
+          <i class="fa-solid fa-circle-user" style="margin-right: 6px;"></i> {{ user.first_name|default:user.username }}
+        </a>
+        <form method="post" action="{% url 'logout' %}" style="margin: 0; padding: 0; background: transparent; border: none; box-shadow: none;">
+          {% csrf_token %}
+          <button type="submit" style="background: #ef4444; color: white; border: none; padding: 4px 10px; border-radius: 8px; font-size: 11px; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; box-shadow: none;">
+            <i class="fa-solid fa-right-from-bracket"></i> Logout
+          </button>
+        </form>
+      </div>
+    {% else %}
+      <a href="{% url 'login' %}" onclick="closeMobileMenu()" style="color: #00f2fe; font-weight: 700; background: rgba(0, 242, 254, 0.1) !important; border: 1px solid rgba(0, 242, 254, 0.3) !important; justify-content: center; margin-top: 6px;">
+        <i class="fa-solid fa-arrow-right-to-bracket" style="margin-right: 8px;"></i> Login / Sign Up
+      </a>
+    {% endif %}
+  </div>
+
+  <!-- ==========================================================================
+       MAIN TRACKER CONSOLE & SEARCH AREA
+       ========================================================================== -->
+  <div class="tracker-main-wrap">
+
+    <div class="tracker-hero-header">
+      <div class="live-beacon-pill">
+        <span class="pulse-dot"></span>
+        <span>Live Shipment &amp; Logistics Tracker</span>
+      </div>
+
+      <h1 class="tracker-title">
+        Real-Time Booking <span class="accent-cyan">Status Tracker</span>
+      </h1>
+
+      <p class="tracker-subtitle">
+        Enter your Booking Reference ID below to monitor live dispatch status, vehicle details, driver allocation, and official payment receipts.
+      </p>
+    </div>
+
+    <!-- Modern Search Card -->
+    <div class="status-search-card">
+      <form method="POST" class="status-search-form">
+        {% csrf_token %}
+        <div class="search-input-wrap">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input
+            type="text"
+            name="booking_id"
+            placeholder="Enter Booking ID (e.g. GT5791), Mobile No, or Email"
+            value="{{ searched_query|default:'' }}"
+            required
+            autocomplete="off"
+            spellcheck="false"
+          >
+        </div>
+        <button type="submit">
+          <span>Check Status</span>
+          <i class="fa-solid fa-arrow-right"></i>
+        </button>
+      </form>
+
+      <!-- Forgot Booking ID Helper Hint -->
+      <div class="tracker-forgot-hint">
+        <i class="fa-solid fa-lightbulb" style="color: #ff9142; font-size: 15px;"></i>
+        <span><strong>Forgot Booking ID?</strong> Enter your registered 10-digit mobile number or email address above to view and track all your active shipments.</span>
+      </div>
+    </div>
+
+    <!-- Search Error Card (when query yields no bookings) -->
+    {% if search_error %}
+    <div class="tracker-alert-card">
+      <div class="alert-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+      <div class="alert-content">
+        <h4>No Consignment Found</h4>
+        <p>{{ search_error }}</p>
+        <div class="alert-actions">
+          <a href="tel:+917489297841" class="btn-support-call"><i class="fa-solid fa-phone"></i> Call 24/7 Support (+91 7489 297 841)</a>
+          <a href="/user-dashboard/" class="btn-dashboard-link"><i class="fa-solid fa-gauge-high"></i> Customer Dashboard</a>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Multiple Bookings Found (Customer queried by Mobile or Email) -->
+    {% if customer_bookings %}
+    <div class="multiple-bookings-card">
+      <div class="multiple-bookings-header">
+        <div class="mb-title-wrap">
+          <i class="fa-solid fa-boxes-stacked mb-icon"></i>
+          <div>
+            <h3>Your Shipments Found ({{ customer_bookings|length }})</h3>
+            <p>Multiple bookings found for <strong>{{ searched_query }}</strong>. Click "Track Shipment" on any booking below to view live status.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="booking-cards-grid">
+        {% for b in customer_bookings %}
+        <div class="booking-item-card">
+          <div class="bic-top">
+            <div class="bic-id">
+              <span class="label">ID:</span>
+              <strong class="id-val">{{ b.booking_id }}</strong>
+              <button type="button" class="mini-copy-btn" onclick="copyTrackingId('{{ b.booking_id }}')" title="Copy ID">
+                <i class="fa-regular fa-copy"></i>
+              </button>
+            </div>
+            <div class="bic-status">
+              {% if b.status == "Confirmed" %}
+                <span class="mini-pill pill-confirmed"><i class="fa-solid fa-circle-check"></i> Confirmed</span>
+              {% elif b.status == "Completed" %}
+                <span class="mini-pill pill-completed"><i class="fa-solid fa-flag-checkered"></i> Completed</span>
+              {% elif b.status == "Pending" %}
+                <span class="mini-pill pill-pending"><i class="fa-solid fa-clock-rotate-left"></i> Pending</span>
+              {% else %}
+                <span class="mini-pill pill-cancelled"><i class="fa-solid fa-ban"></i> {{ b.status }}</span>
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="bic-route">
+            <div class="route-point">
+              <span class="pt-dot green"></span>
+              <span class="pt-text" style="font-weight: 600;">{{ b.pickup }}</span>
+            </div>
+            <div class="route-arrow">⬇ to</div>
+            <div class="route-point">
+              <span class="pt-dot orange"></span>
+              <span class="pt-text" style="font-weight: 600;">{{ b.destination }}</span>
+            </div>
+          </div>
+
+          <div class="bic-meta">
+            <span><i class="fa-solid fa-calendar-day"></i> {{ b.journey_date }}</span>
+            <span><i class="fa-solid fa-truck-pickup"></i> {{ b.vehicle_type|default:"Pickup" }}</span>
+            {% if b.fare %}
+              <span class="price-tag">₹{{ b.fare }}</span>
+            {% endif %}
+          </div>
+
+          <div class="bic-action">
+            <form method="POST" style="margin:0; width:100%;">
+              {% csrf_token %}
+              <input type="hidden" name="booking_id" value="{{ b.booking_id }}">
+              <button type="submit" class="btn-track-item">
+                <i class="fa-solid fa-location-crosshairs"></i> Track Consignment
+              </button>
+            </form>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- ======================================================================
+         BOOKING DETAILS & MILESTONE TRACKER (When Booking Exists)
+         ====================================================================== -->
+    {% if booking %}
+
+    {% if searched_query and searched_query != booking.booking_id %}
+    <div class="recovered-id-pill">
+      <i class="fa-solid fa-circle-check" style="font-size: 18px; color: #22c55e;"></i>
+      <span>Found booking for <strong>{{ searched_query }}</strong>! Your Consignment Reference ID is: <strong class="recovered-highlight">{{ booking.booking_id }}</strong></span>
+    </div>
+    {% endif %}
+
+    <div class="shipment-dossier-card">
+
+      <!-- 1. Header Bar: Tracking ID & Dynamic Live Status Badge -->
+      <div class="shipment-header-bar">
+        <div class="tracking-id-group">
+          <div class="tracking-id-label">Consignment Reference ID</div>
+          <div class="tracking-id-value">
+            <span class="id-text">{{ booking.booking_id }}</span>
+            <button type="button" class="btn-copy-id" onclick="copyTrackingId('{{ booking.booking_id }}')">
+              <i class="fa-regular fa-copy"></i> Copy ID
+            </button>
+          </div>
+          <div class="meta-tags-strip">
+            <span class="meta-tag-item">
+              <i class="fa-solid fa-calendar-day"></i> Journey: {{ booking.journey_date }}
+            </span>
+            <span class="meta-tag-item">
+              <i class="fa-solid fa-clock-rotate-left"></i> Booked: {{ booking.booking_date|date:"d M Y" }}
+            </span>
+            <span class="meta-tag-item">
+              <i class="fa-solid fa-route"></i> {{ booking.trip_type|default:"One Way" }}
+            </span>
+          </div>
+        </div>
+
+        <div class="status-badge-container">
+          {% if booking.status == "Confirmed" %}
+            <div class="status-pill pill-confirmed">
+              <i class="fa-solid fa-circle-check"></i> Booking Confirmed
+            </div>
+          {% elif booking.status == "Completed" %}
+            <div class="status-pill pill-completed">
+              <i class="fa-solid fa-flag-checkered"></i> Journey Completed
+            </div>
+          {% elif booking.status == "Pending" %}
+            <div class="status-pill pill-pending">
+              <i class="fa-solid fa-clock-rotate-left"></i> Verification Pending
+            </div>
+          {% else %}
+            <div class="status-pill pill-cancelled">
+              <i class="fa-solid fa-ban"></i> Booking Cancelled
+            </div>
+          {% endif %}
+          <span style="font-size: 11px; color: #64748b; font-weight: 500;">Real-time status updated</span>
+        </div>
+      </div>
+
+      <!-- 2. Enterprise Logistics Journey Pipeline (Milestone Stepper) -->
+      {% if booking.status != "Cancelled" %}
+      <div class="pipeline-section">
+        <div class="pipeline-header">
+          <i class="fa-solid fa-timeline"></i> Logistics Milestone Progression
+        </div>
+
+        <div class="stepper-track">
+          <!-- Step 1: Booking Placed -->
+          <div class="step-node completed">
+            <div class="step-icon-circle">
+              <i class="fa-solid fa-clipboard-check"></i>
+            </div>
+            <div class="step-title">Order Placed</div>
+            <div class="step-subtext">Booking Registered</div>
+          </div>
+
+          <!-- Step 2: Verification / Confirmed -->
+          <div class="step-node {% if booking.status == 'Pending' %}active pending-node{% else %}completed{% endif %}">
+            <div class="step-icon-circle">
+              {% if booking.status == 'Pending' %}
+                <i class="fa-solid fa-hourglass-half"></i>
+              {% else %}
+                <i class="fa-solid fa-shield-check"></i>
+              {% endif %}
+            </div>
+            <div class="step-title">Verified</div>
+            <div class="step-subtext">
+              {% if booking.status == 'Pending' %}Under Review{% else %}Confirmed{% endif %}
+            </div>
+          </div>
+
+          <!-- Step 3: Fleet & Driver Assigned -->
+          <div class="step-node {% if booking.status == 'Confirmed' %}active{% elif booking.status == 'Completed' %}completed{% else %}{% endif %}">
+            <div class="step-icon-circle">
+              <i class="fa-solid fa-truck-fast"></i>
+            </div>
+            <div class="step-title">Dispatched</div>
+            <div class="step-subtext">
+              {% if booking.assigned_driver %}Driver Allocated{% else %}Fleet Schedule{% endif %}
+            </div>
+          </div>
+
+          <!-- Step 4: Completed -->
+          <div class="step-node {% if booking.status == 'Completed' %}completed active{% endif %}">
+            <div class="step-icon-circle">
+              <i class="fa-solid fa-circle-check"></i>
+            </div>
+            <div class="step-title">Delivered</div>
+            <div class="step-subtext">Journey Finished</div>
+          </div>
+
+          <!-- Dynamic Connector Line Fill -->
+          <div class="stepper-connector">
+            <div class="stepper-connector-fill" style="width: 
+              {% if booking.status == 'Pending' %}33%
+              {% elif booking.status == 'Confirmed' %}66%
+              {% elif booking.status == 'Completed' %}100%
+              {% else %}0%{% endif %};">
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- 3. Route Corridor Visualizer Card -->
+      <div class="route-corridor-card">
+        <div class="route-corridor-grid">
+          <!-- Pickup Location -->
+          <div class="route-stop">
+            <div class="route-pin pin-pickup">
+              <i class="fa-solid fa-location-crosshairs"></i>
+            </div>
+            <div>
+              <div class="stop-label">Origin / Pickup Location</div>
+              <div class="stop-address">{{ booking.pickup }}</div>
+            </div>
+          </div>
+
+          <!-- Highway Track Middle -->
+          <div class="route-highway-visual">
+            <div class="highway-badge-wrap">
+              <span class="highway-pill"><i class="fa-solid fa-route"></i> {{ booking.distance }} KM</span>
+              <span class="highway-pill" style="color:#ffb870; border-color:rgba(255,184,112,0.4);"><i class="fa-solid fa-truck"></i> {{ booking.vehicle_type }}</span>
+            </div>
+            <div class="highway-line-wrap">
+              <i class="fa-solid fa-truck-moving highway-truck-icon"></i>
+            </div>
+          </div>
+
+          <!-- Destination Location -->
+          <div class="route-stop destination-stop">
+            <div class="route-pin pin-dest">
+              <i class="fa-solid fa-location-dot"></i>
+            </div>
+            <div>
+              <div class="stop-label" style="color: #ff9e00;">Destination / Drop Point</div>
+              <div class="stop-address">{{ booking.destination }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. 2-Column Split Details Grid: Consignment vs Driver/Fleet -->
+      <div class="details-split-grid">
+
+        <!-- Column A: Consignment & Sender Details -->
+        <div class="sub-panel-card">
+          <div class="panel-header">
+            <i class="fa-solid fa-box-archive"></i>
+            <span>Consignment &amp; Customer Overview</span>
+          </div>
+
+          <div class="dossier-list">
+            <div class="dossier-row">
+              <span class="dossier-label"><i class="fa-solid fa-user"></i> Customer Name</span>
+              <span class="dossier-val">{{ booking.name }}</span>
+            </div>
+
+            <div class="dossier-row">
+              <span class="dossier-label"><i class="fa-solid fa-phone"></i> Contact Phone</span>
+              <span class="dossier-val">{{ booking.phone }}</span>
+            </div>
+
+            <div class="dossier-row">
+              <span class="dossier-label"><i class="fa-solid fa-truck"></i> Vehicle Allocated</span>
+              <span class="dossier-val" style="color: #38bdf8;">{{ booking.vehicle_type }}</span>
+            </div>
+
+            <div class="dossier-row">
+              <span class="dossier-label"><i class="fa-solid fa-boxes-stacked"></i> Cargo Type</span>
+              <span class="dossier-val">{{ booking.cargo_type|default:"Commercial Goods / Freight" }}</span>
+            </div>
+
+            <div class="dossier-row">
+              <span class="dossier-label"><i class="fa-solid fa-weight-hanging"></i> Consignment Weight</span>
+              <span class="dossier-val">{{ booking.weight_value|default:"Standard" }} {{ booking.weight_unit|default:"kg" }}</span>
+            </div>
+
+            {% if booking.message %}
+            <div class="dossier-row" style="flex-direction: column; align-items: flex-start; gap: 4px;">
+              <span class="dossier-label"><i class="fa-solid fa-comment-dots"></i> Instructions &amp; Notes</span>
+              <span class="dossier-val" style="text-align: left; font-weight: 500; font-size: 13px; color: #cbd5e1;">{{ booking.message }}</span>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Column B: Fleet & Driver Allocation -->
+        <div class="sub-panel-card">
+          <div class="panel-header">
+            <i class="fa-solid fa-id-card-clip"></i>
+            <span>Fleet &amp; Driver Allocation</span>
+          </div>
+
+          {% if booking.assigned_driver %}
+          <div class="driver-profile-wrap">
+            <div class="driver-info-box">
+              {% if booking.assigned_driver.photo %}
+                <img src="{{ booking.assigned_driver.photo.url }}" alt="Driver Photo" class="driver-avatar">
+              {% else %}
+                <div class="driver-avatar">
+                  <i class="fa-solid fa-user-tie"></i>
+                </div>
+              {% endif %}
+              <div class="driver-meta-text">
+                <h4>{{ booking.assigned_driver.name }}</h4>
+                <span class="verified-driver-tag">
+                  <i class="fa-solid fa-shield-check"></i> Verified Ghidora Driver
+                </span>
+                {% if booking.assigned_driver.experience_years %}
+                  <div style="font-size: 12px; color: #94a3b8; margin-top: 3px;">
+                    <i class="fa-solid fa-award" style="color:#ffb870;"></i> {{ booking.assigned_driver.experience_years }} Years Driving Experience
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+
+            {% with vehicle=booking.assigned_driver.vehicle %}
+            {% if vehicle %}
+            <div class="vehicle-spec-strip">
+              <span class="dossier-label">
+                <i class="fa-solid fa-truck-pickup"></i> {{ vehicle.vehicle_type }}
+              </span>
+              <span class="number-plate-badge">
+                <i class="fa-solid fa-certificate"></i> {{ vehicle.vehicle_number }}
+              </span>
+            </div>
+            {% endif %}
+            {% endwith %}
+
+            <div class="driver-contact-actions">
+              <a href="tel:{{ booking.assigned_driver.mobile }}" class="btn-driver-cta btn-cta-call">
+                <i class="fa-solid fa-phone"></i> Call Driver
+              </a>
+              <a href="https://wa.me/91{{ booking.assigned_driver.mobile }}" target="_blank" class="btn-driver-cta btn-cta-whatsapp">
+                <i class="fa-brands fa-whatsapp"></i> WhatsApp
+              </a>
+            </div>
+          </div>
+          {% else %}
+          <div class="unassigned-driver-box">
+            <div class="radar-spinner"></div>
+            <div class="unassigned-title">Driver Assignment in Progress</div>
+            <div class="unassigned-desc">
+              Our 24/7 Logistics Dispatch Desk is allocating the closest top-rated vehicle for your route. Driver contact details will be displayed here as soon as verified.
+            </div>
+          </div>
+          {% endif %}
+        </div>
+
+      </div>
+
+      <!-- 5. Financial & Invoicing Breakdown Card -->
+      <div class="financial-invoicing-card">
+        <div class="panel-header">
+          <i class="fa-solid fa-receipt"></i>
+          <span>Fare Calculation &amp; Invoicing Details</span>
+        </div>
+
+        <div class="fare-breakdown-grid">
+          <div class="fare-tile">
+            <div class="fare-tile-label">Base Transport Freight</div>
+            <div class="fare-tile-value">₹{{ booking.fare }}</div>
+          </div>
+
+          <div class="fare-tile">
+            <div class="fare-tile-label">Toll &amp; Fastag Charges</div>
+            <div class="fare-tile-value">
+              {% if booking.toll_charges %}₹{{ booking.toll_charges }}{% else %}Included / ₹0{% endif %}
+            </div>
+          </div>
+
+          <div class="fare-tile">
+            <div class="fare-tile-label">Parking &amp; Entry Permits</div>
+            <div class="fare-tile-value">
+              {% if booking.parking_charges %}₹{{ booking.parking_charges }}{% else %}₹0{% endif %}
+            </div>
+          </div>
+
+          <div class="fare-tile tile-total">
+            <div class="fare-tile-label">Net Final Amount</div>
+            <div class="fare-tile-value">₹{{ booking.total_fare|default:booking.fare }}</div>
+          </div>
+        </div>
+
+        <!-- Payment Actions & Status -->
+        <div class="payment-actions-strip">
+          <div>
+            {% if booking.payment_status == 'Paid' %}
+              <span class="payment-status-tag tag-paid">
+                <i class="fa-solid fa-circle-check"></i> Paid &amp; Verified (Cash/Online)
+              </span>
+            {% elif booking.payment_status == 'Partial' %}
+              <span class="payment-status-tag tag-pending">
+                <i class="fa-solid fa-circle-half-stroke"></i> Partially Paid
+              </span>
+            {% else %}
+              <span class="payment-status-tag tag-pending">
+                <i class="fa-solid fa-clock-rotate-left"></i> Payment Pending
+              </span>
+            {% endif %}
+          </div>
+
+          <div class="billing-buttons-group">
+            <a href="{% url 'payments:customer_request_payment' booking.booking_id %}" class="btn-bill-cta btn-bill-pay">
+              <i class="fa-solid fa-credit-card"></i> Pay Online Now
+            </a>
+            <a href="{% url 'download_receipt' booking.id %}?view=1" target="_blank" class="btn-bill-cta btn-bill-slip">
+              <i class="fa-solid fa-file-pdf"></i> Download Booking Slip
+            </a>
+          </div>
+        </div>
+
+        <!-- Historical Payment Receipts (if any) -->
+        {% if payments %}
+        <div class="payment-history-wrap">
+          <div class="payment-history-title">Transaction &amp; Online Receipt Records</div>
+          {% for payment in payments %}
+          <div class="payment-item-row">
+            <div>
+              <strong style="color:#ffffff;">Amount: ₹{{ payment.amount }}</strong>
+              {% if payment.payment_method %}
+                <span style="font-size: 12px; color: #94a3b8; margin-left: 8px;">Method: {{ payment.payment_method }}</span>
+              {% endif %}
+              <span style="margin-left: 10px;">
+                {% if payment.status == 'VERIFIED' or payment.status == 'COMPLETED' or payment.status == 'SUCCESS' %}
+                  <span class="payment-status-tag tag-paid" style="font-size: 11px; padding: 2px 8px;">Verified 🟢</span>
+                {% elif payment.status == 'PENDING' or payment.status == 'Pending' %}
+                  <span class="payment-status-tag tag-pending" style="font-size: 11px; padding: 2px 8px;">Pending 🟡</span>
+                {% else %}
+                  <span class="payment-status-tag" style="background: rgba(239, 68, 68, 0.15); color: #f87171; font-size: 11px; padding: 2px 8px;">{{ payment.status }} 🔴</span>
+                {% endif %}
+              </span>
+            </div>
+
+            <div>
+              {% if payment.status == 'PENDING' or payment.status == 'Pending' %}
+                <a href="/payments/pay/{% if payment.payment_id %}{{ payment.payment_id }}{% else %}{{ payment.id }}{% endif %}/" class="btn-bill-cta btn-bill-pay" style="padding: 6px 12px; font-size: 12px;">
+                  Pay Transaction
+                </a>
+              {% elif payment.status == 'VERIFIED' or payment.status == 'COMPLETED' or payment.status == 'SUCCESS' %}
+                <a href="{% url 'download_receipt' booking.id %}?view=1" target="_blank" class="btn-bill-cta btn-bill-slip" style="padding: 6px 12px; font-size: 12px;">
+                  <i class="fa-solid fa-download"></i> Receipt PDF
+                </a>
+              {% endif %}
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+
+      </div>
+
+      <!-- 6. 24/7 Operations Support Strip -->
+      <div class="support-strip-card">
+        <div class="support-strip-text">
+          <i class="fa-solid fa-headset"></i>
+          <div>
+            <div class="support-strip-title">24/7 Ghidora Transport Operations Desk</div>
+            <div class="support-strip-sub">Need immediate assistance, route changes, or cargo inspection? Our team is live.</div>
+          </div>
+        </div>
+        <a href="tel:+917489297841" class="support-call-btn">
+          <i class="fa-solid fa-phone-volume"></i> +91 7489 297 841
+        </a>
+      </div>
+
+    </div>
+
+    {% endif %}
+
+  </div>
+
+  <!-- Chatbot Widget -->
+  {% include "chatbot/widget.html" %}
+
+  <!-- Helper Scripts -->
   <script>
-    window.toggleMobileMenu = function(event) {
-      if (event) {
-        try { event.preventDefault(); } catch(e){}
-        try { event.stopPropagation(); } catch(e){}
+    // Copy Tracking ID to Clipboard
+    function copyTrackingId(id) {
+      if (!id) return;
+      navigator.clipboard.writeText(id).then(function() {
+        alert("Booking ID " + id + " copied to clipboard!");
+      }).catch(function() {
+        prompt("Copy Booking ID:", id);
+      });
+    }
+
+    // Mobile Drawer Toggle
+    window.toggleMobileMenu = function(e) {
+      if (e) {
+        try { e.preventDefault(); } catch(err){}
+        try { e.stopPropagation(); } catch(err){}
       }
       var drawer = document.getElementById('mobileNavDrawer');
       var overlay = document.getElementById('mobileNavOverlay');
-      var btn = document.getElementById('hamburgerBtn');
-      if (!drawer) return;
-
-      var isVisible = drawer.classList.contains('active');
-
-      if (isVisible) {
-        window.closeMobileMenu();
-      } else {
-        drawer.classList.add('active');
-        if (overlay) overlay.classList.add('active');
-        if (btn) btn.classList.add('active');
-        document.body.style.overflow = 'hidden';
+      var hamburger = document.getElementById('hamburgerBtn');
+      if (drawer && overlay) {
+        var isOpen = drawer.classList.toggle('active');
+        overlay.classList.toggle('active');
+        if (hamburger) hamburger.classList.toggle('active');
+        document.body.style.overflow = isOpen ? 'hidden' : '';
       }
     };
 
     window.closeMobileMenu = function() {
       var drawer = document.getElementById('mobileNavDrawer');
       var overlay = document.getElementById('mobileNavOverlay');
-      var btn = document.getElementById('hamburgerBtn');
+      var hamburger = document.getElementById('hamburgerBtn');
       if (drawer) drawer.classList.remove('active');
       if (overlay) overlay.classList.remove('active');
-      if (btn) btn.classList.remove('active');
+      if (hamburger) hamburger.classList.remove('active');
       document.body.style.overflow = '';
     };
 
@@ -819,227 +2830,15 @@ button:hover::after{
         }
       }
     });
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        window.closeMobileMenu();
+      }
+    });
   </script>
 
-<div class="stars"></div>
-<div class="moon"></div>
-
-<div class="status-container">
-
-    <h1>
-        GHIDORA TRANSPORT
-        <span>REAL-TIME BOOKING STATUS TRACKER</span>
-    </h1>
-
-    <form method="POST">
-
-        {% csrf_token %}
-
-        <div class="input-wrap">
-            <span>🔎</span>
-            <input
-                type="text"
-                name="booking_id"
-                placeholder="Enter Booking ID"
-                required>
-        </div>
-
-        <button type="submit">
-            Check Status
-        </button>
-
-    </form>
-
-    {% if booking %}
-
-    <div class="booking-card-wrap">
-    <div class="booking-card">
-
-        <div class="book-loader-wrap">
-            <div class="book-loader">
-                <div class="page left"></div>
-                <div class="page right"></div>
-                <div class="spine"></div>
-            </div>
-        </div>
-
-        <h2> 𝔹𝕆𝕆𝕂𝕀ℕ𝔾 𝔻𝔼𝕋𝔸𝕀𝕃</h2>
-
-        <p><b>Booking ID:</b> {{ booking.booking_id }}</p>
-
-        <p><b>Name:</b> {{ booking.name }}</p>
-
-        <p><b>Phone:</b> {{ booking.phone }}</p>
-
-        <p><b>Vehicle:</b> {{ booking.vehicle_type }}</p>
-
-        <p><b>Pickup:</b> {{ booking.pickup }}</p>
-
-        <p><b>Destination:</b> {{ booking.destination }}</p>
-
-        <p><b>Journey Date:</b> {{ booking.journey_date }}</p>
-
-        <p><b>Distance:</b> {{ booking.distance }} KM</p>
-
-        <p><b>Total Fare:</b> ₹{{ booking.fare }}</p>
-
-        {% if booking.assigned_driver %}
-        <div class="driver-details-box">
-            <h3>🚚 Your Driver Details</h3>
-            <p><b>Driver:</b> {{ booking.assigned_driver.name }}</p>
-            <p><b>Phone:</b> {{ booking.assigned_driver.mobile }}</p>
-            {% with vehicle=booking.assigned_driver.vehicle %}
-            {% if vehicle %}
-            <p><b>Vehicle:</b> {{ vehicle.vehicle_type }}</p>
-            <p><b>Vehicle No:</b> {{ vehicle.vehicle_number }}</p>
-            {% endif %}
-            {% endwith %}
-            <div class="driver-contact-buttons">
-                <a class="btn-call-driver" href="tel:{{ booking.assigned_driver.mobile }}">📞 Call Driver</a>
-                <a class="btn-whatsapp-driver" target="_blank" href="https://wa.me/91{{ booking.assigned_driver.mobile }}">💬 WhatsApp Driver</a>
-            </div>
-        </div>
-        {% endif %}
-
-        <!-- PAYMENT & RECEIPT SECTION -->
-        <div class="payment-details-box">
-            <h3>💳 Payment & Receipt</h3>
-
-            {% if payments %}
-                {% for payment in payments %}
-                <div class="payment-item">
-                    <div class="payment-info">
-                        <p><b>Amount:</b> ₹{{ payment.amount }}</p>
-                        {% if payment.payment_method %}
-                        <p><b>Method:</b> {{ payment.payment_method }}</p>
-                        {% endif %}
-                        <p><b>Status:</b>
-                            {% if payment.status == 'VERIFIED' or payment.status == 'COMPLETED' or payment.status == 'SUCCESS' %}
-                                <span class="payment-status-badge badge-verified">Verified 🟢</span>
-                            {% elif payment.status == 'PENDING' or payment.status == 'Pending' %}
-                                <span class="payment-status-badge badge-pending">Pending 🟡</span>
-                            {% else %}
-                                <span class="payment-status-badge badge-failed">{{ payment.status }} 🔴</span>
-                            {% endif %}
-                        </p>
-                    </div>
-
-                    <div>
-                        {% if payment.status == 'PENDING' or payment.status == 'Pending' %}
-                            <!-- Compatible with both PAY-XXXXXXXX string codes & Integer IDs -->
-                            <a href="/payments/pay/{% if payment.payment_id %}{{ payment.payment_id }}{% else %}{{ payment.id }}{% endif %}/" class="btn-pay-now">
-                                Pay Now 💳
-                            </a>
-                        {% elif payment.status == 'VERIFIED' or payment.status == 'COMPLETED' or payment.status == 'SUCCESS' %}
-                            <a href="{% url 'download_receipt' booking.id %}?view=1" target="_blank" class="btn-download-receipt">
-                                Download Receipt 📄
-                            </a>
-                        {% endif %}
-                    </div>
-                </div>
-                {% endfor %}
-            {% else %}
-                <div class="payment-item">
-                    <div class="payment-info">
-                        <p><b>Total Amount:</b> ₹{{ booking.fare }}</p>
-                        <p style="color: rgba(255,255,255,0.6); font-size:13px !important;">Pay online anytime (Advance or Full remaining amount).</p>
-                    </div>
-                    <div style="display:flex; gap:10px; flex-wrap:wrap;">
-                        <a href="{% url 'payments:customer_request_payment' booking.booking_id %}" class="btn-pay-now">
-                            Pay Online Now 💳
-                        </a>
-                        <a href="{% url 'download_receipt' booking.id %}?view=1" target="_blank" class="btn-download-receipt">
-                            Booking Slip 📄
-                        </a>
-                    </div>
-                </div>
-            {% endif %}
-            
-            {% if payments %}
-                <div style="margin-top:14px; text-align:right;">
-                    <a href="{% url 'payments:customer_request_payment' booking.booking_id %}" class="btn-pay-now" style="font-size:13px; padding:8px 16px;">
-                        + Make New Payment 💳
-                    </a>
-                </div>
-            {% endif %}
-        </div>
-
-        {% if booking.status != "Cancelled" %}
-
-        <div class="timeline-title">Booking Progress</div>
-
-        <div class="timeline">
-
-            <div class="timeline-step completed">
-                <div class="timeline-circle">📝</div>
-                <div class="timeline-label">Booking<br>Received</div>
-            </div>
-
-            <div class="timeline-line line-completed"></div>
-
-            <div class="timeline-step
-                {% if booking.status == 'Pending' %}current stage-pending
-                {% else %}completed{% endif %}">
-                <div class="timeline-circle">🟡</div>
-                <div class="timeline-label">Pending</div>
-            </div>
-
-            <div class="timeline-line
-                {% if booking.status == 'Pending' %}line-upcoming
-                {% else %}line-completed{% endif %}"></div>
-
-            <div class="timeline-step
-                {% if booking.status == 'Pending' %}upcoming
-                {% elif booking.status == 'Confirmed' %}current stage-confirmed
-                {% else %}completed{% endif %}">
-                <div class="timeline-circle">🟢</div>
-                <div class="timeline-label">Confirmed</div>
-            </div>
-
-            <div class="timeline-line
-                {% if booking.status == 'Completed' %}line-completed
-                {% else %}line-upcoming{% endif %}"></div>
-
-            <div class="timeline-step
-                {% if booking.status == 'Completed' %}current stage-completed
-                {% else %}upcoming{% endif %}">
-                <div class="timeline-circle">✅</div>
-                <div class="timeline-label">Completed</div>
-            </div>
-
-        </div>
-
-        {% endif %}
-
-        {% if booking.status == "Pending" %}
-        <div class="pending">
-            🟡 BOOKING PENDING
-        </div>
-
-        {% elif booking.status == "Confirmed" %}
-        <div class="confirmed">
-            🟢 BOOKING CONFIRMED
-        </div>
-
-        {% elif booking.status == "Completed" %}
-        <div class="completed">
-            🔵 JOURNEY COMPLETED
-        </div>
-
-        {% else %}
-        <div class="cancelled">
-            🔴 BOOKING CANCELLED
-        </div>
-        {% endif %}
-
-    </div>
-    </div>
-
-    {% endif %}
-
-</div>
-
-{% include "chatbot/widget.html" %}
+  {% include "booking/footer.html" %}
 
 </body>
 </html>

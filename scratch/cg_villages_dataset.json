@@ -1,0 +1,230 @@
+{
+  "Birejhar": {
+    "lat": 21.1761,
+    "lon": 81.1686,
+    "admin2": "Rajnandgaon",
+    "admin3": "Rajnandgaon"
+  },
+  "Sirri": {
+    "lat": 21.0401,
+    "lon": 81.3757,
+    "admin2": "Balod",
+    "admin3": "Gunderdehi"
+  },
+  "Darba": {
+    "lat": 20.9798,
+    "lon": 81.717,
+    "admin2": "Dhamtari",
+    "admin3": "Kurud"
+  },
+  "Kotgaon": {
+    "lat": 20.9056,
+    "lon": 81.245,
+    "admin2": "Balod",
+    "admin3": "Arjunda"
+  },
+  "Dhetha": {
+    "lat": 20.9642,
+    "lon": 81.7405,
+    "admin2": "Dhamtari",
+    "admin3": "Kurud"
+  },
+  "Hathband": {
+    "lat": 20.733,
+    "lon": 81.9404,
+    "admin2": "Dhamtari",
+    "admin3": "Magarlod"
+  },
+  "Jamgaon": {
+    "lat": 20.3846,
+    "lon": 81.7408,
+    "admin2": "Kanker",
+    "admin3": "Narharpur"
+  },
+  "Nimora": {
+    "lat": 21.1333,
+    "lon": 81.7333,
+    "admin2": "Raipur district",
+    "admin3": "Abhanpur"
+  },
+  "Bhatgaon": {
+    "lat": 23.3598,
+    "lon": 82.9966,
+    "admin2": "Surajpur",
+    "admin3": "Bhaiyathan"
+  },
+  "Hasda": {
+    "lat": 21.3264,
+    "lon": 81.2037,
+    "admin2": "Durg district",
+    "admin3": "Dhamdha"
+  },
+  "Marod": {
+    "lat": 20.9042,
+    "lon": 81.6859,
+    "admin2": "Dhamtari",
+    "admin3": "Kurud"
+  },
+  "Hanchalpur": {
+    "lat": 20.8829,
+    "lon": 81.5479,
+    "admin2": "Dhamtari",
+    "admin3": "Kurud"
+  },
+  "Sankra": {
+    "lat": 21.2852,
+    "lon": 82.6586,
+    "admin2": "Mahasamund",
+    "admin3": "Pithora"
+  },
+  "Sorid": {
+    "lat": 21.1452,
+    "lon": 82.1334,
+    "admin2": "Mahasamund",
+    "admin3": "Mahasamund"
+  },
+  "Rudri": {
+    "lat": 20.6625,
+    "lon": 81.553,
+    "admin2": "Dhamtari",
+    "admin3": "Dhamtari"
+  },
+  "Gangrel": {
+    "lat": 20.6165,
+    "lon": 81.5596,
+    "admin2": "Dhamtari",
+    "admin3": "Dhamtari"
+  },
+  "Dhaneli": {
+    "lat": 21.1667,
+    "lon": 81.7,
+    "admin2": "Raipur district",
+    "admin3": "Raipur"
+  },
+  "Mujgahan": {
+    "lat": 20.978,
+    "lon": 81.0076,
+    "admin2": "Balod",
+    "admin3": "Marri Bangla Dewri"
+  },
+  "Datrenga": {
+    "lat": 21.1617,
+    "lon": 81.6411,
+    "admin2": "Raipur district",
+    "admin3": "Raipur"
+  },
+  "Raweli": {
+    "lat": 21.5899,
+    "lon": 81.9997,
+    "admin2": "Baloda Bazar",
+    "admin3": "Suhela"
+  },
+  "Boria Kalan": {
+    "lat": 21.1833,
+    "lon": 81.6833,
+    "admin2": "Raipur district",
+    "admin3": "Raipur"
+  },
+  "Sejbahar": {
+    "lat": 21.1633,
+    "lon": 81.6659,
+    "admin2": "Raipur district",
+    "admin3": "Raipur"
+  },
+  "Mandir Hasaud": {
+    "lat": 21.2237,
+    "lon": 81.7676,
+    "admin2": "Raipur district",
+    "admin3": "Arang"
+  },
+  "Chandkhuri": {
+    "lat": 21.1355,
+    "lon": 81.2691,
+    "admin2": "Durg district",
+    "admin3": "Durg"
+  },
+  "Selud": {
+    "lat": 21.0833,
+    "lon": 81.4167,
+    "admin2": "Durg district",
+    "admin3": "Patan"
+  },
+  "Utai": {
+    "lat": 21.1167,
+    "lon": 81.3833,
+    "admin2": "Durg district",
+    "admin3": "Durg"
+  },
+  "Gunderdehi": {
+    "lat": 20.9462,
+    "lon": 81.2892,
+    "admin2": "Balod",
+    "admin3": "Gunderdehi"
+  },
+  "Junwani": {
+    "lat": 21.439,
+    "lon": 81.1368,
+    "admin2": "Khairgarh Chhuikhadan Gandai",
+    "admin3": "Khairagarh"
+  },
+  "Supela": {
+    "lat": 21.2102,
+    "lon": 81.3517,
+    "admin2": "Durg district",
+    "admin3": "Durg"
+  },
+  "Kurud": {
+    "lat": 20.8307,
+    "lon": 81.7221,
+    "admin2": "Dhamtari",
+    "admin3": "Kurud"
+  },
+  "Dhamtari": {
+    "lat": 20.7072,
+    "lon": 81.5487,
+    "admin2": "Dhamtari",
+    "admin3": "Dhamtari"
+  },
+  "Abhanpur": {
+    "lat": 21.0531,
+    "lon": 81.7409,
+    "admin2": "Raipur district",
+    "admin3": "Abhanpur"
+  },
+  "Rajim": {
+    "lat": 20.9635,
+    "lon": 81.8799,
+    "admin2": "Gariyaband",
+    "admin3": "Rajim"
+  },
+  "Arang": {
+    "lat": 21.1964,
+    "lon": 81.9691,
+    "admin2": "Raipur district",
+    "admin3": "Arang"
+  },
+  "Tilda": {
+    "lat": 21.5506,
+    "lon": 81.7973,
+    "admin2": "Raipur district",
+    "admin3": "Tilda"
+  },
+  "Kharora": {
+    "lat": 21.401,
+    "lon": 81.9276,
+    "admin2": "Raipur district",
+    "admin3": "Kharora"
+  },
+  "Simga": {
+    "lat": 21.6281,
+    "lon": 81.7038,
+    "admin2": "Baloda Bazar",
+    "admin3": "Simga"
+  },
+  "Balod": {
+    "lat": 20.7308,
+    "lon": 81.2058,
+    "admin2": "Balod",
+    "admin3": "Balod"
+  }
+}

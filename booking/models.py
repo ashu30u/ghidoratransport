@@ -1,9 +1,12 @@
+import logging
 from django.db import models
 from django.conf import settings
 from django.db.models.signals import pre_save, post_save, post_delete
 from django.dispatch import receiver
 from django.core.cache import cache
 import random
+
+logger = logging.getLogger(__name__)
 
 
 class Booking(models.Model):
@@ -406,9 +409,9 @@ Please check Live Admin Panel: https://ghidoratransport.onrender.com/admin/
             recipient_list=['ghidoratransport@gmail.com'],
             fail_silently=True
         )
-        print(f"✅ Admin new booking alert email sent for #{instance.booking_id}")
+        logger.info("Admin new booking alert email sent for #%s", instance.booking_id)
     except Exception as e:
-        print("❌ Admin email notification failed:", e)
+        logger.warning("Admin email notification failed: %s", e)
 
 
 @receiver(post_save, sender=Booking)
@@ -463,17 +466,20 @@ Ghidora Transport
             "application/pdf"
         )
         mail.send(fail_silently=False)
-        print(f"✅ Completion receipt email sent to {instance.email} for #{instance.booking_id}")
+        logger.info("Completion receipt email sent to %s for #%s", instance.email, instance.booking_id)
+        print(f"[OK] Completion receipt email sent to {instance.email} for #{instance.booking_id}")
 
     except Exception as e:
-        print(f"❌ Completion email send failed for booking {booking_id}: {e}")
+        logger.error("Completion email send failed for booking %s: %s", booking_id, e)
+        print(f"[ERROR] Completion email send failed for booking {booking_id}: {e}")
 
 
 @receiver(post_save, sender=Booking)
 def _send_email_on_completion(sender, instance, created, **kwargs):
     previous_status = getattr(instance, '_previous_status', None)
-    if not created and instance.status == 'Completed' and previous_status != 'Completed':
-        if instance.email:
+    should_send = (created and instance.status == 'Completed') or (not created and instance.status == 'Completed' and previous_status != 'Completed')
+    if should_send:
+        if instance.email and instance.email.strip():
             import threading
             threading.Thread(
                 target=_send_completion_email_worker,

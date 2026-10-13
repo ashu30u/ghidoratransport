@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
 <style>
   :root{
@@ -137,6 +138,23 @@
     box-shadow:0 0 0 3px rgba(63,164,255,0.2);
   }
 
+  .pwd-toggle-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-mid);
+    cursor: pointer;
+    padding: 6px;
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s ease, transform 0.15s ease;
+  }
+  .pwd-toggle-btn:hover {
+    color: var(--cyan);
+    transform: scale(1.1);
+  }
+
   .btn{
     width:100%; border:none; border-radius:var(--radius-field);
     font-family:var(--ff-body); font-weight:700; font-size:15px;
@@ -231,6 +249,9 @@
         <label for="id_password1">Password</label>
         <div class="field-shell">
           <input id="id_password1" name="password1" type="password" autocomplete="new-password" placeholder="Create password (min 8 chars)" required>
+          <button type="button" class="pwd-toggle-btn" onclick="togglePasswordVisibility('id_password1', this)" title="Show / Hide Password" tabindex="-1">
+            <i class="fa-solid fa-eye"></i>
+          </button>
         </div>
       </div>
 
@@ -238,6 +259,9 @@
         <label for="id_password2">Confirm Password</label>
         <div class="field-shell">
           <input id="id_password2" name="password2" type="password" autocomplete="new-password" placeholder="Re-enter password" required>
+          <button type="button" class="pwd-toggle-btn" onclick="togglePasswordVisibility('id_password2', this)" title="Show / Hide Password" tabindex="-1">
+            <i class="fa-solid fa-eye"></i>
+          </button>
         </div>
       </div>
 
@@ -249,6 +273,27 @@
     </form>
   </div>
 </main>
+
+<script>
+function togglePasswordVisibility(fieldId, btn) {
+  const input = document.getElementById(fieldId);
+  if (!input) return;
+  const icon = btn.querySelector('i');
+  if (input.type === 'password') {
+    input.type = 'text';
+    if (icon) {
+      icon.classList.remove('fa-eye');
+      icon.classList.add('fa-eye-slash');
+    }
+  } else {
+    input.type = 'password';
+    if (icon) {
+      icon.classList.remove('fa-eye-slash');
+      icon.classList.add('fa-eye');
+    }
+  }
+}
+</script>
 
 </body>
 </html>

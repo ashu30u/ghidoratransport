@@ -15,5 +15,6 @@ urlpatterns = [
     path("admin-panel/dashboard/", views.admin_dashboard, name="admin_dashboard"),
     path("admin-panel/create-request/<str:booking_id>/", views.admin_create_payment_request, name="admin_create_payment_request"),
     path("admin-panel/verify/<str:payment_id>/", views.admin_verification_panel, name="admin_verification_panel"),
+    path("admin-panel/all-done/<str:payment_id>/", views.admin_mark_all_done, name="admin_mark_all_done"),
     path("admin-panel/settings/", views.admin_payment_settings, name="admin_payment_settings"),
 ] 

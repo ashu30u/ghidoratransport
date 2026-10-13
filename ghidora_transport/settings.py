@@ -9,6 +9,19 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Load local .env if present
+_env_file = BASE_DIR / '.env'
+if _env_file.exists():
+    try:
+        with open(_env_file, encoding='utf-8') as _f:
+            for _line in _f:
+                _line = _line.strip()
+                if _line and not _line.startswith('#') and '=' in _line:
+                    _k, _v = _line.split('=', 1)
+                    os.environ.setdefault(_k.strip(), _v.strip())
+    except Exception:
+        pass
+
 
 # Quick-start development settings - unsuitable for production
 SECRET_KEY = os.environ.get(
@@ -23,21 +36,25 @@ ALLOWED_HOSTS = ['*']
 
 # 🌟 CSRF Fix for Ngrok, Local Network & Render Deployment
 CSRF_TRUSTED_ORIGINS = [
+    'https://jester-clang-steadfast.ngrok-free.app',
+    'http://jester-clang-steadfast.ngrok-free.app',
+    'https://jester-clang-steadfast.ngrok-free.dev',
+    'http://jester-clang-steadfast.ngrok-free.dev',
     'https://ghidoratransport.onrender.com',
+    'http://127.0.0.1:8000',
+    'http://localhost:8000',
     'https://*.ngrok-free.dev',
     'https://*.ngrok-free.app',
     'https://*.ngrok.io',
-    'http://*.ngrok-free.dev',
-    'http://*.ngrok-free.app',
-    'http://127.0.0.1:8000',
-    'http://localhost:8000',
-    'http://192.168.*.*',
-    'http://10.*.*.*',
 ]
 
-# Disable cookie secure enforcement for local dev / ngrok HTTP
+# Disable cookie secure enforcement & set SameSite Lax for local dev / ngrok HTTP
 CSRF_COOKIE_SECURE = False
 SESSION_COOKIE_SECURE = False
+CSRF_COOKIE_SAMESITE = 'Lax'
+SESSION_COOKIE_SAMESITE = 'Lax'
+CSRF_COOKIE_HTTPONLY = False
+
 
 
 # Application definition
@@ -94,10 +111,12 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'occasions.context_processors.active_occasion',
+                'social.context_processors.unread_messages',
             ],
         },
     },
 ]
+
 
 WSGI_APPLICATION = 'ghidora_transport.wsgi.application'
 
@@ -134,11 +153,29 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Kolkata'
 
 USE_I18N = True
 
 USE_TZ = True
+
+TIME_INPUT_FORMATS = [
+    '%I:%M:%S %p',
+    '%I:%M %p',
+    '%I:%M:%S%p',
+    '%I:%M%p',
+    '%H:%M:%S',
+    '%H:%M',
+]
+
+DATETIME_INPUT_FORMATS = [
+    '%Y-%m-%d %I:%M:%S %p',
+    '%Y-%m-%d %I:%M %p',
+    '%Y-%m-%d %I:%M:%S%p',
+    '%Y-%m-%d %I:%M%p',
+    '%Y-%m-%d %H:%M:%S',
+    '%Y-%m-%d %H:%M',
+]
 
 
 # Static files (CSS, JavaScript, Images)
@@ -181,7 +218,7 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'ghidoratransport@gmail.com'
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', 'dvoigfiojlfhahoa')
-EMAIL_TIMEOUT = 15
+EMAIL_TIMEOUT = 45
 DEFAULT_FROM_EMAIL = 'Ghidora Transport <ghidoratransport@gmail.com>'
 
 MEDIA_URL = '/media/'
@@ -214,29 +251,58 @@ GOOGLE_MAPS_API_KEY = os.environ.get(
 # ================================
 # Login redirect settings
 # ================================
-LOGIN_URL = '/accounts/login/'
-LOGIN_REDIRECT_URL = '/'
-LOGOUT_REDIRECT_URL = '/accounts/login/'
+LOGIN_URL = '/login/'
+LOGIN_REDIRECT_URL = '/user-dashboard/'
+LOGOUT_REDIRECT_URL = '/'
 
 # ================================
 # django-allauth / Google Login settings
 # ================================
 AUTHENTICATION_BACKENDS = [
+    'booking.backends.MultiIdentifierBackend',
     'django.contrib.auth.backends.ModelBackend',
     'allauth.account.auth_backends.AuthenticationBackend',
 ]
+
+ACCOUNT_AUTHENTICATION_METHOD = 'username_email'
 
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
         'SCOPE': ['profile', 'email'],
         'AUTH_PARAMS': {'access_type': 'online'},
         'APP': {
-            'client_id': '520482080238-ejsi630q0nv6na0de3if97ug73f5rmmt.apps.googleusercontent.com',
-            'secret': os.environ.get('GOOGLE_CLIENT_SECRET', 'GOCSPX-dummy_secret'),
+            'client_id': os.environ.get('GOOGLE_CLIENT_ID', ''),
+            'secret': os.environ.get('GOOGLE_CLIENT_SECRET', ''),
             'key': ''
         }
     }
 }
 
-ACCOUNT_LOGOUT_REDIRECT_URL = '/accounts/login/'
+ACCOUNT_ADAPTER = 'booking.adapters.RoleBasedAccountAdapter'
+ACCOUNT_LOGOUT_REDIRECT_URL = '/'
 SOCIALACCOUNT_LOGIN_ON_GET = True
+SOCIALACCOUNT_ADAPTER = 'social.adapters.CustomSocialAccountAdapter'
+ACCOUNT_EMAIL_VERIFICATION = 'none'
+ACCOUNT_EMAIL_REQUIRED = True
+SOCIALACCOUNT_AUTO_SIGNUP = True
+
+
+
+# 🌟 Universal Smart Scheme Detector (Works on Localhost, Ngrok, and Render automatically)
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SOCIALACCOUNT_STORE_TOKENS = True
+
+# CSRF Trusted Origins & Cookie Security
+CSRF_TRUSTED_ORIGINS = [
+    'http://127.0.0.1:8000',
+    'http://localhost:8000',
+    'http://127.0.0.1',
+    'http://localhost',
+    'https://*.onrender.com',
+    'https://*.ngrok-free.app',
+    'https://*.ngrok.io',
+]
+CSRF_COOKIE_SAMESITE = 'Lax'
+SESSION_COOKIE_SAMESITE = 'Lax'
+
+

@@ -11,6 +11,8 @@ import warnings
 warnings.filterwarnings("ignore", category=FutureWarning)
 import google.generativeai as genai
 
+from django.utils import timezone
+from django.db import transaction
 from .models import Occasion, OccasionSettings
 from booking.models import Booking
 
@@ -208,7 +210,8 @@ def sync_upcoming_occasions():
 
         with transaction.atomic():
             send_time = settings_obj.default_sending_time
-            sched_dt = datetime.combine(ev_date, send_time) if send_time else datetime.combine(ev_date, datetime.min.time()).replace(hour=8, minute=35)
+            naive_dt = datetime.combine(ev_date, send_time) if send_time else datetime.combine(ev_date, datetime.min.time()).replace(hour=8, minute=35)
+            sched_dt = timezone.make_aware(naive_dt) if timezone.is_naive(naive_dt) else naive_dt
             new_occ = Occasion.objects.create(
                 name=name,
                 date=ev_date,
@@ -260,6 +263,15 @@ def dispatch_occasion_notifications(occasion, force=False):
     User = get_user_model()
 
     raw_emails = set(['ghidoratransport@gmail.com'])
+
+    # 0. Custom Occasion Gmail / Email Recipients (Added via Django Admin)
+    try:
+        from .models import OccasionRecipient
+        for em in OccasionRecipient.objects.filter(is_active=True).values_list('email', flat=True):
+            if em and em.strip():
+                raw_emails.add(em.strip().lower())
+    except Exception as e:
+        logger.warning(f"Error fetching OccasionRecipient emails: {e}")
 
     # 1. Booking Customer Emails
     try:
@@ -356,6 +368,15 @@ def dispatch_occasion_notifications(occasion, force=False):
 
     sent_count = 0
     last_error = None
+
+    from django.core.mail import get_connection
+    try:
+        connection = get_connection()
+        connection.open()
+    except Exception as conn_err:
+        connection = None
+        logger.warning(f"Could not open persistent SMTP connection: {conn_err}")
+
     for email in emails:
         try:
             mail = EmailMultiAlternatives(
@@ -363,6 +384,7 @@ def dispatch_occasion_notifications(occasion, force=False):
                 body=plain_text,
                 from_email=settings.DEFAULT_FROM_EMAIL,
                 to=[email],
+                connection=connection,
             )
             mail.attach_alternative(html_body, "text/html")
 
@@ -376,15 +398,21 @@ def dispatch_occasion_notifications(occasion, force=False):
             mail.send(fail_silently=False)
             sent_count += 1
             logger.info(f"Successfully sent occasion email to {email}")
-            print(f"✅ Sent occasion '{occasion.name}' email to {email}")
+            print(f"[OK] Sent occasion '{occasion.name}' email to {email}")
         except Exception as e:
             last_error = str(e)
             logger.error(f"Error sending email to {email}: {e}")
-            print(f"❌ Error sending email to {email}: {e}")
+            print(f"[ERROR] Error sending email to {email}: {e}")
+
+    if connection:
+        try:
+            connection.close()
+        except Exception:
+            pass
 
     if sent_count > 0:
         occasion.last_sent_year = current_year
-        occasion.sent_at = datetime.now()
+        occasion.sent_at = timezone.now()
         occasion.status = 'sent'
         occasion.save()
         return {"sent": sent_count, "status": f"Delivered to {sent_count} customer(s)"}
@@ -393,3 +421,58 @@ def dispatch_occasion_notifications(occasion, force=False):
         occasion.save()
         err_msg = last_error or "Could not deliver email to any customer."
         return {"sent": 0, "error": f"Failed to send email: {err_msg}"}
+
+
+def check_and_send_due_occasions(force=False):
+    """
+    Finds all approved & active occasions whose scheduled_at <= now,
+    and automatically dispatches greeting emails to customers.
+    Also handles occasions scheduled for today if auto_sending_enabled is True.
+    """
+    now = timezone.now()
+    current_year = date.today().year
+
+    # 1. Approved occasions with scheduled_at <= now, not yet sent
+    due_qs = Occasion.objects.filter(
+        approval_status='approved',
+        is_active=True,
+        scheduled_at__isnull=False,
+        scheduled_at__lte=now,
+    ).exclude(status='sent')
+
+    if not force:
+        due_qs = due_qs.exclude(last_sent_year=current_year)
+
+    # 2. Check if auto_sending_enabled in settings for occasions on today's date with no scheduled_at
+    settings_obj = get_occasion_settings()
+    if settings_obj.auto_sending_enabled:
+        today = date.today()
+        auto_qs = Occasion.objects.filter(
+            approval_status='approved',
+            is_active=True,
+            scheduled_at__isnull=True,
+            date=today,
+        ).exclude(status='sent')
+        if not force:
+            auto_qs = auto_qs.exclude(last_sent_year=current_year)
+        due_qs = (due_qs | auto_qs).distinct()
+
+    results = []
+    for occ in due_qs:
+        logger.info(f"[Auto-Scheduler] Dispatching due occasion: {occ.name} (scheduled_at={occ.scheduled_at})")
+        res = dispatch_occasion_notifications(occ, force=force)
+        sent = res.get('sent', 0)
+        status_text = res.get('status') or res.get('error')
+        results.append({
+            'id': occ.id,
+            'name': occ.name,
+            'sent': sent,
+            'status': status_text
+        })
+        print(f"[Auto-Scheduler] {occ.name}: {sent} emails sent ({status_text})")
+
+    return {
+        'total_due': len(results),
+        'dispatched': results
+    }
+

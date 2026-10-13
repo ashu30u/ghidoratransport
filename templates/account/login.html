@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
 <style>
   :root{
@@ -136,6 +137,23 @@
     box-shadow:0 0 0 3px rgba(63,164,255,0.2);
   }
 
+  .pwd-toggle-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-mid);
+    cursor: pointer;
+    padding: 6px;
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s ease, transform 0.15s ease;
+  }
+  .pwd-toggle-btn:hover {
+    color: var(--cyan);
+    transform: scale(1.1);
+  }
+
   .row-between{
     display:flex; align-items:center; justify-content:space-between;
     margin:4px 0 22px; font-size:13px;
@@ -206,16 +224,21 @@
       {% csrf_token %}
 
       <div class="field">
-        <label for="id_login">Username or Email</label>
+        <label for="id_login">Mobile Number, Email, or Username</label>
         <div class="field-shell">
-          <input id="id_login" name="login" type="text" autocomplete="username" placeholder="Enter username or email" required value="{{ form.login.value|default:'' }}">
+          <i class="fa-solid fa-user-shield" style="color: var(--blue); font-size: 14px;"></i>
+          <input id="id_login" name="login" type="text" autocomplete="username" placeholder="Enter 10-digit mobile, email, or username" required value="{{ form.login.value|default:'' }}">
         </div>
       </div>
 
       <div class="field">
         <label for="id_password">Password</label>
         <div class="field-shell">
+          <i class="fa-solid fa-lock" style="color: var(--blue); font-size: 14px;"></i>
           <input id="id_password" name="password" type="password" autocomplete="current-password" placeholder="••••••••" required>
+          <button type="button" class="pwd-toggle-btn" onclick="togglePasswordVisibility('id_password', this)" title="Show / Hide Password" tabindex="-1">
+            <i class="fa-solid fa-eye"></i>
+          </button>
         </div>
       </div>
 
@@ -241,6 +264,27 @@
     </form>
   </div>
 </main>
+
+<script>
+function togglePasswordVisibility(fieldId, btn) {
+  const input = document.getElementById(fieldId);
+  if (!input) return;
+  const icon = btn.querySelector('i');
+  if (input.type === 'password') {
+    input.type = 'text';
+    if (icon) {
+      icon.classList.remove('fa-eye');
+      icon.classList.add('fa-eye-slash');
+    }
+  } else {
+    input.type = 'password';
+    if (icon) {
+      icon.classList.remove('fa-eye-slash');
+      icon.classList.add('fa-eye');
+    }
+  }
+}
+</script>
 
 </body>
 </html>

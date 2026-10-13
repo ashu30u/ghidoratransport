@@ -1,0 +1,279 @@
+{% extends "base.html" %}
+{% load static social_extras %}
+
+{% block title %}Reels • Ghidora Social{% endblock %}
+
+{% block extra_css %}
+<style>
+.reels-feed-wrapper {
+  max-width: 460px;
+  margin: 0 auto;
+  height: calc(100vh - 80px);
+  overflow-y: scroll;
+  scroll-snap-type: y mandatory;
+  scrollbar-width: none;
+}
+.reels-feed-wrapper::-webkit-scrollbar {
+  display: none;
+}
+.reel-item-container {
+  scroll-snap-align: start;
+  height: calc(100vh - 90px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  margin-bottom: 20px;
+}
+.reel-card {
+  width: 380px;
+  max-width: 95vw;
+  height: 640px;
+  max-height: 85vh;
+  background: #000;
+  border-radius: 16px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.8);
+  border: 1px solid rgba(255,255,255,0.12);
+}
+.reel-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.reel-actions-column {
+  position: absolute;
+  right: 12px;
+  bottom: 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  z-index: 10;
+  color: #fff;
+}
+.reel-action-btn {
+  background: transparent;
+  border: none;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 1.6rem;
+  cursor: pointer;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+  transition: transform 0.15s ease;
+}
+.reel-action-btn:hover {
+  transform: scale(1.15);
+}
+.reel-action-btn span {
+  font-size: 0.75rem;
+  font-weight: 700;
+  margin-top: 4px;
+}
+.reel-bottom-info {
+  position: absolute;
+  left: 14px;
+  right: 60px;
+  bottom: 16px;
+  z-index: 10;
+  color: #fff;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+}
+.reel-author-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.reel-author-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--ig-gold);
+}
+.reel-follow-btn {
+  background: transparent;
+  border: 1px solid #fff;
+  color: #fff;
+  border-radius: 8px;
+  padding: 4px 10px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  margin-left: 6px;
+}
+.reel-audio-line {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  opacity: 0.9;
+  margin-top: 6px;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: center; position: relative;">
+  
+  <!-- Upload Reel Floating Action Button -->
+  <button type="button" onclick="openCreateReelModal()" style="position: fixed; right: max(20px, calc(50vw - 320px)); top: 85px; z-index: 100; background: #38bdf8; color: #04060b; border: none; padding: 10px 18px; border-radius: 20px; font-weight: 700; font-size: 0.9rem; cursor: pointer; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(56,189,248,0.4);">
+    <i class="ti ti-video-plus" style="font-size: 1.2rem;"></i> Post Reel
+  </button>
+
+  <div class="reels-feed-wrapper">
+    {% if reels %}
+      {% for reel in reels %}
+        <div class="reel-item-container" id="reel-item-{{ reel.id }}">
+          <div class="reel-card">
+            
+            <video class="reel-video" src="{{ reel.video.url }}" loop playsinline controls preload="metadata"></video>
+
+            <!-- Actions Column (Like, Comment, Share, Audio Disc) -->
+            <div class="reel-actions-column">
+              <button type="button" class="reel-action-btn" onclick="toggleReelLike({{ reel.id }}, this)">
+                <i class="ti {% if request.user in reel.likes.all %}ti-heart-filled{% else %}ti-heart{% endif %}" style="color: {% if request.user in reel.likes.all %}#ef4444{% else %}#fff{% endif %};"></i>
+                <span class="reel-like-count">{{ reel.total_likes }}</span>
+              </button>
+
+              <button type="button" class="reel-action-btn" onclick="alert('Comments on reels coming soon!')">
+                <i class="ti ti-message-circle"></i>
+                <span>12</span>
+              </button>
+
+              <button type="button" class="reel-action-btn" onclick="navigator.clipboard.writeText(window.location.href); alert('Reel link copied!');">
+                <i class="ti ti-share"></i>
+                <span>Share</span>
+              </button>
+
+              <div style="width: 32px; height: 32px; border-radius: 50%; background: #222; border: 2px solid #fff; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; animation: spin 4s linear infinite;">
+                <i class="ti ti-disc"></i>
+              </div>
+            </div>
+
+            <!-- Bottom Author & Caption Info -->
+            <div class="reel-bottom-info">
+              <div class="reel-author-row">
+                <a href="{% url 'social:profile' username=reel.author.username %}" style="text-decoration: none; display: flex; align-items: center; gap: 8px;">
+                  {% if reel.author.profile.avatar %}
+                    <img src="{{ reel.author.profile.avatar.url }}" alt="{{ reel.author.username }}" class="reel-author-avatar">
+                  {% else %}
+                    <div class="reel-author-avatar" style="background: var(--ig-gold); color: #000; display: flex; align-items: center; justify-content: center; font-weight: 700;">{{ reel.author|get_initials }}</div>
+                  {% endif %}
+                  <span style="font-weight: 700; color: #fff; font-size: 0.95rem;">{{ reel.author.username }}</span>
+                </a>
+                <button type="button" class="reel-follow-btn" onclick="this.textContent='Following'; this.disabled=true;">Follow</button>
+              </div>
+
+              {% if reel.caption %}
+                <div style="font-size: 0.88rem; margin-bottom: 4px; max-height: 60px; overflow-y: auto;">{{ reel.caption }}</div>
+              {% endif %}
+
+              <div class="reel-audio-line">
+                <i class="ti ti-music"></i>
+                <span>{{ reel.audio_title|default:"Original Audio" }}</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      {% endfor %}
+    {% else %}
+      <div style="text-align: center; padding: 60px 20px; color: var(--ig-text-muted);">
+        <i class="ti ti-video-off" style="font-size: 4rem; color: var(--ig-gold); margin-bottom: 12px; display: block;"></i>
+        <h3>No Reels Uploaded Yet</h3>
+        <p>Be the first to share a video reel on Ghidora Social!</p>
+        <button type="button" class="ig-btn-primary" onclick="openCreateReelModal()" style="margin-top: 16px;">Post First Reel</button>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Upload Reel Modal -->
+<div class="ig-modal" id="createReelModal" style="display:none; z-index:99995;">
+  <div class="ig-modal-backdrop" onclick="closeCreateReelModal()"></div>
+  <div class="ig-modal-box" style="max-width: 440px; width: 90%; border-radius: 16px; background: #161920; overflow: hidden; padding: 0;">
+    <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-bottom: 1px solid var(--ig-card-border);">
+      <h3 style="margin: 0; font-size: 1rem; font-weight: 700; color: var(--ig-text);">Create New Reel</h3>
+      <button type="button" class="ig-modal-close" onclick="closeCreateReelModal()"><i class="ti ti-x"></i></button>
+    </div>
+
+    <form method="post" enctype="multipart/form-data" action="{% url 'social:create_reel' %}" style="padding: 20px; display: flex; flex-direction: column; gap: 16px;">
+      {% csrf_token %}
+      
+      <div class="ig-file-picker">
+        <label class="ig-file-label" style="display: flex; align-items: center; justify-content: center; gap: 8px; padding: 20px; border: 2px dashed #38bdf8; border-radius: 12px; color: #38bdf8; font-weight: 700; cursor: pointer;">
+          <i class="ti ti-video" style="font-size: 1.6rem;"></i>
+          <span>Select Reel Video</span>
+          <input type="file" name="video" accept="video/*" required style="display: none;" onchange="previewReelVideo(event)">
+        </label>
+      </div>
+
+      <div id="reelVideoPreviewWrap" style="display: none; max-height: 220px; text-align: center; overflow: hidden; border-radius: 8px; background: #000;">
+        <video id="reelPreviewVid" controls style="max-height: 220px; max-width: 100%;"></video>
+      </div>
+
+      <div>
+        <label style="font-size: 0.85rem; font-weight: 700; color: var(--ig-text); display: block; margin-bottom: 6px;">Caption</label>
+        <textarea name="caption" rows="2" class="ig-textarea" placeholder="Write a caption for your reel..."></textarea>
+      </div>
+
+      <div>
+        <label style="font-size: 0.85rem; font-weight: 700; color: var(--ig-text); display: block; margin-bottom: 6px;">Audio Name</label>
+        <input type="text" name="audio_title" class="ig-input" placeholder="e.g. Original Audio - Ghidora Beats" value="Original audio">
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 4px;">
+        <button type="button" class="ig-btn-secondary" onclick="closeCreateReelModal()">Cancel</button>
+        <button type="submit" class="ig-btn-primary" style="background: #38bdf8; color: #04060b;">Share Reel</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+function openCreateReelModal() {
+  const modal = document.getElementById('createReelModal');
+  if (modal) modal.style.display = 'flex';
+}
+function closeCreateReelModal() {
+  const modal = document.getElementById('createReelModal');
+  if (modal) modal.style.display = 'none';
+}
+function previewReelVideo(e) {
+  const wrap = document.getElementById('reelVideoPreviewWrap');
+  const vid = document.getElementById('reelPreviewVid');
+  const file = e.target.files[0];
+  if (file) {
+    vid.src = URL.createObjectURL(file);
+    wrap.style.display = 'block';
+  }
+}
+function toggleReelLike(reelId, btn) {
+  fetch(`/social/reels/${reelId}/like/`, {
+    method: 'POST',
+    headers: {
+      'X-CSRFToken': '{{ csrf_token }}',
+      'Content-Type': 'application/json'
+    }
+  })
+  .then(res => res.json())
+  .then(data => {
+    const icon = btn.querySelector('i');
+    const count = btn.querySelector('.reel-like-count');
+    if (data.liked) {
+      icon.className = 'ti ti-heart-filled';
+      icon.style.color = '#ef4444';
+    } else {
+      icon.className = 'ti ti-heart';
+      icon.style.color = '#fff';
+    }
+    if (count) count.textContent = data.total_likes;
+  });
+}
+</script>
+{% endblock %}

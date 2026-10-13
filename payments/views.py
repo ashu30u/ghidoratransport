@@ -345,3 +345,41 @@ def admin_payment_settings(request):
     else:
         form = PaymentSettingsForm(instance=settings_obj)
     return render(request, "payments/admin_payment_settings.html", {"form": form})
+
+
+@user_passes_test(is_staff)
+def admin_mark_all_done(request, payment_id):
+    """
+    Direct Admin Action to mark payment as ALL DONE and dispatch receipt PDF to customer.
+    """
+    from .utils import mark_payment_all_done_and_send_receipt
+    payment_request = get_object_or_404(
+        PaymentRequest.objects.select_related("booking", "booking__user"),
+        payment_id=payment_id,
+    )
+    result = mark_payment_all_done_and_send_receipt(
+        payment_request=payment_request,
+        verified_by=request.user,
+        request=request,
+    )
+
+    if result.get("email_sent"):
+        messages.success(
+            request,
+            f"🎉 Payment {payment_request.payment_id} marked ALL DONE! Official receipt PDF emailed to customer at {result['customer_email']}."
+        )
+    elif result.get("customer_email"):
+        messages.warning(
+            request,
+            f"Payment {payment_request.payment_id} marked ALL DONE, but email sending failed: {result.get('email_error')}. Receipt PDF was generated successfully."
+        )
+    else:
+        messages.info(
+            request,
+            f"Payment {payment_request.payment_id} marked ALL DONE and receipt PDF generated. (Note: No customer email was associated with this booking)."
+        )
+
+    next_url = request.GET.get("next") or request.META.get("HTTP_REFERER")
+    if next_url:
+        return redirect(next_url)
+    return redirect("admin:payments_paymentproof_changelist")

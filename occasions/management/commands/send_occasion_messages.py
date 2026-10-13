@@ -1,11 +1,12 @@
 from datetime import date
 from django.core.management.base import BaseCommand
+from django.utils import timezone
 from occasions.models import Occasion
-from occasions.services import dispatch_occasion_notifications
+from occasions.services import check_and_send_due_occasions, dispatch_occasion_notifications
 
 
 class Command(BaseCommand):
-    help = "Aaj ki date pe agar koi occasion match kare, to sabhi past customers ko email bhejta hai"
+    help = "Checks scheduled occasions and today's occasions, and sends greeting emails to customers"
 
     def add_arguments(self, parser):
         parser.add_argument('--force', action='store_true', help='Force send even if not approved or already sent')
@@ -13,22 +14,36 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         force = options.get('force', False)
         today = date.today()
-        current_year = today.year
+        now = timezone.now()
 
-        occasions = Occasion.objects.filter(
-            month=today.month,
-            day=today.day,
-            is_active=True,
-        )
-        if not force:
-            occasions = occasions.exclude(last_sent_year=current_year)
+        self.stdout.write(f"[SCHEDULE] Checking scheduled occasions for {today.strftime('%Y-%m-%d')} at {timezone.localtime(now).strftime('%I:%M:%S %p')}...")
 
-        if not occasions.exists():
-            self.stdout.write("Aaj koi active occasion match nahi hua.")
+        res = check_and_send_due_occasions(force=force)
+        total_due = res.get('total_due', 0)
+        dispatched = res.get('dispatched', [])
+
+        if not dispatched:
+            # Check if there are any approved occasions scheduled for later today
+            later_today = Occasion.objects.filter(
+                approval_status='approved',
+                is_active=True,
+                scheduled_at__date=today,
+                scheduled_at__gt=now
+            )
+            if later_today.exists():
+                for occ in later_today:
+                    local_t = timezone.localtime(occ.scheduled_at).strftime('%I:%M %p')
+                    self.stdout.write(self.style.WARNING(f"[WAITING] '{occ.name}' is scheduled for later today at {local_t}."))
+            else:
+                self.stdout.write("Abhi koi due occasion send karne ke liye nahi hai.")
             return
 
-        for occasion in occasions:
-            res = dispatch_occasion_notifications(occasion, force=force)
-            sent_count = res.get('sent', 0)
-            status_msg = res.get('status') or res.get('error')
-            self.stdout.write(f"{occasion.name}: {sent_count} customers ko email bhej diya ({status_msg}).")
+        for item in dispatched:
+            name = item.get('name')
+            sent = item.get('sent', 0)
+            status_text = item.get('status')
+            if sent > 0:
+                self.stdout.write(self.style.SUCCESS(f"[SUCCESS] {name}: {sent} customers ko email bhej diya ({status_text})."))
+            else:
+                self.stdout.write(self.style.ERROR(f"[FAILED] {name}: Send nahi ho paya ({status_text})."))
+

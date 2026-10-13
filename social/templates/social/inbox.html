@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% load static social_extras %}
+
+{% block title %}Messages • Ghidora Social{% endblock %}
+{% block nav_inbox %}active{% endblock %}
+
+{% block content %}
+<div class="ig-inbox-container">
+  <div class="ig-inbox-card">
+    <div class="ig-inbox-header">
+      <h2>Messages</h2>
+      <button type="button" class="ig-btn-primary" onclick="openSearchModal()" style="font-size:0.82rem; padding:6px 14px;">
+        <i class="ti ti-edit"></i> New Message
+      </button>
+    </div>
+
+    <div class="ig-conversation-list">
+      {% if conversation_items %}
+        {% for item in conversation_items %}
+          <a href="{% url 'social:conversation_detail' pk=item.conversation.pk %}" class="ig-conversation-row {% if item.has_unread %}unread{% endif %}">
+            <div class="ig-conv-avatar-wrap">
+              {% if item.other_user.profile.avatar %}
+                <img src="{{ item.other_user.profile.avatar.url }}" alt="{{ item.other_user.username }}" class="ig-conv-avatar">
+              {% else %}
+                <div class="ig-conv-avatar ig-avatar-fallback">{{ item.other_user|get_initials }}</div>
+              {% endif %}
+            </div>
+
+            <div class="ig-conv-body">
+              <div class="ig-conv-top-line">
+                <span class="ig-conv-username">
+                  {{ item.other_user.get_full_name|default:item.other_user.username }}
+                  {% if item.other_user.is_superuser or item.other_user.is_staff or 'ghidora' in item.other_user.username.lower %}
+                    <span class="gs-badge-owner" title="Ghidora Owner / Verified"><i class="ti ti-circle-check-filled"></i></span>
+                  {% endif %}
+                  {% if item.other_user.profile.is_driver %}<span class="gs-badge-driver">DRIVER</span>{% endif %}
+                </span>
+
+                {% if item.last_message %}
+                  <span class="ig-conv-time">{{ item.last_message.created_at|date:"g:i A" }}</span>
+                {% endif %}
+              </div>
+              <div class="ig-conv-preview-line">
+                <span class="ig-conv-preview">
+                  {% if item.last_message %}
+                    {% if item.last_message.sender == request.user %}You: {% endif %}{{ item.last_message.content }}
+                  {% else %}
+                    No messages yet. Send a message!
+                  {% endif %}
+                </span>
+                {% if item.has_unread %}
+                  <div class="ig-unread-dot"></div>
+                {% endif %}
+              </div>
+            </div>
+          </a>
+        {% endfor %}
+      {% else %}
+        <div class="ig-empty-feed" style="border:none; border-radius:0; padding:40px 16px;">
+          <i class="ti ti-message-circle ig-empty-icon"></i>
+          <h3>Your Messages</h3>
+          <p>Send private messages to drivers and friends on Ghidora Transport.</p>
+          <button type="button" class="ig-btn-primary" onclick="openSearchModal()">Search User to Message</button>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

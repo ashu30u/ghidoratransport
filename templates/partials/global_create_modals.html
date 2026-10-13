@@ -1,0 +1,758 @@
+<!-- ========================================== -->
+<!-- Global Create New Post Modal (Creative Studio: Crop, Rotate, Filters & Grading) -->
+<!-- ========================================== -->
+<div class="ig-modal" id="createPostModal" style="display:none; z-index:99990;">
+  <div class="ig-modal-backdrop" onclick="closePostCreateModal()"></div>
+  <div class="ig-modal-box gs-studio-modal" id="studioModalBox" style="width: 780px; max-width: 95%; max-height: 90vh; display: flex; flex-direction: column; border-radius: 18px; background: #12151d; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 24px 60px rgba(0,0,0,0.85);">
+    
+    <!-- Modal Header with Dynamic Title & Navigation -->
+    <div class="ig-modal-header" style="display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; border-bottom: 1px solid var(--ig-card-border); background: #161922;">
+      <button type="button" id="studioBackBtn" onclick="handleStudioBack()" style="display:none; background:transparent; border:none; color:var(--ig-text); font-size:1.1rem; cursor:pointer; padding:4px;" title="Back">
+        <i class="ti ti-arrow-left"></i>
+      </button>
+      <div id="studioModalTitle" style="font-size: 1rem; font-weight: 700; color: var(--ig-text); flex:1; text-align:center;">Create new post</div>
+      <button type="button" id="studioNextBtn" onclick="handleStudioNext()" style="display:none; background:transparent; border:none; color:#38bdf8; font-weight:700; font-size:0.92rem; cursor:pointer; padding:4px 8px;" title="Next">
+        Next
+      </button>
+      <button type="button" class="ig-modal-close" onclick="closePostCreateModal()"><i class="ti ti-x"></i></button>
+    </div>
+
+    <!-- Main Studio Body -->
+    <form method="post" enctype="multipart/form-data" action="{% url 'social:feed' %}" id="createPostForm" onsubmit="handlePostSubmit(event)" style="display: flex; flex-direction: column; flex: 1; overflow: hidden; margin: 0;">
+      {% csrf_token %}
+      <input type="file" name="image" id="hiddenFinalPostImage" style="display:none;">
+
+      <!-- ============================================== -->
+      <!-- STEP 0: Initial Dropzone                       -->
+      <!-- ============================================== -->
+      <div id="studioStepDropzone" style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px 20px; text-align: center; gap: 16px; min-height: 420px;">
+        <div style="width: 86px; height: 86px; border-radius: 50%; background: rgba(56,189,248,0.1); display: flex; align-items: center; justify-content: center; font-size: 3rem; color: #38bdf8; margin-bottom: 4px; box-shadow: 0 0 24px rgba(56,189,248,0.2);">
+          <i class="ti ti-photo-circle"></i>
+        </div>
+        <div style="font-size: 1.4rem; font-weight: 600; color: var(--ig-text);">Drag photos and videos here</div>
+        <div style="font-size: 0.88rem; color: var(--ig-text-muted); max-width: 360px; line-height: 1.5;">
+          Share transport moments, highway journeys, truck fleets, and delivery milestones.
+        </div>
+        
+        <label class="ig-btn-primary" style="background: linear-gradient(135deg, #38bdf8, #EF9F27); color: #04060b; font-weight: 700; padding: 11px 26px; border-radius: 12px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; margin-top: 8px; box-shadow: 0 6px 18px rgba(56,189,248,0.35);">
+          <i class="ti ti-upload"></i> Select from computer
+          <input type="file" id="studioFileInput" accept="image/*,video/*" style="display: none;" onchange="handleStudioFileSelect(event)">
+        </label>
+      </div>
+
+      <!-- ============================================== -->
+      <!-- STEP 1: Crop & Aspect Ratio Studio             -->
+      <!-- ============================================== -->
+      <div id="studioStepCrop" style="display: none; flex-direction: column; flex: 1; overflow: hidden;">
+        <div style="flex: 1; background: #07090e; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; min-height: 380px; max-height: 500px; padding: 16px;">
+          <div id="cropViewport" style="position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 40px rgba(0,0,0,0.9); border: 1.5px solid rgba(255,255,255,0.12); border-radius: 8px; background: #000;">
+            <canvas id="studioCropCanvas" style="display: block; max-width: 100%; max-height: 100%;"></canvas>
+          </div>
+        </div>
+
+        <!-- Crop Controls Toolbar -->
+        <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; background: #161922; border-top: 1px solid var(--ig-card-border); gap: 12px; flex-wrap: wrap;">
+          <!-- Aspect Presets -->
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <span style="font-size: 0.72rem; font-weight: 800; color: var(--ig-text-muted); margin-right: 4px; letter-spacing: 0.05em;">CROP:</span>
+            <button type="button" class="gs-aspect-btn active" data-ratio="original" onclick="changeStudioAspect('original', this)"><i class="ti ti-arrows-maximize"></i> Fit</button>
+            <button type="button" class="gs-aspect-btn" data-ratio="1:1" onclick="changeStudioAspect('1:1', this)"><i class="ti ti-square"></i> 1:1</button>
+            <button type="button" class="gs-aspect-btn" data-ratio="4:5" onclick="changeStudioAspect('4:5', this)"><i class="ti ti-rectangle-vertical"></i> 4:5</button>
+            <button type="button" class="gs-aspect-btn" data-ratio="16:9" onclick="changeStudioAspect('16:9', this)"><i class="ti ti-rectangle"></i> 16:9</button>
+          </div>
+
+          <!-- Zoom & Rotation -->
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="display: flex; align-items: center; gap: 6px;" title="Zoom image">
+              <i class="ti ti-zoom-in" style="color: var(--ig-text-muted); font-size: 1.1rem;"></i>
+              <input type="range" id="studioZoomRange" min="1" max="2.5" step="0.05" value="1" oninput="changeStudioZoom(this.value)" class="gs-range-slider" style="width: 85px;">
+            </div>
+            <button type="button" class="gs-aspect-btn" onclick="rotateStudioImage()" title="Rotate 90° Clockwise">
+              <i class="ti ti-rotate-clockwise"></i> Rotate 90°
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============================================== -->
+      <!-- STEP 2: Color Filters & Color Grading Studio   -->
+      <!-- ============================================== -->
+      <div id="studioStepFilters" style="display: none; flex: 1; overflow: hidden;">
+        <!-- Left: Image Preview with Active Filters -->
+        <div style="flex: 1.25; background: #07090e; display: flex; align-items: center; justify-content: center; overflow: hidden; min-height: 380px; padding: 16px;">
+          <canvas id="studioFilterCanvas" style="max-width: 100%; max-height: 480px; border-radius: 8px; box-shadow: 0 8px 30px rgba(0,0,0,0.8);"></canvas>
+        </div>
+
+        <!-- Right: Filter Presets & Adjustment Controls -->
+        <div style="flex: 1; width: 320px; background: #161922; border-left: 1px solid var(--ig-card-border); display: flex; flex-direction: column; overflow: hidden;">
+          
+          <!-- Mode Switcher -->
+          <div style="display: flex; border-bottom: 1px solid var(--ig-card-border);">
+            <button type="button" id="tabBtnFilters" class="gs-studio-subtab active" onclick="switchFilterSubtab('presets')">
+              <i class="ti ti-sparkles"></i> Filters
+            </button>
+            <button type="button" id="tabBtnAdjust" class="gs-studio-subtab" onclick="switchFilterSubtab('adjust')">
+              <i class="ti ti-adjustments"></i> Adjust
+            </button>
+          </div>
+
+          <!-- Subtab 1: Presets Grid -->
+          <div id="studioPresetsPanel" style="flex: 1; overflow-y: auto; padding: 16px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+            <div class="gs-filter-card active" onclick="applyStudioFilter('normal', this)">
+              <div class="gs-filter-swatch filter-normal">Normal</div>
+              <span>Normal</span>
+            </div>
+            <div class="gs-filter-card" onclick="applyStudioFilter('clarendon', this)">
+              <div class="gs-filter-swatch filter-clarendon">Cyan</div>
+              <span>Clarendon</span>
+            </div>
+            <div class="gs-filter-card" onclick="applyStudioFilter('ghidora_gold', this)">
+              <div class="gs-filter-swatch filter-gold">Gold</div>
+              <span>Ghidora Gold</span>
+            </div>
+            <div class="gs-filter-card" onclick="applyStudioFilter('cyberpunk', this)">
+              <div class="gs-filter-swatch filter-cyber">Neon</div>
+              <span>Cyberpunk</span>
+            </div>
+            <div class="gs-filter-card" onclick="applyStudioFilter('sunset', this)">
+              <div class="gs-filter-swatch filter-sunset">Warm</div>
+              <span>Sunset</span>
+            </div>
+            <div class="gs-filter-card" onclick="applyStudioFilter('noir', this)">
+              <div class="gs-filter-swatch filter-noir">B&W</div>
+              <span>Noir</span>
+            </div>
+            <div class="gs-filter-card" onclick="applyStudioFilter('vintage', this)">
+              <div class="gs-filter-swatch filter-vintage">Retro</div>
+              <span>Vintage</span>
+            </div>
+            <div class="gs-filter-card" onclick="applyStudioFilter('vivid', this)">
+              <div class="gs-filter-swatch filter-vivid">Punch</div>
+              <span>Vivid</span>
+            </div>
+          </div>
+
+          <!-- Subtab 2: Fine-Tuning Sliders -->
+          <div id="studioAdjustPanel" style="display: none; flex: 1; overflow-y: auto; padding: 18px 16px; flex-direction: column; gap: 16px;">
+            <div>
+              <div style="display: flex; justify-content: space-between; font-size: 0.82rem; margin-bottom: 6px; color: var(--ig-text);">
+                <span>Brightness</span>
+                <span id="valBrightness" style="color: #38bdf8; font-weight: 700;">0%</span>
+              </div>
+              <input type="range" id="sliderBrightness" min="-50" max="50" value="0" oninput="changeAdjustValue('brightness', this.value)" class="gs-range-slider">
+            </div>
+
+            <div>
+              <div style="display: flex; justify-content: space-between; font-size: 0.82rem; margin-bottom: 6px; color: var(--ig-text);">
+                <span>Contrast</span>
+                <span id="valContrast" style="color: #38bdf8; font-weight: 700;">0%</span>
+              </div>
+              <input type="range" id="sliderContrast" min="-50" max="50" value="0" oninput="changeAdjustValue('contrast', this.value)" class="gs-range-slider">
+            </div>
+
+            <div>
+              <div style="display: flex; justify-content: space-between; font-size: 0.82rem; margin-bottom: 6px; color: var(--ig-text);">
+                <span>Saturation</span>
+                <span id="valSaturation" style="color: #38bdf8; font-weight: 700;">0%</span>
+              </div>
+              <input type="range" id="sliderSaturation" min="-50" max="100" value="0" oninput="changeAdjustValue('saturation', this.value)" class="gs-range-slider">
+            </div>
+
+            <div>
+              <div style="display: flex; justify-content: space-between; font-size: 0.82rem; margin-bottom: 6px; color: var(--ig-text);">
+                <span>Warmth / Amber Tint</span>
+                <span id="valWarmth" style="color: #EF9F27; font-weight: 700;">0%</span>
+              </div>
+              <input type="range" id="sliderWarmth" min="0" max="100" value="0" oninput="changeAdjustValue('warmth', this.value)" class="gs-range-slider">
+            </div>
+
+            <button type="button" class="ig-btn-secondary" onclick="resetAdjustSliders()" style="margin-top: 8px; font-size: 0.8rem; padding: 6px 12px; align-self: flex-start;">
+              Reset Adjustments
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ============================================== -->
+      <!-- STEP 3: Caption, Location & Share Post         -->
+      <!-- ============================================== -->
+      <div id="studioStepCaption" style="display: none; flex: 1; overflow: hidden;">
+        <!-- Left: Final Graded Image Preview -->
+        <div style="flex: 1.15; background: #07090e; display: flex; align-items: center; justify-content: center; padding: 16px; position: relative;">
+          <img id="finalPostPreviewImg" src="" alt="Final preview" style="max-width: 100%; max-height: 440px; border-radius: 10px; box-shadow: 0 12px 36px rgba(0,0,0,0.85); object-fit: contain;">
+        </div>
+
+        <!-- Right: Caption & Sharing Form -->
+        <div style="flex: 1; background: #161922; border-left: 1px solid var(--ig-card-border); padding: 20px; display: flex; flex-direction: column; gap: 16px; overflow-y: auto;">
+          <!-- User info -->
+          <div style="display: flex; align-items: center; gap: 10px;">
+            {% if user.profile.avatar %}
+              <img src="{{ user.profile.avatar.url }}" alt="{{ user.username }}" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover;">
+            {% else %}
+              <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--ig-gold-dark); display: flex; align-items: center; justify-content: center; font-weight: 700; color: #fff;">{{ user.username|slice:":1"|upper }}</div>
+            {% endif %}
+            <span style="font-weight: 700; font-size: 0.92rem; color: var(--ig-text);">{{ user.username }}</span>
+          </div>
+
+          <!-- Caption Textarea -->
+          <div style="position: relative;">
+            <textarea name="content" id="studioPostCaption" rows="4" class="ig-textarea" placeholder="Write a caption... #ghidora #transport #highway" required style="resize: none;"></textarea>
+          </div>
+
+          <!-- Location Input -->
+          <div style="position: relative;">
+            <i class="ti ti-map-pin" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--ig-text-muted); font-size: 1.1rem; pointer-events: none;"></i>
+            <input type="text" name="location" id="studioPostLocation" class="ig-input" placeholder="Add location (e.g. NH48 Logistics Hub, Mumbai)..." style="padding-left: 36px; height: 42px; font-size: 0.88rem;">
+          </div>
+
+          <!-- Video Audio Tag (if video) -->
+          <div id="studioAudioTagWrap" style="display: none; position: relative;">
+            <i class="ti ti-music" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--ig-text-muted); font-size: 1.1rem; pointer-events: none;"></i>
+            <input type="text" name="audio_title" class="ig-input" placeholder="Audio track name..." value="Original audio" style="padding-left: 36px; height: 42px; font-size: 0.88rem;">
+          </div>
+
+          <!-- Share Button Area -->
+          <div style="margin-top: auto; padding-top: 14px; border-top: 1px solid var(--ig-card-border); display: flex; justify-content: space-between; align-items: center;">
+            <button type="button" class="ig-btn-secondary" onclick="setStudioStep(2)">Back to Filters</button>
+            <button type="submit" class="ig-btn-primary" id="studioShareBtn" style="background: linear-gradient(135deg, #38bdf8, #EF9F27); color: #04060b; font-weight: 700; padding: 10px 24px; box-shadow: 0 4px 14px rgba(56,189,248,0.35);">
+              Share Post
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </form>
+  </div>
+</div>
+
+<!-- ========================================== -->
+<!-- Global Upload Story Modal                  -->
+<!-- ========================================== -->
+<div class="ig-modal" id="uploadStoryModal" style="display:none; z-index:99990;">
+  <div class="ig-modal-backdrop" onclick="closeStoryUploadModal()"></div>
+  <div class="ig-modal-box" style="max-height:85vh; display:flex; flex-direction:column;">
+    <div class="ig-modal-header">
+      <h3>Add to Story</h3>
+      <button class="ig-modal-close" onclick="closeStoryUploadModal()"><i class="ti ti-x"></i></button>
+    </div>
+    <form method="post" enctype="multipart/form-data" action="{% url 'social:create_story' %}" style="display:flex; flex-direction:column; flex:1; overflow:hidden;">
+      {% csrf_token %}
+      <div class="ig-modal-body" style="overflow-y:auto; flex:1;">
+        <div class="ig-file-picker">
+          <label class="ig-file-label">
+            <i class="ti ti-camera"></i>
+            <span>Choose Story Media</span>
+            <input type="file" name="media" id="storyMediaInput" accept="image/*,video/*" required onchange="previewStoryImage(event)">
+          </label>
+        </div>
+
+        <div class="ig-aspect-selector" id="storyAspectSelector" style="display:none; margin-top:8px;">
+          <span style="font-size:0.75rem; font-weight:700; color:var(--ig-text-muted); margin-right:4px;">Size:</span>
+          <button type="button" class="ig-aspect-btn active" onclick="setStoryAspect('fit', this)"><i class="ti ti-arrows-maximize"></i> Fit</button>
+          <button type="button" class="ig-aspect-btn" onclick="setStoryAspect('9:16', this)"><i class="ti ti-device-mobile"></i> 9:16 Story</button>
+          <button type="button" class="ig-aspect-btn" onclick="setStoryAspect('1:1', this)"><i class="ti ti-square"></i> 1:1 Square</button>
+        </div>
+
+        <div class="ig-story-preview-container" id="storyPreviewWrap" style="display:none; max-height:220px; overflow:hidden; text-align:center; margin:10px 0; background:#000; border-radius:8px;">
+          <img id="storyPreviewImg" src="" alt="Story preview" style="max-height:220px; max-width:100%; object-fit:contain; border-radius:8px;">
+        </div>
+        <input type="text" name="caption" class="ig-input" placeholder="Add a caption (optional)...">
+      </div>
+
+      <div class="ig-modal-footer" style="flex-shrink:0;">
+        <button type="button" class="ig-btn-secondary" onclick="closeStoryUploadModal()">Cancel</button>
+        <button type="submit" class="ig-btn-primary">Post Story</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ========================================== -->
+<!-- Global Upload Reel Modal                   -->
+<!-- ========================================== -->
+<div class="ig-modal" id="createReelModal" style="display:none; z-index:99995;">
+  <div class="ig-modal-backdrop" onclick="closeCreateReelModal()"></div>
+  <div class="ig-modal-box" style="max-width: 440px; width: 90%; border-radius: 16px; background: #161920; overflow: hidden; padding: 0; border: 1px solid var(--ig-card-border);">
+    <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-bottom: 1px solid var(--ig-card-border);">
+      <h3 style="margin: 0; font-size: 1rem; font-weight: 700; color: var(--ig-text);">Create New Reel</h3>
+      <button type="button" class="ig-modal-close" onclick="closeCreateReelModal()"><i class="ti ti-x"></i></button>
+    </div>
+
+    <form method="post" enctype="multipart/form-data" action="{% url 'social:create_reel' %}" style="padding: 20px; display: flex; flex-direction: column; gap: 16px;">
+      {% csrf_token %}
+      
+      <div class="ig-file-picker">
+        <label class="ig-file-label" style="display: flex; align-items: center; justify-content: center; gap: 8px; padding: 20px; border: 2px dashed #38bdf8; border-radius: 12px; color: #38bdf8; font-weight: 700; cursor: pointer;">
+          <i class="ti ti-video" style="font-size: 1.6rem;"></i>
+          <span>Select Reel Video</span>
+          <input type="file" name="video" accept="video/*" required style="display: none;" onchange="previewReelVideoGlobal(event)">
+        </label>
+      </div>
+
+      <div id="globalReelPreviewWrap" style="display: none; max-height: 220px; text-align: center; overflow: hidden; border-radius: 8px; background: #000;">
+        <video id="globalReelPreviewVid" controls style="max-height: 220px; max-width: 100%;"></video>
+      </div>
+
+      <div>
+        <label style="font-size: 0.85rem; font-weight: 700; color: var(--ig-text); display: block; margin-bottom: 6px;">Reel Caption</label>
+        <textarea name="caption" rows="2" class="ig-textarea" placeholder="Write a caption for your reel..."></textarea>
+      </div>
+
+      <div>
+        <label style="font-size: 0.85rem; font-weight: 700; color: var(--ig-text); display: block; margin-bottom: 6px;">Audio Title</label>
+        <input type="text" name="audio_title" class="ig-input" placeholder="e.g. Original Audio" value="Original audio">
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 4px;">
+        <button type="button" class="ig-btn-secondary" onclick="closeCreateReelModal()">Cancel</button>
+        <button type="submit" class="ig-btn-primary" style="background: #38bdf8; color: #04060b;">Share Reel</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+/* Global Post Creative Studio State */
+const studioState = {
+  step: 0, // 0: dropzone, 1: crop, 2: filters, 3: caption
+  rawFile: null,
+  rawImage: null,
+  isVideo: false,
+  aspectRatio: 'original',
+  zoom: 1.0,
+  rotation: 0,
+  filter: 'normal',
+  adjust: {
+    brightness: 0,
+    contrast: 0,
+    saturation: 0,
+    warmth: 0
+  },
+  finalBlob: null
+};
+
+function openPostCreateModal() {
+  const modal = document.getElementById('createPostModal');
+  if (modal) {
+    modal.style.display = 'flex';
+    if (studioState.step === 0) {
+      setStudioStep(0);
+    }
+  }
+}
+
+function closePostCreateModal() {
+  const modal = document.getElementById('createPostModal');
+  if (modal) modal.style.display = 'none';
+}
+
+function setStudioStep(step) {
+  studioState.step = step;
+  const dropzone = document.getElementById('studioStepDropzone');
+  const cropStep = document.getElementById('studioStepCrop');
+  const filterStep = document.getElementById('studioStepFilters');
+  const captionStep = document.getElementById('studioStepCaption');
+  const backBtn = document.getElementById('studioBackBtn');
+  const nextBtn = document.getElementById('studioNextBtn');
+  const title = document.getElementById('studioModalTitle');
+  const modalBox = document.getElementById('studioModalBox');
+
+  if (dropzone) dropzone.style.display = 'none';
+  if (cropStep) cropStep.style.display = 'none';
+  if (filterStep) filterStep.style.display = 'none';
+  if (captionStep) captionStep.style.display = 'none';
+  if (backBtn) backBtn.style.display = 'none';
+  if (nextBtn) nextBtn.style.display = 'none';
+
+  if (step === 0) {
+    if (dropzone) dropzone.style.display = 'flex';
+    if (title) title.textContent = 'Create new post';
+    if (modalBox) modalBox.style.width = '520px';
+  } else if (step === 1) {
+    if (cropStep) cropStep.style.display = 'flex';
+    if (backBtn) backBtn.style.display = 'block';
+    if (nextBtn) {
+      nextBtn.style.display = 'block';
+      nextBtn.textContent = 'Next';
+    }
+    if (title) title.textContent = 'Crop & Resize';
+    if (modalBox) modalBox.style.width = '640px';
+    renderCropCanvas();
+  } else if (step === 2) {
+    if (filterStep) filterStep.style.display = 'flex';
+    if (backBtn) backBtn.style.display = 'block';
+    if (nextBtn) {
+      nextBtn.style.display = 'block';
+      nextBtn.textContent = 'Next';
+    }
+    if (title) title.textContent = 'Color & Filters';
+    if (modalBox) modalBox.style.width = '820px';
+    renderFilterCanvas();
+  } else if (step === 3) {
+    if (captionStep) captionStep.style.display = 'flex';
+    if (backBtn) backBtn.style.display = 'block';
+    if (title) title.textContent = 'Create new post';
+    if (modalBox) modalBox.style.width = '780px';
+    renderFinalPreview();
+  }
+}
+
+function handleStudioBack() {
+  if (studioState.step === 1) {
+    setStudioStep(0);
+  } else if (studioState.step === 2) {
+    setStudioStep(1);
+  } else if (studioState.step === 3) {
+    if (studioState.isVideo) {
+      setStudioStep(0);
+    } else {
+      setStudioStep(2);
+    }
+  }
+}
+
+function handleStudioNext() {
+  if (studioState.step === 1) {
+    setStudioStep(2);
+  } else if (studioState.step === 2) {
+    setStudioStep(3);
+  }
+}
+
+function handleStudioFileSelect(e) {
+  const file = e.target.files && e.target.files[0];
+  if (!file) return;
+  studioState.rawFile = file;
+
+  if (file.type.startsWith('video/')) {
+    studioState.isVideo = true;
+    // For video, skip canvas crop/filters straight to caption
+    const audioWrap = document.getElementById('studioAudioTagWrap');
+    if (audioWrap) audioWrap.style.display = 'block';
+    const previewImg = document.getElementById('finalPostPreviewImg');
+    if (previewImg) {
+      previewImg.src = '';
+      previewImg.style.display = 'none';
+    }
+    setStudioStep(3);
+    return;
+  }
+
+  studioState.isVideo = false;
+  const reader = new FileReader();
+  reader.onload = (evt) => {
+    const img = new Image();
+    img.onload = () => {
+      studioState.rawImage = img;
+      studioState.zoom = 1.0;
+      studioState.rotation = 0;
+      studioState.aspectRatio = 'original';
+      const zoomInput = document.getElementById('studioZoomRange');
+      if (zoomInput) zoomInput.value = 1.0;
+      setStudioStep(1);
+    };
+    img.src = evt.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function changeStudioAspect(ratio, btn) {
+  studioState.aspectRatio = ratio;
+  document.querySelectorAll('.gs-aspect-btn[data-ratio]').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  renderCropCanvas();
+}
+
+function changeStudioZoom(val) {
+  studioState.zoom = parseFloat(val);
+  renderCropCanvas();
+}
+
+function rotateStudioImage() {
+  studioState.rotation = (studioState.rotation + 90) % 360;
+  renderCropCanvas();
+}
+
+function renderCropCanvas() {
+  const canvas = document.getElementById('studioCropCanvas');
+  const viewport = document.getElementById('cropViewport');
+  const img = studioState.rawImage;
+  if (!canvas || !img) return;
+
+  const ctx = canvas.getContext('2d');
+  const ratio = studioState.aspectRatio;
+
+  let targetW = 600;
+  let targetH = 600;
+
+  if (ratio === '1:1') {
+    targetW = 600;
+    targetH = 600;
+  } else if (ratio === '4:5') {
+    targetW = 480;
+    targetH = 600;
+  } else if (ratio === '16:9') {
+    targetW = 640;
+    targetH = 360;
+  } else {
+    // Original fit
+    targetW = img.naturalWidth || 600;
+    targetH = img.naturalHeight || 600;
+    const maxDim = 600;
+    if (targetW > maxDim || targetH > maxDim) {
+      if (targetW > targetH) {
+        targetH = Math.round((targetH / targetW) * maxDim);
+        targetW = maxDim;
+      } else {
+        targetW = Math.round((targetW / targetH) * maxDim);
+        targetH = maxDim;
+      }
+    }
+  }
+
+  canvas.width = targetW;
+  canvas.height = targetH;
+  if (viewport) {
+    viewport.style.aspectRatio = `${targetW} / ${targetH}`;
+  }
+
+  ctx.clearRect(0, 0, targetW, targetH);
+  ctx.save();
+  ctx.translate(targetW / 2, targetH / 2);
+  ctx.rotate((studioState.rotation * Math.PI) / 180);
+  ctx.scale(studioState.zoom, studioState.zoom);
+
+  // Compute cover dimensions
+  const isRotated = studioState.rotation === 90 || studioState.rotation === 270;
+  const srcW = isRotated ? img.naturalHeight : img.naturalWidth;
+  const srcH = isRotated ? img.naturalWidth : img.naturalHeight;
+  const scale = Math.max(targetW / srcW, targetH / srcH);
+  const drawW = img.naturalWidth * scale;
+  const drawH = img.naturalHeight * scale;
+
+  ctx.drawImage(img, -drawW / 2, -drawH / 2, drawW, drawH);
+  ctx.restore();
+}
+
+function switchFilterSubtab(tab) {
+  const presetsPanel = document.getElementById('studioPresetsPanel');
+  const adjustPanel = document.getElementById('studioAdjustPanel');
+  const btnPresets = document.getElementById('tabBtnFilters');
+  const btnAdjust = document.getElementById('tabBtnAdjust');
+
+  if (tab === 'adjust') {
+    if (presetsPanel) presetsPanel.style.display = 'none';
+    if (adjustPanel) adjustPanel.style.display = 'flex';
+    if (btnPresets) btnPresets.classList.remove('active');
+    if (btnAdjust) btnAdjust.classList.add('active');
+  } else {
+    if (presetsPanel) presetsPanel.style.display = 'grid';
+    if (adjustPanel) adjustPanel.style.display = 'none';
+    if (btnPresets) btnPresets.classList.add('active');
+    if (btnAdjust) btnAdjust.classList.remove('active');
+  }
+}
+
+function applyStudioFilter(name, cardEl) {
+  studioState.filter = name;
+  document.querySelectorAll('.gs-filter-card').forEach(c => c.classList.remove('active'));
+  if (cardEl) cardEl.classList.add('active');
+  renderFilterCanvas();
+}
+
+function changeAdjustValue(prop, val) {
+  studioState.adjust[prop] = parseInt(val, 10);
+  const label = document.getElementById(`val${prop.charAt(0).toUpperCase() + prop.slice(1)}`);
+  if (label) label.textContent = `${val > 0 ? '+' : ''}${val}%`;
+  renderFilterCanvas();
+}
+
+function resetAdjustSliders() {
+  studioState.adjust = { brightness: 0, contrast: 0, saturation: 0, warmth: 0 };
+  ['Brightness', 'Contrast', 'Saturation', 'Warmth'].forEach(k => {
+    const input = document.getElementById(`slider${k}`);
+    const label = document.getElementById(`val${k}`);
+    if (input) input.value = 0;
+    if (label) label.textContent = '0%';
+  });
+  renderFilterCanvas();
+}
+
+function buildCanvasFilterString() {
+  const f = studioState.filter;
+  const adj = studioState.adjust;
+  let brightness = 1 + (adj.brightness / 100);
+  let contrast = 1 + (adj.contrast / 100);
+  let saturation = 1 + (adj.saturation / 100);
+  let sepia = adj.warmth / 100;
+  let hue = 0;
+
+  if (f === 'clarendon') {
+    contrast *= 1.2;
+    saturation *= 1.25;
+    brightness *= 1.05;
+  } else if (f === 'ghidora_gold') {
+    contrast *= 1.15;
+    saturation *= 1.35;
+    sepia = Math.max(sepia, 0.25);
+    brightness *= 1.08;
+  } else if (f === 'cyberpunk') {
+    contrast *= 1.35;
+    saturation *= 1.5;
+    hue += 15;
+  } else if (f === 'sunset') {
+    saturation *= 1.4;
+    contrast *= 1.1;
+    sepia = Math.max(sepia, 0.35);
+  } else if (f === 'noir') {
+    contrast *= 1.45;
+    saturation = 0;
+  } else if (f === 'vintage') {
+    sepia = Math.max(sepia, 0.5);
+    contrast *= 0.9;
+    brightness *= 1.05;
+  } else if (f === 'vivid') {
+    saturation *= 1.6;
+    contrast *= 1.2;
+  }
+
+  return `brightness(${brightness}) contrast(${contrast}) saturate(${saturation}) sepia(${sepia}) hue-rotate(${hue}deg)`;
+}
+
+function renderFilterCanvas() {
+  const cropCanvas = document.getElementById('studioCropCanvas');
+  const filterCanvas = document.getElementById('studioFilterCanvas');
+  if (!cropCanvas || !filterCanvas) return;
+
+  filterCanvas.width = cropCanvas.width;
+  filterCanvas.height = cropCanvas.height;
+  const ctx = filterCanvas.getContext('2d');
+
+  ctx.clearRect(0, 0, filterCanvas.width, filterCanvas.height);
+  ctx.filter = buildCanvasFilterString();
+  ctx.drawImage(cropCanvas, 0, 0);
+  ctx.filter = 'none';
+}
+
+function renderFinalPreview() {
+  if (studioState.isVideo) return;
+  const filterCanvas = document.getElementById('studioFilterCanvas');
+  const previewImg = document.getElementById('finalPostPreviewImg');
+  if (!filterCanvas || !previewImg) return;
+
+  renderFilterCanvas();
+  const dataUrl = filterCanvas.toDataURL('image/jpeg', 0.92);
+  previewImg.src = dataUrl;
+  previewImg.style.display = 'block';
+}
+
+async function handlePostSubmit(e) {
+  e.preventDefault();
+  const form = e.target;
+  const btn = document.getElementById('studioShareBtn');
+  const oldText = btn.innerHTML;
+
+  btn.disabled = true;
+  btn.innerHTML = '<i class="ti ti-loader animate-spin"></i> Sharing...';
+
+  try {
+    const formData = new FormData(form);
+
+    if (!studioState.isVideo) {
+      const filterCanvas = document.getElementById('studioFilterCanvas');
+      if (filterCanvas) {
+        renderFilterCanvas();
+        const blob = await new Promise(resolve => filterCanvas.toBlob(resolve, 'image/jpeg', 0.92));
+        if (blob) {
+          formData.delete('image');
+          formData.delete('images');
+          formData.append('image', blob, 'ghidora_post.jpg');
+          formData.append('images', blob, 'ghidora_post.jpg');
+        }
+      }
+    } else if (studioState.rawFile) {
+      formData.append('video', studioState.rawFile);
+    }
+
+    const res = await fetch(form.action, {
+      method: 'POST',
+      body: formData,
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest'
+      }
+    });
+
+    const data = await res.json();
+    if (res.ok && data.ok) {
+      closePostCreateModal();
+      window.location.reload();
+    } else {
+      let err = 'Failed to create post.';
+      if (data.errors) {
+        err = Object.values(data.errors).flat().join(', ');
+      }
+      alert(err);
+      btn.disabled = false;
+      btn.innerHTML = oldText;
+    }
+  } catch (err) {
+    console.error('Post submit error:', err);
+    // Fallback: normal submission
+    form.submit();
+  }
+}
+
+function openCreateReelModal() {
+  const modal = document.getElementById('createReelModal');
+  if (modal) modal.style.display = 'flex';
+}
+function closeCreateReelModal() {
+  const modal = document.getElementById('createReelModal');
+  if (modal) modal.style.display = 'none';
+}
+function previewReelVideoGlobal(e) {
+  const wrap = document.getElementById('globalReelPreviewWrap');
+  const vid = document.getElementById('globalReelPreviewVid');
+  const file = e.target.files[0];
+  if (file) {
+    vid.src = URL.createObjectURL(file);
+    wrap.style.display = 'block';
+  }
+}
+function previewStoryImage(e) {
+  const wrap = document.getElementById('storyPreviewWrap');
+  const img = document.getElementById('storyPreviewImg');
+  const selector = document.getElementById('storyAspectSelector');
+  const file = e.target.files[0];
+  if (file) {
+    img.src = URL.createObjectURL(file);
+    wrap.style.display = 'block';
+    if (selector) selector.style.display = 'flex';
+  }
+}
+function closeStoryUploadModal() {
+  const modal = document.getElementById('uploadStoryModal');
+  if (modal) modal.style.display = 'none';
+}
+function setStoryAspect(aspect, btn) {
+  const selector = document.getElementById('storyAspectSelector');
+  if (selector) {
+    selector.querySelectorAll('.ig-aspect-btn').forEach(b => b.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+  }
+  const img = document.getElementById('storyPreviewImg');
+  if (img) {
+    if (aspect === '9:16') {
+      img.style.aspectRatio = '9/16';
+      img.style.objectFit = 'cover';
+    } else if (aspect === '1:1') {
+      img.style.aspectRatio = '1/1';
+      img.style.objectFit = 'cover';
+    } else {
+      img.style.aspectRatio = 'unset';
+      img.style.objectFit = 'contain';
+    }
+  }
+}
+</script>

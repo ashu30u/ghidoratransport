@@ -1,0 +1,9 @@
+# Disable delta compression for large media assets so git packing is instantaneous
+*.mp3 -delta
+*.mp4 -delta
+*.mov -delta
+*.wav -delta
+*.ogg -delta
+*.png -delta
+*.jpg -delta
+*.jpeg -delta

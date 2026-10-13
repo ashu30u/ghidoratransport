@@ -1,0 +1,61 @@
+{% load static social_extras %}
+<div class="ig-stories-bar">
+  <div class="ig-stories-scroll">
+    
+    <!-- Logged-in user's story / Add story item -->
+    <div class="ig-story-item">
+      {% if my_story_group and my_story_group.stories %}
+        <div class="ig-story-ring {% if my_story_group.has_unseen %}unseen{% else %}seen{% endif %}"
+             onclick="openStoryViewer({{ request.user.id }}, '{{ request.user.username|escapejs }}', '{% if request.user.profile.avatar %}{{ request.user.profile.avatar.url|escapejs }}{% endif %}', JSON.parse(document.getElementById('my-user-stories-json').textContent))">
+          <div class="ig-story-avatar">
+            {% if request.user.profile.avatar %}
+              <img src="{{ request.user.profile.avatar.url }}" alt="{{ request.user.username }}">
+            {% else %}
+              <div class="ig-avatar-fallback">{{ request.user|get_initials }}</div>
+            {% endif %}
+          </div>
+        </div>
+        <span class="ig-story-name">Your story</span>
+      {% else %}
+        <div class="ig-story-ring add-story" onclick="openStoryUploadModal()">
+          <div class="ig-story-avatar">
+            {% if request.user.profile.avatar %}
+              <img src="{{ request.user.profile.avatar.url }}" alt="{{ request.user.username }}">
+            {% else %}
+              <div class="ig-avatar-fallback">{{ request.user|get_initials }}</div>
+            {% endif %}
+            <div class="ig-add-badge"><i class="ti ti-plus"></i></div>
+          </div>
+        </div>
+        <span class="ig-story-name">Your story</span>
+      {% endif %}
+    </div>
+
+    <!-- Other users' active stories -->
+    {% for group in other_story_groups %}
+      <div class="ig-story-item">
+        <div class="ig-story-ring {% if group.has_unseen %}unseen{% else %}seen{% endif %}"
+             onclick="openStoryViewer({{ group.user.id }}, '{{ group.username|escapejs }}', '{{ group.avatar_url|default:''|escapejs }}', JSON.parse(document.getElementById('{{ group.username|escapejs }}').textContent))">
+          <div class="ig-story-avatar">
+            {% if group.avatar_url %}
+              <img src="{{ group.avatar_url }}" alt="{{ group.username }}">
+            {% else %}
+              <div class="ig-avatar-fallback">{{ group.user|get_initials }}</div>
+            {% endif %}
+          </div>
+        </div>
+        <span class="ig-story-name" title="{{ group.username }}">{{ group.username }}</span>
+      </div>
+    {% endfor %}
+
+  </div>
+</div>
+
+<!-- Hidden JSON Script Data for Story Viewer -->
+{% if my_story_group and my_story_group.stories %}
+  {{ my_story_group.stories|json_script:"my-user-stories-json" }}
+{% endif %}
+
+{% for group in other_story_groups %}
+  {{ group.stories|json_script:group.username }}
+{% endfor %}

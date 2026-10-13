@@ -2,6 +2,7 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
+    path('', views.dashboard, name='occasions_index'),
     path('dashboard/', views.dashboard, name='occasions_dashboard'),
     path('settings/', views.settings_view, name='occasions_settings'),
     path('toggle-website-banner/', views.toggle_website_banner, name='occasions_toggle_website_banner'),

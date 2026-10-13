@@ -7,7 +7,9 @@
 <title>Pickupwala — Ghidora Transport Radio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Poppins:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="{% static 'pickupwala/css/player.css' %}?v=9999999999999">
+<link rel="preload" as="image" href="{% static 'images/pikupwala.png' %}">
+<link rel="stylesheet" href="{% static 'pickupwala/css/player.css' %}?v=2026082605">
+
 <style>
   /* Full-Screen Pickup Background & Element Overlays */
   html, body, .stage { width: 100vw !important; height: 100vh !important; height: 100dvh !important; margin: 0 !important; padding: 0 !important; overflow: hidden !important; background: #120c1d !important; }
@@ -51,11 +53,15 @@
   .progress-truck {
     position: absolute !important;
     top: 50% !important;
-    transform: translate(-50%, -65%) scaleX(-1) !important;
-    font-size: 26px !important;
-    line-height: 1 !important;
-    display: inline-block !important;
-    filter: drop-shadow(0 3px 6px rgba(0,0,0,0.95)) !important;
+    left: 0%;
+    height: 32px !important;
+    width: auto !important;
+    max-width: 55px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transform: translate(-50%, -60%) !important;
+    filter: drop-shadow(0 3px 6px rgba(0,0,0,0.85)) !important;
     z-index: 30 !important;
     pointer-events: auto !important;
     cursor: grab !important;
@@ -63,12 +69,28 @@
     opacity: 1 !important;
     user-select: none !important;
     -webkit-user-drag: none !important;
-    transition: left 0.1s linear !important;
+    touch-action: none !important;
+    transition: none !important;
   }
 
-  .progress-truck:active {
+  .truck-img-inner {
+    height: 32px !important;
+    width: auto !important;
+    max-width: 55px !important;
+    object-fit: contain !important;
+    transform: scaleX(1) !important; /* Right-facing direction */
+    display: block !important;
+    pointer-events: none !important;
+    user-select: none !important;
+    -webkit-user-drag: none !important;
+  }
+
+  .progress-truck:active,
+  .progress-truck.dragging,
+  .road-progress.dragging .progress-truck {
     cursor: grabbing !important;
-    transform: translate(-50%, -65%) scaleX(-1) scale(1.2) !important;
+    transform: translate(-50%, -60%) scale(1.1) !important;
+    transition: none !important;
   }
 
   /* White Road Fill Line Matching truckpemusic.online Reference Screenshot */
@@ -88,19 +110,34 @@
   .listeners:hover { transform: translateY(-2px) scale(1.05) !important; background: rgba(20, 38, 30, 0.85) !important; border-color: rgba(63, 224, 160, 0.85) !important; box-shadow: 0 8px 24px rgba(0,0,0,0.6), 0 0 20px rgba(63, 224, 160, 0.45) !important; color: #3fe0a0 !important; }
   .clock:hover { transform: translateY(-2px) scale(1.05) !important; background: rgba(38, 25, 48, 0.85) !important; border-color: rgba(255, 198, 92, 0.85) !important; box-shadow: 0 8px 24px rgba(0,0,0,0.6), 0 0 20px rgba(255, 198, 92, 0.45) !important; color: #ffdf9e !important; }
 
-  /* Shayari Glassmorphism Container (Exact Reference Image 1 Match) */
-  .signage-wrap {
+  /* Vertical Overlay Stack System for Floating Info Cards above Player */
+  .overlay-stack {
     position: absolute !important;
     left: 50% !important;
-    bottom: 92px !important;
-    top: auto !important;
+    bottom: 120px !important;
     transform: translateX(-50%) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    gap: 14px !important;
+    z-index: 28 !important;
+    width: max-content !important;
+    max-width: 94vw !important;
+    pointer-events: none !important;
+  }
+
+  .signage-wrap {
+    position: relative !important;
+    inset: auto !important;
+    transform: none !important;
     width: max-content !important;
     max-width: 92vw !important;
     text-align: center !important;
     z-index: 25 !important;
     display: block !important;
     visibility: visible !important;
+    pointer-events: auto !important;
   }
 
   .signage {
@@ -127,12 +164,6 @@
     text-shadow: 0 2px 4px rgba(0,0,0,0.6) !important;
   }
 
-  .signage.chai-active {
-    opacity: 0 !important;
-    pointer-events: none !important;
-    transform: translateY(6px) !important;
-  }
-
   .signage:hover {
     transform: translateY(-2px) scale(1.04) !important;
     background: rgba(28, 22, 42, 0.88) !important;
@@ -141,14 +172,13 @@
     color: #ffdf9e !important;
   }
 
-  /* Chai Break Popup Card (Exact Reference Image 2 Match - Replaces Shayari Box on Chai Break) */
+  /* Chai Break Popup Card */
   .chai-popup {
-    position: absolute !important;
-    left: 50% !important;
-    bottom: 86px !important;
-    transform: translateX(-50%) translateY(8px) scale(0.95) !important;
+    position: relative !important;
+    inset: auto !important;
+    transform: translateY(6px) scale(0.96) !important;
     z-index: 28 !important;
-    display: flex !important;
+    display: none !important;
     align-items: center !important;
     gap: 12px !important;
     background: rgba(44, 24, 18, 0.94) !important;
@@ -164,18 +194,10 @@
   }
 
   .chai-popup.active {
+    display: flex !important;
     opacity: 1 !important;
     pointer-events: auto !important;
-    transform: translateX(-50%) translateY(0) scale(1) !important;
-  }
-
-  /* Automatic CSS Rule: Hide Shayari Box whenever Chai Break Popup is active */
-  .chai-popup.active ~ .signage-wrap,
-  .chai-popup.active + .signage-wrap,
-  .stage:has(.chai-popup.active) .signage-wrap {
-    display: none !important;
-    opacity: 0 !important;
-    pointer-events: none !important;
+    transform: translateY(0) scale(1) !important;
   }
 
   /* Bottom Sound Bar */
@@ -184,23 +206,221 @@
   .play-main { width: 44px !important; height: 44px !important; border-radius: 50% !important; background: #ffffff !important; color: #120e1c !important; font-size: 16px !important; font-weight: bold !important; display: flex !important; align-items: center !important; justify-content: center !important; box-shadow: 0 4px 14px rgba(255,255,255,0.35) !important; border: none !important; cursor: pointer !important; }
 
   @media (max-width: 680px) {
-    .signage-wrap { bottom: 78px !important; }
-    .signage { font-size: 13px !important; padding: 6px 16px !important; }
-    .chai-popup { bottom: 74px !important; padding: 8px 16px !important; }
-    .player { bottom: 12px !important; }
-    .player-inner { padding: 8px 12px !important; gap: 8px !important; }
-    .play-main { width: 38px !important; height: 38px !important; font-size: 15px !important; }
+    /* Floating Info Overlay Stack (Shayari & Chai) */
+    .overlay-stack {
+      bottom: 152px !important;
+      gap: 8px !important;
+      max-width: 95vw !important;
+      width: 95vw !important;
+    }
+    .signage-wrap {
+      max-width: 94vw !important;
+      width: 100% !important;
+    }
+    .signage {
+      font-size: 12px !important;
+      padding: 6px 14px !important;
+      max-width: 94vw !important;
+      white-space: normal !important;
+      line-height: 1.35 !important;
+      text-align: center !important;
+    }
+    .signage #signageText {
+      white-space: normal !important;
+      word-break: break-word !important;
+      display: inline !important;
+    }
+    .chai-popup {
+      padding: 6px 12px !important;
+      font-size: 11.5px !important;
+      border-radius: 14px !important;
+    }
+    .chai-icon-wrap {
+      width: 28px !important;
+      height: 28px !important;
+      font-size: 14px !important;
+    }
+    .chai-title {
+      font-size: 12.5px !important;
+    }
+    .chai-sub {
+      font-size: 10.5px !important;
+    }
+
+    /* Player Container & 2-Tier Mobile Grid */
+    .player {
+      bottom: 12px !important;
+      width: calc(100vw - 16px) !important;
+      max-width: 100vw !important;
+      left: 50% !important;
+      transform: translateX(-50%) !important;
+    }
+    .player-inner {
+      border-radius: 20px !important;
+      padding: 10px 12px 8px !important;
+      display: grid !important;
+      grid-template-columns: auto 1fr !important;
+      grid-template-rows: auto auto !important;
+      gap: 8px 10px !important;
+      align-items: center !important;
+    }
+    .cassette-wrap {
+      grid-column: 1 !important;
+      grid-row: 1 !important;
+      width: 44px !important;
+      height: 44px !important;
+    }
+    .track-info {
+      grid-column: 2 !important;
+      grid-row: 1 !important;
+      width: 100% !important;
+      min-width: 0 !important;
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 3px !important;
+    }
+    .track-meta-row {
+      display: flex !important;
+      align-items: baseline !important;
+      gap: 6px !important;
+      overflow: hidden !important;
+      width: 100% !important;
+    }
+    .track-title {
+      font-size: 14px !important;
+      font-weight: 700 !important;
+      white-space: nowrap !important;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+      flex: 1 1 auto !important;
+      min-width: 0 !important;
+    }
+    .track-artist {
+      font-size: 11px !important;
+      white-space: nowrap !important;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+      flex: 0 0 auto !important;
+      max-width: 38% !important;
+      color: rgba(255, 255, 255, 0.65) !important;
+    }
+    .road-progress {
+      margin-top: 2px !important;
+      padding: 4px 0 !important;
+    }
+    .progress-truck {
+      height: 22px !important;
+      max-width: 26px !important;
+      transform: translate(-50%, -60%) !important;
+    }
+    .truck-img-inner {
+      height: 22px !important;
+      max-width: 26px !important;
+    }
+    .km-readout {
+      font-size: 9px !important;
+      margin-top: 2px !important;
+    }
+
+    /* Controls Bar: Row 2 of Grid */
+    .controls {
+      grid-column: 1 / -1 !important;
+      grid-row: 2 !important;
+      width: 100% !important;
+      display: flex !important;
+      justify-content: space-between !important;
+      align-items: center !important;
+      padding-top: 6px !important;
+      border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+      gap: 2px !important;
+    }
+    .ctrl-icon-btn {
+      width: 32px !important;
+      height: 32px !important;
+      font-size: 13.5px !important;
+      flex-shrink: 0 !important;
+      padding: 0 !important;
+    }
+    .play-main {
+      width: 38px !important;
+      height: 38px !important;
+      font-size: 15px !important;
+      flex-shrink: 0 !important;
+      margin: 0 2px !important;
+    }
+    .topbar {
+      padding: max(10px, env(safe-area-inset-top)) 14px 0 14px !important;
+    }
+    .topbar .pill {
+      font-size: 11.5px !important;
+      padding: 6px 12px !important;
+    }
   }
+
+  /* Floating Horn Toast Speech Bubble */
+  .horn-popup {
+    position: absolute !important;
+    left: 50% !important;
+    top: 42% !important;
+    transform: translate(-50%, -50%) scale(0.6) !important;
+    background: linear-gradient(135deg, #ff6b35, #ff3b00) !important;
+    color: #ffffff !important;
+    font-family: 'Baloo 2', sans-serif !important;
+    font-weight: 800 !important;
+    font-size: 22px !important;
+    padding: 8px 24px !important;
+    border-radius: 999px !important;
+    border: 2px solid #ffffff !important;
+    box-shadow: 0 12px 35px rgba(0,0,0,0.7), 0 0 25px rgba(255, 107, 53, 0.85) !important;
+    z-index: 35 !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.2s ease !important;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5) !important;
+  }
+  .horn-popup.active {
+    opacity: 1 !important;
+    transform: translate(-50%, -60%) scale(1.1) !important;
+  }
+
+  /* Pickup Honk Pulse Animation */
+  .honk-effect {
+    animation: truckHonk 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97) !important;
+  }
+  @keyframes truckHonk {
+    0% { transform: scale(1); }
+    20% { transform: scale(1.03) rotate(-0.8deg); filter: brightness(1.25); }
+    40% { transform: scale(0.98) rotate(0.8deg); }
+    60% { transform: scale(1.02) rotate(-0.4deg); }
+    80% { transform: scale(0.99) rotate(0.2deg); }
+    100% { transform: scale(1); }
+  }
+
+  /* Horn Button Bounce Animation */
+  .btn-honk-bounce {
+    animation: btnBounce 0.4s ease !important;
+  }
+  @keyframes btnBounce {
+    0% { transform: scale(1); }
+    40% { transform: scale(1.4) rotate(-14deg); background: rgba(255, 107, 53, 0.45) !important; border-color: rgba(255, 107, 53, 0.8) !important; }
+    70% { transform: scale(0.9) rotate(6deg); }
+    100% { transform: scale(1); }
+  }
+
 </style>
 </head>
 <body>
 <div class="stage" id="stage">
   <!-- FULL SCREEN PICKUP BACKGROUND IMAGE -->
   <div class="bg-hero-wrap">
-    <img class="bg-hero-img" src="{% static 'images/pikupwala.png' %}" alt="Ghidora Transport Pickup Background">
+    <img class="bg-hero-img" src="{% static 'images/pikupwala.png' %}" alt="Ghidora Transport Pickup Background" fetchpriority="high" decoding="async">
   </div>
+
   <!-- Vignette Gradient Overlay -->
   <div class="bg-overlay"></div>
+
+  <!-- Horn Speech Bubble Toast Popup -->
+  <div class="horn-popup" id="hornPopup">PEEP PEEP! 🎺</div>
 
   <!-- Top bar -->
   <div class="topbar">
@@ -208,20 +428,23 @@
     <div class="pill clock mono" id="clock">1:53<span class="ampm">pm</span></div>
   </div>
 
-  <!-- Chai Break Popup Card (Matching Reference Image directly above sound bar) -->
-  <div class="chai-popup" id="chaiPopup">
-    <div class="chai-icon-wrap">☕</div>
-    <div class="chai-text-wrap">
-      <div class="chai-title" id="chaiTitle">Chai pe charcha! ☕</div>
-      <div class="chai-sub" id="chaiSub">Music baad mein, pehle chai!</div>
+  <!-- Vertical Overlay Stack (Shayari Card -> Chai Break Card -> Music Player) -->
+  <div class="overlay-stack" id="overlayStack">
+    <!-- Shayari Board -->
+    <div class="signage-wrap" id="signageWrap">
+      <div class="signage" id="signage">
+        <span class="radio-tag">● FM RADIO</span>
+        <span id="signageText">दम है तो क्रॉस कर, वरना बर्दाश्त कर</span>
+      </div>
     </div>
-  </div>
 
-  <!-- Shayari Board (Overlaid in center of Pickup Background Scene) -->
-  <div class="signage-wrap">
-    <div class="signage" id="signage">
-      <span class="radio-tag">● FM RADIO</span>
-      <span id="signageText">दम है तो क्रॉस कर, वरना बर्दाश्त कर</span>
+    <!-- Chai Break Popup Card -->
+    <div class="chai-popup" id="chaiPopup">
+      <div class="chai-icon-wrap">☕</div>
+      <div class="chai-text-wrap">
+        <div class="chai-title" id="chaiTitle">Chai pe charcha! ☕</div>
+        <div class="chai-sub" id="chaiSub">Music baad mein, pehle chai!</div>
+      </div>
     </div>
   </div>
 
@@ -244,7 +467,9 @@
         <div class="road-progress">
           <div class="road-track">
             <div class="road-fill" id="roadFill"></div>
-            <div class="progress-truck" id="progressTruck">🚚</div>
+            <div class="progress-truck" id="progressTruck">
+              <img src="{% static 'images/pikipwaladetails/imojipikup.png' %}" class="truck-img-inner" alt="Pickupwala" draggable="false">
+            </div>
           </div>
           <div class="km-readout">
             <span id="timeReadout">0:04 / 5:04</span>
@@ -258,6 +483,8 @@
         <button class="ctrl-icon-btn" id="hornBtn" title="Horn">🎺</button>
         <button class="ctrl-icon-btn" id="radioBtn" title="Radio shayari">📻</button>
         <button class="ctrl-icon-btn" id="teaBtn" title="Chai break">☕</button>
+        <button class="ctrl-icon-btn" id="repeatBtn" title="Repeat (OFF)">🔁</button>
+        <button class="ctrl-icon-btn active" id="autoNextBtn" title="Auto Next (ON)">🔀</button>
         <button class="ctrl-icon-btn" id="prevBtn" title="Previous">⏮</button>
 
         <!-- Main White Round Play/Pause Button -->
@@ -288,13 +515,13 @@
   </div>
 </div>
 
-<audio id="audioEl" loop></audio>
+<audio id="audioEl" preload="auto"></audio>
 <audio id="hornAudio" src="{% static 'pickupwala/audio/horn.wav' %}"></audio>
 <audio id="radioClickAudio" src="{% static 'pickupwala/audio/radio_click.wav' %}"></audio>
 
 <script>
   window.PICKUPWALA_API = "{% url 'pickupwala:playlist-api' %}";
 </script>
-<script src="{% static 'pickupwala/js/player.js' %}?v=9999999999999"></script>
+<script src="{% static 'pickupwala/js/player.js' %}?v=2026082609"></script>
 </body>
 </html>

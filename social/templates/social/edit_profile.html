@@ -1,24 +1,305 @@
 {% extends "base.html" %}
-{% load static %}
+{% load static social_extras %}
 
-{% block extra_css %}
-<link rel="stylesheet" href="{% static 'social/css/social.css' %}">
-{% endblock %}
+{% block title %}Edit Profile • Ghidora Social Settings{% endblock %}
 
 {% block content %}
-<div class="gs-wrap">
-  <h1 class="gs-title" style="font-size:1.4rem; margin-bottom:16px;">Edit profile</h1>
-  <div class="gs-composer">
-    <form method="post" enctype="multipart/form-data">
+<div style="max-width: 980px; margin: 0 auto; display: flex; gap: 24px; min-height: 85vh; padding-bottom: 80px;">
+
+  <!-- Left Settings Navigation Sidebar (Instagram Style) -->
+  <div style="width: 280px; flex-shrink: 0; border-right: 1px solid var(--ig-card-border); padding-right: 16px; overflow-y: auto; max-height: calc(100vh - 100px);">
+    <h2 style="font-size: 1.4rem; font-weight: 700; color: var(--ig-text); margin: 0 0 16px;">Settings</h2>
+    
+    <div style="margin-bottom: 16px;">
+      <input type="text" class="ig-input" id="settingsSearchInput" onkeyup="filterSettingsMenu()" placeholder="Search settings..." style="border-radius: 10px; padding: 9px 12px; font-size: 0.85rem;">
+    </div>
+
+    <div id="settingsMenuList">
+      <!-- Section 1: Your account -->
+      <div class="settings-group" style="margin-bottom: 20px;">
+        <div style="font-size: 0.72rem; font-weight: 700; color: var(--ig-text-muted); text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.05em;">Your account</div>
+        <a href="#" onclick="openPlaceholderModal('Accounts Center')" class="settings-nav-item" style="display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 10px; color: var(--ig-text); text-decoration: none; font-size: 0.88rem;">
+          <i class="ti ti-user-check" style="font-size: 1.1rem; color: var(--ig-gold);"></i> Accounts Center
+        </a>
+      </div>
+
+      <!-- Section 2: How you use Instagram -->
+      <div class="settings-group" style="margin-bottom: 20px;">
+        <div style="font-size: 0.72rem; font-weight: 700; color: var(--ig-text-muted); text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.05em;">How you use Instagram</div>
+        <a href="{% url 'social:edit_profile' %}" class="settings-nav-item active" style="display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 10px; background: rgba(255,255,255,0.08); color: var(--ig-text); font-weight: 600; text-decoration: none; font-size: 0.88rem; margin-bottom: 2px;">
+          <i class="ti ti-user-edit" style="font-size: 1.1rem;"></i> Edit profile
+        </a>
+        <a href="#" onclick="openNotificationsModal()" class="settings-nav-item" style="display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 10px; color: var(--ig-text-muted); text-decoration: none; font-size: 0.88rem;">
+          <i class="ti ti-bell" style="font-size: 1.1rem;"></i> Notifications
+        </a>
+      </div>
+
+      <!-- Section 3: Who can see your content -->
+      <div class="settings-group" style="margin-bottom: 20px;">
+        <div style="font-size: 0.72rem; font-weight: 700; color: var(--ig-text-muted); text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.05em;">Who can see your content</div>
+        <a href="#" onclick="openPlaceholderModal('Account privacy')" class="settings-nav-item" style="display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 10px; color: var(--ig-text-muted); text-decoration: none; font-size: 0.88rem;">
+          <i class="ti ti-lock" style="font-size: 1.1rem;"></i> Account privacy
+        </a>
+        <a href="#" onclick="openPlaceholderModal('Close Friends')" class="settings-nav-item" style="display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 10px; color: var(--ig-text-muted); text-decoration: none; font-size: 0.88rem;">
+          <i class="ti ti-star" style="font-size: 1.1rem;"></i> Close Friends
+        </a>
+        <a href="#" onclick="openPlaceholderModal('Blocked')" class="settings-nav-item" style="display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 10px; color: var(--ig-text-muted); text-decoration: none; font-size: 0.88rem;">
+          <i class="ti ti-ban" style="font-size: 1.1rem;"></i> Blocked
+        </a>
+        <a href="#" onclick="openPlaceholderModal('Story and location')" class="settings-nav-item" style="display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 10px; color: var(--ig-text-muted); text-decoration: none; font-size: 0.88rem;">
+          <i class="ti ti-map-pin" style="font-size: 1.1rem;"></i> Story and location
+        </a>
+      </div>
+
+      <!-- Section 4: How others can interact with you -->
+      <div class="settings-group" style="margin-bottom: 20px;">
+        <div style="font-size: 0.72rem; font-weight: 700; color: var(--ig-text-muted); text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.05em;">How others can interact</div>
+        <a href="#" onclick="openPlaceholderModal('Messages and story replies')" class="settings-nav-item" style="display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 10px; color: var(--ig-text-muted); text-decoration: none; font-size: 0.88rem;">
+          <i class="ti ti-message-circle" style="font-size: 1.1rem;"></i> Messages and story replies
+        </a>
+        <a href="#" onclick="openPlaceholderModal('Tags and mentions')" class="settings-nav-item" style="display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 10px; color: var(--ig-text-muted); text-decoration: none; font-size: 0.88rem;">
+          <i class="ti ti-at" style="font-size: 1.1rem;"></i> Tags and mentions
+        </a>
+        <a href="#" onclick="openPlaceholderModal('Comments')" class="settings-nav-item" style="display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 10px; color: var(--ig-text-muted); text-decoration: none; font-size: 0.88rem;">
+          <i class="ti ti-message-2" style="font-size: 1.1rem;"></i> Comments
+        </a>
+        <a href="#" onclick="openPlaceholderModal('Sharing')" class="settings-nav-item" style="display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 10px; color: var(--ig-text-muted); text-decoration: none; font-size: 0.88rem;">
+          <i class="ti ti-share" style="font-size: 1.1rem;"></i> Sharing
+        </a>
+        <a href="#" onclick="openPlaceholderModal('Restricted accounts')" class="settings-nav-item" style="display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 10px; color: var(--ig-text-muted); text-decoration: none; font-size: 0.88rem;">
+          <i class="ti ti-eye-off" style="font-size: 1.1rem;"></i> Restricted accounts
+        </a>
+        <a href="#" onclick="openPlaceholderModal('Hidden Words')" class="settings-nav-item" style="display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 10px; color: var(--ig-text-muted); text-decoration: none; font-size: 0.88rem;">
+          <i class="ti ti-forms" style="font-size: 1.1rem;"></i> Hidden Words
+        </a>
+      </div>
+
+      <!-- Section 5: What you see -->
+      <div class="settings-group" style="margin-bottom: 20px;">
+        <div style="font-size: 0.72rem; font-weight: 700; color: var(--ig-text-muted); text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.05em;">What you see</div>
+        <a href="#" onclick="openPlaceholderModal('Muted accounts')" class="settings-nav-item" style="display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 10px; color: var(--ig-text-muted); text-decoration: none; font-size: 0.88rem;">
+          <i class="ti ti-volume-3" style="font-size: 1.1rem;"></i> Muted accounts
+        </a>
+        <a href="#" onclick="openPlaceholderModal('Content preferences')" class="settings-nav-item" style="display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 10px; color: var(--ig-text-muted); text-decoration: none; font-size: 0.88rem;">
+          <i class="ti ti-adjustments" style="font-size: 1.1rem;"></i> Content preferences
+        </a>
+        <a href="#" onclick="openPlaceholderModal('Like and share counts')" class="settings-nav-item" style="display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 10px; color: var(--ig-text-muted); text-decoration: none; font-size: 0.88rem;">
+          <i class="ti ti-heart" style="font-size: 1.1rem;"></i> Like and share counts
+        </a>
+      </div>
+
+      <!-- Section 6: Your app and media -->
+      <div class="settings-group" style="margin-bottom: 20px;">
+        <div style="font-size: 0.72rem; font-weight: 700; color: var(--ig-text-muted); text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.05em;">Your app and media</div>
+        <a href="#" onclick="openPlaceholderModal('Archiving and downloading')" class="settings-nav-item" style="display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 10px; color: var(--ig-text-muted); text-decoration: none; font-size: 0.88rem;">
+          <i class="ti ti-download" style="font-size: 1.1rem;"></i> Archiving and downloading
+        </a>
+        <a href="#" onclick="openPlaceholderModal('Accessibility')" class="settings-nav-item" style="display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 10px; color: var(--ig-text-muted); text-decoration: none; font-size: 0.88rem;">
+          <i class="ti ti-accessible" style="font-size: 1.1rem;"></i> Accessibility
+        </a>
+        <a href="#" onclick="openPlaceholderModal('Language')" class="settings-nav-item" style="display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 10px; color: var(--ig-text-muted); text-decoration: none; font-size: 0.88rem;">
+          <i class="ti ti-language" style="font-size: 1.1rem;"></i> Language
+        </a>
+      </div>
+
+      <!-- Section 7: For professionals -->
+      <div class="settings-group" style="margin-bottom: 20px;">
+        <div style="font-size: 0.72rem; font-weight: 700; color: var(--ig-text-muted); text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.05em;">For professionals</div>
+        <a href="#" onclick="openPlaceholderModal('Account type and tools')" class="settings-nav-item" style="display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 10px; color: var(--ig-text-muted); text-decoration: none; font-size: 0.88rem;">
+          <i class="ti ti-chart-bar" style="font-size: 1.1rem;"></i> Account type and tools
+        </a>
+        <a href="#" onclick="openPlaceholderModal('Meta Verified Badge')" class="settings-nav-item" style="display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 10px; color: #ec4899; font-weight: 600; text-decoration: none; font-size: 0.88rem;">
+          <i class="ti ti-circle-check-filled" style="font-size: 1.1rem; color: #ec4899;"></i> Meta Verified (Pink Badge)
+        </a>
+      </div>
+
+      <!-- Section 8: More info and support -->
+      <div class="settings-group" style="margin-bottom: 20px;">
+        <div style="font-size: 0.72rem; font-weight: 700; color: var(--ig-text-muted); text-transform: uppercase; margin-bottom: 6px; letter-spacing: 0.05em;">More info and support</div>
+        <a href="#" onclick="openPlaceholderModal('Help')" class="settings-nav-item" style="display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 10px; color: var(--ig-text-muted); text-decoration: none; font-size: 0.88rem;">
+          <i class="ti ti-help" style="font-size: 1.1rem;"></i> Help
+        </a>
+        <a href="#" onclick="openPlaceholderModal('Privacy Center')" class="settings-nav-item" style="display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 10px; color: var(--ig-text-muted); text-decoration: none; font-size: 0.88rem;">
+          <i class="ti ti-shield-check" style="font-size: 1.1rem;"></i> Privacy Center
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Main Settings Content -->
+  <div style="flex: 1; min-width: 0; padding-left: 10px;">
+    <h2 style="font-size: 1.4rem; font-weight: 700; color: var(--ig-text); margin: 0 0 24px;">Edit profile</h2>
+
+    <form method="post" enctype="multipart/form-data" id="editProfileMainForm" style="display: flex; flex-direction: column; gap: 24px; max-width: 580px;">
       {% csrf_token %}
-      <label style="font-size:0.85rem; color:var(--gs-ink-soft);">Bio</label>
-      {{ form.bio }}
-      <label style="font-size:0.85rem; color:var(--gs-ink-soft); display:block; margin-top:10px;">Avatar</label>
-      {{ form.avatar }}
-      <div style="text-align:right; margin-top:14px;">
-        <button type="submit" class="gs-btn">Save</button>
+
+      {% if form.errors %}
+        <div style="padding: 12px 16px; background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; border-radius: 10px; color: #fca5a5; font-size: 0.88rem;">
+          <strong style="display:block; margin-bottom:4px;"><i class="ti ti-alert-triangle"></i> Please fix the errors below:</strong>
+          <ul style="margin: 0; padding-left: 20px;">
+            {% for field, errs in form.errors.items %}
+              {% for err in errs %}
+                <li><strong>{{ field|title }}:</strong> {{ err }}</li>
+              {% endfor %}
+            {% endfor %}
+          </ul>
+        </div>
+      {% endif %}
+
+      <!-- Top Profile Card -->
+      <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; background: #161920; border-radius: 16px; border: 1px solid var(--ig-card-border);">
+        <div style="display: flex; align-items: center; gap: 16px;">
+          {% if profile.avatar %}
+            <img src="{{ profile.avatar.url }}" alt="{{ request.user.username }}" class="ig-avatar" style="width: 56px; height: 56px; cursor: pointer;" onclick="openChangePhotoModal()">
+          {% else %}
+            <div class="ig-avatar ig-avatar-fallback" style="width: 56px; height: 56px; font-size: 1.2rem; cursor: pointer;" onclick="openChangePhotoModal()">{{ request.user|get_initials }}</div>
+          {% endif %}
+
+          <div>
+            <div style="font-weight: 700; font-size: 1rem; color: var(--ig-text); display: flex; align-items: center; gap: 4px;">
+              {{ request.user.username }}
+              {% if request.user.is_superuser or request.user.is_staff or 'ghidora' in request.user.username.lower %}
+                <span class="gs-badge-owner" title="Ghidora Owner / Verified"><i class="ti ti-circle-check-filled"></i></span>
+              {% endif %}
+            </div>
+            <div style="font-size: 0.85rem; color: var(--ig-text-muted);">{{ request.user.get_full_name|default:request.user.username }}</div>
+          </div>
+        </div>
+
+        <button type="button" class="ig-btn-primary" onclick="openChangePhotoModal()" style="background: #38bdf8; color: #04060b; font-size: 0.85rem; padding: 8px 16px;">
+          Change photo
+        </button>
+      </div>
+
+      <!-- Field: Full Name -->
+      <div>
+        <label style="font-size: 0.9rem; font-weight: 700; color: var(--ig-text); display: flex; justify-content: space-between; margin-bottom: 8px;">
+          <span>Name (Display Name)</span>
+          <span style="font-size: 0.75rem; color: var(--ig-text-muted); font-weight: normal;">Visible on your profile & posts</span>
+        </label>
+        <input type="text" name="first_name" value="{{ form.first_name.value|default:request.user.first_name }}" class="ig-input" placeholder="e.g. Ashutosh Sharma" maxlength="50">
+        <div style="font-size: 0.75rem; color: var(--ig-text-muted); margin-top: 5px;">Help people discover your account by using the name you're known by.</div>
+      </div>
+
+      <!-- Field: Username Handle -->
+      <div>
+        <label style="font-size: 0.9rem; font-weight: 700; color: var(--ig-text); display: flex; justify-content: space-between; margin-bottom: 8px;">
+          <span>Username (@handle)</span>
+          <span style="font-size: 0.75rem; color: var(--ig-gold); font-weight: normal;">Unique ID</span>
+        </label>
+        <div style="position: relative;">
+          <span style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--ig-gold); font-weight: 700; font-size: 0.95rem;">@</span>
+          <input type="text" name="username" value="{{ form.username.value|default:request.user.username }}" class="ig-input" placeholder="your_custom_handle" style="padding-left: 28px; font-weight: 600;" required pattern="^[a-zA-Z0-9._]+$" title="Only letters, numbers, underscores and periods allowed">
+        </div>
+        <div style="font-size: 0.75rem; color: var(--ig-text-muted); margin-top: 5px;">
+          Your Ghidora Social handle: <code style="color: var(--ig-gold);">@{{ request.user.username }}</code>. Changing this updates your profile URL.
+        </div>
+      </div>
+
+      <!-- Field: Website -->
+      <div>
+        <label style="font-size: 0.9rem; font-weight: 700; color: var(--ig-text); display: block; margin-bottom: 6px;">Website</label>
+        <input type="url" name="website" value="{{ profile.website|default:'' }}" class="ig-input" placeholder="https://example.com">
+        <div style="font-size: 0.75rem; color: var(--ig-text-muted); margin-top: 4px;">Editing your links is available on Ghidora Social.</div>
+      </div>
+
+      <!-- Field: Bio -->
+      <div>
+        <label style="font-size: 0.9rem; font-weight: 700; color: var(--ig-text); display: block; margin-bottom: 6px;">Bio</label>
+        <div style="position: relative;">
+          <textarea name="bio" id="bioTextarea" rows="3" class="ig-textarea" placeholder="Bio..." maxlength="200" oninput="updateBioCounter()">{{ profile.bio }}</textarea>
+          <div id="bioCharCounter" style="position: absolute; right: 10px; bottom: 10px; font-size: 0.75rem; color: var(--ig-text-muted);">
+            {{ profile.bio|length }}/200
+          </div>
+        </div>
+      </div>
+
+      <!-- Field: Note Bubble -->
+      <div>
+        <label style="font-size: 0.9rem; font-weight: 700; color: var(--ig-text); display: block; margin-bottom: 6px;">Note Bubble</label>
+        <input type="text" name="note" value="{{ profile.note }}" class="ig-input" placeholder="Note... (e.g. Infinite ∞...)" maxlength="60">
+        <div style="font-size: 0.75rem; color: var(--ig-text-muted); margin-top: 4px;">Floating note displayed above your profile photo.</div>
+      </div>
+
+      <!-- Field: Gender -->
+      <div>
+        <label style="font-size: 0.9rem; font-weight: 700; color: var(--ig-text); display: block; margin-bottom: 6px;">Gender</label>
+        <select name="gender" class="ig-input" style="background: #101217; color: var(--ig-text);">
+          <option value="Male" {% if profile.gender == "Male" %}selected{% endif %}>Male</option>
+          <option value="Female" {% if profile.gender == "Female" %}selected{% endif %}>Female</option>
+          <option value="Custom" {% if profile.gender == "Custom" %}selected{% endif %}>Custom</option>
+          <option value="Prefer not to say" {% if profile.gender == "Prefer not to say" %}selected{% endif %}>Prefer not to say</option>
+        </select>
+        <div style="font-size: 0.75rem; color: var(--ig-text-muted); margin-top: 4px;">This won't be part of your public profile.</div>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; margin-top: 10px;">
+        <button type="submit" class="ig-btn-primary" style="padding: 10px 24px;">Submit</button>
       </div>
     </form>
   </div>
 </div>
+
+<!-- ========================================== -->
+<!-- Change Profile Photo Modal (Instagram Style) -->
+<!-- ========================================== -->
+<div class="ig-modal" id="changePhotoModal" style="display:none;">
+  <div class="ig-modal-backdrop" onclick="closeChangePhotoModal()"></div>
+  <div class="ig-modal-box" style="max-width: 380px; width: 90%; text-align: center; padding: 0; border-radius: 16px; overflow: hidden; background: #161920;">
+    <div style="padding: 24px 16px; font-weight: 700; font-size: 1.1rem; color: var(--ig-text); border-bottom: 1px solid var(--ig-card-border);">
+      Change Profile Photo
+    </div>
+
+    <!-- Upload Photo Form -->
+    <form method="post" enctype="multipart/form-data" action="{% url 'social:edit_profile' %}" id="uploadPhotoForm">
+      {% csrf_token %}
+      <label style="display: block; padding: 14px; color: #38bdf8; font-weight: 700; font-size: 0.95rem; border-bottom: 1px solid var(--ig-card-border); cursor: pointer; margin: 0;">
+        Upload Photo
+        <input type="file" name="avatar" accept="image/*" style="display:none;" onchange="document.getElementById('uploadPhotoForm').submit()">
+      </label>
+    </form>
+
+    <!-- Remove Current Photo Form -->
+    {% if profile.avatar %}
+      <form method="post" action="{% url 'social:edit_profile' %}">
+        {% csrf_token %}
+        <input type="hidden" name="remove_avatar" value="1">
+        <button type="submit" style="width: 100%; padding: 14px; color: #ef4444; font-weight: 700; font-size: 0.95rem; background: transparent; border: none; border-bottom: 1px solid var(--ig-card-border); cursor: pointer;">
+          Remove Current Photo
+        </button>
+      </form>
+    {% endif %}
+
+    <!-- Cancel Button -->
+    <button type="button" onclick="closeChangePhotoModal()" style="width: 100%; padding: 14px; color: var(--ig-text); font-size: 0.95rem; background: transparent; border: none; cursor: pointer;">
+      Cancel
+    </button>
+  </div>
+</div>
+
+<script>
+function openChangePhotoModal() {
+  const modal = document.getElementById('changePhotoModal');
+  if (modal) modal.style.display = 'flex';
+}
+function closeChangePhotoModal() {
+  const modal = document.getElementById('changePhotoModal');
+  if (modal) modal.style.display = 'none';
+}
+function updateBioCounter() {
+  const bio = document.getElementById('bioTextarea');
+  const counter = document.getElementById('bioCharCounter');
+  if (bio && counter) {
+    counter.textContent = bio.value.length + '/200';
+  }
+}
+function filterSettingsMenu() {
+  const query = document.getElementById('settingsSearchInput').value.toLowerCase();
+  const items = document.querySelectorAll('.settings-nav-item');
+  items.forEach(item => {
+    const text = item.textContent.toLowerCase();
+    item.style.display = text.includes(query) ? 'flex' : 'none';
+  });
+}
+</script>
 {% endblock %}

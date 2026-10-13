@@ -496,6 +496,17 @@ class ReviewAdmin(admin.ModelAdmin):
         self.message_user(request, f"⚪ {rows} review(s) un-marked from Verified!")
     unmark_verified.short_description = "⚪ Unmark Verified Status"
 
+    def save_model(self, request, obj, form, change):
+        super().save_model(request, obj, form, change)
+        from django.core.cache import cache
+        cache.delete("home_reviews_summary_data")
+
+    def delete_model(self, request, obj):
+        super().delete_model(request, obj)
+        from django.core.cache import cache
+        cache.delete("home_reviews_summary_data")
+
+
 
 @admin.register(ContactMessage)
 class ContactMessageAdmin(admin.ModelAdmin):

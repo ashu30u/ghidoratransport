@@ -5,9 +5,12 @@ notification dispatch, and duplicate-upload hashing.
 import os
 import hashlib
 import io
+import logging
 import urllib.parse
 from datetime import date
 from PIL import Image as PILImage
+
+logger = logging.getLogger(__name__)
 
 from django.conf import settings
 from django.core.files.base import ContentFile
@@ -136,14 +139,15 @@ def _remove_black_background(image_path):
 # SINGLE-PAGE PERFECT COMPACT PDF RECEIPT GENERATOR
 # ---------------------------------------------------------------------------
 
-def generate_receipt_pdf(payment_request):
+def generate_receipt_pdf(payment_request, proof=None):
     """
     Builds a compact single-page A4 PDF receipt.
     Includes Mantra, Logo, Company Details, Metadata, Booking/Customer Info,
     Full Payment Breakdown, Status, 1-Line Offer Strip, Stamp & Signatures.
     """
     booking = payment_request.booking
-    proof = payment_request.latest_proof
+    if proof is None:
+        proof = payment_request.latest_proof
     receipt = getattr(payment_request, 'receipt', None)
     receipt_id = receipt.receipt_id if receipt else f"RCPT-{payment_request.payment_id}"
 
@@ -510,3 +514,168 @@ def _kv_table(rows):
         ("LINEBELOW", (0, 0), (-1, -1), 0.4, colors.HexColor("#e2e8f0")),
     ]))
     return table
+
+
+# ---------------------------------------------------------------------------
+# 🌟 1-Click "All Done" Payment Verification & Receipt Email Dispatch
+# ---------------------------------------------------------------------------
+
+def mark_payment_all_done_and_send_receipt(payment_request, proof=None, verified_by=None, request=None):
+    """
+    1-Click ALL DONE action:
+    1. Approves PaymentVerification on the payment proof.
+    2. Updates PaymentRequest status to VERIFIED (or COMPLETED) and updates amounts.
+    3. Generates the official branded PDF Receipt with QR, signature, and stamp.
+    4. Dispatches an email with the PDF attached directly to the customer's email.
+    5. Updates Receipt metadata (is_sent, sent_to_email, sent_at).
+    6. Logs in AuditLog and creates in-app Notification.
+    """
+    from decimal import Decimal
+    from django.utils import timezone
+    from django.core.mail import EmailMessage
+    from django.conf import settings
+    from .models import (
+        PaymentVerification, PaymentStatus, Receipt,
+        AuditLog, NotificationType, PaymentStatusHistory
+    )
+
+    booking = payment_request.booking
+    active_proof = proof or payment_request.latest_proof
+
+    # 1. Approve Verification
+    if active_proof:
+        verification = getattr(active_proof, 'verification', None)
+        if verification:
+            verification.action = PaymentVerification.Action.APPROVED
+            verification.verified_by = verified_by
+            if request:
+                verification.verifier_ip = get_client_ip(request)
+            verification.notes = (verification.notes or "").strip() + " [Verified via 1-Click All Done Admin Button]"
+            verification.save()
+        else:
+            verification = PaymentVerification.objects.create(
+                proof=active_proof,
+                action=PaymentVerification.Action.APPROVED,
+                verified_by=verified_by,
+                verifier_ip=get_client_ip(request) if request else None,
+                notes="Verified via 1-Click All Done Admin Button.",
+            )
+
+    # 2. Update Payment Request status and amount paid
+    paid_amount = Decimal(str(active_proof.amount_paid if (active_proof and active_proof.amount_paid is not None) else payment_request.amount))
+    if payment_request.status not in (PaymentStatus.VERIFIED, PaymentStatus.COMPLETED):
+        already_paid = Decimal(str(payment_request.amount_already_paid or 0))
+        payment_request.amount_already_paid = already_paid + paid_amount
+
+    if payment_request.remaining_amount <= 0:
+        payment_request.status = PaymentStatus.COMPLETED
+    else:
+        payment_request.status = PaymentStatus.VERIFIED
+
+    payment_request.save(update_fields=["status", "amount_already_paid", "updated_at"])
+
+    # Log status history
+    PaymentStatusHistory.objects.create(
+        payment_request=payment_request,
+        status=payment_request.status,
+        changed_by=verified_by,
+        notes=f"Payment marked ALL DONE (₹{paid_amount:.2f} verified).",
+    )
+
+    # 3. Generate Receipt PDF
+    receipt, _ = Receipt.objects.get_or_create(payment_request=payment_request)
+    try:
+        pdf_file = generate_receipt_pdf(payment_request, proof=active_proof)
+        receipt.pdf_file.save(pdf_file.name, pdf_file, save=True)
+    except Exception as pdf_err:
+        logger.error("Receipt PDF generation error: %s", pdf_err)
+
+    # 4. Find Customer Email
+    customer_email = None
+    if booking.email and booking.email.strip():
+        customer_email = booking.email.strip()
+    elif booking.user and booking.user.email and booking.user.email.strip():
+        customer_email = booking.user.email.strip()
+
+    email_sent = False
+    email_error = None
+
+    # 5. Send Receipt Email
+    if customer_email and receipt.pdf_file:
+        try:
+            subject = f"🚚 Official Payment Receipt — Ghidora Transport (Booking #{booking.booking_id})"
+            body = f"""Dear {booking.name or 'Customer'},
+
+Thank you for choosing Ghidora Transport!
+
+Your payment for Booking #{booking.booking_id} has been verified and marked as ALL DONE.
+
+--------------------------------------------------
+PAYMENT SUMMARY
+--------------------------------------------------
+Booking ID: #{booking.booking_id}
+Payment ID: {payment_request.payment_id}
+Route: {booking.pickup} → {booking.destination}
+Amount Paid: Rs. {paid_amount:.2f}
+Total Amount Paid: Rs. {payment_request.amount_already_paid:.2f}
+Remaining Balance: Rs. {payment_request.remaining_amount:.2f}
+Status: {payment_request.get_status_display().upper()}
+
+Your official computer-generated PDF payment receipt with company stamp and signature is attached to this email.
+
+Need help or trip updates?
+Call us: +91 7489297841 | +91 6266014139
+Visit: https://ghidoratransport.com
+
+Warm Regards,
+Ghidora Transport Logistics
+Kodebod, Kurud, Dhamtari, Chhattisgarh
+"""
+            msg = EmailMessage(
+                subject=subject,
+                body=body,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                to=[customer_email],
+            )
+            receipt.pdf_file.open("rb")
+            pdf_bytes = receipt.pdf_file.read()
+            receipt.pdf_file.close()
+
+            filename = f"Receipt_{booking.booking_id}_{payment_request.payment_id}.pdf"
+            msg.attach(filename, pdf_bytes, "application/pdf")
+            msg.send(fail_silently=False)
+
+            email_sent = True
+            receipt.is_sent = True
+            receipt.sent_at = timezone.now()
+            receipt.sent_to_email = customer_email
+            receipt.save(update_fields=["is_sent", "sent_at", "sent_to_email"])
+            logger.info("Payment receipt emailed to %s", customer_email)
+        except Exception as e:
+            email_error = str(e)
+            logger.error("Failed to email receipt to %s: %s", customer_email, e)
+
+    # 6. AuditLog & Notification
+    AuditLog.objects.create(
+        actor=verified_by,
+        action="payment_marked_all_done",
+        details=f"Payment {payment_request.payment_id} (Booking #{booking.booking_id}) marked ALL DONE. Receipt emailed: {email_sent} ({customer_email or 'No email'}).",
+        ip_address=get_client_ip(request) if request else None,
+    )
+
+    notify(
+        notification_type=NotificationType.PAYMENT_VERIFIED,
+        message=f"Payment {payment_request.payment_id} marked ALL DONE and verified.",
+        booking=booking,
+        payment_request=payment_request,
+        user=booking.user,
+    )
+
+    return {
+        "success": True,
+        "payment_request": payment_request,
+        "email_sent": email_sent,
+        "customer_email": customer_email,
+        "email_error": email_error,
+        "receipt": receipt,
+    }

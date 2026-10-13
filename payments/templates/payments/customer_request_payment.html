@@ -22,6 +22,11 @@
         input[type="number"] { width: 100%; padding: 12px; margin-top: 10px; border-radius: 8px; border: 1px solid #00e5ff; background: #050b18; color: #fff; font-size: 16px; outline: none; }
         .btn-submit { width: 100%; padding: 16px; border: none; border-radius: 12px; background: linear-gradient(135deg, #00e5ff, #2979ff); color: #fff; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 20px; transition: 0.3s; }
         .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0, 229, 255, 0.5); }
+        .toll-parking-notice { background: linear-gradient(135deg, rgba(245, 158, 11, 0.12), rgba(239, 68, 68, 0.08)); border: 1.5px solid rgba(245, 158, 11, 0.45); border-radius: 12px; padding: 14px 16px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.1); }
+        .notice-header { display: flex; align-items: center; gap: 8px; color: #fbbf24; font-size: 14px; font-weight: 700; margin-bottom: 8px; }
+        .notice-body-hi { font-size: 12.5px; line-height: 1.55; color: #f3f4f6; margin: 0 0 6px 0; }
+        .notice-body-hi strong { color: #fef08a; }
+        .notice-body-en { font-size: 11.5px; line-height: 1.45; color: #9ca3af; margin: 0; }
     </style>
 </head>
 <body>
@@ -33,6 +38,20 @@
             <div class="summary-row"><span>कुल किराया (Total Fare):</span> <span>₹{{ total_fare }}</span></div>
             <div class="summary-row"><span>जमा राशि (Already Paid):</span> <span style="color: #00e676;">₹{{ total_paid }}</span></div>
             <div class="summary-row total"><span>बकाया राशि (Remaining):</span> <span>₹{{ remaining_amount }}</span></div>
+        </div>
+
+        <!-- ⚠️ Toll / Parking / Extra Charges Notice -->
+        <div class="toll-parking-notice">
+            <div class="notice-header">
+                <span>⚠️</span>
+                <span>महत्वपूर्ण सूचना (Important Billing Policy)</span>
+            </div>
+            <p class="notice-body-hi">
+                यह केवल वाहन का <strong>बेस ट्रांसपोर्ट किराया (Base Fare)</strong> है। यात्रा के दौरान रास्ते में लगने वाले <strong>टोल टैक्स (Toll Tax), पार्किंग (Parking), मंडी/राज्य कर अथवा अन्य कोई अतिरिक्त शुल्क</strong> इसमें शामिल नहीं हैं। यात्रा पूर्ण होने पर वास्तविक रसीद/खर्च अनुसार यह शुल्क अलग से देय (Settle) होंगे।
+            </p>
+            <p class="notice-body-en">
+                <em>Note: Base freight fare excludes Toll Taxes, Parking, and unlisted extra expenses. Any such charges incurred during transit remain payable separately upon trip completion.</em>
+            </p>
         </div>
 
         <form method="POST">

@@ -1,8 +1,11 @@
+import logging
 from decimal import Decimal
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.core.mail import EmailMessage
 from django.conf import settings
+
+logger = logging.getLogger(__name__)
 
 from .models import (
     PaymentRequest, PaymentProof, PaymentVerification,
@@ -105,11 +108,11 @@ Phone: +91 7489297841 / +91 6266014139
                         "application/pdf"
                     )
                     email_msg.send(fail_silently=True)
-                    print(f"✅ Receipt email sent successfully to {booking.email}")
+                    logger.info("Receipt email sent successfully to %s", booking.email)
                 except Exception as mail_err:
-                    print("❌ Email sending failed:", mail_err)
+                    logger.error("Email sending failed: %s", mail_err)
         except Exception as err:
-            print("❌ Receipt PDF generation error:", err)
+            logger.error("Receipt PDF generation error: %s", err)
 
         notify(
             notification_type=NotificationType.PAYMENT_VERIFIED,

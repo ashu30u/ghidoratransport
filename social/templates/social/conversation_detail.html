@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+{% load static social_extras %}
+
+{% block title %}Chat with {{ other_user.username }} • Ghidora Social{% endblock %}
+{% block nav_inbox %}active{% endblock %}
+
+{% block content %}
+<div class="ig-inbox-container">
+  <div class="ig-chat-card">
+    <!-- Top Header -->
+    <div class="ig-chat-header">
+      <a href="{% url 'social:inbox' %}" class="ig-chat-back-btn" title="Back to Messages">
+        <i class="ti ti-arrow-left"></i>
+      </a>
+
+      <a href="{% url 'social:profile' username=other_user.username %}" class="ig-chat-user-link">
+        {% if other_user.profile.avatar %}
+          <img src="{{ other_user.profile.avatar.url }}" alt="{{ other_user.username }}" class="ig-avatar">
+        {% else %}
+          <div class="ig-avatar ig-avatar-fallback">{{ other_user|get_initials }}</div>
+        {% endif %}
+
+        <div>
+          <div style="font-weight:700; font-size:0.95rem; color:var(--ig-text);">
+            {{ other_user.get_full_name|default:other_user.username }}
+            {% if other_user.is_superuser or other_user.is_staff or 'ghidora' in other_user.username.lower %}
+              <span class="gs-badge-owner" title="Ghidora Owner / Verified"><i class="ti ti-circle-check-filled"></i></span>
+            {% endif %}
+            {% if other_user.profile.is_driver %}<span class="gs-badge-driver">DRIVER</span>{% endif %}
+          </div>
+
+          <div style="font-size:0.75rem; color:var(--ig-text-muted);">@{{ other_user.username }}</div>
+        </div>
+      </a>
+    </div>
+
+    <!-- Message Thread -->
+    <div class="ig-chat-thread" id="chatThreadContainer">
+      {% for msg in chat_messages %}
+        <div class="ig-chat-bubble-wrap {% if msg.sender == request.user %}mine{% else %}other{% endif %}" data-msg-id="{{ msg.id }}">
+          <div class="ig-chat-bubble">{{ msg.content }}</div>
+          <div class="ig-chat-time">{{ msg.created_at|date:"g:i A" }}</div>
+        </div>
+      {% empty %}
+        <div id="noMessagesNotice" style="text-align:center; padding:40px 16px; color:var(--ig-text-muted);">
+          <i class="ti ti-brand-telegram" style="font-size:2.5rem; color:var(--ig-gold); margin-bottom:8px; display:block;"></i>
+          <p>No messages yet. Say hello to @{{ other_user.username }}!</p>
+        </div>
+      {% endfor %}
+    </div>
+
+    <!-- Bottom Input Bar -->
+    <div class="ig-chat-input-bar">
+      <form id="chatForm" onsubmit="submitChatMessageAJAX(event, {{ conversation.id }})">
+        {% csrf_token %}
+        <input type="text" id="chatInputField" class="ig-comment-input-field" placeholder="Message @{{ other_user.username }}..." autocomplete="off" required>
+        <button type="submit" class="ig-comment-post-btn" id="chatSendBtn">Send</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  let conversationId = {{ conversation.id }};
+  let lastMessageId = 0;
+
+  function scrollToBottom() {
+    const thread = document.getElementById('chatThreadContainer');
+    if (thread) {
+      thread.scrollTop = thread.scrollHeight;
+    }
+  }
+
+  // Find highest message ID currently in DOM
+  function updateLastMsgId() {
+    const bubbles = document.querySelectorAll('.ig-chat-bubble-wrap[data-msg-id]');
+    bubbles.forEach(b => {
+      const id = parseInt(b.getAttribute('data-msg-id')) || 0;
+      if (id > lastMessageId) lastMessageId = id;
+    });
+  }
+
+  async function submitChatMessageAJAX(event, convId) {
+    event.preventDefault();
+    const input = document.getElementById('chatInputField');
+    const content = input.value.trim();
+    if (!content) return;
+
+    input.value = '';
+    const notice = document.getElementById('noMessagesNotice');
+    if (notice) notice.remove();
+
+    // Send via AJAX
+    try {
+      const response = await fetch(`/social/messages/${convId}/send/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'X-CSRFToken': getCSRFToken(),
+          'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: new URLSearchParams({ content })
+      });
+
+      const data = await response.json();
+      if (data.ok && data.message) {
+        appendBubble(data.message.content, data.message.created_at, true, data.message.id);
+        lastMessageId = Math.max(lastMessageId, data.message.id);
+      }
+    } catch (err) {
+      console.error('Failed to send message:', err);
+    }
+  }
+
+  function appendBubble(text, timeStr, isMine, msgId) {
+    const thread = document.getElementById('chatThreadContainer');
+    if (!thread) return;
+
+    const wrap = document.createElement('div');
+    wrap.className = `ig-chat-bubble-wrap ${isMine ? 'mine' : 'other'}`;
+    if (msgId) wrap.setAttribute('data-msg-id', msgId);
+    wrap.innerHTML = `
+      <div class="ig-chat-bubble">${escapeHTML(text)}</div>
+      <div class="ig-chat-time">${timeStr}</div>
+    `;
+    thread.appendChild(wrap);
+    scrollToBottom();
+  }
+
+  // Real-time polling every 4 seconds
+  async function pollNewMessages() {
+    try {
+      const res = await fetch(`/social/messages/${conversationId}/send/?after_id=${lastMessageId}`);
+      const data = await res.json();
+
+      if (data.ok && data.messages && data.messages.length > 0) {
+        const notice = document.getElementById('noMessagesNotice');
+        if (notice) notice.remove();
+
+        data.messages.forEach(m => {
+          if (m.id > lastMessageId) {
+            appendBubble(m.content, m.created_at, m.is_mine, m.id);
+            lastMessageId = m.id;
+          }
+        });
+      }
+    } catch (err) {
+      // silent polling error
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    updateLastMsgId();
+    scrollToBottom();
+    setInterval(pollNewMessages, 4000);
+  });
+</script>
+{% endblock %}

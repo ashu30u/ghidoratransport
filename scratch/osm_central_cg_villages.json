@@ -1,0 +1,687 @@
+{
+  "Bindra Nawagarh": {
+    "lat": 20.4814,
+    "lon": 82.182,
+    "hindi": ""
+  },
+  "Gurur": {
+    "lat": 20.6829,
+    "lon": 81.4017,
+    "hindi": ""
+  },
+  "Kharora": {
+    "lat": 21.4004,
+    "lon": 81.9264,
+    "hindi": ""
+  },
+  "Dhamda": {
+    "lat": 21.4607,
+    "lon": 81.3305,
+    "hindi": ""
+  },
+  "Patan": {
+    "lat": 21.0392,
+    "lon": 81.5436,
+    "hindi": ""
+  },
+  "Kurud": {
+    "lat": 20.8594,
+    "lon": 81.71,
+    "hindi": ""
+  },
+  "Abhanpur": {
+    "lat": 21.0546,
+    "lon": 81.7485,
+    "hindi": ""
+  },
+  "Nava Raipur": {
+    "lat": 21.161,
+    "lon": 81.7864,
+    "hindi": "नवा रायपुर अटल नगर"
+  },
+  "Gundardehi": {
+    "lat": 20.9444,
+    "lon": 81.2888,
+    "hindi": ""
+  },
+  "Rajim": {
+    "lat": 20.9685,
+    "lon": 81.8797,
+    "hindi": "राजिम"
+  },
+  "Tumgaon": {
+    "lat": 21.1926,
+    "lon": 82.1234,
+    "hindi": ""
+  },
+  "Mahasamund": {
+    "lat": 21.1101,
+    "lon": 82.0987,
+    "hindi": "महासमुन्द"
+  },
+  "Balod": {
+    "lat": 20.7272,
+    "lon": 81.2054,
+    "hindi": "बालोद"
+  },
+  "Gariaband": {
+    "lat": 20.6336,
+    "lon": 82.0635,
+    "hindi": "गरियाबंद"
+  },
+  "Sankara": {
+    "lat": 21.114,
+    "lon": 81.1795,
+    "hindi": ""
+  },
+  "Dheri": {
+    "lat": 21.1068,
+    "lon": 81.2004,
+    "hindi": ""
+  },
+  "Somni": {
+    "lat": 21.1236,
+    "lon": 81.1468,
+    "hindi": ""
+  },
+  "Santipur": {
+    "lat": 20.6643,
+    "lon": 81.4863,
+    "hindi": ""
+  },
+  "Jhangh": {
+    "lat": 21.152,
+    "lon": 81.7809,
+    "hindi": ""
+  },
+  "Kuhera": {
+    "lat": 21.155,
+    "lon": 81.8088,
+    "hindi": ""
+  },
+  "Capital Complex": {
+    "lat": 21.1573,
+    "lon": 81.7983,
+    "hindi": ""
+  },
+  "Dundera": {
+    "lat": 21.1516,
+    "lon": 81.392,
+    "hindi": ""
+  },
+  "Kumhari": {
+    "lat": 21.2546,
+    "lon": 81.5219,
+    "hindi": ""
+  },
+  "Banbarad": {
+    "lat": 21.3587,
+    "lon": 81.4173,
+    "hindi": ""
+  },
+  "Nandini Nagar": {
+    "lat": 21.3535,
+    "lon": 81.4027,
+    "hindi": ""
+  },
+  "Arang": {
+    "lat": 21.1986,
+    "lon": 81.966,
+    "hindi": ""
+  },
+  "Sirpur": {
+    "lat": 21.347,
+    "lon": 82.1847,
+    "hindi": ""
+  },
+  "Khapri": {
+    "lat": 21.2357,
+    "lon": 81.3121,
+    "hindi": ""
+  },
+  "Narharpur": {
+    "lat": 20.4486,
+    "lon": 81.6205,
+    "hindi": ""
+  },
+  "Navadabri": {
+    "lat": 20.4385,
+    "lon": 81.532,
+    "hindi": ""
+  },
+  "Bahanapani": {
+    "lat": 20.4516,
+    "lon": 81.5931,
+    "hindi": ""
+  },
+  "Navapara": {
+    "lat": 20.4746,
+    "lon": 81.3467,
+    "hindi": ""
+  },
+  "Chapeli": {
+    "lat": 20.464,
+    "lon": 81.3088,
+    "hindi": ""
+  },
+  "Golkumhara": {
+    "lat": 20.4544,
+    "lon": 81.4057,
+    "hindi": ""
+  },
+  "Pipraud": {
+    "lat": 20.4139,
+    "lon": 81.4405,
+    "hindi": ""
+  },
+  "Dokla": {
+    "lat": 20.54,
+    "lon": 81.3508,
+    "hindi": ""
+  },
+  "Charama": {
+    "lat": 20.493,
+    "lon": 81.3663,
+    "hindi": ""
+  },
+  "Mayana": {
+    "lat": 20.4231,
+    "lon": 81.2949,
+    "hindi": ""
+  },
+  "Khairapara": {
+    "lat": 20.411,
+    "lon": 81.2951,
+    "hindi": ""
+  },
+  "Mainkhera": {
+    "lat": 20.4195,
+    "lon": 81.2336,
+    "hindi": ""
+  },
+  "Siltara": {
+    "lat": 21.3684,
+    "lon": 81.6694,
+    "hindi": ""
+  },
+  "Bhatgaon": {
+    "lat": 21.1596,
+    "lon": 81.7158,
+    "hindi": ""
+  },
+  "Kendri": {
+    "lat": 21.0996,
+    "lon": 81.738,
+    "hindi": ""
+  },
+  "Purur": {
+    "lat": 20.6684,
+    "lon": 81.4844,
+    "hindi": ""
+  },
+  "Magarlod": {
+    "lat": 20.7472,
+    "lon": 81.8521,
+    "hindi": ""
+  },
+  "Jara": {
+    "lat": 21.4704,
+    "lon": 82.016,
+    "hindi": ""
+  },
+  "Ganod": {
+    "lat": 21.1472,
+    "lon": 81.8499,
+    "hindi": ""
+  },
+  "Chhatauna": {
+    "lat": 21.224,
+    "lon": 81.7934,
+    "hindi": ""
+  },
+  "Ameri": {
+    "lat": 21.3247,
+    "lon": 81.8763,
+    "hindi": ""
+  },
+  "Jamagon": {
+    "lat": 21.1402,
+    "lon": 81.5241,
+    "hindi": ""
+  },
+  "Devada": {
+    "lat": 21.0704,
+    "lon": 81.4983,
+    "hindi": ""
+  },
+  "Odan": {
+    "lat": 21.4924,
+    "lon": 82.1994,
+    "hindi": ""
+  },
+  "Gidhpuri": {
+    "lat": 21.3869,
+    "lon": 82.1702,
+    "hindi": ""
+  },
+  "Sasaha": {
+    "lat": 21.4866,
+    "lon": 82.0727,
+    "hindi": ""
+  },
+  "Khartora": {
+    "lat": 21.4541,
+    "lon": 82.0676,
+    "hindi": ""
+  },
+  "Sector 3": {
+    "lat": 21.2023,
+    "lon": 81.8262,
+    "hindi": ""
+  },
+  "Sector 2": {
+    "lat": 21.2131,
+    "lon": 81.8149,
+    "hindi": ""
+  },
+  "Nawagaon": {
+    "lat": 21.2197,
+    "lon": 81.815,
+    "hindi": ""
+  },
+  "Semariya-2": {
+    "lat": 21.3103,
+    "lon": 81.732,
+    "hindi": ""
+  },
+  "Ghodari": {
+    "lat": 21.1667,
+    "lon": 82.0248,
+    "hindi": ""
+  },
+  "Utai": {
+    "lat": 21.1157,
+    "lon": 81.3879,
+    "hindi": ""
+  },
+  "Jamgaon": {
+    "lat": 20.9517,
+    "lon": 81.4355,
+    "hindi": ""
+  },
+  "Dhamtari": {
+    "lat": 20.7103,
+    "lon": 81.5487,
+    "hindi": ""
+  },
+  "Purai": {
+    "lat": 21.116,
+    "lon": 81.3452,
+    "hindi": ""
+  },
+  "jepara": {
+    "lat": 20.4714,
+    "lon": 81.4658,
+    "hindi": ""
+  },
+  "Urriya": {
+    "lat": 20.4773,
+    "lon": 81.6911,
+    "hindi": ""
+  },
+  "Unkari": {
+    "lat": 20.4946,
+    "lon": 81.3336,
+    "hindi": ""
+  },
+  "Sriguhan": {
+    "lat": 20.4059,
+    "lon": 81.5235,
+    "hindi": ""
+  },
+  "Saletola": {
+    "lat": 20.4834,
+    "lon": 81.3176,
+    "hindi": ""
+  },
+  "Retedih": {
+    "lat": 20.4762,
+    "lon": 81.282,
+    "hindi": ""
+  },
+  "Ranidongari": {
+    "lat": 20.4511,
+    "lon": 81.5081,
+    "hindi": ""
+  },
+  "Rampur": {
+    "lat": 20.4239,
+    "lon": 81.2501,
+    "hindi": ""
+  },
+  "Rajpur": {
+    "lat": 20.4235,
+    "lon": 81.6621,
+    "hindi": ""
+  },
+  "Raghotola": {
+    "lat": 20.485,
+    "lon": 81.3527,
+    "hindi": ""
+  },
+  "Puri": {
+    "lat": 20.4326,
+    "lon": 81.2566,
+    "hindi": ""
+  },
+  "Pradhandogri": {
+    "lat": 20.5242,
+    "lon": 81.3319,
+    "hindi": ""
+  },
+  "Patharrinala": {
+    "lat": 20.4357,
+    "lon": 81.6933,
+    "hindi": ""
+  },
+  "Patelpara Babukohka": {
+    "lat": 20.4378,
+    "lon": 81.3923,
+    "hindi": ""
+  },
+  "Patelpara Aroud": {
+    "lat": 20.4364,
+    "lon": 81.4568,
+    "hindi": ""
+  },
+  "Parchapipara": {
+    "lat": 20.4174,
+    "lon": 81.3219,
+    "hindi": ""
+  },
+  "Palewa": {
+    "lat": 20.4017,
+    "lon": 81.4875,
+    "hindi": ""
+  },
+  "Mudkhusara": {
+    "lat": 20.5222,
+    "lon": 81.3439,
+    "hindi": ""
+  },
+  "Muddhowa": {
+    "lat": 20.4905,
+    "lon": 81.5107,
+    "hindi": ""
+  },
+  "Masulpani": {
+    "lat": 20.4219,
+    "lon": 81.6494,
+    "hindi": ""
+  },
+  "Maradeo": {
+    "lat": 20.5001,
+    "lon": 81.6298,
+    "hindi": ""
+  },
+  "Manchandur": {
+    "lat": 20.529,
+    "lon": 81.3677,
+    "hindi": ""
+  },
+  "Mahud": {
+    "lat": 20.5184,
+    "lon": 81.3647,
+    "hindi": ""
+  },
+  "Lilwapahar": {
+    "lat": 20.4212,
+    "lon": 81.5441,
+    "hindi": ""
+  },
+  "Lilejhar": {
+    "lat": 20.4306,
+    "lon": 81.3331,
+    "hindi": ""
+  },
+  "Kusumpani": {
+    "lat": 20.4268,
+    "lon": 81.5467,
+    "hindi": ""
+  },
+  "Kurrubhat": {
+    "lat": 20.4541,
+    "lon": 81.4712,
+    "hindi": ""
+  },
+  "Kurathemli": {
+    "lat": 20.4305,
+    "lon": 81.7199,
+    "hindi": ""
+  },
+  "Kotela": {
+    "lat": 20.4386,
+    "lon": 81.4853,
+    "hindi": ""
+  },
+  "Kochwahi": {
+    "lat": 20.4248,
+    "lon": 81.6173,
+    "hindi": ""
+  },
+  "Kisanpuri": {
+    "lat": 20.4123,
+    "lon": 81.5653,
+    "hindi": ""
+  },
+  "Khusgudra": {
+    "lat": 20.4521,
+    "lon": 81.55,
+    "hindi": ""
+  },
+  "Khaudand": {
+    "lat": 20.4053,
+    "lon": 81.3118,
+    "hindi": ""
+  },
+  "Kharikeda": {
+    "lat": 20.4028,
+    "lon": 81.3992,
+    "hindi": ""
+  },
+  "Khairwahi": {
+    "lat": 20.4086,
+    "lon": 81.2933,
+    "hindi": ""
+  },
+  "Khadarwahi": {
+    "lat": 20.4395,
+    "lon": 81.6518,
+    "hindi": ""
+  },
+  "Kasawahi": {
+    "lat": 20.5278,
+    "lon": 81.3304,
+    "hindi": ""
+  },
+  "Kansipur": {
+    "lat": 20.4304,
+    "lon": 81.2375,
+    "hindi": ""
+  },
+  "Kandel": {
+    "lat": 20.5081,
+    "lon": 81.3614,
+    "hindi": ""
+  },
+  "Kanapod": {
+    "lat": 20.4094,
+    "lon": 81.4287,
+    "hindi": ""
+  },
+  "Jhipatola": {
+    "lat": 20.4186,
+    "lon": 81.4023,
+    "hindi": ""
+  },
+  "Jangalpara": {
+    "lat": 20.4011,
+    "lon": 81.6779,
+    "hindi": ""
+  },
+  "Imlipara": {
+    "lat": 20.4682,
+    "lon": 81.6292,
+    "hindi": ""
+  },
+  "Havarkondal": {
+    "lat": 20.4044,
+    "lon": 81.1807,
+    "hindi": ""
+  },
+  "Hatkacharama": {
+    "lat": 20.4332,
+    "lon": 81.4969,
+    "hindi": ""
+  },
+  "Gandagouri": {
+    "lat": 20.4027,
+    "lon": 81.3584,
+    "hindi": ""
+  },
+  "Durgatola": {
+    "lat": 20.5089,
+    "lon": 81.5045,
+    "hindi": ""
+  },
+  "Dudumbahara": {
+    "lat": 20.4324,
+    "lon": 81.6719,
+    "hindi": ""
+  },
+  "Dodrapahar": {
+    "lat": 20.4364,
+    "lon": 81.6433,
+    "hindi": ""
+  },
+  "Dihipara": {
+    "lat": 20.4311,
+    "lon": 81.4279,
+    "hindi": ""
+  },
+  "Darripara": {
+    "lat": 20.4354,
+    "lon": 81.3441,
+    "hindi": ""
+  },
+  "Dagrahan": {
+    "lat": 20.4801,
+    "lon": 81.3684,
+    "hindi": ""
+  },
+  "Chinori": {
+    "lat": 20.4232,
+    "lon": 81.4266,
+    "hindi": ""
+  },
+  "Budeli Panka": {
+    "lat": 20.4018,
+    "lon": 81.4538,
+    "hindi": ""
+  },
+  "Boipara": {
+    "lat": 20.4142,
+    "lon": 81.3431,
+    "hindi": ""
+  },
+  "Bhotha": {
+    "lat": 20.4057,
+    "lon": 81.253,
+    "hindi": ""
+  },
+  "Bhejritola": {
+    "lat": 20.4621,
+    "lon": 81.5047,
+    "hindi": ""
+  },
+  "Bhatapara": {
+    "lat": 20.4796,
+    "lon": 81.3751,
+    "hindi": ""
+  },
+  "Bharritola": {
+    "lat": 20.529,
+    "lon": 81.3493,
+    "hindi": ""
+  },
+  "Bhansuli": {
+    "lat": 20.4464,
+    "lon": 81.7275,
+    "hindi": ""
+  },
+  "Bhainsakatta": {
+    "lat": 20.4157,
+    "lon": 81.4652,
+    "hindi": ""
+  },
+  "Bedegori": {
+    "lat": 20.4359,
+    "lon": 81.3553,
+    "hindi": ""
+  },
+  "Barkachhar": {
+    "lat": 20.4485,
+    "lon": 81.3386,
+    "hindi": ""
+  },
+  "Baretinbahra": {
+    "lat": 20.4521,
+    "lon": 81.7079,
+    "hindi": ""
+  },
+  "Bandatola": {
+    "lat": 20.401,
+    "lon": 81.4758,
+    "hindi": ""
+  },
+  "Bagdongri": {
+    "lat": 20.505,
+    "lon": 81.5681,
+    "hindi": ""
+  },
+  "Babukohka": {
+    "lat": 20.4395,
+    "lon": 81.3874,
+    "hindi": ""
+  },
+  "Aroud": {
+    "lat": 20.4289,
+    "lon": 81.4609,
+    "hindi": ""
+  },
+  "Ankhihaararra": {
+    "lat": 20.4288,
+    "lon": 81.5862,
+    "hindi": ""
+  },
+  "Rengadih": {
+    "lat": 21.4851,
+    "lon": 82.0057,
+    "hindi": ""
+  },
+  "Math": {
+    "lat": 21.3929,
+    "lon": 81.9029,
+    "hindi": ""
+  },
+  "J K Township": {
+    "lat": 21.3847,
+    "lon": 81.6708,
+    "hindi": ""
+  },
+  "Dugli": {
+    "lat": 20.4923,
+    "lon": 81.8711,
+    "hindi": ""
+  }
+}

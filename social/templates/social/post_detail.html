@@ -2,33 +2,38 @@
 {% load static %}
 
 {% block extra_css %}
+<!-- Tabler Icons CDN -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
 <link rel="stylesheet" href="{% static 'social/css/social.css' %}">
 {% endblock %}
 
 {% block content %}
-<div class="gs-wrap">
-  {% include "social/partials/post_card.html" %}
-
-  <div class="gs-composer">
-    <form method="post">
-      {% csrf_token %}
-      {{ comment_form.content }}
-      <div style="text-align:right; margin-top:8px;">
-        <button type="submit" class="gs-btn">Comment</button>
-      </div>
-    </form>
+<div class="ig-feed-container">
+  <div style="margin-bottom: 12px;">
+    <a href="{% url 'social:feed' %}" class="ig-page-btn">
+      <i class="ti ti-arrow-left"></i> Back to Feed
+    </a>
   </div>
 
-  <div style="background: var(--gs-surface); border:1px solid var(--gs-line); border-radius: var(--gs-radius); overflow:hidden;">
-    {% for comment in comments %}
-      <div class="gs-comment" style="{% if not forloop.last %}border-bottom:1px solid var(--gs-line);{% endif %}">
-        <a href="{% url 'social:profile' comment.author.username %}" class="gs-author">{{ comment.author.username }}</a>
-        <span>{{ comment.content }}</span>
-        <span class="gs-timestamp" style="margin-left:auto;">{{ comment.created_at|timesince }} ago</span>
-      </div>
-    {% empty %}
-      <div class="gs-empty">No comments yet.</div>
-    {% endfor %}
+  {% include "social/post_card.html" %}
+
+</div>
+
+<!-- Who Liked Modal -->
+<div class="ig-modal" id="likesModal" style="display:none;">
+  <div class="ig-modal-backdrop" onclick="closeLikesModal()"></div>
+  <div class="ig-modal-box">
+    <div class="ig-modal-header">
+      <h3>Likes</h3>
+      <button class="ig-modal-close" onclick="closeLikesModal()"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="ig-modal-body ig-likes-modal-body" id="likesListContainer">
+      <div class="ig-loading">Loading...</div>
+    </div>
   </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'social/js/social.js' %}"></script>
 {% endblock %}

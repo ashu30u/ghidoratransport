@@ -21,7 +21,24 @@ from reportlab.lib.pagesizes import A4
 
 
 def _fit_image(path_or_stream, max_width, max_height):
-    img = Image(path_or_stream)
+    try:
+        im = PILImage.open(path_or_stream)
+        orig_w, orig_h = im.size
+        target_w = max(int((max_width / 72.0) * 220), 220)
+        target_h = max(int((max_height / 72.0) * 220), 220)
+        max_px = max(target_w, target_h)
+        if orig_w > max_px or orig_h > max_px:
+            im.thumbnail((max_px, max_px), PILImage.Resampling.LANCZOS)
+        buf = BytesIO()
+        if im.mode in ('RGBA', 'LA') or (im.mode == 'P' and 'transparency' in im.info):
+            im.save(buf, format='PNG', optimize=True)
+        else:
+            im.convert('RGB').save(buf, format='JPEG', quality=85, optimize=True)
+        buf.seek(0)
+        img = Image(buf)
+    except Exception:
+        img = Image(path_or_stream)
+
     ratio = min(
         max_width / float(img.imageWidth),
         max_height / float(img.imageHeight),
@@ -33,10 +50,13 @@ def _fit_image(path_or_stream, max_width, max_height):
 
 def _remove_black_background(image_path):
     """
-    Signature image me se black background ko transparent me convert karta hai.
+    Signature image me se black background ko transparent me convert karta hai
+    aur size optimize karta hai.
     """
     try:
         img = PILImage.open(image_path).convert("RGBA")
+        if img.width > 400 or img.height > 400:
+            img.thumbnail((400, 400), PILImage.Resampling.LANCZOS)
         datas = img.getdata()
 
         new_data = []
@@ -50,7 +70,7 @@ def _remove_black_background(image_path):
         img.putdata(new_data)
 
         out_buffer = BytesIO()
-        img.save(out_buffer, format="PNG")
+        img.save(out_buffer, format="PNG", optimize=True)
         out_buffer.seek(0)
         return out_buffer
     except Exception as e:

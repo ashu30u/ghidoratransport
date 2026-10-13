@@ -24,6 +24,18 @@ urlpatterns = [
     ),
 
     path(
+        'user-dashboard/',
+        views.user_dashboard,
+        name='user_dashboard'
+    ),
+
+    path(
+        'my-bookings/',
+        views.user_dashboard,
+        name='my_bookings'
+    ),
+
+    path(
         'history/',
         views.booking_history,
         name='history'
@@ -85,7 +97,7 @@ urlpatterns = [
     path('api/submit-user-review/', views.submit_user_review, name='submit_user_review'),
     path('api/export-bookings/', views.export_bookings_api, name='export_bookings_api'),
     path('api/export-reviews/', views.export_reviews_api, name='export_reviews_api'),
-    path('pickupwala/', include('pickupwala.urls')),
+    path('game/', views.cargo_mission_game, name='game'),
 ]
 
 if settings.DEBUG:

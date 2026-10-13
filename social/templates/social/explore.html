@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Explore • Ghidora Social{% endblock %}
+{% block nav_explore %}active{% endblock %}
+
+{% block content %}
+<div class="ig-explore-container">
+  {% if posts %}
+    <div class="ig-explore-grid">
+      {% for post in posts %}
+        <a href="{% url 'social:post_detail' pk=post.pk %}" class="ig-explore-item" title="Post by @{{ post.author.username }}">
+          {% if post.images.all %}
+            <img src="{{ post.images.all.0.image.url }}" alt="Post image" loading="lazy">
+            {% if post.images.all|length > 1 %}
+              <div class="ig-explore-badge" title="Multiple photos">
+                <i class="ti ti-copy"></i>
+              </div>
+            {% endif %}
+          {% elif post.image %}
+            <img src="{{ post.image.url }}" alt="Post image" loading="lazy">
+          {% else %}
+            <div class="ig-explore-text-thumb">
+              <span>{{ post.content|truncatechars:80 }}</span>
+            </div>
+          {% endif %}
+        </a>
+      {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if page_obj.paginator.num_pages > 1 %}
+      <div class="ig-pagination" style="margin-top:24px;">
+        {% if page_obj.has_previous %}
+          <a class="ig-page-btn" href="?page={{ page_obj.previous_page_number }}"><i class="ti ti-chevron-left"></i> Newer</a>
+        {% endif %}
+        <span class="ig-page-info">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}
+          <a class="ig-page-btn" href="?page={{ page_obj.next_page_number }}">Older <i class="ti ti-chevron-right"></i></a>
+        {% endif %}
+      </div>
+    {% endif %}
+  {% else %}
+    <div class="ig-empty-feed">
+      <i class="ti ti-compass ig-empty-icon"></i>
+      <h3>No Posts in Explore</h3>
+      <p>Check back later or post something new!</p>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,38 +1,834 @@
 {% extends "base.html" %}
-{% load static %}
+{% load static social_extras %}
 
-{% block extra_css %}
-<link rel="stylesheet" href="{% static 'social/css/social.css' %}">
-{% endblock %}
+{% block title %}{{ profile_user.username }} (@{{ profile_user.username }}) • Ghidora Social{% endblock %}
 
 {% block content %}
-<div class="gs-wrap">
-  <div class="gs-profile-header">
-    {% if profile.avatar %}
-      <img class="gs-avatar" src="{{ profile.avatar.url }}" alt="{{ profile_user.username }}">
-    {% else %}
-      <div class="gs-avatar"></div>
-    {% endif %}
-    <div>
-      <h1 class="gs-title" style="font-size:1.3rem; margin:0;">
-        {{ profile_user.get_full_name|default:profile_user.username }}
-        {% if profile.is_driver %}<span class="gs-badge-driver">DRIVER</span>{% endif %}
-      </h1>
-      <div class="gs-timestamp">@{{ profile_user.username }}</div>
-      {% if profile.bio %}<p style="margin:8px 0 0; font-size:0.92rem;">{{ profile.bio }}</p>{% endif %}
-      <div class="gs-stats"><strong>{{ post_count }}</strong>&nbsp;posts</div>
+<div class="ig-profile-container">
+
+  <!-- Instagram Profile Header -->
+  <div class="ig-profile-header">
+    
+    <!-- Left: Avatar + Floating Note Bubble -->
+    <div class="ig-profile-avatar-wrap" {% if is_own_profile %}onclick="openChangePhotoModal()" style="cursor:pointer;" title="Change profile photo"{% endif %}>
+      {% if profile.note %}
+        <div class="ig-avatar-note">{{ profile.note }}</div>
+      {% endif %}
+
+      {% if profile.avatar %}
+        <img class="ig-profile-avatar-large" src="{{ profile.avatar.url }}" alt="{{ profile_user.username }}">
+      {% else %}
+        <div class="ig-profile-avatar-large-fallback">{{ profile_user|get_initials }}</div>
+      {% endif %}
     </div>
+
+    <!-- Right: Profile Info -->
+    <div class="ig-profile-info">
+      
+      <!-- Row 1: Username & Action Buttons -->
+      <div class="ig-profile-row-top">
+        <span class="ig-profile-username">{{ profile_user.username }}</span>
+
+        {% if profile_user.is_superuser or profile_user.is_staff or 'ghidora' in profile_user.username.lower %}
+          <span class="gs-badge-owner" title="Ghidora Owner / Verified" style="font-size:1.2rem;"><i class="ti ti-circle-check-filled"></i></span>
+        {% endif %}
+
+        {% if profile.is_driver %}
+          <span class="gs-badge-driver" style="font-size:0.75rem;">DRIVER</span>
+        {% endif %}
+
+        <div class="ig-profile-actions">
+          {% if is_own_profile %}
+            <button type="button" class="ig-btn-profile" onclick="openQuickEditModal()"><i class="ti ti-edit"></i> Edit profile</button>
+            <a href="{% url 'social:saved_posts' %}" class="ig-btn-profile"><i class="ti ti-bookmark"></i> Saved</a>
+            <a href="{% url 'social:edit_profile' %}" class="ig-icon-btn" title="Account Settings"><i class="ti ti-settings"></i></a>
+          {% else %}
+            <a href="{% url 'social:start_conversation' username=profile_user.username %}" class="ig-btn-primary" style="text-decoration:none; display:inline-flex; align-items:center; gap:6px;">
+              <i class="ti ti-message-circle"></i> Message
+            </a>
+            <button type="button" 
+                    id="profileFollowBtn" 
+                    class="{% if is_following %}ig-btn-profile{% else %}ig-btn-primary{% endif %}" 
+                    onclick="toggleFollowAJAX('{{ profile_user.username|escapejs }}')">
+              {% if is_following %}Following{% else %}Follow{% endif %}
+            </button>
+            <button type="button" class="ig-icon-btn" onclick="openReportModal('user', {{ profile_user.id }})" title="Report User">
+              <i class="ti ti-dots"></i>
+            </button>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Row 2: Stats (Posts, Followers, Following) -->
+      <div class="ig-profile-stats">
+        <span><strong style="color:var(--ig-text);">{{ post_count }}</strong> posts</span>
+        <span style="cursor:pointer;" onclick="openFollowersModal('{{ profile_user.username|escapejs }}')" title="View followers">
+          <strong id="profileFollowersCount" style="color:var(--ig-text);">{{ followers_count }}</strong> followers
+        </span>
+        <span style="cursor:pointer;" onclick="openFollowingModal('{{ profile_user.username|escapejs }}')" title="View following">
+          <strong id="profileFollowingCount" style="color:var(--ig-text);">{{ following_count }}</strong> following
+        </span>
+      </div>
+
+      <!-- Row 3: Display Name & Bio -->
+      <div class="ig-profile-bio-box">
+        {% if profile_user.get_full_name %}
+          <div class="ig-profile-fullname">{{ profile_user.get_full_name }} ★</div>
+        {% else %}
+          <div class="ig-profile-fullname">{{ profile_user.username }} ★</div>
+        {% endif %}
+
+        {% if profile.bio %}
+          <div style="white-space: pre-line;">{{ profile.bio }}</div>
+        {% endif %}
+
+        {% if profile.website %}
+          <div style="margin-top: 4px;">
+            <a href="{{ profile.website }}" target="_blank" rel="noopener" style="color: var(--ig-gold); text-decoration: none; font-weight: 600; font-size: 0.88rem;">
+              <i class="ti ti-link"></i> {{ profile.website }}
+            </a>
+          </div>
+        {% endif %}
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Story Highlights Row -->
+  <div class="ig-highlights-row">
+    {% for hl in highlights %}
+      <div class="ig-highlight-item" onclick="openHighlightViewer({{ hl.id }}, '{{ profile_user.username|escapejs }}', '{% if profile.avatar %}{{ profile.avatar.url|escapejs }}{% endif %}')">
+        <div class="ig-highlight-circle">
+          {% if hl.cover_image %}
+            <img src="{{ hl.cover_image.url }}" alt="{{ hl.title }}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">
+          {% else %}
+            <i class="ti ti-heart-filled" style="color:var(--ig-gold);"></i>
+          {% endif %}
+        </div>
+        <span class="ig-highlight-label">{{ hl.title }}</span>
+      </div>
+
+      <!-- JSON Script for Highlight Items -->
+      <script id="highlight-data-{{ hl.id }}" type="application/json">
+        [
+          {% for item in hl.items.all %}
+            {
+              "id": {{ item.id }},
+              "media_url": "{{ item.media.url|escapejs }}",
+              "is_video": {% if item.is_video %}true{% else %}false{% endif %},
+              "caption": "{{ item.caption|escapejs }}",
+              "time": "{{ item.created_at|timesince }}"
+            }{% if not forloop.last %},{% endif %}
+          {% endfor %}
+        ]
+      </script>
+    {% empty %}
+      {% if not is_own_profile %}
+        <div style="font-size:0.8rem; color:var(--ig-text-muted);">No highlights yet.</div>
+      {% endif %}
+    {% endfor %}
+
     {% if is_own_profile %}
-      <a href="{% url 'social:edit_profile' %}" class="gs-btn gs-btn-ghost" style="margin-left:auto;">Edit profile</a>
+      <div class="ig-highlight-item" onclick="openNewHighlightModal()">
+        <div class="ig-highlight-circle">
+          <i class="ti ti-plus"></i>
+        </div>
+        <span class="ig-highlight-label">New</span>
+      </div>
     {% endif %}
   </div>
 
-  {% if posts %}
-    {% for post in posts %}
-      {% include "social/partials/post_card.html" %}
-    {% endfor %}
-  {% else %}
-    <div class="gs-empty">No posts yet.</div>
+  <!-- Profile Navigation Tabs (Instagram Style) -->
+  <div class="ig-profile-tabs" style="display: flex; justify-content: center; gap: 60px; border-top: 1px solid var(--ig-card-border); margin-top: 16px;">
+    <div class="ig-tab-btn active" id="tabBtnPosts" onclick="switchProfileTab('posts')" style="background: none !important; border: none !important; border-top: 1px solid #ffffff !important; border-radius: 0 !important; margin-top: -1px; padding: 16px 0; color: #ffffff !important; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; display: inline-flex; align-items: center; gap: 6px; cursor: pointer;">
+      <i class="ti ti-grid-dots" style="font-size: 1.1rem;"></i> POSTS
+    </div>
+
+    <div class="ig-tab-btn" id="tabBtnReels" onclick="switchProfileTab('reels')" style="background: none !important; border: none !important; border-top: 1px solid transparent !important; border-radius: 0 !important; margin-top: -1px; padding: 16px 0; color: var(--ig-text-muted) !important; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; display: inline-flex; align-items: center; gap: 6px; cursor: pointer;">
+      <i class="ti ti-player-play" style="font-size: 1.1rem;"></i> REELS
+    </div>
+
+    {% if is_own_profile %}
+    <div class="ig-tab-btn" id="tabBtnSaved" onclick="switchProfileTab('saved')" style="background: none !important; border: none !important; border-top: 1px solid transparent !important; border-radius: 0 !important; margin-top: -1px; padding: 16px 0; color: var(--ig-text-muted) !important; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; display: inline-flex; align-items: center; gap: 6px; cursor: pointer;">
+      <i class="ti ti-bookmark" style="font-size: 1.1rem;"></i> SAVED
+    </div>
+    {% endif %}
+
+    <div class="ig-tab-btn" id="tabBtnTagged" onclick="switchProfileTab('tagged')" style="background: none !important; border: none !important; border-top: 1px solid transparent !important; border-radius: 0 !important; margin-top: -1px; padding: 16px 0; color: var(--ig-text-muted) !important; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; display: inline-flex; align-items: center; gap: 6px; cursor: pointer;">
+      <i class="ti ti-user-check" style="font-size: 1.1rem;"></i> TAGGED
+    </div>
+  </div>
+
+
+
+  <!-- User Posts Grid -->
+  <div id="userPostsGrid">
+    {% if posts %}
+      <div class="ig-explore-grid" style="margin-top: 16px;">
+        {% for post in posts %}
+          <a href="{% url 'social:post_detail' pk=post.pk %}" class="ig-explore-item" title="Post by @{{ post.author.username }}">
+            {% if post.images.all %}
+              {% if post.images.all.0.is_video %}
+                <video src="{{ post.images.all.0.image.url }}" style="width:100%; height:100%; object-fit:cover;"></video>
+              {% else %}
+                <img src="{{ post.images.all.0.image.url }}" alt="Post thumbnail" loading="lazy">
+              {% endif %}
+              {% if post.images.all|length > 1 %}
+                <div class="ig-explore-badge" title="Multiple items"><i class="ti ti-copy"></i></div>
+              {% endif %}
+            {% elif post.image %}
+              {% if post.is_video %}
+                <video src="{{ post.image.url }}" style="width:100%; height:100%; object-fit:cover;"></video>
+              {% else %}
+                <img src="{{ post.image.url }}" alt="Post thumbnail" loading="lazy">
+              {% endif %}
+            {% else %}
+              <div class="ig-explore-text-thumb">
+                <span>{{ post.content|truncatechars:80 }}</span>
+              </div>
+            {% endif %}
+          </a>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="ig-empty-feed" style="margin-top: 24px;">
+        <i class="ti ti-camera ig-empty-icon"></i>
+        <h3>No Posts Yet</h3>
+        <p>When @{{ profile_user.username }} shares photos or updates, they will appear here.</p>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- User Reels Grid -->
+  <div id="userReelsGrid" style="display: none;">
+    {% if reels %}
+      <div class="ig-explore-grid" style="margin-top: 16px;">
+        {% for reel in reels %}
+          <a href="{% url 'social:reels_feed' %}#reel-item-{{ reel.id }}" class="ig-explore-item" style="aspect-ratio: 9/16; position: relative;">
+            <video src="{{ reel.video.url }}" style="width:100%; height:100%; object-fit:cover;" muted preload="metadata"></video>
+            <div style="position: absolute; left: 10px; bottom: 10px; color: #fff; text-shadow: 0 1px 4px rgba(0,0,0,0.8); font-weight: 700; font-size: 0.85rem; display: flex; align-items: center; gap: 4px;">
+              <i class="ti ti-player-play-filled"></i> {{ reel.total_likes }}
+            </div>
+          </a>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="ig-empty-feed" style="margin-top: 24px;">
+        <i class="ti ti-video-off ig-empty-icon"></i>
+        <h3>No Reels Yet</h3>
+        <p>When @{{ profile_user.username }} shares video reels, they will appear here.</p>
+        {% if is_own_profile %}
+          <button type="button" class="ig-btn-primary" onclick="openCreateReelModal()" style="margin-top: 12px;">Post a Reel</button>
+        {% endif %}
+      </div>
+    {% endif %}
+  </div>
+
+  {% if is_own_profile %}
+  <!-- User Saved Grid -->
+  <div id="userSavedGrid" style="display: none;">
+    {% if saved_posts %}
+      <div class="ig-explore-grid" style="margin-top: 16px;">
+        {% for item in saved_posts %}
+          {% with post=item.post %}
+            <a href="{% url 'social:post_detail' pk=post.pk %}" class="ig-explore-item" title="Post by @{{ post.author.username }}">
+              {% if post.images.all %}
+                {% if post.images.all.0.is_video %}
+                  <video src="{{ post.images.all.0.image.url }}" style="width:100%; height:100%; object-fit:cover;"></video>
+                {% else %}
+                  <img src="{{ post.images.all.0.image.url }}" alt="Post thumbnail" loading="lazy">
+                {% endif %}
+                {% if post.images.all|length > 1 %}
+                  <div class="ig-explore-badge" title="Multiple items"><i class="ti ti-copy"></i></div>
+                {% endif %}
+              {% elif post.image %}
+                {% if post.is_video %}
+                  <video src="{{ post.image.url }}" style="width:100%; height:100%; object-fit:cover;"></video>
+                {% else %}
+                  <img src="{{ post.image.url }}" alt="Post thumbnail" loading="lazy">
+                {% endif %}
+              {% else %}
+                <div class="ig-explore-text-thumb">
+                  <span>{{ post.content|truncatechars:80 }}</span>
+                </div>
+              {% endif %}
+            </a>
+          {% endwith %}
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="ig-empty-feed" style="margin-top: 24px;">
+        <i class="ti ti-bookmark ig-empty-icon"></i>
+        <h3>Save</h3>
+        <p>Save photos and videos that you want to see again. No one is notified, and only you can see what you've saved.</p>
+      </div>
+    {% endif %}
+  </div>
   {% endif %}
+
+  <!-- User Tagged Grid -->
+  <div id="userTaggedGrid" style="display: none;">
+    <div class="ig-empty-feed" style="margin-top: 24px;">
+      <i class="ti ti-user-check ig-empty-icon"></i>
+      <h3>Photos of you</h3>
+      <p>When people tag you in transport updates or photos, they'll appear here.</p>
+    </div>
+  </div>
+
 </div>
+
+<!-- ========================================== -->
+<!-- Fullscreen Instagram Highlight Viewer (Matching Screenshot 1) -->
+<!-- ========================================== -->
+<div class="ig-modal" id="highlightViewerModal" style="display:none; z-index:99999; align-items:center; justify-content:center;">
+  <div class="ig-modal-backdrop" onclick="closeHighlightViewer()" style="background:rgba(0,0,0,0.92);"></div>
+  
+  <div style="position:relative; z-index:100000; display:flex; align-items:center; justify-content:center; width:100%; height:100vh;">
+    
+    <!-- Close Button Top-Right -->
+    <button type="button" onclick="closeHighlightViewer()" style="position:fixed; top:20px; right:24px; background:transparent; border:none; color:#fff; font-size:2rem; cursor:pointer; z-index:100002;">
+      <i class="ti ti-x"></i>
+    </button>
+
+    <!-- Prev Chevron -->
+    <button type="button" id="hlPrevBtn" onclick="prevHighlightSlide(event)" style="position:absolute; left:max(16px, calc(50vw - 260px)); background:rgba(255,255,255,0.18); border:none; color:#fff; width:44px; height:44px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.4rem; cursor:pointer; z-index:100002; transition:all 0.2s;">
+      <i class="ti ti-chevron-left"></i>
+    </button>
+
+    <!-- Main Active Phone Card -->
+    <div id="hlCardContainer" style="width:360px; max-width:90vw; height:640px; max-height:85vh; background:#000; border-radius:16px; overflow:hidden; position:relative; display:flex; flex-direction:column; box-shadow:0 24px 48px rgba(0,0,0,0.8); border:1px solid rgba(255,255,255,0.15);">
+      
+      <!-- Top Progress Bars -->
+      <div id="hlProgressBarWrap" style="position:absolute; top:12px; left:12px; right:12px; display:flex; gap:4px; z-index:10;"></div>
+
+      <!-- Top Header Row -->
+      <div style="position:absolute; top:24px; left:12px; right:12px; display:flex; align-items:center; justify-content:space-between; z-index:10; color:#fff; text-shadow:0 1px 4px rgba(0,0,0,0.8);">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <img id="hlUserAvatar" src="" style="width:32px; height:32px; border-radius:50%; object-fit:cover; border:1px solid #fff;">
+          <div>
+            <div id="hlUsername" style="font-weight:700; font-size:0.88rem; line-height:1.2;"></div>
+            <div id="hlTime" style="font-size:0.7rem; opacity:0.85;"></div>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:12px;">
+          <button type="button" onclick="toggleHighlightMute()" style="background:transparent; border:none; color:#fff; font-size:1.2rem; cursor:pointer;" id="hlMuteBtn" title="Mute/Unmute"><i class="ti ti-volume"></i></button>
+          <button type="button" onclick="toggleHighlightPause()" style="background:transparent; border:none; color:#fff; font-size:1.2rem; cursor:pointer;" id="hlPauseBtn" title="Pause/Play"><i class="ti ti-pause"></i></button>
+        </div>
+      </div>
+
+      <!-- Left / Right Click Nav Zones -->
+      <div onclick="prevHighlightSlide(event)" style="position:absolute; top:60px; left:0; width:35%; bottom:60px; z-index:8; cursor:pointer;"></div>
+      <div onclick="nextHighlightSlide(event)" style="position:absolute; top:60px; right:0; width:65%; bottom:60px; z-index:8; cursor:pointer;"></div>
+
+      <!-- Media Content (Image or Video) -->
+      <div style="flex:1; width:100%; height:100%; position:relative; background:#000; display:flex; align-items:center; justify-content:center;">
+        <img id="hlActiveImg" src="" style="width:100%; height:100%; object-fit:cover; display:none;">
+        <video id="hlActiveVid" src="" style="width:100%; height:100%; object-fit:cover; display:none;" playsinline webkit-playsinline></video>
+      </div>
+
+      <!-- Caption Overlay at Bottom -->
+      <div id="hlCaption" style="position:absolute; bottom:16px; left:16px; right:16px; color:#fff; font-size:0.88rem; text-shadow:0 1px 4px rgba(0,0,0,0.9); z-index:10; background:rgba(0,0,0,0.5); padding:8px 12px; border-radius:8px; display:none;"></div>
+    </div>
+
+    <!-- Next Chevron -->
+    <button type="button" id="hlNextBtn" onclick="nextHighlightSlide(event)" style="position:absolute; right:max(16px, calc(50vw - 260px)); background:rgba(255,255,255,0.18); border:none; color:#fff; width:44px; height:44px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.4rem; cursor:pointer; z-index:100002; transition:all 0.2s;">
+      <i class="ti ti-chevron-right"></i>
+    </button>
+  </div>
+</div>
+
+<!-- ========================================== -->
+<!-- New Highlight Modal -->
+<!-- ========================================== -->
+<div class="ig-modal" id="newHighlightModal" style="display:none;">
+  <div class="ig-modal-backdrop" onclick="closeNewHighlightModal()"></div>
+  <div class="ig-modal-box" style="max-width: 420px; width: 90%; border-radius: 16px; background: #161920; overflow: hidden; padding: 0;">
+    <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-bottom: 1px solid var(--ig-card-border);">
+      <button type="button" class="ig-modal-close" onclick="closeNewHighlightModal()"><i class="ti ti-x"></i></button>
+      <h3 style="margin: 0; font-size: 1rem; font-weight: 700; color: var(--ig-text);">New Highlight</h3>
+      <button type="submit" form="newHighlightForm" style="background: transparent; border: none; color: #38bdf8; font-weight: 700; font-size: 0.95rem; cursor: pointer;">Next</button>
+    </div>
+
+    <form method="post" enctype="multipart/form-data" action="{% url 'social:create_highlight' %}" id="newHighlightForm" style="padding: 20px; display: flex; flex-direction: column; gap: 16px;">
+      {% csrf_token %}
+      <input type="text" name="title" class="ig-input" placeholder="Highlight Name" required style="border-radius: 8px; padding: 12px; font-size: 0.95rem;">
+
+      <div class="ig-file-picker">
+        <label class="ig-file-label" style="display: flex; align-items: center; justify-content: center; gap: 8px; padding: 16px; border: 1px dashed var(--ig-gold); border-radius: 8px; color: var(--ig-gold); font-weight: 600; cursor: pointer;">
+          <i class="ti ti-photo-plus" style="font-size: 1.3rem;"></i>
+          <span>Choose Photo or Video</span>
+          <input type="file" name="media" accept="image/*,video/*" required style="display: none;" onchange="previewHighlightMedia(event)">
+        </label>
+      </div>
+
+      <div id="highlightMediaPreviewWrap" style="display: none; max-height: 200px; text-align: center; overflow: hidden; border-radius: 8px; background: #000;">
+        <img id="highlightPreviewImg" src="" style="max-height: 200px; max-width: 100%; object-fit: contain; display: none;">
+        <video id="highlightPreviewVid" controls style="max-height: 200px; max-width: 100%; display: none;"></video>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% if is_own_profile %}
+<!-- Change Profile Photo Modal -->
+<div class="ig-modal" id="changePhotoModal" style="display:none;">
+  <div class="ig-modal-backdrop" onclick="closeChangePhotoModal()"></div>
+  <div class="ig-modal-box" style="max-width: 380px; width: 90%; text-align: center; padding: 0; border-radius: 16px; overflow: hidden; background: #161920;">
+    <div style="padding: 24px 16px; font-weight: 700; font-size: 1.1rem; color: var(--ig-text); border-bottom: 1px solid var(--ig-card-border);">
+      Change Profile Photo
+    </div>
+
+    <!-- Upload Photo Form -->
+    <form method="post" enctype="multipart/form-data" action="{% url 'social:edit_profile' %}" id="uploadPhotoForm">
+      {% csrf_token %}
+      <label style="display: block; padding: 14px; color: #38bdf8; font-weight: 700; font-size: 0.95rem; border-bottom: 1px solid var(--ig-card-border); cursor: pointer; margin: 0;">
+        Upload Photo
+        <input type="file" name="avatar" accept="image/*" style="display:none;" onchange="document.getElementById('uploadPhotoForm').submit()">
+      </label>
+    </form>
+
+    <!-- Remove Current Photo Form -->
+    {% if profile.avatar %}
+      <form method="post" action="{% url 'social:edit_profile' %}">
+        {% csrf_token %}
+        <input type="hidden" name="remove_avatar" value="1">
+        <button type="submit" style="width: 100%; padding: 14px; color: #ef4444; font-weight: 700; font-size: 0.95rem; background: transparent; border: none; border-bottom: 1px solid var(--ig-card-border); cursor: pointer;">
+          Remove Current Photo
+        </button>
+      </form>
+    {% endif %}
+
+    <!-- Cancel Button -->
+    <button type="button" onclick="closeChangePhotoModal()" style="width: 100%; padding: 14px; color: var(--ig-text); font-size: 0.95rem; background: transparent; border: none; cursor: pointer;">
+      Cancel
+    </button>
+  </div>
+</div>
+
+<!-- ========================================== -->
+<!-- Quick Edit Profile & Name Customization Modal -->
+<!-- ========================================== -->
+<div class="ig-modal" id="quickEditProfileModal" style="display:none; z-index:99992;">
+  <div class="ig-modal-backdrop" onclick="closeQuickEditModal()"></div>
+  <div class="ig-modal-box" style="max-width: 520px; width: 92%; border-radius: 16px; background: #161920; overflow: hidden; border: 1px solid var(--ig-card-border); box-shadow: 0 20px 50px rgba(0,0,0,0.8);">
+    <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--ig-card-border);">
+      <h3 style="margin: 0; font-size: 1.1rem; font-weight: 700; color: var(--ig-text); display: flex; align-items: center; gap: 8px;">
+        <i class="ti ti-user-edit" style="color: var(--ig-gold);"></i> Edit Profile & Handle
+      </h3>
+      <button type="button" class="ig-modal-close" onclick="closeQuickEditModal()"><i class="ti ti-x"></i></button>
+    </div>
+
+    <form method="post" action="{% url 'social:edit_profile' %}" id="quickEditProfileForm" onsubmit="handleQuickEditSubmit(event)" style="padding: 20px; display: flex; flex-direction: column; gap: 16px; max-height: calc(85vh - 70px); overflow-y: auto;">
+      {% csrf_token %}
+      <input type="hidden" name="ajax" value="1">
+      <div id="quickEditAlert" style="display: none; padding: 10px 14px; border-radius: 8px; font-size: 0.85rem;"></div>
+
+      <!-- Quick Avatar Preview & Change Action -->
+      <div style="display: flex; align-items: center; gap: 14px; padding: 12px 14px; background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px solid rgba(255,255,255,0.06);">
+        {% if profile.avatar %}
+          <img src="{{ profile.avatar.url }}" alt="{{ profile_user.username }}" style="width: 46px; height: 46px; border-radius: 50%; object-fit: cover; border: 1.5px solid var(--ig-gold);">
+        {% else %}
+          <div style="width: 46px; height: 46px; border-radius: 50%; background: var(--ig-gold-dark); display: flex; align-items: center; justify-content: center; font-weight: 700; color: #fff;">{{ profile_user|get_initials }}</div>
+        {% endif %}
+        <div style="flex: 1;">
+          <div style="font-weight: 700; font-size: 0.95rem; color: var(--ig-text);">@<span id="quickHandleHeader">{{ profile_user.username }}</span></div>
+          <div style="font-size: 0.78rem; color: var(--ig-text-muted);">Change photo via Settings or Profile Photo</div>
+        </div>
+        <button type="button" class="ig-btn-secondary" onclick="closeQuickEditModal(); openChangePhotoModal();" style="font-size: 0.8rem; padding: 6px 12px;">Change Photo</button>
+      </div>
+
+      <!-- Display Name -->
+      <div>
+        <label style="font-size: 0.85rem; font-weight: 700; color: var(--ig-text); display: flex; justify-content: space-between; margin-bottom: 6px;">
+          <span>Display Name (Full Name)</span>
+          <span style="font-size: 0.75rem; color: var(--ig-text-muted);">Shown on profile & posts</span>
+        </label>
+        <input type="text" name="first_name" id="quickEditFirstName" value="{{ profile_user.first_name }}" class="ig-input" placeholder="e.g. Ashutosh Sharma" maxlength="50">
+      </div>
+
+      <!-- Username Handle -->
+      <div>
+        <label style="font-size: 0.85rem; font-weight: 700; color: var(--ig-text); display: flex; justify-content: space-between; margin-bottom: 6px;">
+          <span>Username (@handle)</span>
+          <span style="font-size: 0.75rem; color: var(--ig-gold);">Unique ID</span>
+        </label>
+        <div style="position: relative;">
+          <span style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--ig-gold); font-weight: 700; font-size: 1rem;">@</span>
+          <input type="text" name="username" id="quickEditUsername" value="{{ profile_user.username }}" class="ig-input" style="padding-left: 30px; font-weight: 600;" required pattern="^[a-zA-Z0-9._]+$" title="Only letters, numbers, underscores and periods allowed" oninput="document.getElementById('quickHandlePreview').textContent = this.value.trim(); document.getElementById('quickHandleHeader').textContent = this.value.trim();">
+        </div>
+        <div style="font-size: 0.75rem; color: var(--ig-text-muted); margin-top: 4px;">
+          Your custom profile URL will be: <code>/social/profile/<span id="quickHandlePreview" style="color:var(--ig-gold);">{{ profile_user.username }}</span>/</code>
+        </div>
+      </div>
+
+      <!-- Bio -->
+      <div>
+        <label style="font-size: 0.85rem; font-weight: 700; color: var(--ig-text); display: block; margin-bottom: 6px;">Bio</label>
+        <textarea name="bio" id="quickEditBio" rows="3" class="ig-textarea" placeholder="Write something about yourself or your transport fleet..." maxlength="200">{{ profile.bio }}</textarea>
+      </div>
+
+      <!-- Status Note -->
+      <div>
+        <label style="font-size: 0.85rem; font-weight: 700; color: var(--ig-text); display: block; margin-bottom: 6px;">Status Note (Bubble above avatar)</label>
+        <input type="text" name="note" id="quickEditNote" value="{{ profile.note }}" class="ig-input" placeholder="e.g. On Highway NH48 🚛 / Available" maxlength="60">
+      </div>
+
+      <!-- Website -->
+      <div>
+        <label style="font-size: 0.85rem; font-weight: 700; color: var(--ig-text); display: block; margin-bottom: 6px;">Website Link</label>
+        <input type="url" name="website" id="quickEditWebsite" value="{{ profile.website|default:'' }}" class="ig-input" placeholder="https://ghidoratransport.com">
+      </div>
+
+      <!-- Actions -->
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 6px; border-top: 1px solid var(--ig-card-border); padding-top: 14px;">
+        <a href="{% url 'social:edit_profile' %}" style="color: var(--ig-text-muted); font-size: 0.82rem; text-decoration: none; display: flex; align-items: center; gap: 4px;">
+          <i class="ti ti-settings"></i> Advanced Settings →
+        </a>
+        <div style="display: flex; gap: 8px;">
+          <button type="button" class="ig-btn-secondary" onclick="closeQuickEditModal()">Cancel</button>
+          <button type="submit" class="ig-btn-primary" id="quickEditSubmitBtn">Save Changes</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+{% endif %}
+
+<script>
+let activeHighlightItems = [];
+let activeHighlightIdx = 0;
+let hlTimer = null;
+let isHlPaused = false;
+let isHlMuted = false;
+
+function openHighlightViewer(hlId, username, avatarUrl) {
+  const dataScript = document.getElementById(`highlight-data-${hlId}`);
+  if (!dataScript) return;
+
+  try {
+    activeHighlightItems = JSON.parse(dataScript.textContent);
+  } catch (e) {
+    activeHighlightItems = [];
+  }
+
+  if (!activeHighlightItems || activeHighlightItems.length === 0) return;
+
+  activeHighlightIdx = 0;
+  isHlPaused = false;
+
+  document.getElementById('hlUsername').textContent = username;
+  const avatarEl = document.getElementById('hlUserAvatar');
+  if (avatarUrl) {
+    avatarEl.src = avatarUrl;
+    avatarEl.style.display = 'block';
+  } else {
+    avatarEl.style.display = 'none';
+  }
+
+  const modal = document.getElementById('highlightViewerModal');
+  if (modal) modal.style.display = 'flex';
+
+  renderHighlightSlide();
+}
+
+function closeHighlightViewer() {
+  const modal = document.getElementById('highlightViewerModal');
+  if (modal) modal.style.display = 'none';
+
+  clearTimeout(hlTimer);
+  const vid = document.getElementById('hlActiveVid');
+  if (vid) {
+    vid.pause();
+    vid.src = '';
+  }
+}
+
+function renderHighlightSlide() {
+  clearTimeout(hlTimer);
+  const item = activeHighlightItems[activeHighlightIdx];
+  if (!item) return;
+
+  // Build Progress Bars
+  const progressWrap = document.getElementById('hlProgressBarWrap');
+  progressWrap.innerHTML = '';
+  activeHighlightItems.forEach((_, idx) => {
+    const bar = document.createElement('div');
+    bar.style.flex = '1';
+    bar.style.height = '3px';
+    bar.style.background = 'rgba(255,255,255,0.3)';
+    bar.style.borderRadius = '2px';
+    bar.style.overflow = 'hidden';
+
+    const fill = document.createElement('div');
+    fill.className = `hl-progress-fill-${idx}`;
+    fill.style.height = '100%';
+    fill.style.background = '#fff';
+    fill.style.width = idx < activeHighlightIdx ? '100%' : '0%';
+    fill.style.transition = 'width 0.1s linear';
+    bar.appendChild(fill);
+    progressWrap.appendChild(bar);
+  });
+
+  const img = document.getElementById('hlActiveImg');
+  const vid = document.getElementById('hlActiveVid');
+  const captionEl = document.getElementById('hlCaption');
+  const timeEl = document.getElementById('hlTime');
+
+  if (timeEl) timeEl.textContent = item.time ? `${item.time} ago` : '';
+
+  if (captionEl) {
+    if (item.caption) {
+      captionEl.textContent = item.caption;
+      captionEl.style.display = 'block';
+    } else {
+      captionEl.style.display = 'none';
+    }
+  }
+
+  const activeFill = progressWrap.querySelector(`.hl-progress-fill-${activeHighlightIdx}`);
+
+  if (item.is_video) {
+    img.style.display = 'none';
+    vid.style.display = 'block';
+    vid.src = item.media_url;
+    vid.muted = isHlMuted;
+    vid.currentTime = 0;
+    vid.play().catch(() => {});
+
+    vid.onended = () => {
+      nextHighlightSlide();
+    };
+
+    vid.ontimeupdate = () => {
+      if (vid.duration && activeFill) {
+        const pct = (vid.currentTime / vid.duration) * 100;
+        activeFill.style.width = `${pct}%`;
+      }
+    };
+  } else {
+    vid.pause();
+    vid.style.display = 'none';
+    img.style.display = 'block';
+    img.src = item.media_url;
+
+    let startTime = Date.now();
+    const duration = 5000;
+
+    function step() {
+      if (isHlPaused) {
+        hlTimer = setTimeout(step, 100);
+        return;
+      }
+      const elapsed = Date.now() - startTime;
+      const pct = Math.min(100, (elapsed / duration) * 100);
+      if (activeFill) activeFill.style.width = `${pct}%`;
+
+      if (elapsed >= duration) {
+        nextHighlightSlide();
+      } else {
+        hlTimer = setTimeout(step, 50);
+      }
+    }
+    step();
+  }
+}
+
+function nextHighlightSlide(e) {
+  if (e) e.stopPropagation();
+  if (activeHighlightIdx < activeHighlightItems.length - 1) {
+    activeHighlightIdx++;
+    renderHighlightSlide();
+  } else {
+    closeHighlightViewer();
+  }
+}
+
+function prevHighlightSlide(e) {
+  if (e) e.stopPropagation();
+  if (activeHighlightIdx > 0) {
+    activeHighlightIdx--;
+    renderHighlightSlide();
+  }
+}
+
+function toggleHighlightMute() {
+  isHlMuted = !isHlMuted;
+  const vid = document.getElementById('hlActiveVid');
+  if (vid) vid.muted = isHlMuted;
+  const btn = document.getElementById('hlMuteBtn');
+  if (btn) btn.innerHTML = isHlMuted ? '<i class="ti ti-volume-3"></i>' : '<i class="ti ti-volume"></i>';
+}
+
+function toggleHighlightPause() {
+  isHlPaused = !isHlPaused;
+  const vid = document.getElementById('hlActiveVid');
+  if (vid) {
+    if (isHlPaused) vid.pause();
+    else vid.play().catch(() => {});
+  }
+  const btn = document.getElementById('hlPauseBtn');
+  if (btn) btn.innerHTML = isHlPaused ? '<i class="ti ti-player-play"></i>' : '<i class="ti ti-pause"></i>';
+}
+
+function openChangePhotoModal() {
+  const modal = document.getElementById('changePhotoModal');
+  if (modal) modal.style.display = 'flex';
+}
+function closeChangePhotoModal() {
+  const modal = document.getElementById('changePhotoModal');
+  if (modal) modal.style.display = 'none';
+}
+function openNewHighlightModal() {
+  const modal = document.getElementById('newHighlightModal');
+  if (modal) modal.style.display = 'flex';
+}
+function closeNewHighlightModal() {
+  const modal = document.getElementById('newHighlightModal');
+  if (modal) modal.style.display = 'none';
+}
+function previewHighlightMedia(e) {
+  const wrap = document.getElementById('highlightMediaPreviewWrap');
+  const img = document.getElementById('highlightPreviewImg');
+  const vid = document.getElementById('highlightPreviewVid');
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const url = URL.createObjectURL(file);
+  wrap.style.display = 'block';
+
+  if (file.type.startsWith('video/')) {
+    img.style.display = 'none';
+    vid.style.display = 'inline-block';
+    vid.src = url;
+  } else {
+    vid.style.display = 'none';
+    img.style.display = 'inline-block';
+    img.src = url;
+  }
+}
+function switchProfileTab(tab) {
+  const postsGrid = document.getElementById('userPostsGrid');
+  const reelsGrid = document.getElementById('userReelsGrid');
+  const savedGrid = document.getElementById('userSavedGrid');
+  const taggedGrid = document.getElementById('userTaggedGrid');
+
+  const btnPosts = document.getElementById('tabBtnPosts');
+  const btnReels = document.getElementById('tabBtnReels');
+  const btnSaved = document.getElementById('tabBtnSaved');
+  const btnTagged = document.getElementById('tabBtnTagged');
+
+  // Hide all grids
+  if (postsGrid) postsGrid.style.display = 'none';
+  if (reelsGrid) reelsGrid.style.display = 'none';
+  if (savedGrid) savedGrid.style.display = 'none';
+  if (taggedGrid) taggedGrid.style.display = 'none';
+
+  // Reset all buttons
+  const resetBtn = (btn) => {
+    if (btn) {
+      btn.style.setProperty('border-top-color', 'transparent', 'important');
+      btn.style.setProperty('color', 'var(--ig-text-muted)', 'important');
+      btn.style.fontWeight = '600';
+    }
+  };
+  const activeBtn = (btn) => {
+    if (btn) {
+      btn.style.setProperty('border-top-color', '#ffffff', 'important');
+      btn.style.setProperty('color', '#ffffff', 'important');
+      btn.style.fontWeight = '700';
+    }
+  };
+
+  resetBtn(btnPosts);
+  resetBtn(btnReels);
+  resetBtn(btnSaved);
+  resetBtn(btnTagged);
+
+  if (tab === 'reels') {
+    if (reelsGrid) reelsGrid.style.display = 'block';
+    activeBtn(btnReels);
+  } else if (tab === 'saved') {
+    if (savedGrid) savedGrid.style.display = 'block';
+    activeBtn(btnSaved);
+  } else if (tab === 'tagged') {
+    if (taggedGrid) taggedGrid.style.display = 'block';
+    activeBtn(btnTagged);
+  } else {
+    if (postsGrid) postsGrid.style.display = 'block';
+    activeBtn(btnPosts);
+  }
+}
+
+function openQuickEditModal() {
+  const modal = document.getElementById('quickEditProfileModal');
+  if (modal) modal.style.display = 'flex';
+}
+
+function closeQuickEditModal() {
+  const modal = document.getElementById('quickEditProfileModal');
+  if (modal) modal.style.display = 'none';
+  const alertBox = document.getElementById('quickEditAlert');
+  if (alertBox) alertBox.style.display = 'none';
+}
+
+async function handleQuickEditSubmit(e) {
+  e.preventDefault();
+  const form = e.target;
+  const btn = document.getElementById('quickEditSubmitBtn');
+  const alertBox = document.getElementById('quickEditAlert');
+  const oldText = btn.innerHTML;
+
+  btn.disabled = true;
+  btn.innerHTML = '<i class="ti ti-loader animate-spin"></i> Saving...';
+  if (alertBox) alertBox.style.display = 'none';
+
+  try {
+    const formData = new FormData(form);
+    const res = await fetch(form.action, {
+      method: 'POST',
+      body: formData,
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest'
+      }
+    });
+
+    const data = await res.json();
+    if (res.ok && data.ok) {
+      if (alertBox) {
+        alertBox.style.display = 'block';
+        alertBox.style.background = 'rgba(34, 197, 94, 0.15)';
+        alertBox.style.border = '1px solid #22c55e';
+        alertBox.style.color = '#86efac';
+        alertBox.innerHTML = '<i class="ti ti-circle-check"></i> ' + data.message;
+      }
+      setTimeout(() => {
+        if (data.redirect_url) {
+          window.location.href = data.redirect_url;
+        } else {
+          window.location.reload();
+        }
+      }, 500);
+    } else {
+      let msg = 'Failed to update profile.';
+      if (data.errors) {
+        msg = Object.entries(data.errors).map(([k, v]) => `<strong>${k}:</strong> ${Array.isArray(v) ? v.join(', ') : v}`).join('<br>');
+      }
+      if (alertBox) {
+        alertBox.style.display = 'block';
+        alertBox.style.background = 'rgba(239, 68, 68, 0.15)';
+        alertBox.style.border = '1px solid #ef4444';
+        alertBox.style.color = '#fca5a5';
+        alertBox.innerHTML = '<i class="ti ti-alert-triangle"></i> ' + msg;
+      }
+      btn.disabled = false;
+      btn.innerHTML = oldText;
+    }
+  } catch (err) {
+    console.error('Profile update error:', err);
+    // Fallback to standard form submission
+    form.submit();
+  }
+}
+</script>
 {% endblock %}
+

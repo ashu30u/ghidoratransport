@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-{% load static %}
+{% load static social_extras %}
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -9,6 +9,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<!-- Tabler Icons CDN -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<!-- Ghidora Social Stylesheet -->
+<link rel="stylesheet" href="{% static 'social/css/social.css' %}?v=20260914_rev5">
 
 <style>
   :root{
@@ -209,57 +214,329 @@
 </head>
 <body>
 
-<nav class="nav">
-  <div class="nav-left">
-    <a href="{% url 'social:feed' %}" class="brand">
-      <div class="brand-mark"></div>
-      <div class="brand-text">GHIDORA<small>TRANSPORT NETWORK</small></div>
-    </a>
-    <ul class="nav-links">
-      <li><a href="{% url 'social:feed' %}" class="{% block nav_feed %}{% endblock %}">Feed</a></li>
-      <li><a href="/" class="{% block nav_booking %}{% endblock %}">Bookings</a></li>
-      <li><a href="/occasions/" class="{% block nav_occasions %}{% endblock %}">Occasions</a></li>
-      <li><a href="{% url 'pickupwala:player' %}" title="Pickupwala Radio 📻" style="color:#ffb870; font-weight: 700; font-size: 13.5px; padding: 4px 10px; background: rgba(255, 184, 112, 0.18); border: 1.5px solid rgba(255, 184, 112, 0.5); border-radius: 8px;">📻 Pickup Radio</a></li>
-      <li><a href="#" class="{% block nav_drivers %}{% endblock %}">Drivers</a></li>
-    </ul>
-  </div>
+{% if '/social/' in request.path or request.resolver_match.app_name == 'social' %}
+  <!-- ========================================== -->
+  <!-- GHIDORA SOCIAL PLATFORM: LEFT SIDEBAR      -->
+  <!-- ========================================== -->
+  {% if user.is_authenticated %}
+    <aside class="ig-sidebar">
+      <div class="ig-sidebar-top">
+        <a href="{% url 'social:feed' %}" class="ig-sidebar-brand" title="Ghidora Social">
+          <div class="brand-mark" style="width:32px; height:32px;"></div>
+        </a>
+        <a href="{% url 'social:feed' %}" class="ig-sidebar-link {% if request.resolver_match.url_name == 'feed' %}active{% endif %}" title="Home">
+          <i class="ti ti-home"></i>
+        </a>
+        <a href="{% url 'social:reels_feed' %}" class="ig-sidebar-link {% if request.resolver_match.url_name == 'reels_feed' %}active{% endif %}" title="Reels">
+          <i class="ti ti-video"></i>
+        </a>
+        <button type="button" class="ig-sidebar-link" onclick="openSearchModal()" title="Search">
+          <i class="ti ti-search"></i>
+        </button>
+        <a href="{% url 'social:explore' %}" class="ig-sidebar-link {% if request.resolver_match.url_name == 'explore' %}active{% endif %}" title="Explore">
+          <i class="ti ti-compass"></i>
+        </a>
+        <a href="{% url 'social:inbox' %}" class="ig-sidebar-link {% if request.resolver_match.url_name == 'inbox' or request.resolver_match.url_name == 'conversation_detail' %}active{% endif %}" title="Messages">
+          <i class="ti ti-message-circle"></i>
+          {% if unread_messages_count %}<span class="ig-sidebar-badge">{{ unread_messages_count }}</span>{% endif %}
+        </a>
+        <button type="button" class="ig-sidebar-link" onclick="openNotificationsModal()" title="Notifications">
+          <i class="ti ti-heart"></i>
+          <span class="ig-sidebar-badge" id="sidebarNotifBadge" {% if not unread_notifications_count %}style="display:none;"{% endif %}>{{ unread_notifications_count|default:0 }}</span>
+        </button>
+        <button type="button" class="ig-sidebar-link ig-create-trigger" onclick="if(typeof openPostCreateModal==='function'){openPostCreateModal();}else{window.location.href='{% url "social:feed" %}?compose=1';}" title="Create Post">
+          <i class="ti ti-square-plus"></i>
+        </button>
+      </div>
 
-  <div class="nav-right">
-    {% if user.is_authenticated %}
-      <a href="#" class="nav-icon-btn" aria-label="Notifications" title="Notifications">
-        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      <div class="ig-sidebar-bottom">
+        <a href="{% url 'social:profile' username=user.username %}" class="ig-sidebar-link {% if request.resolver_match.url_name == 'profile' and request.resolver_match.kwargs.username == user.username %}active{% endif %}" title="Profile">
+          {% if user.profile.avatar %}
+            <img src="{{ user.profile.avatar.url }}" alt="{{ user.username }}" class="ig-sidebar-avatar">
+          {% else %}
+            <div class="ig-sidebar-avatar-fallback">{{ user.username|slice:":1"|upper }}</div>
+          {% endif %}
+        </a>
+        <button type="button" class="ig-sidebar-link ig-menu-trigger" onclick="toggleProfileMenu(event)" title="More Options">
+          <i class="ti ti-menu-2"></i>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Floating Dropdown for More / Profile Menu -->
+    <div class="ig-profile-dropdown" id="profileDropdownMenu">
+      <a href="{% url 'social:profile' username=user.username %}" class="ig-dropdown-item"><i class="ti ti-user"></i> Profile</a>
+      <a href="{% url 'social:saved_posts' %}" class="ig-dropdown-item"><i class="ti ti-bookmark"></i> Saved Posts</a>
+      <a href="{% url 'social:edit_profile' %}" class="ig-dropdown-item"><i class="ti ti-settings"></i> Edit Profile & Handle</a>
+      <button type="button" class="ig-dropdown-item" onclick="openReportModal('problem', 0)" style="background:none; border:none; width:100%; text-align:left; font-size:inherit; color:inherit; cursor:pointer;">
+        <i class="ti ti-alert-circle"></i> Report a Problem
+      </button>
+      <div class="ig-dropdown-divider"></div>
+      <a href="/" class="ig-dropdown-item" style="color: #EF9F27;">
+        <i class="ti ti-truck" style="color: #EF9F27;"></i> Switch to Transport Hub ↗
       </a>
-      <a href="#" class="user-chip">
-        <div class="user-avatar">{{ user.username|slice:":1"|upper }}</div>
-        <span class="user-name">{{ user.username }}</span>
-      </a>
-      <form action="{% url 'logout' %}" method="post" style="margin:0;">
+      <div class="ig-dropdown-divider"></div>
+      <form action="{% url 'logout' %}" method="post" id="sidebarLogoutForm" style="margin:0;">
         {% csrf_token %}
-        <button type="submit" class="secondary" style="padding:9px 14px;">Logout</button>
+        <button type="submit" class="ig-dropdown-item" style="color:var(--ig-red); width: 100%; text-align: left; background: transparent; border: none; cursor: pointer; padding: 10px 16px; display: flex; align-items: center; gap: 12px;">
+          <i class="ti ti-logout" style="color:var(--ig-red);"></i> Log Out
+        </button>
       </form>
-    {% else %}
-      <a href="{% url 'login' %}" class="btn-login">Sign In</a>
-    {% endif %}
-  </div>
-</nav>
+    </div>
+  {% endif %}
+{% endif %}
 
-<main class="page">
-  {% if messages %}
-    <ul class="messages">
-      {% for message in messages %}
-        <li class="{{ message.tags }}">{{ message }}</li>
-      {% endfor %}
-    </ul>
+<!-- Main Content Area Wrapper -->
+<div class="{% if '/social/' in request.path or request.resolver_match.app_name == 'social' %}{% if user.is_authenticated %}ig-main-layout{% endif %}{% endif %}" style="min-height: 100vh; display: flex; flex-direction: column; flex: 1;">
+
+  {% if '/social/' in request.path or request.resolver_match.app_name == 'social' %}
+    <!-- Dedicated Bespoke Social Topbar (Replacing Transport Navbar) -->
+    <header class="gs-social-topbar">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <a href="{% url 'social:feed' %}" class="gs-social-topbar-brand" title="Ghidora Social Home">
+          <span>GHIDORA</span>
+          <span class="gs-badge-social">SOCIAL</span>
+        </a>
+      </div>
+
+      <div class="gs-topbar-search" onclick="openSearchModal()" title="Search Ghidora (Press /)">
+        <i class="ti ti-search"></i>
+        <span>Search users, transport tags...</span>
+        <kbd>/</kbd>
+      </div>
+
+      <div class="gs-topbar-actions">
+        {% if user.is_authenticated %}
+          <button type="button" class="gs-topbar-create-btn" onclick="if(typeof openPostCreateModal==='function'){openPostCreateModal();}else{window.location.href='{% url "social:feed" %}?compose=1';}" title="Create New Post">
+            <i class="ti ti-plus"></i> <span>Create</span>
+          </button>
+          
+          <a href="/" class="gs-portal-btn" title="Switch to Ghidora Transport & Logistics Hub">
+            <i class="ti ti-truck"></i> <span>Transport Hub ↗</span>
+          </a>
+        {% else %}
+          <a href="{% url 'login' %}" class="btn-login" style="padding:6px 14px; font-size:13px;">Sign In</a>
+        {% endif %}
+      </div>
+    </header>
+
+  {% else %}
+
+    <!-- Standard Ghidora Transport Topbar -->
+    <nav class="nav">
+      <div class="nav-left">
+        <a href="/" class="brand">
+          <div class="brand-mark"></div>
+          <div class="brand-text">GHIDORA<small>TRANSPORT NETWORK</small></div>
+        </a>
+        <ul class="nav-links">
+          <li><a href="{% url 'social:feed' %}" class="{% block nav_feed %}{% endblock %}">Feed</a></li>
+          <li><a href="/" class="{% block nav_booking %}{% endblock %}">Bookings</a></li>
+          <li><a href="/occasions/" class="{% block nav_occasions %}{% endblock %}">Occasions</a></li>
+          <li><a href="{% url 'pickupwala:player' %}" title="Pickupwala Radio 📻" style="color:#ffb870; font-weight: 700; font-size: 13.5px; padding: 4px 10px; background: rgba(255, 184, 112, 0.18); border: 1.5px solid rgba(255, 184, 112, 0.5); border-radius: 8px;">📻 Pickup Radio</a></li>
+          <li><a href="#" class="{% block nav_drivers %}{% endblock %}">Drivers</a></li>
+        </ul>
+      </div>
+
+      <div class="nav-right">
+        {% if user.is_authenticated %}
+          <a href="{% url 'social:profile' username=user.username %}" class="user-chip">
+            <div class="user-avatar">{{ user.username|slice:":1"|upper }}</div>
+            <span class="user-name">{{ user.username }}</span>
+          </a>
+          <form action="{% url 'logout' %}" method="post" style="margin:0;">
+            {% csrf_token %}
+            <button type="submit" class="secondary" style="padding:9px 14px;">Logout</button>
+          </form>
+        {% else %}
+          <a href="{% url 'login' %}" class="btn-login">Sign In</a>
+        {% endif %}
+      </div>
+    </nav>
+
   {% endif %}
 
-  {% block content %}{% endblock %}
-</main>
+  <main class="page" {% if '/social/' in request.path or request.resolver_match.app_name == 'social' %}style="padding-top: 20px;"{% endif %}>
+    {% if messages %}
+      <ul class="messages">
+        {% for message in messages %}
+          <li class="{{ message.tags }}">{{ message }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
 
-<footer class="site-footer">
-  <span>© {% now "Y" %} GHIDORA TRANSPORT NETWORK</span>
-  <span>SYSTEM STATUS: ONLINE</span>
-</footer>
+    {% block content %}{% endblock %}
+  </main>
 
+  {% if '/social/' not in request.path and request.resolver_match.app_name != 'social' %}
+    <footer class="site-footer">
+      <span>© {% now "Y" %} GHIDORA TRANSPORT NETWORK</span>
+      <span>SYSTEM STATUS: ONLINE</span>
+    </footer>
+  {% endif %}
+
+</div>
+
+<!-- Mobile Bottom Tab Navigation (Authenticated Users) -->
+{% if user.is_authenticated %}
+  <nav class="ig-mobile-bottom-nav">
+    <a href="{% url 'social:feed' %}" class="ig-mob-tab {% if request.resolver_match.url_name == 'feed' %}active{% endif %}" title="Home">
+      <i class="ti ti-home"></i>
+    </a>
+    <button type="button" class="ig-mob-tab" onclick="openSearchModal()" title="Search">
+      <i class="ti ti-search"></i>
+    </button>
+    <button type="button" class="ig-mob-tab ig-mob-create-btn" onclick="if(typeof openPostCreateModal==='function'){openPostCreateModal();}else{window.location.href='{% url "social:feed" %}?compose=1';}" title="Create Post">
+      <i class="ti ti-square-plus"></i>
+    </button>
+    <a href="{% url 'social:reels_feed' %}" class="ig-mob-tab {% if request.resolver_match.url_name == 'reels_feed' %}active{% endif %}" title="Reels">
+      <i class="ti ti-video"></i>
+    </a>
+    <a href="{% url 'social:profile' username=user.username %}" class="ig-mob-tab ig-mob-avatar-tab {% if request.resolver_match.url_name == 'profile' and request.resolver_match.kwargs.username == user.username %}active{% endif %}" title="Profile">
+      {% if user.profile.avatar %}
+        <img src="{{ user.profile.avatar.url }}" alt="{{ user.username }}" class="ig-mob-avatar-img">
+      {% else %}
+        <div class="ig-mob-avatar-fallback">{{ user.username|slice:":1"|upper }}</div>
+      {% endif %}
+    </a>
+  </nav>
+{% endif %}
+
+<!-- Global Search Modal (Debounced Live Search) -->
+<div class="ig-modal" id="searchModalOverlay" style="display:none; z-index:99990;">
+  <div class="ig-modal-backdrop" onclick="closeSearchModal()"></div>
+  <div class="ig-modal-box" style="max-width:480px; width:92%; max-height:80vh; display:flex; flex-direction:column; border-radius:16px; overflow:hidden;">
+    <div class="ig-modal-header" style="padding:12px 16px;">
+      <div style="display:flex; align-items:center; gap:10px; width:100%;">
+        <i class="ti ti-search" style="color:var(--ig-text-muted); font-size:1.2rem;"></i>
+        <input type="text" id="searchInputField" class="ig-input" placeholder="Search profiles, #hashtags, routes..." autocomplete="off" oninput="handleSearchDebounce(event)" style="border:none; background:transparent; font-size:0.95rem; padding:6px 0; width:100%; box-shadow:none;">
+      </div>
+      <button class="ig-modal-close" onclick="closeSearchModal()"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="ig-modal-body" id="searchResultsContainer" style="overflow-y:auto; flex:1; max-height:60vh; padding:12px 16px;">
+      <div style="text-align:center; padding:30px 10px; color:var(--ig-text-muted);">
+        <i class="ti ti-search" style="font-size:2rem; margin-bottom:8px; display:block; opacity:0.5;"></i>
+        <p style="margin:0; font-size:0.88rem;">Search for drivers, clients, transport updates, or #hashtags</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Global Notifications Modal -->
+<div class="ig-modal" id="notificationsModalOverlay" style="display:none; z-index:99990;">
+  <div class="ig-modal-backdrop" onclick="closeNotificationsModal()"></div>
+  <div class="ig-modal-box" style="max-width:480px; width:92%; max-height:80vh; display:flex; flex-direction:column; border-radius:16px; overflow:hidden;">
+    <div class="ig-modal-header" style="justify-content:space-between; padding:14px 16px;">
+      <h3 style="margin:0; font-size:1.05rem; font-weight:700;">Activity</h3>
+      <div style="display:flex; align-items:center; gap:12px;">
+        <button type="button" class="ig-btn-text" onclick="markAllNotificationsRead()" style="font-size:0.78rem; color:var(--blue-soft); background:none; border:none; cursor:pointer;">Mark all read</button>
+        <button class="ig-modal-close" onclick="closeNotificationsModal()"><i class="ti ti-x"></i></button>
+      </div>
+    </div>
+    <div class="ig-modal-body" id="notificationsListContainer" style="overflow-y:auto; flex:1; max-height:60vh; padding:8px 16px;">
+      <div style="text-align:center; padding:30px 10px; color:var(--ig-text-muted);">
+        <i class="ti ti-loader" style="font-size:2rem; margin-bottom:8px; display:block;"></i>
+        <p style="margin:0; font-size:0.88rem;">Loading activity...</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Followers / Following List Modal -->
+<div class="ig-modal" id="userListModal" style="display:none; z-index:99992;">
+  <div class="ig-modal-backdrop" onclick="closeUserListModal()"></div>
+  <div class="ig-modal-box" style="max-width:420px; width:90%; max-height:75vh; display:flex; flex-direction:column; border-radius:16px; overflow:hidden; position:relative;">
+    <div class="ig-modal-header" style="padding:14px 16px;">
+      <h3 id="userListModalTitle" style="margin:0; font-size:1rem; font-weight:700; width:100%; text-align:center;">Followers</h3>
+      <button class="ig-modal-close" onclick="closeUserListModal()" style="position:absolute; right:16px; top:50%; transform:translateY(-50%);"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="ig-modal-body" id="userListModalBody" style="overflow-y:auto; flex:1; max-height:60vh; padding:8px 16px;">
+      <div style="text-align:center; padding:24px; color:var(--ig-text-muted);">Loading...</div>
+    </div>
+  </div>
+</div>
+
+<!-- Report Modal -->
+<div class="ig-modal" id="reportModal" style="display:none; z-index:99995;">
+  <div class="ig-modal-backdrop" onclick="closeReportModal()"></div>
+  <div class="ig-modal-box" style="max-width:440px; width:90%; border-radius:16px; overflow:hidden;">
+    <div class="ig-modal-header" style="padding:14px 16px;">
+      <h3 style="margin:0; font-size:1rem; font-weight:700;">Report to Ghidora Moderation</h3>
+      <button class="ig-modal-close" onclick="closeReportModal()"><i class="ti ti-x"></i></button>
+    </div>
+    <form onsubmit="submitReportAJAX(event)">
+      {% csrf_token %}
+      <input type="hidden" id="reportTargetType" value="post">
+      <input type="hidden" id="reportTargetId" value="0">
+      <div class="ig-modal-body" style="padding:16px; display:flex; flex-direction:column; gap:12px;">
+        <label style="font-size:0.85rem; font-weight:600; color:var(--text-hi);">Why are you reporting this?</label>
+        <select id="reportReasonSelect" class="ig-input" required>
+          <option value="spam">Spam or unwanted advertising</option>
+          <option value="inappropriate">Inappropriate or offensive content</option>
+          <option value="harassment">Harassment or bullying</option>
+          <option value="false_info">False transport info or scam</option>
+          <option value="other">Other issue</option>
+        </select>
+        <label style="font-size:0.85rem; font-weight:600; color:var(--text-hi); margin-top:4px;">Additional Details (Optional):</label>
+        <textarea id="reportDetailsInput" rows="3" class="ig-textarea" placeholder="Provide extra context to help our moderation team..."></textarea>
+      </div>
+      <div class="ig-modal-footer" style="padding:12px 16px; display:flex; justify-content:flex-end; gap:8px;">
+        <button type="button" class="ig-btn-secondary" onclick="closeReportModal()">Cancel</button>
+        <button type="submit" class="ig-btn-primary" style="background:var(--danger); color:#fff;">Submit Report</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Share Modal -->
+<div class="ig-modal" id="shareModal" style="display:none; z-index:99993;">
+  <div class="ig-modal-backdrop" onclick="closeShareModal()"></div>
+  <div class="ig-modal-box" style="max-width:440px; width:90%; border-radius:16px; overflow:hidden;">
+    <div class="ig-modal-header" style="padding:14px 16px;">
+      <h3 style="margin:0; font-size:1rem; font-weight:700;">Share Post</h3>
+      <button class="ig-modal-close" onclick="closeShareModal()"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="ig-modal-body" style="padding:16px; display:flex; flex-direction:column; gap:16px;">
+      <input type="hidden" id="sharePostUrl" value="">
+      <input type="hidden" id="sharePostId" value="">
+      <div style="display:flex; gap:10px;">
+        <button type="button" class="ig-btn-secondary" onclick="copyShareModalLink()" style="flex:1; display:flex; align-items:center; justify-content:center; gap:6px; padding:10px;">
+          <i class="ti ti-link"></i> Copy Link
+        </button>
+        <button type="button" class="ig-btn-secondary" onclick="shareOnWhatsApp()" style="flex:1; display:flex; align-items:center; justify-content:center; gap:6px; padding:10px; color:#25D366;">
+          <i class="ti ti-brand-whatsapp"></i> WhatsApp
+        </button>
+      </div>
+      <div style="border-top:1px solid var(--glass-border); padding-top:12px;">
+        <label style="font-size:0.82rem; font-weight:600; color:var(--text-mid); display:block; margin-bottom:8px;">Send via Ghidora Direct Message</label>
+        <div style="display:flex; gap:8px;">
+          <input type="text" id="shareDmUsernameInput" class="ig-input" placeholder="Enter username (e.g. driver_john)..." style="flex:1;">
+          <button type="button" class="ig-btn-primary" onclick="sendPostViaDMAJAX()" style="padding:0 16px;">Send</button>
+        </div>
+        <div id="shareDmStatus" style="font-size:0.8rem; margin-top:6px; display:none;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Story Viewers Modal -->
+<div class="ig-modal" id="storyViewersModal" style="display:none; z-index:99996;">
+  <div class="ig-modal-backdrop" onclick="closeStoryViewersModal()"></div>
+  <div class="ig-modal-box" style="max-width:400px; width:90%; border-radius:16px; overflow:hidden; position:relative;">
+    <div class="ig-modal-header" style="padding:14px 16px;">
+      <h3 style="margin:0; font-size:1rem; font-weight:700;">Story Viewers</h3>
+      <button class="ig-modal-close" onclick="closeStoryViewersModal()"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="ig-modal-body" id="storyViewersList" style="padding:12px 16px; max-height:60vh; overflow-y:auto;">
+      <div style="text-align:center; padding:20px; color:var(--ig-text-muted);">Loading viewers...</div>
+    </div>
+  </div>
+</div>
+
+<!-- Global Create Post & Story Modals -->
+{% include "partials/global_create_modals.html" %}
+
+<script src="{% static 'social/js/social.js' %}"></script>
 {% block extra_js %}{% endblock %}
 </body>
 </html>

@@ -5,7 +5,64 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>{% block title %}Ghidora Transport{% endblock %}</title>
-<link rel="stylesheet" href="{% static 'css/style.css' %}">
+<script>
+  window.toggleMobileMenu = function(e) {
+    if (e) {
+      try { e.preventDefault(); } catch(err){}
+      try { e.stopPropagation(); } catch(err){}
+    }
+    var d = document.getElementById('mobileNavDrawer');
+    var o = document.getElementById('mobileNavOverlay');
+    var b = document.getElementById('hamburgerBtn');
+    if (!d) return;
+
+    var isCurrentlyOpen = d.classList.contains('active') || (d.style.display === 'flex');
+
+    if (isCurrentlyOpen) {
+      window.closeMobileMenu();
+    } else {
+      d.classList.add('active');
+      d.style.cssText = "display: flex !important; visibility: visible !important; opacity: 1 !important; pointer-events: auto !important; transform: translateY(0) scale(1) !important; z-index: 9999999 !important;";
+      if (o) {
+        o.classList.add('active');
+        o.style.cssText = "display: block !important; visibility: visible !important; opacity: 1 !important; pointer-events: auto !important; z-index: 9999998 !important;";
+      }
+      if (b) b.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+  };
+
+  window.closeMobileMenu = function() {
+    var d = document.getElementById('mobileNavDrawer');
+    var o = document.getElementById('mobileNavOverlay');
+    var b = document.getElementById('hamburgerBtn');
+    if (d) {
+      d.classList.remove('active');
+      d.style.cssText = "display: none !important; visibility: hidden !important; opacity: 0 !important; pointer-events: none !important; transform: translateY(-8px) scale(0.96) !important;";
+    }
+    if (o) {
+      o.classList.remove('active');
+      o.style.cssText = "display: none !important; visibility: hidden !important; opacity: 0 !important; pointer-events: none !important;";
+    }
+    if (b) b.classList.remove('active');
+    document.body.style.overflow = '';
+  };
+
+  document.addEventListener('click', function(e) {
+    var d = document.getElementById('mobileNavDrawer');
+    if (!d) return;
+
+    var isDrawerActive = d.classList.contains('active') || (d.style.display === 'flex');
+    if (isDrawerActive) {
+      var clickedInsideDrawer = e.target && (d.contains(e.target) || (e.target.closest && e.target.closest('#mobileNavDrawer')));
+      var clickedOnBtn = e.target && (e.target.closest && (e.target.closest('#hamburgerBtn') || e.target.closest('.hamburger-btn')));
+      if (!clickedInsideDrawer && !clickedOnBtn) {
+        window.closeMobileMenu();
+      }
+    }
+  });
+</script>
+
 <style>
   .hamburger-btn {
     display: flex !important;
@@ -62,64 +119,72 @@
 
   @media (max-width: 768px) {
     .navbar {
-      padding: 10px 12px !important;
+      padding: 10px 14px !important;
       flex-wrap: nowrap !important;
+      gap: 8px !important;
+      justify-content: space-between !important;
     }
     .nav-logo {
       font-size: 15px !important;
       gap: 6px !important;
+      flex-shrink: 1 !important;
+      white-space: nowrap !important;
     }
     .nav-logo svg {
-      width: 30px !important;
-      height: 30px !important;
+      width: 28px !important;
+      height: 28px !important;
     }
     .nav-right-actions {
-      gap: 5px !important;
+      gap: 6px !important;
+      flex-shrink: 0 !important;
+      display: flex !important;
+      align-items: center !important;
+    }
+    .call-btn {
+      padding: 7px 11px !important;
+      font-size: 12px !important;
+      gap: 4px !important;
+      border-radius: 8px !important;
+      font-weight: 700 !important;
+    }
+    .animated-login-btn, .desktop-login-btn, .user-badge-glowing, .desktop-user-badge {
+      display: none !important;
+    }
+    .hamburger-btn {
+      width: 38px !important;
+      height: 34px !important;
+      border-radius: 8px !important;
+      flex-shrink: 0 !important;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .navbar {
+      padding: 8px 10px !important;
+    }
+    .nav-logo {
+      font-size: 13.5px !important;
+      letter-spacing: 0.2px !important;
+    }
+    .nav-logo svg {
+      width: 24px !important;
+      height: 24px !important;
     }
     .call-btn {
       padding: 6px 9px !important;
-      font-size: 11.5px !important;
-      gap: 4px !important;
-    }
-    .animated-login-btn {
-      padding: 6px 9px !important;
-      font-size: 11.5px !important;
-      gap: 4px !important;
-    }
-    .user-badge-glowing {
-      padding: 4px 8px !important;
       font-size: 11px !important;
+      border-radius: 7px !important;
+    }
+    .call-btn .phone-shake {
+      font-size: 11px !important;
+    }
+    /* Keep navbar clean and uncrowded on mobile */
+    .animated-login-btn {
+      display: none !important;
     }
     .hamburger-btn {
       width: 36px !important;
       height: 32px !important;
-    }
-  }
-
-  @media (max-width: 420px) {
-    .navbar {
-      padding: 8px 8px !important;
-    }
-    .nav-logo {
-      font-size: 13.5px !important;
-    }
-    .nav-logo svg {
-      width: 26px !important;
-      height: 26px !important;
-    }
-    .call-btn {
-      padding: 5px 7px !important;
-      font-size: 10.5px !important;
-      border-radius: 8px !important;
-    }
-    .animated-login-btn {
-      padding: 5px 7px !important;
-      font-size: 10.5px !important;
-      border-radius: 8px !important;
-    }
-    .hamburger-btn {
-      width: 34px !important;
-      height: 30px !important;
     }
     .hamburger-btn svg {
       width: 20px !important;
@@ -131,48 +196,91 @@
     .nav-logo .accent {
       display: none !important;
     }
+    .call-btn {
+      padding: 5px 8px !important;
+      font-size: 10.5px !important;
+    }
+    .hamburger-btn {
+      width: 34px !important;
+      height: 30px !important;
+    }
+  }
+
+  /* 🌟 Popup Menu Card Floating Overlay Styling */
+  .mobile-nav-overlay {
+    position: fixed !important;
+    inset: 0 !important;
+    background: rgba(4, 7, 15, 0.72) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    z-index: 10000000 !important;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.25s ease !important;
+  }
+  .mobile-nav-overlay.active {
+    display: block !important;
+    opacity: 1 !important;
   }
 
   .mobile-nav-drawer {
-    display: none;
-    position: absolute;
-    top: 100%;
-    right: 20px;
-    width: 320px;
-    background: linear-gradient(145deg, rgba(15, 23, 42, 0.96), rgba(30, 41, 59, 0.96));
-    border: 1px solid rgba(255, 122, 26, 0.4);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border-radius: 16px;
-    padding: 16px;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 30px rgba(255, 107, 0, 0.2);
-    z-index: 9999;
-    flex-direction: column;
-    gap: 6px;
-    opacity: 0;
-    transform: translateY(-10px);
-    transition: opacity 0.3s ease, transform 0.3s ease;
+    position: fixed !important;
+    top: 0 !important;
+    right: 0 !important;
+    width: min(320px, 86vw) !important;
+    height: 100vh !important;
+    max-height: 100vh !important;
+    background: #080f1e !important;
+    border-left: 2px solid #ff7a1a !important;
+    border-top: none !important;
+    border-bottom: none !important;
+    border-right: none !important;
+    border-radius: 0 !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    padding: 22px 16px !important;
+    box-shadow: -10px 0 45px rgba(0, 0, 0, 0.95), 0 0 25px rgba(255, 122, 26, 0.3) !important;
+    z-index: 10000001 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 6px !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    box-sizing: border-box !important;
+    transform: translateX(110%) !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease, visibility 0.25s ease !important;
   }
   .mobile-nav-drawer.active {
-    display: flex !important;
+    transform: translateX(0) !important;
     opacity: 1 !important;
-    transform: translateY(0) !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
   }
   .mobile-nav-drawer a {
-    color: #f8fafc;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 13.5px;
-    padding: 9px 12px;
-    border-radius: 10px;
-    transition: background 0.2s ease, color 0.2s ease;
-    display: flex;
-    align-items: center;
-    gap: 8px;
+    color: #f8fafc !important;
+    text-decoration: none !important;
+    font-weight: 600 !important;
+    font-size: 13.5px !important;
+    padding: 10px 12px !important;
+    min-height: 44px !important;
+    border-radius: 10px !important;
+    transition: all 0.15s ease !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    touch-action: manipulation !important;
   }
-  .mobile-nav-drawer a:hover {
-    background: rgba(255, 122, 26, 0.18);
-    color: #ff9e00;
+  .mobile-nav-drawer a:hover,
+  .mobile-nav-drawer a:active {
+    background: rgba(255, 122, 26, 0.18) !important;
+    color: #ff9e00 !important;
+    border-color: rgba(255, 122, 26, 0.4) !important;
+    transform: translateX(3px);
   }
 </style>
 {% block extra_style %}{% endblock %}
@@ -194,22 +302,29 @@
     </a>
     <div class="nav-links">
       <a href="{% url 'home' %}">Home</a>
+      <a href="{% url 'home' %}#booking">Book Transport</a>
       <a href="{% url 'services' %}">Services</a>
-      <a href="{% url 'home' %}#booking">Booking</a>
+      <a href="{% url 'social:feed' %}">Social</a>
       <a href="{% url 'about' %}">About Us</a>
       <a href="{% url 'contact_us' %}">Contact</a>
-      <a href="{% url 'pickupwala:player' %}" title="Pickupwala Radio 📻" style="color: #ffb870; font-weight: 700; font-size: 13.5px; padding: 4px 10px; background: rgba(255, 184, 112, 0.18); border: 1.5px solid rgba(255, 184, 112, 0.5); border-radius: 8px; display: inline-flex; align-items: center; gap: 5px;" class="radio-emoji-link">📻 Pickup Radio</a>
     </div>
     <div class="nav-right-actions">
-      <a href="tel:+916264588894" class="call-btn"><span class="phone-shake">📞</span> Call Now</a>
+      <a href="tel:+917489297841" class="call-btn"><span class="phone-shake">📞</span> Call Now</a>
 
       {% if not user.is_authenticated %}
         <a href="{% url 'login' %}" class="animated-login-btn">
-          <span>🔑</span> Login
+          <span>🔑</span> Login / Sign Up
         </a>
       {% else %}
         <div class="user-badge-glowing">
-          <span>👤</span> <strong style="color:#ffffff;">{{ user.first_name|default:user.username }}</strong>
+          <a href="{% url 'user_dashboard' %}" style="text-decoration: none; color: inherit; display: inline-flex; align-items: center; gap: 5px;">
+            <span>👤</span> <strong style="color:#ffffff; max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: inline-block; vertical-align: middle;">{{ user.first_name|default:user.username }}</strong>
+            {% if user.is_staff or user.is_superuser %}
+              <span style="background: #ffd700; color: #000; font-size: 9px; padding: 1px 4px; border-radius: 4px; font-weight: 900;">ADMIN</span>
+            {% else %}
+              <span style="background: rgba(56, 189, 248, 0.2); color: #38bdf8; font-size: 9px; padding: 1px 4px; border-radius: 4px; font-weight: 700;">USER</span>
+            {% endif %}
+          </a>
           <form method="post" action="{% url 'logout' %}" style="display: inline; margin-left: 4px;">
             {% csrf_token %}
             <button type="submit" style="background: rgba(239, 68, 68, 0.25); border: 1px solid #ef4444; color: #fca5a5; padding: 2px 8px; border-radius: 8px; font-size: 11px; cursor: pointer; font-weight: bold;" title="Logout">
@@ -219,11 +334,11 @@
         </div>
       {% endif %}
 
-      <button class="hamburger-btn" id="hamburgerBtn" onclick="toggleMobileMenu(event)" aria-label="Toggle Navigation Menu">
-        <svg width="24" height="18" viewBox="0 0 24 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <rect y="0" width="24" height="3" rx="1.5" fill="#FFFFFF"/>
-          <rect y="7.5" width="24" height="3" rx="1.5" fill="#FFFFFF"/>
-          <rect y="15" width="24" height="3" rx="1.5" fill="#FFFFFF"/>
+      <button class="hamburger-btn" id="hamburgerBtn" onclick="toggleMobileMenu(event)" aria-label="Toggle Navigation Menu" title="Open Navigation Menu" style="cursor: pointer; position: relative; z-index: 10001; pointer-events: auto; display: inline-flex; align-items: center; justify-content: center; padding: 0; width: 36px; height: 34px; min-width: 36px;">
+        <svg width="20" height="15" viewBox="0 0 24 18" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: block; pointer-events: none;">
+          <rect y="0" width="24" height="2.8" rx="1.4" fill="#FFFFFF"/>
+          <rect y="7.6" width="24" height="2.8" rx="1.4" fill="#FFFFFF"/>
+          <rect y="15.2" width="24" height="2.8" rx="1.4" fill="#FFFFFF"/>
         </svg>
       </button>
     </div>
@@ -232,30 +347,58 @@
   <!-- Dark Backdrop Overlay (Closes menu on outside click) -->
   <div class="mobile-nav-overlay" id="mobileNavOverlay" onclick="closeMobileMenu()"></div>
 
-  <!-- 60% Width Responsive Side Drawer Navigation Menu -->
+  <!-- Floating Side Drawer Navigation Menu Popup Card -->
   <div class="mobile-nav-drawer" id="mobileNavDrawer">
-    <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 6px;">
-      <div style="font-size: 11px; font-weight: 800; letter-spacing: 1.5px; color: #ff7a1a; text-transform: uppercase;">📍 Navigation Menu</div>
-      <button onclick="closeMobileMenu()" aria-label="Close Menu" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #ffffff; width: 28px; height: 28px; border-radius: 50%; font-size: 14px; display: flex; align-items: center; justify-content: center; cursor: pointer;">✕</button>
+    <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.12); margin-bottom: 6px;">
+      <div style="font-size: 13px; font-weight: 800; letter-spacing: 1px; color: #ff7a1a;">Navigation Menu</div>
+      <button onclick="closeMobileMenu()" aria-label="Close Menu" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #ffffff; width: 28px; height: 28px; border-radius: 50%; font-size: 14px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background 0.2s ease;">✕</button>
     </div>
 
-    <div style="font-size: 11px; font-weight: 800; letter-spacing: 1.5px; color: #ff7a1a; padding: 4px 6px 2px; text-transform: uppercase;">📍 Main Pages</div>
+    {% if user.is_staff or user.is_superuser %}
+      <a href="{% url 'dashboard' %}" onclick="closeMobileMenu()" style="color: #00f2fe !important; font-weight: 800 !important; background: rgba(0, 242, 254, 0.2) !important; border: 1.5px solid rgba(0, 242, 254, 0.5) !important; margin-bottom: 6px;">
+        👑 Open Admin Dashboard
+      </a>
+    {% endif %}
+
+    <div style="font-size: 11px; font-weight: 800; letter-spacing: 1.2px; color: #ff7a1a; padding: 2px 4px 4px; text-transform: uppercase;">📍 Main Pages</div>
     <a href="{% url 'home' %}" onclick="closeMobileMenu()">🏠 Home</a>
-    <a href="{% url 'services' %}" onclick="closeMobileMenu()">🛠️ Services</a>
     <a href="{% url 'home' %}#booking" onclick="closeMobileMenu()">📦 Book Transport</a>
-    <a href="{% url 'pickupwala:player' %}" onclick="closeMobileMenu()" style="color: #ffb870; font-weight: 800; background: rgba(255, 184, 112, 0.16) !important; border: 1.5px solid rgba(255, 184, 112, 0.45) !important;">📻 Pickupwala Radio</a>
+    <a href="{% url 'status' %}" onclick="closeMobileMenu()">🔍 Track Booking</a>
+
+    {% if user.is_authenticated %}
+      <a href="{% url 'user_dashboard' %}#my-bookings" onclick="closeMobileMenu()" style="color: #38bdf8; font-weight: 700;">📋 My Bookings</a>
+      <a href="{% url 'user_dashboard' %}" onclick="closeMobileMenu()" style="color: #38bdf8; font-weight: 700;">📊 User Dashboard</a>
+    {% endif %}
+
+    <a href="{% url 'services' %}" onclick="closeMobileMenu()">🛠️ Services</a>
+    <a href="{% url 'social:feed' %}" onclick="closeMobileMenu()">🌐 Ghidora Social</a>
+    <a href="{% url 'pickupwala:player' %}" onclick="closeMobileMenu()">📻 Pickupwala Radio</a>
     <a href="{% url 'about' %}" onclick="closeMobileMenu()">ℹ️ About Us</a>
     <a href="{% url 'contact_us' %}" onclick="closeMobileMenu()">🕿 Contact Us</a>
 
     <div style="height: 1px; background: rgba(255, 255, 255, 0.1); margin: 6px 0;"></div>
 
-    <div style="font-size: 11px; font-weight: 800; letter-spacing: 1.5px; color: #00d2ff; padding: 4px 6px 2px; text-transform: uppercase;">⚡ Special Features & Tools</div>
-    <a href="{% url 'pickupwala:player' %}" onclick="closeMobileMenu()" style="color: #ffb870; font-weight: 800; background: rgba(255, 184, 112, 0.16) !important; border: 1.5px solid rgba(255, 184, 112, 0.45) !important;">🚚 Pickupwala Radio & Music FM 📻</a>
-    <a href="{% url 'occasions_dashboard' %}" onclick="closeMobileMenu()" style="color: #00f2fe; font-weight: 700;">🎉 Smart Occasions Dashboard</a>
-    <a href="{% url 'home' %}#360-viewer" onclick="closeMobileMenu()" style="color: #ff9e00; font-weight: 700;">🏎️ 360° Vehicle View</a>
+    <div style="font-size: 11px; font-weight: 800; letter-spacing: 1.2px; color: #00d2ff; padding: 2px 4px 4px; text-transform: uppercase;">⚡ Special Features & Tools</div>
+    <a href="{% url 'social:feed' %}" onclick="closeMobileMenu()" style="color: #00d2ff; font-weight: 700;">🌐 Ghidora Social Network 🚀</a>
+    <a href="{% url 'pickupwala:player' %}" onclick="closeMobileMenu()">🚚 Pickupwala Radio & Music FM 📻</a>
+    <a href="{% url 'home' %}#360-viewer" onclick="closeMobileMenu()">🏎️ 360° Vehicle View</a>
     <a href="{% url 'quotations:quote_request' %}" onclick="closeMobileMenu()">💰 Check Fare & Rate Quote</a>
     <a href="{% url 'business_card' %}" onclick="closeMobileMenu()">🪪 Digital Business Card</a>
-    <a href="{% url 'status' %}" onclick="closeMobileMenu()">💳 Check Booking Status & Payment</a>
+    <a href="{% url 'game' %}" onclick="closeMobileMenu()" style="color: #ff9142; font-weight: 800; background: linear-gradient(135deg, rgba(255, 123, 0, 0.22), rgba(255, 145, 66, 0.1)) !important; border: 1.5px solid rgba(255, 123, 0, 0.5) !important; border-radius: 10px; margin-top: 4px; box-shadow: 0 0 14px rgba(255, 123, 0, 0.25);">🎮 Cargo Mission Game <span style="margin-left: auto; background: #ff7b00; color: #fff; font-size: 9px; padding: 2px 7px; border-radius: 6px; font-weight: 900;">PLAY NOW</span></a>
+
+    {% if not user.is_authenticated %}
+      <div style="height: 1px; background: rgba(255, 255, 255, 0.1); margin: 6px 0;"></div>
+      <a href="{% url 'login' %}" onclick="closeMobileMenu()" style="background: linear-gradient(135deg, rgba(255, 122, 26, 0.25), rgba(255, 122, 26, 0.15)) !important; border-color: #ff7a1a !important; color: #ff9e00 !important; font-weight: 800;">🔑 Login / Sign Up</a>
+    {% else %}
+      <div style="height: 1px; background: rgba(255, 255, 255, 0.1); margin: 6px 0;"></div>
+      <div style="display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; background: rgba(255,122,26,0.12); border-radius: 8px;">
+        <a href="{% url 'user_dashboard' %}" onclick="closeMobileMenu()" style="color: #4ade80 !important; font-weight: 700; text-decoration: none;">👤 {{ user.first_name|default:user.username }}</a>
+        <form method="post" action="{% url 'logout' %}" style="margin:0;">
+          {% csrf_token %}
+          <button type="submit" style="background:#ef4444; color:#fff; border:none; padding:3px 8px; border-radius:6px; font-size:11px; cursor:pointer;">Logout</button>
+        </form>
+      </div>
+    {% endif %}
   </div>
 
   <!-- ===== Page-specific content goes here ===== -->
@@ -265,56 +408,75 @@
     function callNow() {
       let confirmCall = confirm("Kya aap Ghidora Transport ko call karna chahte hain?");
       if (confirmCall) {
-        window.location.href = "tel:+916264588894";
+        window.location.href = "tel:+917489297841";
       }
     }
 
-    window.toggleMobileMenu = function(event) {
-      if (event) {
-        try { event.preventDefault(); } catch(e){}
-        try { event.stopPropagation(); } catch(e){}
+    window.toggleMobileMenu = function(e) {
+      if (e) {
+        try { e.preventDefault(); } catch(err){}
+        try { e.stopPropagation(); } catch(err){}
+        try { if (e.stopImmediatePropagation) e.stopImmediatePropagation(); } catch(err){}
       }
-      var drawer = document.getElementById('mobileNavDrawer');
-      var overlay = document.getElementById('mobileNavOverlay');
-      var btn = document.getElementById('hamburgerBtn');
-      if (!drawer) return;
+      var d = document.getElementById('mobileNavDrawer');
+      var o = document.getElementById('mobileNavOverlay');
+      var b = document.getElementById('hamburgerBtn');
+      if (!d) return;
 
-      var isVisible = drawer.classList.contains('active');
+      var isCurrentlyOpen = d.classList.contains('active') || (d.style.display && d.style.display !== 'none');
 
-      if (isVisible) {
+      if (isCurrentlyOpen) {
         window.closeMobileMenu();
       } else {
-        drawer.classList.add('active');
-        if (overlay) overlay.classList.add('active');
-        if (btn) btn.classList.add('active');
-        document.body.style.overflow = 'hidden';
+        d.classList.add('active');
+        d.style.setProperty('display', 'flex', 'important');
+        d.style.setProperty('visibility', 'visible', 'important');
+        d.style.setProperty('opacity', '1', 'important');
+        d.style.setProperty('pointer-events', 'auto', 'important');
+        d.style.setProperty('transform', 'translateY(0) scale(1)', 'important');
+
+        if (o) {
+          o.classList.add('active');
+          o.style.setProperty('display', 'block', 'important');
+          o.style.setProperty('visibility', 'visible', 'important');
+          o.style.setProperty('opacity', '1', 'important');
+          o.style.setProperty('pointer-events', 'auto', 'important');
+        }
+        if (b) b.classList.add('active');
       }
     };
 
     window.closeMobileMenu = function() {
-      var drawer = document.getElementById('mobileNavDrawer');
-      var overlay = document.getElementById('mobileNavOverlay');
-      var btn = document.getElementById('hamburgerBtn');
-      if (drawer) drawer.classList.remove('active');
-      if (overlay) overlay.classList.remove('active');
-      if (btn) btn.classList.remove('active');
-      document.body.style.overflow = '';
+      var d = document.getElementById('mobileNavDrawer');
+      var o = document.getElementById('mobileNavOverlay');
+      var b = document.getElementById('hamburgerBtn');
+      if (d) {
+        d.classList.remove('active');
+        d.style.setProperty('display', 'none', 'important');
+        d.style.setProperty('visibility', 'hidden', 'important');
+        d.style.setProperty('opacity', '0', 'important');
+        d.style.setProperty('pointer-events', 'none', 'important');
+        d.style.setProperty('transform', 'translateY(-8px) scale(0.96)', 'important');
+      }
+      if (o) {
+        o.classList.remove('active');
+        o.style.setProperty('display', 'none', 'important');
+        o.style.setProperty('visibility', 'hidden', 'important');
+        o.style.setProperty('opacity', '0', 'important');
+        o.style.setProperty('pointer-events', 'none', 'important');
+      }
+      if (b) b.classList.remove('active');
     };
 
-    document.addEventListener('DOMContentLoaded', function() {
-      var btn = document.getElementById('hamburgerBtn');
-      if (btn) {
-        btn.onclick = function(e) {
-          window.toggleMobileMenu(e);
-        };
-      }
-    });
-
     document.addEventListener('click', function(e) {
-      var drawer = document.getElementById('mobileNavDrawer');
-      var btn = document.getElementById('hamburgerBtn');
-      if (drawer && drawer.classList.contains('active')) {
-        if (!drawer.contains(e.target) && (!btn || !btn.contains(e.target))) {
+      var d = document.getElementById('mobileNavDrawer');
+      if (!d) return;
+
+      var isDrawerActive = d.classList.contains('active') || (d.style.display && d.style.display !== 'none');
+      if (isDrawerActive) {
+        var clickedInsideDrawer = e.target && (d.contains(e.target) || (e.target.closest && e.target.closest('#mobileNavDrawer')));
+        var clickedOnBtn = e.target && (e.target.closest && (e.target.closest('#hamburgerBtn') || e.target.closest('.hamburger-btn')));
+        if (!clickedInsideDrawer && !clickedOnBtn) {
           window.closeMobileMenu();
         }
       }
@@ -322,6 +484,642 @@
   </script>
 
   {% block extra_script %}{% endblock %}
+
+  <!-- ==========================================================================
+       GHIDORA TRANSPORT FOOTER (MULTICOLUMN MODERN DARK THEME)
+       ========================================================================== -->
+  <style>
+  .ghidora-footer {
+    background: #0b0e14 !important;
+    color: #cbd5e1 !important;
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif !important;
+    position: relative !important;
+    z-index: 10 !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+    margin-top: 50px !important;
+  }
+
+  .ghidora-footer-container {
+    max-width: 1240px !important;
+    margin: 0 auto !important;
+    padding: 60px 20px 40px !important;
+    display: grid !important;
+    grid-template-columns: 2.2fr 1.1fr 1.3fr 1.5fr 1.2fr !important;
+    gap: 32px !important;
+    box-sizing: border-box !important;
+  }
+
+  .gf-col {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .gf-title {
+    font-family: 'Plus Jakarta Sans', sans-serif !important;
+    font-size: 15px !important;
+    font-weight: 800 !important;
+    color: #FF5500 !important;
+    letter-spacing: 1px !important;
+    margin-bottom: 20px !important;
+    text-transform: uppercase !important;
+  }
+
+  /* Brand Column */
+  .gf-logo-wrap {
+    margin-bottom: 12px !important;
+    max-width: 260px !important;
+  }
+
+  .gf-logo-svg {
+    width: 100% !important;
+    height: auto !important;
+    display: block !important;
+  }
+
+  .gf-tagline {
+    font-weight: 800 !important;
+    font-size: 14px !important;
+    color: #FF5500 !important;
+    letter-spacing: 1.5px !important;
+    margin-bottom: 12px !important;
+  }
+
+  .gf-desc {
+    font-size: 13.5px !important;
+    line-height: 1.6 !important;
+    color: #94a3b8 !important;
+    margin-bottom: 20px !important;
+    max-width: 290px !important;
+  }
+
+  .gf-address-box {
+    display: flex !important;
+    align-items: flex-start !important;
+    gap: 10px !important;
+    font-size: 13px !important;
+    color: #cbd5e1 !important;
+    line-height: 1.5 !important;
+  }
+
+  .gf-icon-pin {
+    width: 20px !important;
+    height: 20px !important;
+    flex-shrink: 0 !important;
+    margin-top: 2px !important;
+  }
+
+  /* Lists */
+  .gf-links-list,
+  .gf-services-list,
+  .gf-contact-list {
+    list-style: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 10px !important;
+  }
+
+  .gf-links-list a {
+    color: #94a3b8 !important;
+    text-decoration: none !important;
+    font-size: 13.5px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    transition: all 0.2s ease !important;
+  }
+
+  .gf-links-list a:hover {
+    color: #ffffff !important;
+    transform: translateX(4px) !important;
+  }
+
+  .gf-chevron {
+    color: #FF5500 !important;
+    font-weight: bold !important;
+    font-size: 16px !important;
+    line-height: 1 !important;
+  }
+
+  .gf-services-list li {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    font-size: 13.5px !important;
+    color: #cbd5e1 !important;
+  }
+
+  .gf-svc-icon {
+    width: 18px !important;
+    height: 18px !important;
+    flex-shrink: 0 !important;
+  }
+
+  /* Contact Column */
+  .gf-contact-list li a {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    font-size: 13.5px !important;
+    color: #cbd5e1 !important;
+    text-decoration: none !important;
+    transition: color 0.2s ease !important;
+  }
+
+  .gf-contact-list li a:hover {
+    color: #FF5500 !important;
+  }
+
+  .gf-cnt-icon {
+    width: 18px !important;
+    height: 18px !important;
+    flex-shrink: 0 !important;
+  }
+
+  .gf-divider {
+    border: 0 !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+    margin: 16px 0 !important;
+  }
+
+  .gf-hours-box {
+    display: flex !important;
+    align-items: flex-start !important;
+    gap: 10px !important;
+    font-size: 12.5px !important;
+    color: #94a3b8 !important;
+    line-height: 1.5 !important;
+  }
+
+  /* Follow Us Column */
+  .gf-social-grid {
+    display: grid !important;
+    grid-template-columns: repeat(3, 44px) !important;
+    gap: 10px !important;
+    margin-bottom: 14px !important;
+  }
+
+  .gf-soc-btn {
+    width: 44px !important;
+    height: 44px !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-radius: 10px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    color: #cbd5e1 !important;
+    text-decoration: none !important;
+    transition: all 0.2s ease !important;
+  }
+
+  .gf-soc-btn svg {
+    width: 20px !important;
+    height: 20px !important;
+  }
+
+  .gf-soc-btn:hover {
+    background: #FF5500 !important;
+    border-color: #FF5500 !important;
+    color: #ffffff !important;
+    transform: translateY(-3px) !important;
+    box-shadow: 0 6px 20px rgba(255, 85, 0, 0.4) !important;
+  }
+
+  .gf-handle {
+    font-weight: 700 !important;
+    font-size: 14px !important;
+    color: #FF5500 !important;
+    margin-bottom: 6px !important;
+  }
+
+  .gf-follow-desc {
+    font-size: 12.5px !important;
+    color: #94a3b8 !important;
+    line-height: 1.5 !important;
+  }
+
+  /* Bottom Bar Strip */
+  .gf-bottom-bar {
+    background: #07090e !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.06) !important;
+    padding: 24px 0 !important;
+  }
+
+  .gf-bottom-container {
+    max-width: 1240px !important;
+    margin: 0 auto !important;
+    padding: 0 20px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 20px !important;
+    flex-wrap: wrap !important;
+    box-sizing: border-box !important;
+  }
+
+  .gf-bottom-left p {
+    font-size: 13px !important;
+    color: #94a3b8 !important;
+    margin: 0 !important;
+  }
+
+  .gf-slogan {
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    color: #FF5500 !important;
+    margin-top: 2px !important;
+  }
+
+  .gf-bottom-center {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 6px !important;
+  }
+
+  .gf-btn-book {
+    background: linear-gradient(135deg, #FF5500 0%, #FF2200 100%) !important;
+    color: #ffffff !important;
+    padding: 12px 28px !important;
+    border-radius: 30px !important;
+    font-weight: 800 !important;
+    font-size: 15px !important;
+    text-decoration: none !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    box-shadow: 0 4px 20px rgba(255, 85, 0, 0.4) !important;
+    transition: all 0.2s ease !important;
+    letter-spacing: 0.5px !important;
+  }
+
+  .gf-btn-book svg {
+    width: 20px !important;
+    height: 20px !important;
+  }
+
+  .gf-btn-book:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 30px rgba(255, 85, 0, 0.6) !important;
+    color: #ffffff !important;
+  }
+
+  .gf-book-subtext {
+    font-size: 11.5px !important;
+    color: #94a3b8 !important;
+    margin: 0 !important;
+    letter-spacing: 0.3px !important;
+  }
+
+  .gf-bottom-right {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-end !important;
+    gap: 6px !important;
+    padding-right: 85px !important;
+  }
+
+  .gf-legal-links {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    font-size: 13px !important;
+    color: #94a3b8 !important;
+  }
+
+  .gf-legal-links a {
+    color: #cbd5e1 !important;
+    text-decoration: none !important;
+    transition: color 0.2s ease !important;
+  }
+
+  .gf-legal-links a:hover {
+    color: #FF5500 !important;
+  }
+
+  .gf-credit {
+    font-size: 12px !important;
+    color: #94a3b8 !important;
+    margin: 0 !important;
+  }
+
+  .gf-credit a.gf-dev-link {
+    color: #94a3b8 !important;
+    text-decoration: none !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 5px !important;
+    transition: all 0.25s ease !important;
+    cursor: pointer !important;
+  }
+
+  .gf-credit a.gf-dev-link:hover {
+    color: #ffffff !important;
+  }
+
+  .gf-credit a.gf-dev-link .gf-dev-prefix {
+    color: #94a3b8 !important;
+    transition: color 0.25s ease !important;
+  }
+
+  .gf-credit a.gf-dev-link:hover .gf-dev-prefix {
+    color: #cbd5e1 !important;
+  }
+
+  .gf-credit a.gf-dev-link .gf-dev-name {
+    color: #FF5500 !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.4px !important;
+    transition: all 0.25s ease !important;
+    text-decoration: underline !important;
+    text-decoration-color: rgba(255, 85, 0, 0.4) !important;
+    text-underline-offset: 3px !important;
+  }
+
+  .gf-credit a.gf-dev-link:hover .gf-dev-name {
+    color: #ff8533 !important;
+    text-decoration-color: #ff8533 !important;
+    text-shadow: 0 0 12px rgba(255, 85, 0, 0.45) !important;
+  }
+
+  .gf-credit a.gf-dev-link .gf-dev-icon {
+    width: 12px !important;
+    height: 12px !important;
+    color: #FF5500 !important;
+    transition: transform 0.25s ease, color 0.25s ease !important;
+    flex-shrink: 0 !important;
+  }
+
+  .gf-credit a.gf-dev-link:hover .gf-dev-icon {
+    transform: translate(2px, -2px) !important;
+    color: #ff8533 !important;
+  }
+
+  /* Floating WhatsApp Button */
+  .gf-floating-whatsapp {
+    position: fixed !important;
+    bottom: 28px !important;
+    right: 28px !important;
+    width: 58px !important;
+    height: 58px !important;
+    border-radius: 50% !important;
+    background: linear-gradient(135deg, #FF5500 0%, #FF2200 100%) !important;
+    color: #ffffff !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-shadow: 0 6px 25px rgba(255, 85, 0, 0.5) !important;
+    z-index: 990 !important;
+    text-decoration: none !important;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+  }
+
+  .gf-floating-whatsapp svg {
+    width: 32px !important;
+    height: 32px !important;
+  }
+
+  .gf-floating-whatsapp:hover {
+    transform: scale(1.12) rotate(6deg) !important;
+    box-shadow: 0 10px 35px rgba(255, 85, 0, 0.7) !important;
+    color: #ffffff !important;
+  }
+
+  /* Responsive Footer Layout */
+  @media (max-width: 1200px) {
+    .ghidora-footer-container {
+      grid-template-columns: 2fr 1fr 1fr 1.2fr 1fr !important;
+      gap: 24px !important;
+    }
+  }
+
+  @media (max-width: 992px) {
+    .ghidora-footer-container {
+      grid-template-columns: 1fr 1fr 1fr !important;
+      gap: 32px !important;
+    }
+    .gf-col-brand {
+      grid-column: span 3 !important;
+    }
+    .gf-bottom-container {
+      flex-direction: column !important;
+      text-align: center !important;
+    }
+    .gf-bottom-right {
+      align-items: center !important;
+      padding-right: 0 !important;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .ghidora-footer-container {
+      grid-template-columns: 1fr !important;
+      gap: 36px !important;
+    }
+    .gf-col-brand {
+      grid-column: span 1 !important;
+    }
+    .gf-social-grid {
+      grid-template-columns: repeat(6, 40px) !important;
+    }
+  }
+  </style>
+
+  <footer class="ghidora-footer">
+    <div class="ghidora-footer-container">
+      
+      <!-- Column 1: Brand & Address -->
+      <div class="gf-col gf-col-brand">
+        <div class="gf-logo-wrap" style="margin-bottom: 16px;">
+          <a href="{% url 'home' %}" style="display: inline-flex; align-items: center; gap: 14px; text-decoration: none;">
+            <img src="{% static 'images/logo6.png' %}" alt="Ghidora Transport Logo" style="height: 52px; width: auto; max-width: 120px; object-fit: contain; filter: drop-shadow(0 2px 8px rgba(0,0,0,0.5)); display: block;">
+            <div style="display: flex; flex-direction: column; justify-content: center;">
+              <span style="font-family: 'Syne', 'Plus Jakarta Sans', sans-serif; font-weight: 900; font-size: 24px; color: #FFFFFF; letter-spacing: 1px; line-height: 1;">GHIDORA</span>
+              <span style="font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; font-size: 13px; color: #FF5500; letter-spacing: 3.5px; margin-top: 4px; line-height: 1;">TRANSPORT</span>
+            </div>
+          </a>
+        </div>
+        <p class="gf-tagline">SAFE. FAST. RELIABLE.</p>
+        <p class="gf-desc">
+          Ghidora Transport is your trusted partner for pickup and goods transportation services. We deliver your goods safely and on time, every time.
+        </p>
+        <div class="gf-address-box">
+          <svg class="gf-icon-pin" viewBox="0 0 24 24" fill="none" stroke="#FF5500" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+            <circle cx="12" cy="10" r="3"></circle>
+          </svg>
+          <span>Kodebod, Tehsil Kurud, Dhamtari, Chhattisgarh - 493663, India</span>
+        </div>
+      </div>
+
+      <!-- Column 2: NAVIGATE -->
+      <div class="gf-col gf-col-nav">
+        <h4 class="gf-title">NAVIGATE</h4>
+        <ul class="gf-links-list">
+          <li><a href="{% url 'home' %}"><span class="gf-chevron">&rsaquo;</span> Home</a></li>
+          <li><a href="{% url 'services' %}"><span class="gf-chevron">&rsaquo;</span> Services</a></li>
+          <li><a href="{% url 'home' %}#booking"><span class="gf-chevron">&rsaquo;</span> Book Now</a></li>
+          <li><a href="{% url 'status' %}"><span class="gf-chevron">&rsaquo;</span> Track Booking</a></li>
+          <li><a href="{% url 'about' %}"><span class="gf-chevron">&rsaquo;</span> About Us</a></li>
+          <li><a href="{% url 'home' %}#360-viewer"><span class="gf-chevron">&rsaquo;</span> Vehicles</a></li>
+          <li><a href="{% url 'quotations:quote_request' %}"><span class="gf-chevron">&rsaquo;</span> Pricing</a></li>
+          <li><a href="{% url 'home' %}#reviews"><span class="gf-chevron">&rsaquo;</span> Reviews</a></li>
+          <li><a href="{% url 'pickupwala:player' %}"><span class="gf-chevron">&rsaquo;</span> Pickup Radio</a></li>
+          <li><a href="{% url 'contact_us' %}"><span class="gf-chevron">&rsaquo;</span> Contact Us</a></li>
+          <li><a href="{% url 'contact_us' %}"><span class="gf-chevron">&rsaquo;</span> Careers</a></li>
+        </ul>
+      </div>
+
+      <!-- Column 3: SERVICES -->
+      <div class="gf-col gf-col-services">
+        <h4 class="gf-title">SERVICES</h4>
+        <ul class="gf-services-list">
+          <li>
+            <svg class="gf-svc-icon" viewBox="0 0 24 24" fill="none" stroke="#FF5500" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
+            <span>Goods Transportation</span>
+          </li>
+          <li>
+            <svg class="gf-svc-icon" viewBox="0 0 24 24" fill="none" stroke="#FF5500" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+            <span>House Shifting</span>
+          </li>
+          <li>
+            <svg class="gf-svc-icon" viewBox="0 0 24 24" fill="none" stroke="#FF5500" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
+            <span>Local Delivery</span>
+          </li>
+          <li>
+            <svg class="gf-svc-icon" viewBox="0 0 24 24" fill="none" stroke="#FF5500" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line></svg>
+            <span>Intercity Transport</span>
+          </li>
+          <li>
+            <svg class="gf-svc-icon" viewBox="0 0 24 24" fill="none" stroke="#FF5500" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+            <span>Bulk Cargo</span>
+          </li>
+          <li>
+            <svg class="gf-svc-icon" viewBox="0 0 24 24" fill="none" stroke="#FF5500" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+            <span>Express Delivery</span>
+          </li>
+          <li>
+            <svg class="gf-svc-icon" viewBox="0 0 24 24" fill="none" stroke="#FF5500" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+            <span>Warehousing</span>
+          </li>
+          <li>
+            <svg class="gf-svc-icon" viewBox="0 0 24 24" fill="none" stroke="#FF5500" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 16 12 12 8 16"></polyline><line x1="12" y1="12" x2="12" y2="21"></line><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"></path></svg>
+            <span>Packaging</span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Column 4: CONTACT -->
+      <div class="gf-col gf-col-contact">
+        <h4 class="gf-title">CONTACT</h4>
+        <ul class="gf-contact-list">
+          <li>
+            <a href="tel:+916266014139">
+              <svg class="gf-cnt-icon" viewBox="0 0 24 24" fill="none" stroke="#FF5500" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+              <span>+91 6266014139</span>
+            </a>
+          </li>
+          <li>
+            <a href="tel:+917489297841">
+              <svg class="gf-cnt-icon" viewBox="0 0 24 24" fill="none" stroke="#FF5500" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+              <span>+91 7489297841</span>
+            </a>
+          </li>
+          <li>
+            <a href="mailto:ghidoratransport@gmail.com">
+              <svg class="gf-cnt-icon" viewBox="0 0 24 24" fill="none" stroke="#FF5500" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+              <span>ghidoratransport@gmail.com</span>
+            </a>
+          </li>
+          <li>
+            <a href="https://ghidoratransport.onrender.com/" target="_blank" rel="noopener noreferrer">
+              <svg class="gf-cnt-icon" viewBox="0 0 24 24" fill="none" stroke="#FF5500" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+              <span>https://ghidoratransport.onrender.com/</span>
+            </a>
+          </li>
+          <li>
+            <a href="https://wa.me/916266014139?text=Hi%20Ghidora%20Transport%2C%20I%20want%20to%20inquire%20about%20your%20services!" target="_blank" rel="noopener noreferrer">
+              <svg class="gf-cnt-icon" viewBox="0 0 24 24" fill="#FF5500"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.006c.106.005.249-.04.39.298.144.347.491 1.2.534 1.287.043.087.072.188.014.304-.058.116-.087.188-.173.289l-.26.304c-.087.086-.177.18-.076.354.101.174.449.741.964 1.201.662.591 1.221.774 1.394.86.174.086.275.072.376-.043.101-.116.433-.506.549-.68.116-.173.231-.144.39-.086s1.011.477 1.184.564.289.13.332.202c.043.073.043.419-.101.824z"/></svg>
+              <span>WhatsApp Chat</span>
+            </a>
+          </li>
+        </ul>
+        <hr class="gf-divider">
+        <div class="gf-hours-box">
+          <svg class="gf-cnt-icon" viewBox="0 0 24 24" fill="none" stroke="#FF5500" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+          <div>
+            <p>Mon &ndash; Sun: Open 24 Hours</p>
+            <p>24/7 Transport &amp; Booking Service</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Column 5: FOLLOW US -->
+      <div class="gf-col gf-col-follow">
+        <h4 class="gf-title">FOLLOW US</h4>
+        <div class="gf-social-grid">
+          <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" class="gf-soc-btn" aria-label="Facebook">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+          </a>
+          <a href="https://www.instagram.com/ghidora__transport2286?stkn=c3Q0enVsbzl1dTB6" target="_blank" rel="noopener noreferrer" class="gf-soc-btn" aria-label="Instagram">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+          </a>
+          <a href="https://wa.me/916266014139?text=Hi%20Ghidora%20Transport%2C%20I%20want%20to%20connect!" target="_blank" rel="noopener noreferrer" class="gf-soc-btn" aria-label="WhatsApp">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.006c.106.005.249-.04.39.298.144.347.491 1.2.534 1.287.043.087.072.188.014.304-.058.116-.087.188-.173.289l-.26.304c-.087.086-.177.18-.076.354.101.174.449.741.964 1.201.662.591 1.221.774 1.394.86.174.086.275.072.376-.043.101-.116.433-.506.549-.68.116-.173.231-.144.39-.086s1.011.477 1.184.564.289.13.332.202c.043.073.043.419-.101.824z"/></svg>
+          </a>
+          <a href="https://www.linkedin.com/in/amit-kumar-sahu-980a4236b?utm_source=share_via&amp;utm_content=profile&amp;utm_medium=member_android" target="_blank" rel="noopener noreferrer" class="gf-soc-btn" aria-label="LinkedIn">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+          </a>
+          <a href="https://youtube.com/@ghidoratransport?si=NH43mylmjRGQ7iv4" target="_blank" rel="noopener noreferrer" class="gf-soc-btn" aria-label="YouTube">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+          </a>
+          <a href="https://x.com/GhidoraTransport" target="_blank" rel="noopener noreferrer" class="gf-soc-btn" aria-label="X / Twitter">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+          </a>
+        </div>
+        <p class="gf-handle">@GhidoraTransport</p>
+        <p class="gf-follow-desc">Stay connected with us for latest updates and offers.</p>
+      </div>
+
+    </div>
+
+    <!-- Bottom Bar Strip -->
+    <div class="gf-bottom-bar">
+      <div class="gf-bottom-container">
+        <div class="gf-bottom-left">
+          <p>© 2026 Ghidora Transport. All rights reserved.</p>
+          <p class="gf-slogan">Your Trust, Our Responsibility.</p>
+        </div>
+
+        <div class="gf-bottom-center">
+          <a href="{% url 'home' %}#booking" class="gf-btn-book">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+            <span>BOOK YOUR TRANSPORT NOW</span>
+          </a>
+          <p class="gf-book-subtext">Quick Booking &bull; Safe Delivery &bull; Best Prices</p>
+        </div>
+
+        <div class="gf-bottom-right">
+          <div class="gf-legal-links">
+            <a href="{% url 'about' %}">Privacy Policy</a>
+            <span>|</span>
+            <a href="{% url 'about' %}">Terms &amp; Conditions</a>
+            <span>|</span>
+            <a href="{% url 'home' %}">Sitemap</a>
+          </div>
+          <p class="gf-credit">
+            <a href="https://portfolio-website-delta-one-38.vercel.app/" target="_blank" rel="noopener noreferrer" class="gf-dev-link" title="Open Amit Kumar Sahu's Portfolio">
+              <span class="gf-dev-prefix">Built by</span>
+              <span class="gf-dev-name">AMIT KUMAR SAHU</span>
+              <svg class="gf-dev-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
+            </a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </footer>
 
   {% include "chatbot/widget.html" %}
 

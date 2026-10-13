@@ -5,425 +5,1420 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>About Us - Ghidora Transport</title>
-<link rel="stylesheet" href="{% static 'css/style.css' %}">
+<link rel="stylesheet" href="{% static 'css/style.css' %}?v=99002">
+
+<!-- Google Fonts & Font Awesome 6 for Sleek Professional Icons -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Inter:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
 <style>
-    body {
-        background: #0a0e17;
+    :root {
+        --bg-dark: #060911;
+        --card-bg: rgba(14, 21, 37, 0.75);
+        --card-border: rgba(255, 255, 255, 0.08);
+        --card-hover-border: rgba(0, 242, 254, 0.45);
+        --cyan: #00f2fe;
+        --blue: #4facfe;
+        --purple: #a855f7;
+        --glow-color: 0, 242, 254;
     }
 
-    .about-hero {
-        background: linear-gradient(135deg, #0a0e17 0%, #1a1f2e 100%);
-        padding: 80px 20px 60px;
-        text-align: center;
-        color: #fff;
+    * {
+        box-sizing: border-box;
     }
-    .about-hero h1 {
-        font-size: 42px;
+
+    body {
+        background: var(--bg-dark);
+        color: #e0e6f0;
+        font-family: 'Outfit', 'Inter', system-ui, sans-serif;
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        position: relative;
+        overflow-x: hidden;
+    }
+
+    /* ===== 3D CANVAS & AMBIENT GLOWING ORBS ===== */
+    #aboutBgCanvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: 0;
+        pointer-events: none;
+    }
+
+    .ambient-orb-1 {
+        position: fixed;
+        top: 6%;
+        left: 8%;
+        width: 380px;
+        height: 380px;
+        background: radial-gradient(circle, rgba(0, 242, 254, 0.32), rgba(0, 114, 255, 0.12) 60%, transparent 80%);
+        filter: blur(65px);
+        border-radius: 50%;
+        pointer-events: none;
+        z-index: 0;
+        animation: orbGlowFloat1 7s infinite ease-in-out;
+    }
+
+    .ambient-orb-2 {
+        position: fixed;
+        bottom: 10%;
+        right: 8%;
+        width: 440px;
+        height: 440px;
+        background: radial-gradient(circle, rgba(255, 0, 127, 0.28), rgba(121, 40, 202, 0.14) 60%, transparent 80%);
+        filter: blur(75px);
+        border-radius: 50%;
+        pointer-events: none;
+        z-index: 0;
+        animation: orbGlowFloat2 8s infinite ease-in-out;
+    }
+
+    @keyframes orbGlowFloat1 {
+        0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.5; }
+        50% { transform: translate(65px, -45px) scale(1.25); opacity: 0.85; }
+    }
+
+    @keyframes orbGlowFloat2 {
+        0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.45; }
+        50% { transform: translate(-55px, 50px) scale(1.3); opacity: 0.8; }
+    }
+
+    /* Content Wrapper */
+    .about-page-wrap {
+        position: relative;
+        z-index: 2;
+    }
+
+    /* Hero Section */
+    .about-hero {
+        padding: 85px 20px 50px;
+        text-align: center;
+        position: relative;
+    }
+
+    .about-hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 18px;
+        background: rgba(0, 242, 254, 0.1);
+        border: 1px solid rgba(0, 242, 254, 0.35);
+        border-radius: 30px;
+        font-size: 12px;
         font-weight: 700;
-        margin-bottom: 10px;
-        background: linear-gradient(90deg, #4facfe, #00f2fe);
+        color: var(--cyan);
+        letter-spacing: 1.2px;
+        text-transform: uppercase;
+        margin-bottom: 18px;
+        box-shadow: 0 0 20px rgba(0, 242, 254, 0.15);
+    }
+
+    .about-hero-badge .pulse-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--cyan);
+        box-shadow: 0 0 10px var(--cyan);
+        animation: pulseDot 1.5s infinite;
+    }
+
+    @keyframes pulseDot {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.35; transform: scale(0.75); }
+    }
+
+    .about-hero h1 {
+        font-size: clamp(32px, 5.5vw, 50px);
+        font-weight: 800;
+        margin: 0 0 14px;
+        background: linear-gradient(135deg, #ffffff 20%, var(--cyan) 70%, var(--blue) 100%);
         -webkit-background-clip: text;
         background-clip: text;
         -webkit-text-fill-color: transparent;
+        letter-spacing: -0.5px;
+        line-height: 1.2;
     }
+
     .about-hero p.tagline {
-        font-size: 18px;
-        color: #9aa5b8;
-    }
-
-    .about-section {
-        max-width: 1000px;
+        font-size: clamp(15px, 2.5vw, 19px);
+        color: #94a3b8;
+        max-width: 680px;
         margin: 0 auto;
-        padding: 50px 20px;
-        color: #e0e6f0;
-    }
-    .about-section h2 {
-        font-size: 28px;
-        margin-bottom: 15px;
-        color: #4facfe;
-    }
-    .about-section p {
-        line-height: 1.8;
-        font-size: 16px;
-        color: #b8c1d1;
-    }
-
-    .priority-list {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 15px;
-        margin-top: 20px;
-    }
-    .priority-list span {
-        background: rgba(79, 172, 254, 0.1);
-        border: 1px solid rgba(79, 172, 254, 0.3);
-        padding: 10px 18px;
-        border-radius: 30px;
-        font-size: 14px;
-        color: #4facfe;
-    }
-
-    .services-grid, .why-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-        gap: 20px;
-        margin-top: 30px;
-    }
-    .service-card, .why-card {
-        background: rgba(255, 255, 255, 0.04);
-        backdrop-filter: blur(12px);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 16px;
-        padding: 25px;
-        transition: transform 0.3s ease, border-color 0.3s ease;
-    }
-    .service-card:hover, .why-card:hover {
-        transform: translateY(-6px);
-        border-color: rgba(79, 172, 254, 0.4);
-    }
-    .service-card .icon, .why-card .icon {
-        font-size: 32px;
-        margin-bottom: 12px;
-        display: block;
-    }
-    .service-card h3, .why-card h3 {
-        font-size: 18px;
-        color: #fff;
-        margin-bottom: 8px;
-    }
-    .service-card p, .why-card p {
-        font-size: 14px;
-        color: #9aa5b8;
         line-height: 1.6;
     }
 
+    /* Main Content Sections */
+    .about-section {
+        max-width: 1040px;
+        margin: 0 auto 30px;
+        padding: 0 20px;
+    }
+
+    .about-intro-card {
+        background: var(--card-bg);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid var(--card-border);
+        border-radius: 20px;
+        padding: 32px 36px;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .about-intro-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+    }
+
+    .about-section h2 {
+        font-size: 26px;
+        font-weight: 800;
+        margin: 0 0 16px;
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .about-section h2 i {
+        color: var(--cyan);
+        font-size: 22px;
+    }
+
+    .about-section p {
+        line-height: 1.8;
+        font-size: 16px;
+        color: #cbd5e1;
+        margin: 0;
+    }
+
+    /* Priority / Core Value Pills */
+    .priority-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 24px;
+    }
+
+    .priority-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        background: rgba(15, 23, 42, 0.85);
+        border: 1px solid rgba(0, 242, 254, 0.25);
+        padding: 10px 20px;
+        border-radius: 30px;
+        font-size: 14px;
+        font-weight: 600;
+        color: #f1f5f9;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        transition: all 0.3s ease;
+    }
+
+    .priority-item:hover {
+        transform: translateY(-3px);
+        border-color: var(--cyan);
+        box-shadow: 0 8px 25px rgba(0, 242, 254, 0.25);
+    }
+
+    .priority-item i {
+        font-size: 15px;
+    }
+
+    /* Services & Why Grids */
+    .services-grid, .why-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+        gap: 22px;
+        margin-top: 24px;
+    }
+
+    .service-card, .why-card {
+        background: var(--card-bg);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid var(--card-border);
+        border-radius: 18px;
+        padding: 28px 24px;
+        transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+    }
+
+    .service-card:hover, .why-card:hover {
+        transform: translateY(-8px);
+        border-color: var(--card-hover-border);
+        box-shadow: 0 18px 40px rgba(0, 242, 254, 0.18);
+    }
+
+    /* Icon Capsules */
+    .icon-capsule {
+        width: 52px;
+        height: 52px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+        margin-bottom: 18px;
+        transition: transform 0.3s ease;
+    }
+
+    .service-card:hover .icon-capsule,
+    .why-card:hover .icon-capsule {
+        transform: scale(1.1) rotate(5deg);
+    }
+
+    .icon-capsule.cyan {
+        background: rgba(0, 242, 254, 0.14);
+        border: 1px solid rgba(0, 242, 254, 0.4);
+        color: var(--cyan);
+        box-shadow: 0 0 20px rgba(0, 242, 254, 0.25);
+    }
+
+    .icon-capsule.purple {
+        background: rgba(168, 85, 247, 0.14);
+        border: 1px solid rgba(168, 85, 247, 0.4);
+        color: var(--purple);
+        box-shadow: 0 0 20px rgba(168, 85, 247, 0.25);
+    }
+
+    .icon-capsule.blue {
+        background: rgba(59, 130, 246, 0.14);
+        border: 1px solid rgba(59, 130, 246, 0.4);
+        color: #60a5fa;
+        box-shadow: 0 0 20px rgba(59, 130, 246, 0.25);
+    }
+
+    .icon-capsule.amber {
+        background: rgba(245, 158, 11, 0.14);
+        border: 1px solid rgba(245, 158, 11, 0.4);
+        color: #fbbf24;
+        box-shadow: 0 0 20px rgba(245, 158, 11, 0.25);
+    }
+
+    .icon-capsule.emerald {
+        background: rgba(16, 185, 129, 0.14);
+        border: 1px solid rgba(16, 185, 129, 0.4);
+        color: #34d399;
+        box-shadow: 0 0 20px rgba(16, 185, 129, 0.25);
+    }
+
+    .service-card h3, .why-card h3 {
+        font-size: 19px;
+        font-weight: 700;
+        color: #ffffff;
+        margin: 0 0 10px;
+    }
+
+    .service-card p, .why-card p {
+        font-size: 14px;
+        color: #94a3b8;
+        line-height: 1.65;
+        margin: 0;
+    }
+
+    /* Tech Features Badges */
     .tech-features {
         display: flex;
         flex-wrap: wrap;
         gap: 12px;
-        margin-top: 20px;
-    }
-    .tech-features span {
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        padding: 8px 16px;
-        border-radius: 8px;
-        font-size: 14px;
-        color: #e0e6f0;
+        margin-top: 22px;
     }
 
+    .tech-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        background: rgba(255, 255, 255, 0.04);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 10px 18px;
+        border-radius: 12px;
+        font-size: 14px;
+        font-weight: 600;
+        color: #e2e8f0;
+        transition: all 0.25s ease;
+    }
+
+    .tech-pill:hover {
+        background: rgba(0, 242, 254, 0.08);
+        border-color: rgba(0, 242, 254, 0.4);
+        color: #ffffff;
+        transform: translateY(-2px);
+    }
+
+    .tech-pill i {
+        font-size: 15px;
+    }
+
+    /* Mission Vision Grid */
     .mission-vision-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-        gap: 20px;
-        margin-top: 20px;
-    }
-    .mv-card {
-        background: rgba(79, 172, 254, 0.06);
-        border: 1px solid rgba(79, 172, 254, 0.2);
-        border-radius: 16px;
-        padding: 30px;
-    }
-    .mv-card h3 {
-        color: #4facfe;
-        margin-bottom: 10px;
-        font-size: 20px;
+        gap: 22px;
+        margin-top: 24px;
     }
 
+    .mv-card {
+        background: rgba(14, 21, 37, 0.85);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(0, 242, 254, 0.22);
+        border-radius: 20px;
+        padding: 32px 28px;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .mv-card:hover {
+        transform: translateY(-6px);
+        border-color: var(--cyan);
+        box-shadow: 0 20px 45px rgba(0, 242, 254, 0.2);
+    }
+
+    .mv-card h3 {
+        color: var(--cyan);
+        margin: 0 0 14px;
+        font-size: 22px;
+        font-weight: 800;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .mv-card p {
+        color: #cbd5e1;
+        font-size: 15px;
+        line-height: 1.7;
+    }
+
+    /* Promise Box */
     .promise-box {
         text-align: center;
-        background: linear-gradient(135deg, rgba(79,172,254,0.1), rgba(0,242,254,0.05));
-        border: 1px solid rgba(79, 172, 254, 0.3);
-        border-radius: 20px;
-        padding: 40px;
+        background: linear-gradient(135deg, rgba(0, 242, 254, 0.12), rgba(168, 85, 247, 0.08));
+        backdrop-filter: blur(16px);
+        border: 1.5px solid rgba(0, 242, 254, 0.35);
+        border-radius: 24px;
+        padding: 44px 30px;
         margin-top: 20px;
-    }
-    .promise-box .quote {
-        font-size: 26px;
-        font-weight: 600;
-        color: #fff;
-        margin-bottom: 10px;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), 0 0 30px rgba(0, 242, 254, 0.15);
+        position: relative;
     }
 
+    .promise-box .quote {
+        font-size: clamp(22px, 4vw, 30px);
+        font-weight: 800;
+        color: #ffffff;
+        margin-bottom: 12px;
+        letter-spacing: -0.5px;
+    }
+
+    .promise-box .quote i {
+        color: var(--cyan);
+        font-size: 22px;
+        opacity: 0.7;
+    }
+
+    .promise-box p:last-child {
+        color: #94a3b8;
+        font-size: 16px;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    /* ===== OUR TEAM & INTERACTIVE PROFILE MODAL ===== */
     .team-section {
-        padding: 60px 20px;
-        text-align: center;
+        padding: 70px 20px !important;
+        background: rgba(8, 12, 20, 0.65) !important;
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border-top: 1px solid rgba(255, 255, 255, 0.06);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        color: #ffffff !important;
+        position: relative !important;
+        text-align: center !important;
+        z-index: 2;
     }
+
+    .team-section-title {
+        font-size: clamp(28px, 4vw, 36px) !important;
+        font-weight: 900 !important;
+        color: #38bdf8 !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 12px !important;
+        margin: 0 0 8px !important;
+    }
+
+    .team-section-subtitle {
+        color: #94a3b8 !important;
+        font-size: 14px !important;
+        margin: 0 0 45px !important;
+    }
+
     .team-grid {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 30px;
-        margin-top: 30px;
+        display: flex !important;
+        justify-content: center !important;
+        gap: 30px !important;
+        flex-wrap: wrap !important;
+        max-width: 1100px !important;
+        margin: 0 auto !important;
     }
+
     .team-card {
-        background: rgba(255, 255, 255, 0.04);
-        backdrop-filter: blur(12px);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 16px;
-        padding: 25px;
-        width: 220px;
-        transition: transform 0.3s ease;
+        background: rgba(18, 24, 38, 0.85) !important;
+        border: 1px solid rgba(255, 255, 255, 0.08) !important;
+        border-radius: 22px !important;
+        padding: 34px 26px !important;
+        width: 250px !important;
+        max-width: 250px !important;
+        box-sizing: border-box !important;
+        text-align: center !important;
+        cursor: pointer !important;
+        backdrop-filter: blur(14px) !important;
+        box-shadow: 0 12px 35px rgba(0, 0, 0, 0.5) !important;
+        transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        user-select: none !important;
+        position: relative;
     }
+
     .team-card:hover {
-        transform: translateY(-8px);
-        border-color: rgba(79, 172, 254, 0.4);
+        transform: translateY(-10px) scale(1.02) !important;
+        border-color: rgba(56, 189, 248, 0.6) !important;
+        box-shadow: 0 20px 45px rgba(0, 0, 0, 0.8), 0 0 30px rgba(56, 189, 248, 0.3) !important;
     }
-    .team-photo {
-        width: 140px;
-        height: 140px;
-        border-radius: 50%;
-        object-fit: cover;
-        margin-bottom: 15px;
-        border: 3px solid rgba(79, 172, 254, 0.3);
+
+    .team-avatar-wrapper {
+        width: 115px !important;
+        height: 115px !important;
+        margin: 0 auto 18px !important;
+        border-radius: 50% !important;
+        overflow: hidden !important;
+        flex-shrink: 0 !important;
+        position: relative;
     }
-    .team-card h3 {
-        color: #fff;
-        font-size: 17px;
-        margin-bottom: 4px;
+
+    .team-avatar-img {
+        width: 115px !important;
+        height: 115px !important;
+        border-radius: 50% !important;
+        object-fit: cover !important;
+        border: 3px solid rgba(255, 255, 255, 0.2) !important;
+        transition: all 0.3s ease !important;
+        display: block !important;
     }
-    .team-role {
-        color: #9aa5b8;
+
+    .team-card:hover .team-avatar-img {
+        border-color: #38bdf8 !important;
+        box-shadow: 0 0 25px rgba(56, 189, 248, 0.6) !important;
+    }
+
+    .team-card-name {
+        font-size: 17px !important;
+        font-weight: 800 !important;
+        color: #ffffff !important;
+        letter-spacing: 0.5px !important;
+        text-transform: uppercase !important;
+        margin: 0 0 6px !important;
+    }
+
+    .team-card-role {
+        font-size: 13px !important;
+        color: #94a3b8 !important;
+        margin: 0 0 14px !important;
+    }
+
+    .team-card-view-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 14px;
+        border-radius: 20px;
+        background: rgba(56, 189, 248, 0.12);
+        border: 1px solid rgba(56, 189, 248, 0.3);
+        color: #38bdf8;
+        font-size: 12px;
+        font-weight: 700;
+        transition: all 0.2s ease;
+    }
+
+    .team-card:hover .team-card-view-btn {
+        background: #38bdf8;
+        color: #060911;
+        box-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
+    }
+
+    /* Modal Overlay */
+    .team-modal-overlay {
+        display: none !important;
+        position: fixed !important;
+        inset: 0 !important;
+        z-index: 99999999 !important;
+        background: rgba(4, 7, 13, 0.88) !important;
+        backdrop-filter: blur(16px) !important;
+        -webkit-backdrop-filter: blur(16px) !important;
+        align-items: center !important;
+        justify-content: center !important;
+        padding: 20px !important;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease !important;
+        overflow-y: auto !important;
+        box-sizing: border-box !important;
+    }
+
+    .team-modal-overlay.active {
+        display: flex !important;
+        opacity: 1 !important;
+        pointer-events: auto !important;
+    }
+
+    .team-modal-card {
+        position: relative !important;
+        width: 100% !important;
+        max-width: 860px !important;
+        background: #0f1628 !important;
+        border: 1.5px solid #2563eb !important;
+        border-radius: 24px !important;
+        padding: 36px 32px 28px !important;
+        color: #ffffff !important;
+        box-shadow: 0 25px 70px rgba(0, 0, 0, 0.95), 0 0 45px rgba(37, 99, 235, 0.35) !important;
+        backdrop-filter: blur(20px) !important;
+        transform: scale(0.95) translateY(15px);
+        transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        max-height: 90vh !important;
+        overflow-y: auto !important;
+        box-sizing: border-box !important;
+        text-align: left !important;
+    }
+
+    .team-modal-overlay.active .team-modal-card {
+        transform: scale(1) translateY(0) !important;
+    }
+
+    .team-modal-close-btn {
+        position: absolute !important;
+        top: 20px !important;
+        right: 20px !important;
+        width: 36px !important;
+        height: 36px !important;
+        border-radius: 50% !important;
+        background: rgba(255, 255, 255, 0.12) !important;
+        border: 1px solid rgba(255, 255, 255, 0.18) !important;
+        color: #ffffff !important;
+        font-size: 16px !important;
+        font-weight: 800 !important;
+        cursor: pointer !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        transition: all 0.2s ease !important;
+        z-index: 10 !important;
+    }
+
+    .team-modal-close-btn:hover {
+        background: rgba(239, 68, 68, 0.85) !important;
+        transform: scale(1.1) rotate(90deg) !important;
+    }
+
+    .team-modal-body {
+        display: flex !important;
+        gap: 32px !important;
+        align-items: stretch !important;
+    }
+
+    @media (max-width: 768px) {
+        .team-modal-body {
+            flex-direction: column !important;
+            gap: 24px !important;
+        }
+    }
+
+    .team-modal-left {
+        flex: 1 !important;
+        min-width: 270px !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        text-align: center !important;
+    }
+
+    .team-modal-avatar {
+        width: 150px !important;
+        height: 150px !important;
+        border-radius: 50% !important;
+        object-fit: cover !important;
+        border: 3.5px solid #38bdf8 !important;
+        box-shadow: 0 0 35px rgba(56, 189, 248, 0.6) !important;
+        margin-bottom: 16px !important;
+        display: block !important;
+    }
+
+    .team-modal-name {
+        font-size: 22px !important;
+        font-weight: 900 !important;
+        color: #ffffff !important;
+        letter-spacing: 0.5px !important;
+        text-transform: uppercase !important;
+        margin: 0 0 8px !important;
+    }
+
+    .team-modal-role-badge {
+        background: #1e1b4b !important;
+        border: 1px solid #4338ca !important;
+        color: #a5b4fc !important;
+        font-size: 12.5px !important;
+        font-weight: 700 !important;
+        padding: 4px 16px !important;
+        border-radius: 20px !important;
+        margin-bottom: 16px !important;
+        display: inline-block !important;
+    }
+
+    .team-modal-quote {
+        font-size: 13px !important;
+        color: #cbd5e1 !important;
+        font-style: italic !important;
+        margin-bottom: 24px !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 6px !important;
+    }
+
+    .team-stats-row {
+        display: grid !important;
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 10px !important;
+        width: 100% !important;
+    }
+
+    .team-stat-box {
+        background: rgba(255, 255, 255, 0.05) !important;
+        border: 1px solid rgba(255, 255, 255, 0.08) !important;
+        border-radius: 12px !important;
+        padding: 12px 6px !important;
+        text-align: center !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+
+    .team-stat-box-icon {
+        width: 30px !important;
+        height: 30px !important;
+        border-radius: 50% !important;
+        background: rgba(56, 189, 248, 0.15) !important;
+        color: #38bdf8 !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        margin-bottom: 6px !important;
         font-size: 13px;
     }
 
+    .team-stat-box-val {
+        font-size: 15px !important;
+        font-weight: 800 !important;
+        color: #ffffff !important;
+    }
+
+    .team-stat-box-lbl {
+        font-size: 10.5px !important;
+        color: #94a3b8 !important;
+        margin-top: 2px !important;
+        line-height: 1.2 !important;
+    }
+
+    .team-modal-right {
+        flex: 1.3 !important;
+        min-width: 280px !important;
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 18px !important;
+    }
+
+    .team-modal-sec-header {
+        font-size: 15px !important;
+        font-weight: 800 !important;
+        color: #38bdf8 !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+        margin-bottom: 12px !important;
+    }
+
+    .team-info-rows {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 10px !important;
+    }
+
+    .team-info-row-card {
+        background: rgba(255, 255, 255, 0.04) !important;
+        border: 1px solid rgba(255, 255, 255, 0.08) !important;
+        border-radius: 12px !important;
+        padding: 10px 14px !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 14px !important;
+    }
+
+    .team-info-row-icon {
+        width: 32px !important;
+        height: 32px !important;
+        border-radius: 8px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        flex-shrink: 0 !important;
+        font-size: 14px;
+    }
+
+    .team-info-row-icon.purple { background: rgba(168, 85, 247, 0.2) !important; color: #c084fc !important; }
+    .team-info-row-icon.cyan { background: rgba(6, 182, 212, 0.2) !important; color: #22d3ee !important; }
+    .team-info-row-icon.green { background: rgba(34, 197, 94, 0.2) !important; color: #4ade80 !important; }
+    .team-info-row-icon.pink { background: rgba(244, 63, 94, 0.2) !important; color: #fb7185 !important; }
+
+    .team-info-row-label {
+        font-size: 13px !important;
+        font-weight: 700 !important;
+        width: 120px !important;
+        flex-shrink: 0 !important;
+    }
+
+    .team-info-row-label.purple { color: #c084fc !important; }
+    .team-info-row-label.cyan { color: #22d3ee !important; }
+    .team-info-row-label.green { color: #4ade80 !important; }
+    .team-info-row-label.pink { color: #fb7185 !important; }
+
+    .team-info-row-val {
+        font-size: 13.5px !important;
+        font-weight: 600 !important;
+        color: #ffffff !important;
+        word-break: break-word !important;
+    }
+
+    .team-info-row-val a {
+        color: #ffffff !important;
+        text-decoration: none !important;
+    }
+
+    .team-info-row-val a:hover {
+        text-decoration: underline !important;
+        color: #38bdf8 !important;
+    }
+
+    .team-about-sec {
+        margin-top: 4px !important;
+    }
+
+    .team-about-sec-header {
+        font-size: 15px !important;
+        font-weight: 800 !important;
+        color: #f59e0b !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+        margin-bottom: 10px !important;
+    }
+
+    .team-about-p {
+        font-size: 13px !important;
+        color: #cbd5e1 !important;
+        line-height: 1.6 !important;
+        margin: 0 !important;
+    }
+
+    .team-modal-footer-strip {
+        display: grid !important;
+        grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)) !important;
+        gap: 12px !important;
+        margin-top: 14px !important;
+        padding-top: 14px !important;
+        border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+        font-size: 12px !important;
+    }
+
+    .team-footer-item {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 2px !important;
+    }
+
+    .team-footer-item-label {
+        color: #94a3b8 !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 6px !important;
+        font-weight: 700 !important;
+    }
+
+    .team-footer-item-val {
+        color: #e2e8f0 !important;
+        font-size: 12px !important;
+        word-break: break-word !important;
+    }
+
+    .team-footer-item-val a {
+        color: #e2e8f0 !important;
+        text-decoration: none !important;
+    }
+
+    .team-footer-item-val a:hover {
+        color: #38bdf8 !important;
+    }
+
+    /* Contact Box */
     .contact-box {
         text-align: center;
-        padding: 40px 20px 60px;
+        padding: 50px 20px 70px;
         color: #b8c1d1;
+        position: relative;
+        z-index: 2;
+        max-width: 900px;
+        margin: 0 auto;
     }
+
+    .contact-box-inner {
+        background: var(--card-bg);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid var(--card-border);
+        border-radius: 24px;
+        padding: 40px 30px;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+    }
+
     .contact-box h2 {
-        color: #4facfe;
-        margin-bottom: 15px;
+        color: #ffffff;
+        font-size: 28px;
+        font-weight: 800;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
     }
 
     .contact-links {
         display: flex;
         justify-content: center;
-        gap: 15px;
+        gap: 16px;
         flex-wrap: wrap;
-        margin-top: 25px;
+        margin-top: 28px;
     }
-    .contact-links a {
+
+    .contact-link-card {
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 4px;
+        gap: 6px;
         text-decoration: none;
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        padding: 12px 22px;
-        border-radius: 14px;
-        transition: border-color 0.3s ease, transform 0.3s ease;
-    }
-    .contact-links a:hover {
-        transform: translateY(-3px);
-    }
-    .contact-links .link-label {
-        font-size: 14px;
-        font-weight: 600;
-        color: #e0e6f0;
-    }
-    .contact-links .link-value {
-        font-size: 12px;
-        color: #9aa5b8;
-    }
-    .contact-links .icon-mail:hover {
-        border-color: #ea4335;
-    }
-    .contact-links .icon-insta:hover {
-        border-color: #d62976;
-    }
-    .contact-links .icon-whatsapp:hover {
-        border-color: #25D366;
-    }
-
-    /* Team Detail Side Panel */
-    .team-card {
-        cursor: pointer;
-    }
-    .detail-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.6);
-        backdrop-filter: blur(4px);
-        z-index: 998;
-        opacity: 0;
-        visibility: hidden;
-        transition: opacity 0.3s ease;
-    }
-    .detail-overlay.active {
-        opacity: 1;
-        visibility: visible;
-    }
-    .detail-panel {
-        position: fixed;
-        top: 0;
-        right: -400px;
-        width: 360px;
-        max-width: 90%;
-        height: 100%;
-        background: #12172a;
-        border-left: 1px solid rgba(79, 172, 254, 0.2);
-        z-index: 999;
-        transition: right 0.35s ease;
-        overflow-y: auto;
-        padding: 30px 25px;
-        box-sizing: border-box;
-    }
-    .detail-panel.active {
-        right: 0;
-    }
-    .detail-close {
-        background: none;
-        border: none;
-        color: #9aa5b8;
-        font-size: 24px;
-        cursor: pointer;
-        float: right;
-        line-height: 1;
-    }
-    .detail-close:hover {
-        color: #fff;
-    }
-    .detail-photo {
-        width: 160px;
-        height: 160px;
-        border-radius: 50%;
-        object-fit: cover;
-        display: block;
-        margin: 40px auto 20px;
-        border: 3px solid rgba(79, 172, 254, 0.4);
-    }
-    .detail-name {
-        text-align: center;
-        color: #fff;
-        font-size: 22px;
-        margin: 0 0 4px;
-    }
-    .detail-role {
-        text-align: center;
-        color: #4facfe;
-        font-size: 14px;
-        margin: 0 0 30px;
-    }
-    .detail-info {
-        display: flex;
-        flex-direction: column;
-        gap: 16px;
-    }
-    .detail-row {
         background: rgba(255, 255, 255, 0.04);
         border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 12px;
-        padding: 12px 16px;
+        padding: 16px 24px;
+        border-radius: 16px;
+        min-width: 200px;
+        transition: all 0.3s ease;
     }
-    .detail-row .d-label {
-        display: block;
-        font-size: 11px;
-        color: #9aa5b8;
-        margin-bottom: 4px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
+
+    .contact-link-card:hover {
+        transform: translateY(-5px);
+        border-color: rgba(0, 242, 254, 0.5);
+        box-shadow: 0 10px 25px rgba(0, 242, 254, 0.15);
     }
-    .detail-row .d-value {
-        display: block;
+
+    .contact-link-card .link-icon {
+        font-size: 24px;
+        margin-bottom: 2px;
+    }
+
+    .contact-link-card .link-label {
         font-size: 14px;
-        color: #e0e6f0;
-    }
-    .detail-row a.d-value {
-        color: #4facfe;
-        text-decoration: none;
+        font-weight: 700;
+        color: #f1f5f9;
     }
 
-    /* ===== Cursor-following spotlight glow (with glowing border) ===== */
-    :root {
-        --glow-color: 79, 172, 254; /* Ghidora blue RGB */
-    }
-    .glow-card {
-        position: relative;
-        overflow: hidden;
-        isolation: isolate;
-    }
-    .glow-card::before {
-        content: "";
-        position: absolute;
-        inset: 0;
-        border-radius: inherit;
-        pointer-events: none;
-        background: radial-gradient(
-            380px circle at var(--x, 50%) var(--y, 50%),
-            rgba(var(--glow-color), 0.35),
-            transparent 70%
-        );
-        opacity: 0;
-        transition: opacity 0.35s ease;
-        z-index: 0;
-    }
-    .glow-card::after {
-        content: "";
-        position: absolute;
-        inset: 0;
-        border-radius: inherit;
-        padding: 1px;
-        background: radial-gradient(
-            380px circle at var(--x, 50%) var(--y, 50%),
-            rgba(var(--glow-color), 0.9),
-            transparent 70%
-        );
-        -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-        mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-        -webkit-mask-composite: xor;
-        mask-composite: exclude;
-        opacity: 0;
-        transition: opacity 0.35s ease;
-        z-index: 0;
-        pointer-events: none;
-    }
-    .glow-card:hover::before,
-    .glow-card:hover::after {
-        opacity: 1;
-    }
-    .glow-card > * {
-        position: relative;
-        z-index: 1;
+    .contact-link-card .link-value {
+        font-size: 12.5px;
+        color: #94a3b8;
     }
 
-    /* Zero Navbar Scrollbar Guarantee & 1150px Responsive Breakpoint */
+    /* =================================================================
+       PREMIUM UNIVERSAL NAVBAR DESIGN & ZERO-OVERLAP SYSTEM
+       ================================================================= */
     .navbar {
-        overflow: visible !important;
+        position: sticky !important;
+        top: 0 !important;
+        z-index: 1000 !important;
+        background: rgba(8, 12, 20, 0.92) !important;
+        backdrop-filter: blur(16px) !important;
+        -webkit-backdrop-filter: blur(16px) !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4) !important;
+        width: 100% !important;
         max-width: 100vw !important;
         box-sizing: border-box !important;
+        overflow: visible !important;
+        padding: 8px 0 !important;
     }
+
     .navbar-inner {
-        overflow: hidden !important;
-        overflow-x: hidden !important;
-        overflow-y: hidden !important;
-        max-width: 100vw !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        width: 100% !important;
+        max-width: 1440px !important;
+        margin: 0 auto !important;
+        padding: 0 16px !important;
+        gap: 12px !important;
         box-sizing: border-box !important;
         flex-wrap: nowrap !important;
     }
-    .navbar::-webkit-scrollbar,
-    .navbar-inner::-webkit-scrollbar,
-    .navbar::-webkit-scrollbar-thumb,
-    .navbar-inner::-webkit-scrollbar-thumb,
-    .navbar::-webkit-scrollbar-track,
-    .navbar-inner::-webkit-scrollbar-track {
-        display: none !important;
-        width: 0 !important;
-        height: 0 !important;
-        background: transparent !important;
+
+    .nav-logo {
+        display: flex !important;
+        align-items: center !important;
+        gap: 10px !important;
+        text-decoration: none !important;
+        color: #ffffff !important;
+        font-weight: 800 !important;
+        font-size: 15.5px !important;
+        letter-spacing: 0.5px !important;
+        flex-shrink: 0 !important;
+        white-space: nowrap !important;
+        margin-right: 8px !important;
     }
-    @media (max-width: 1150px) {
+
+    .nav-logo .logo-img {
+        height: 40px !important;
+        width: auto !important;
+        object-fit: contain !important;
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        border-radius: 0 !important;
+        filter: drop-shadow(0 0 1.2px #ffffff)
+                drop-shadow(0 0 6px rgba(0, 242, 254, 0.95))
+                drop-shadow(0 0 14px rgba(0, 242, 254, 0.55))
+                brightness(1.15) contrast(1.05) !important;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        display: block !important;
+    }
+
+    .nav-logo:hover .logo-img {
+        transform: scale(1.06) !important;
+        filter: drop-shadow(0 0 2px #ffffff)
+                drop-shadow(0 0 10px rgba(0, 242, 254, 1))
+                drop-shadow(0 0 22px rgba(0, 242, 254, 0.8))
+                drop-shadow(0 0 10px rgba(255, 122, 26, 0.5))
+                brightness(1.25) !important;
+    }
+
+    .nav-logo .accent {
+        color: #ff7a1a !important;
+    }
+
+    .nav-links {
+        display: flex !important;
+        align-items: center !important;
+        gap: 6px !important;
+        flex-wrap: nowrap !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        list-style: none !important;
+    }
+
+    .nav-links a {
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 6px !important;
+        color: #94a3b8 !important;
+        text-decoration: none !important;
+        font-weight: 600 !important;
+        font-size: 13.5px !important;
+        padding: 7px 12px !important;
+        border-radius: 10px !important;
+        white-space: nowrap !important;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    }
+
+    .nav-links a i {
+        font-size: 14px !important;
+        color: #64748b !important;
+        transition: color 0.2s ease, transform 0.2s ease !important;
+    }
+
+    .nav-links a:hover {
+        color: #ffffff !important;
+        background: rgba(255, 255, 255, 0.07) !important;
+    }
+
+    .nav-links a:hover i {
+        color: #00f2fe !important;
+        transform: translateY(-1px) !important;
+    }
+
+    .nav-links a.active {
+        color: #ffffff !important;
+        background: rgba(0, 242, 254, 0.12) !important;
+        border: 1px solid rgba(0, 242, 254, 0.35) !important;
+        box-shadow: 0 0 16px rgba(0, 242, 254, 0.2) !important;
+    }
+
+    .nav-links a.active i {
+        color: #00f2fe !important;
+    }
+
+    .radio-emoji-link {
+        color: #ffb870 !important;
+        font-weight: 700 !important;
+        font-size: 13px !important;
+        padding: 6px 12px !important;
+        background: rgba(255, 184, 112, 0.15) !important;
+        border: 1.5px solid rgba(255, 184, 112, 0.45) !important;
+        border-radius: 10px !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 6px !important;
+        white-space: nowrap !important;
+        transition: all 0.2s ease !important;
+        text-decoration: none !important;
+    }
+
+    .radio-emoji-link:hover {
+        background: rgba(255, 184, 112, 0.28) !important;
+        transform: translateY(-1px) !important;
+        box-shadow: 0 0 14px rgba(255, 184, 112, 0.3) !important;
+    }
+
+    .nav-actions {
+        display: flex !important;
+        align-items: center !important;
+        gap: 10px !important;
+        flex-shrink: 0 !important;
+        margin: 0 !important;
+    }
+
+    .call-btn {
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 7px !important;
+        padding: 8px 16px !important;
+        border-radius: 22px !important;
+        background: linear-gradient(135deg, #ff7a1a 0%, #ff9e00 100%) !important;
+        color: #060911 !important;
+        font-weight: 800 !important;
+        font-size: 13px !important;
+        text-decoration: none !important;
+        box-shadow: 0 4px 14px rgba(255, 122, 26, 0.35) !important;
+        white-space: nowrap !important;
+        transition: all 0.2s ease !important;
+        border: none !important;
+    }
+
+    .call-btn:hover {
+        transform: translateY(-2px) scale(1.02) !important;
+        box-shadow: 0 6px 20px rgba(255, 122, 26, 0.55) !important;
+    }
+
+    .phone-shake {
+        display: inline-block !important;
+        animation: phoneRing 2s infinite ease-in-out !important;
+    }
+
+    @keyframes phoneRing {
+        0%, 100% { transform: rotate(0deg); }
+        10%, 30% { transform: rotate(-14deg); }
+        20%, 40% { transform: rotate(14deg); }
+        50% { transform: rotate(0deg); }
+    }
+
+    .animated-login-btn {
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 6px !important;
+        padding: 7px 14px !important;
+        border-radius: 20px !important;
+        background: rgba(0, 242, 254, 0.12) !important;
+        border: 1px solid rgba(0, 242, 254, 0.35) !important;
+        color: #00f2fe !important;
+        font-weight: 700 !important;
+        font-size: 13px !important;
+        text-decoration: none !important;
+        white-space: nowrap !important;
+        transition: all 0.2s ease !important;
+    }
+
+    .animated-login-btn:hover {
+        background: #00f2fe !important;
+        color: #060911 !important;
+        box-shadow: 0 0 15px rgba(0, 242, 254, 0.4) !important;
+    }
+
+    .user-badge-glowing {
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+        background: rgba(15, 23, 42, 0.85) !important;
+        border: 1px solid rgba(0, 242, 254, 0.3) !important;
+        padding: 6px 12px !important;
+        border-radius: 20px !important;
+        font-size: 12.5px !important;
+        white-space: nowrap !important;
+        box-shadow: 0 0 12px rgba(0, 242, 254, 0.15) !important;
+    }
+
+    .hamburger-btn {
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 6px !important;
+        min-width: 38px !important;
+        width: auto !important;
+        height: 34px !important;
+        padding: 0 10px !important;
+        background: rgba(255, 122, 26, 0.18) !important;
+        border: 1.5px solid #ff7a1a !important;
+        border-radius: 9px !important;
+        cursor: pointer !important;
+        z-index: 10001 !important;
+        flex-shrink: 0 !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+        transition: all 0.2s ease !important;
+    }
+
+    .hamburger-btn .ham-text {
+        font-size: 11.5px !important;
+        font-weight: 800 !important;
+        color: #ffffff !important;
+        letter-spacing: 0.5px !important;
+        text-transform: uppercase !important;
+        display: inline-block !important;
+    }
+
+    .hamburger-btn:hover, .hamburger-btn.active {
+        background: #ff7a1a !important;
+        border-color: #ffffff !important;
+        box-shadow: 0 0 16px rgba(255, 122, 26, 0.6) !important;
+    }
+
+    @media (max-width: 600px) {
+        .hamburger-btn {
+            padding: 0 8px !important;
+        }
+        .hamburger-btn .ham-text {
+            display: none !important;
+        }
+    }
+
+    /* Medium & Standard Laptop Desktop Responsive (1101px - 1400px) */
+    @media (min-width: 1101px) and (max-width: 1400px) {
+        .navbar-inner {
+            padding: 0 12px !important;
+            gap: 8px !important;
+        }
+        .nav-links {
+            gap: 2px !important;
+        }
+        .nav-links a {
+            font-size: 11.5px !important;
+            padding: 5px 6px !important;
+            gap: 3px !important;
+        }
+        .nav-logo {
+            font-size: 13.5px !important;
+            gap: 6px !important;
+            margin-right: 4px !important;
+        }
+        .nav-logo .logo-img {
+            height: 34px !important;
+        }
+        .call-btn {
+            font-size: 11px !important;
+            padding: 5px 9px !important;
+        }
+        .radio-emoji-link {
+            font-size: 11px !important;
+            padding: 4px 7px !important;
+        }
+    }
+
+    @media (max-width: 1100px) {
         .nav-links {
             display: none !important;
         }
         .navbar {
-            padding: 8px 12px !important;
+            min-height: 52px !important;
+            height: auto !important;
+            width: 100% !important;
+            max-width: 100vw !important;
+            overflow: visible !important;
+            padding: 6px 12px !important;
+        }
+        .navbar-inner {
+            padding: 0 4px !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            flex-wrap: nowrap !important;
+            overflow: visible !important;
+            box-sizing: border-box !important;
+        }
+        .nav-logo {
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 6px !important;
+            font-size: 13.5px !important;
+            font-weight: 800 !important;
+            flex-shrink: 1 !important;
+            white-space: nowrap !important;
+        }
+        .nav-logo .accent {
+            font-size: 13px !important;
+            color: #ff7a1a !important;
+        }
+        .nav-logo .logo-img {
+            height: 32px !important;
+            width: auto !important;
+            max-width: 44px !important;
+            object-fit: contain !important;
+            padding: 0 !important;
+        }
+        .nav-actions {
+            display: flex !important;
+            align-items: center !important;
+            gap: 6px !important;
+            flex-shrink: 0 !important;
+        }
+        .call-btn {
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 5px !important;
+            padding: 6px 11px !important;
+            font-size: 11.5px !important;
+            font-weight: 800 !important;
+            border-radius: 20px !important;
+            background: linear-gradient(135deg, #ff7a1a 0%, #ff9e00 100%) !important;
+            color: #000000 !important;
+            white-space: nowrap !important;
+            flex-shrink: 0 !important;
+        }
+
+        /* 🚫 HIDE LOGIN/USER BADGE FROM CRAMPED MOBILE TOP NAVBAR */
+        .desktop-user-badge, .desktop-login-btn, .animated-login-btn, .user-badge-glowing {
+            display: none !important;
+        }
+
+        .hamburger-btn {
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 5px !important;
+            min-width: 42px !important;
+            height: 34px !important;
+            padding: 0 10px !important;
+            border-radius: 9px !important;
+            background: linear-gradient(135deg, #FF6B00 0%, #ff8c00 100%) !important;
+            border: 1.5px solid #ffffff !important;
+            box-shadow: 0 0 14px rgba(255, 107, 0, 0.6) !important;
+            flex-shrink: 0 !important;
+            cursor: pointer !important;
+            z-index: 1000002 !important;
+        }
+        .hamburger-btn .ham-text {
+            font-size: 11px !important;
+            font-weight: 800 !important;
+            color: #ffffff !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.5px !important;
+            display: inline-block !important;
+        }
+    }
+
+    @media (max-width: 420px) {
+        .hamburger-btn {
+            min-width: 36px !important;
+            width: 36px !important;
+            padding: 0 !important;
+        }
+        .hamburger-btn .ham-text {
+            display: none !important;
+        }
+        .call-btn {
+            padding: 5px 8px !important;
+            font-size: 10.5px !important;
+        }
+        .nav-logo {
+            font-size: 12px !important;
+            gap: 4px !important;
+        }
+        .nav-logo .logo-img {
+            height: 28px !important;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .about-hero {
+            padding: 45px 16px 30px !important;
+        }
+        .about-hero h1 {
+            font-size: 30px !important;
+        }
+        .about-hero p {
+            font-size: 15px !important;
+        }
+        .why-grid, .mission-vision-grid {
+            grid-template-columns: 1fr !important;
+            gap: 16px !important;
+        }
+        .team-stats-row {
+            grid-template-columns: repeat(3, 1fr) !important;
+            gap: 6px !important;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .team-stats-row {
+            grid-template-columns: 1fr !important;
+            gap: 8px !important;
+        }
+        .team-modal-content {
+            padding: 18px 14px !important;
+            width: calc(100vw - 20px) !important;
+        }
+        .animated-login-btn {
+            display: none !important;
+        }
+        .card, .why-card, .mission-card {
+            padding: 20px 16px !important;
+            backdrop-filter: blur(8px) !important;
+            -webkit-backdrop-filter: blur(8px) !important;
         }
     }
 </style>
@@ -431,358 +1426,843 @@
 
 <body>
 
+  <!-- 3D Particle Constellation Background Canvas & Ambient Glowing Orbs -->
+  <canvas id="aboutBgCanvas"></canvas>
+  <div class="ambient-orb-1"></div>
+  <div class="ambient-orb-2"></div>
+
   <!-- Sticky Navbar -->
   <nav class="navbar">
-    <div class="navbar-inner" style="display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 1440px; margin: 0 auto; padding: 0 16px;">
+    <div class="navbar-inner">
       <a href="{% url 'home' %}" class="nav-logo">
         <img src="{% static 'images/logo6.png' %}" alt="Ghidora Transport Logo" class="logo-img">
         GHIDORA <span class="accent">TRANSPORT</span>
       </a>
+
       <div class="nav-links">
-        <a href="{% url 'home' %}">Home</a>
-        <a href="{% url 'services' %}">Services</a>
-        <a href="{% url 'home' %}#booking">Booking</a>
-        <a href="{% url 'about' %}" class="active">About Us</a>
-        <a href="{% url 'contact_us' %}">Contact</a>
-        <a href="{% url 'pickupwala:player' %}" title="Pickupwala Radio 📻" style="color: #ffb870; font-size: 18px; padding: 2px 7px; background: rgba(255, 184, 112, 0.18); border: 1.5px solid rgba(255, 184, 112, 0.5); border-radius: 8px; transition: transform 0.2s;" class="radio-emoji-link">📻</a>
+        <a href="{% url 'home' %}"><i class="fa-solid fa-house"></i> Home</a>
+        <a href="{% url 'home' %}#booking"><i class="fa-solid fa-truck-fast"></i> Book Transport</a>
+        <a href="{% url 'services' %}"><i class="fa-solid fa-truck-ramp-box"></i> Services</a>
+        <a href="{% url 'social:feed' %}"><i class="fa-solid fa-users"></i> Social</a>
+        <a href="{% url 'about' %}" class="active"><i class="fa-solid fa-circle-info"></i> About Us</a>
+        <a href="{% url 'contact_us' %}"><i class="fa-solid fa-headset"></i> Contact</a>
       </div>
-      <div class="nav-actions" style="display: flex; align-items: center; gap: 8px;">
-        <a href="tel:+916264588894" class="call-btn"><span class="phone-shake">📞</span> Call Now</a>
+
+      <div class="nav-actions">
+        <a href="tel:+917489297841" class="call-btn">
+          <i class="fa-solid fa-phone-volume phone-shake"></i> Call Now
+        </a>
 
         {% if not user.is_authenticated %}
           <a href="{% url 'login' %}" class="animated-login-btn">
-            <span>🔑</span> Login
+            <i class="fa-solid fa-arrow-right-to-bracket"></i> Login / Sign Up
           </a>
         {% else %}
           <div class="user-badge-glowing">
-            <span>👤</span> <strong style="color:#ffffff;">{{ user.first_name|default:user.username }}</strong>
-            <form method="post" action="{% url 'logout' %}" style="display: inline; margin-left: 4px;">
+            <a href="{% url 'user_dashboard' %}" style="text-decoration: none; color: inherit; display: inline-flex; align-items: center; gap: 6px;" title="User Dashboard">
+              <i class="fa-solid fa-circle-user" style="color: #38bdf8;"></i>
+              <strong style="color:#ffffff; max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: inline-block; vertical-align: middle;">{{ user.first_name|default:user.username }}</strong>
+              {% if user.is_staff or user.is_superuser %}
+                <span style="background: #ffd700; color: #040814; font-size: 9px; padding: 1px 5px; border-radius: 4px; font-weight: 900;">ADMIN</span>
+              {% else %}
+                <span style="background: rgba(56, 189, 248, 0.2); color: #38bdf8; font-size: 9px; padding: 1px 5px; border-radius: 4px; font-weight: 700;">USER</span>
+              {% endif %}
+            </a>
+            <form method="post" action="{% url 'logout' %}" style="display: inline; margin-left: 6px;">
               {% csrf_token %}
-              <button type="submit" style="background: rgba(239, 68, 68, 0.25); border: 1px solid #ef4444; color: #fca5a5; padding: 2px 8px; border-radius: 8px; font-size: 11px; cursor: pointer; font-weight: bold;" title="Logout">
-                🚪
+              <button type="submit" style="background: rgba(239, 68, 68, 0.25); border: 1px solid #ef4444; color: #fca5a5; padding: 3px 8px; border-radius: 8px; font-size: 11px; cursor: pointer; font-weight: bold;" title="Logout">
+                <i class="fa-solid fa-right-from-bracket"></i>
               </button>
             </form>
           </div>
         {% endif %}
 
-        <button class="hamburger-btn" id="hamburgerBtn" onclick="toggleMobileMenu(event)" aria-label="Toggle Navigation Menu">
-          <svg width="24" height="18" viewBox="0 0 24 18" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: block; pointer-events: none;">
-            <rect y="0" width="24" height="3" rx="1.5" fill="#FFFFFF"/>
-            <rect y="7.5" width="24" height="3" rx="1.5" fill="#FFFFFF"/>
-            <rect y="15" width="24" height="3" rx="1.5" fill="#FFFFFF"/>
+        <button class="hamburger-btn" id="hamburgerBtn" onclick="toggleMobileMenu(event)" aria-label="Toggle Navigation Menu" title="Open Navigation Menu" style="width: 36px; height: 34px; padding: 0; display: inline-flex; align-items: center; justify-content: center;">
+          <svg width="20" height="15" viewBox="0 0 24 18" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: block; pointer-events: none;">
+            <rect y="0" width="24" height="2.8" rx="1.4" fill="#FFFFFF"/>
+            <rect y="7.6" width="24" height="2.8" rx="1.4" fill="#FFFFFF"/>
+            <rect y="15.2" width="24" height="2.8" rx="1.4" fill="#FFFFFF"/>
           </svg>
         </button>
       </div>
     </div>
   </nav>
 
-  <!-- Dark Backdrop Overlay (Placed outside navbar at body level) -->
+  <!-- Dark Backdrop Overlay -->
   <div class="mobile-nav-overlay" id="mobileNavOverlay" onclick="closeMobileMenu()"></div>
 
-  <!-- Floating Side Drawer Navigation Menu Card (Placed outside navbar at body level) -->
+  <!-- Floating Side Drawer Navigation Menu Card -->
   <div class="mobile-nav-drawer" id="mobileNavDrawer">
     <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 8px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 6px;">
-      <div style="font-size: 11px; font-weight: 800; letter-spacing: 1.5px; color: #ff7a1a; text-transform: uppercase;">📍 Navigation Menu</div>
+      <div style="font-size: 11px; font-weight: 800; letter-spacing: 1.5px; color: #ff7a1a; text-transform: uppercase;">
+        <i class="fa-solid fa-compass" style="margin-right: 6px;"></i> Navigation Menu
+      </div>
       <button onclick="closeMobileMenu()" aria-label="Close Menu" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #ffffff; width: 28px; height: 28px; border-radius: 50%; font-size: 14px; display: flex; align-items: center; justify-content: center; cursor: pointer;">✕</button>
     </div>
 
-    <div style="font-size: 11px; font-weight: 800; letter-spacing: 1.5px; color: #ff7a1a; padding: 4px 6px 2px; text-transform: uppercase;">📍 Main Pages</div>
-    <a href="{% url 'home' %}" onclick="closeMobileMenu()">🏠 Home</a>
-    <a href="{% url 'services' %}" onclick="closeMobileMenu()">🛠️ Services</a>
-    <a href="{% url 'home' %}#booking" onclick="closeMobileMenu()">📦 Book Transport</a>
-    <a href="{% url 'pickupwala:player' %}" onclick="closeMobileMenu()" style="color: #ffb870; font-weight: 800; background: rgba(255, 184, 112, 0.16) !important; border: 1.5px solid rgba(255, 184, 112, 0.45) !important;">📻 Pickupwala Radio</a>
-    <a href="{% url 'about' %}" class="active" onclick="closeMobileMenu()">ℹ️ About Us</a>
-    <a href="{% url 'contact_us' %}" onclick="closeMobileMenu()">🕿 Contact Us</a>
+    {% if user.is_staff or user.is_superuser %}
+      <a href="{% url 'dashboard' %}" onclick="closeMobileMenu()" style="color: #00f2fe !important; font-weight: 800 !important; background: rgba(0, 242, 254, 0.2) !important; border: 1.5px solid rgba(0, 242, 254, 0.5) !important; margin-bottom: 8px; border-radius: 10px; padding: 10px 14px; display: flex; align-items: center; text-decoration: none; box-shadow: 0 0 15px rgba(0, 242, 254, 0.25);">
+        <i class="fa-solid fa-crown" style="margin-right: 10px; color: #ffd700; font-size: 16px;"></i> Admin Dashboard
+      </a>
+    {% endif %}
+
+    <div style="font-size: 11px; font-weight: 800; letter-spacing: 1.5px; color: #ff7a1a; padding: 4px 6px 2px; text-transform: uppercase;">
+      <i class="fa-solid fa-layer-group" style="margin-right: 6px;"></i> Main Pages
+    </div>
+    <a href="{% url 'home' %}" onclick="closeMobileMenu()"><i class="fa-solid fa-house" style="margin-right: 8px;"></i> Home</a>
+    <a href="{% url 'home' %}#booking" onclick="closeMobileMenu()"><i class="fa-solid fa-boxes-packing" style="margin-right: 8px;"></i> Book Transport</a>
+    <a href="{% url 'status' %}" onclick="closeMobileMenu()" style="color: #38bdf8; font-weight: 700;">
+      <i class="fa-solid fa-magnifying-glass-location" style="margin-right: 8px; color: #38bdf8;"></i> Track Booking
+    </a>
+
+    {% if user.is_authenticated %}
+      <a href="{% url 'user_dashboard' %}#my-bookings" onclick="closeMobileMenu()" style="color: #38bdf8; font-weight: 700;">
+        <i class="fa-solid fa-clipboard-list" style="margin-right: 8px;"></i> My Bookings
+      </a>
+      <a href="{% url 'user_dashboard' %}" onclick="closeMobileMenu()" style="color: #38bdf8; font-weight: 700;">
+        <i class="fa-solid fa-gauge-high" style="margin-right: 8px;"></i> User Dashboard
+      </a>
+    {% endif %}
+
+    <a href="{% url 'services' %}" onclick="closeMobileMenu()"><i class="fa-solid fa-truck-ramp-box" style="margin-right: 8px;"></i> Services</a>
+    <a href="{% url 'social:feed' %}" onclick="closeMobileMenu()"><i class="fa-solid fa-users" style="margin-right: 8px;"></i> Ghidora Social</a>
+    <a href="{% url 'pickupwala:player' %}" onclick="closeMobileMenu()" style="color: #ffb870; font-weight: 800; background: rgba(255, 184, 112, 0.16) !important; border: 1.5px solid rgba(255, 184, 112, 0.45) !important;">
+      <i class="fa-solid fa-radio" style="margin-right: 8px;"></i> Pickupwala Radio
+    </a>
+    <a href="{% url 'about' %}" class="active" onclick="closeMobileMenu()"><i class="fa-solid fa-circle-info" style="margin-right: 8px;"></i> About Us</a>
+    <a href="{% url 'contact_us' %}" onclick="closeMobileMenu()"><i class="fa-solid fa-headset" style="margin-right: 8px;"></i> Contact Us</a>
 
     <div style="height: 1px; background: rgba(255, 255, 255, 0.1); margin: 6px 0;"></div>
 
-    <div style="font-size: 11px; font-weight: 800; letter-spacing: 1.5px; color: #00d2ff; padding: 4px 6px 2px; text-transform: uppercase;">⚡ Special Features & Tools</div>
-    <a href="{% url 'pickupwala:player' %}" onclick="closeMobileMenu()" style="color: #ffb870; font-weight: 800; background: rgba(255, 184, 112, 0.16) !important; border: 1.5px solid rgba(255, 184, 112, 0.45) !important;">🚚 Pickupwala Radio & Music FM 📻</a>
-    <a href="{% url 'home' %}#360-viewer" onclick="closeMobileMenu()" style="color: #ff9e00; font-weight: 700;">🏎️ 360° Vehicle View</a>
-    <a href="{% url 'quotations:quote_request' %}" onclick="closeMobileMenu()">💰 Check Fare & Rate Quote</a>
-    <a href="{% url 'business_card' %}" onclick="closeMobileMenu()">🪪 Digital Business Card</a>
-    <a href="{% url 'status' %}" onclick="closeMobileMenu()">💳 Check Booking Status & Payment</a>
+    <div style="font-size: 11px; font-weight: 800; letter-spacing: 1.5px; color: #00d2ff; padding: 4px 6px 2px; text-transform: uppercase;">
+      <i class="fa-solid fa-bolt" style="margin-right: 6px;"></i> Special Features &amp; Tools
+    </div>
+    <a href="{% url 'social:feed' %}" onclick="closeMobileMenu()" style="color: #00d2ff; font-weight: 700;">
+      <i class="fa-solid fa-globe" style="margin-right: 8px;"></i> Ghidora Social Network
+    </a>
+    <a href="{% url 'pickupwala:player' %}" onclick="closeMobileMenu()" style="color: #ffb870; font-weight: 800; background: rgba(255, 184, 112, 0.16) !important; border: 1.5px solid rgba(255, 184, 112, 0.45) !important;">
+      <i class="fa-solid fa-music" style="margin-right: 8px;"></i> Pickupwala Radio &amp; FM
+    </a>
+    <a href="{% url 'home' %}#360-viewer" onclick="closeMobileMenu()" style="color: #ff9e00; font-weight: 700;">
+      <i class="fa-solid fa-rotate" style="margin-right: 8px;"></i> 360° Vehicle View
+    </a>
+    <a href="{% url 'quotations:quote_request' %}" onclick="closeMobileMenu()">
+      <i class="fa-solid fa-file-invoice-dollar" style="margin-right: 8px;"></i> Check Fare &amp; Rate Quote
+    </a>
+    <a href="{% url 'business_card' %}" onclick="closeMobileMenu()">
+      <i class="fa-solid fa-address-card" style="margin-right: 8px;"></i> Digital Business Card
+    </a>
+
+    {% if user.is_authenticated %}
+      <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: rgba(255,122,26,0.12); border: 1px solid rgba(255,122,26,0.3); border-radius: 12px; margin-top: 6px;">
+        <a href="{% url 'user_dashboard' %}" onclick="closeMobileMenu()" style="color: #ff7a1a; font-weight: 700; font-size: 13px; text-decoration: none;">
+          <i class="fa-solid fa-circle-user" style="margin-right: 6px;"></i> {{ user.first_name|default:user.username }}
+        </a>
+        <form method="post" action="{% url 'logout' %}" style="margin: 0;">
+          {% csrf_token %}
+          <button type="submit" style="background: #ef4444; color: white; border: none; padding: 4px 10px; border-radius: 8px; font-size: 11px; font-weight: bold; cursor: pointer;">
+            <i class="fa-solid fa-right-from-bracket"></i> Logout
+          </button>
+        </form>
+      </div>
+    {% else %}
+      <a href="{% url 'login' %}" onclick="closeMobileMenu()" style="background: linear-gradient(135deg, #00d2ff, #0072ff) !important; color: white !important; justify-content: center; font-weight: bold; margin-top: 6px;">
+        <i class="fa-solid fa-arrow-right-to-bracket" style="margin-right: 8px;"></i> Login / Sign Up
+      </a>
+    {% endif %}
   </div>
 
   <script>
-    window.toggleMobileMenu = function(event) {
-      if (event) {
-        try { event.preventDefault(); } catch(e){}
-        try { event.stopPropagation(); } catch(e){}
+    window.toggleMobileMenu = function(e) {
+      if (e) {
+        try { e.preventDefault(); } catch(err){}
+        try { e.stopPropagation(); } catch(err){}
       }
-      window._justToggledMenu = true;
-      setTimeout(function() { window._justToggledMenu = false; }, 350);
+      var d = document.getElementById('mobileNavDrawer');
+      var o = document.getElementById('mobileNavOverlay');
+      var b = document.getElementById('hamburgerBtn');
+      if (!d) return;
 
-      var drawer = document.getElementById('mobileNavDrawer');
-      var overlay = document.getElementById('mobileNavOverlay');
-      var btn = document.getElementById('hamburgerBtn');
-      if (!drawer) return;
+      var isCurrentlyOpen = d.classList.contains('active');
 
-      var isVisible = drawer.classList.contains('active') || drawer.style.opacity === '1';
-
-      if (isVisible) {
-        window._justToggledMenu = false;
+      if (isCurrentlyOpen) {
         window.closeMobileMenu();
       } else {
-        drawer.classList.add('active');
-        drawer.style.opacity = '1';
-        drawer.style.pointerEvents = 'auto';
-        drawer.style.transform = 'translateY(0) scale(1)';
-        drawer.style.display = 'flex';
-        if (overlay) {
-          overlay.classList.add('active');
-          overlay.style.opacity = '1';
-          overlay.style.pointerEvents = 'auto';
-          overlay.style.display = 'block';
-        }
-        if (btn) btn.classList.add('active');
+        d.classList.add('active');
+        if (o) o.classList.add('active');
+        if (b) b.classList.add('active');
         document.body.style.overflow = 'hidden';
       }
     };
 
     window.closeMobileMenu = function() {
-      if (window._justToggledMenu) return;
-
-      var drawer = document.getElementById('mobileNavDrawer');
-      var overlay = document.getElementById('mobileNavOverlay');
-      var btn = document.getElementById('hamburgerBtn');
-      if (drawer) {
-        drawer.classList.remove('active');
-        drawer.style.opacity = '0';
-        drawer.style.pointerEvents = 'none';
-        drawer.style.transform = 'translateY(-12px) scale(0.96)';
-      }
-      if (overlay) {
-        overlay.classList.remove('active');
-        overlay.style.opacity = '0';
-        overlay.style.pointerEvents = 'none';
-      }
-      if (btn) btn.classList.remove('active');
+      var d = document.getElementById('mobileNavDrawer');
+      var o = document.getElementById('mobileNavOverlay');
+      var b = document.getElementById('hamburgerBtn');
+      if (d) d.classList.remove('active');
+      if (o) o.classList.remove('active');
+      if (b) b.classList.remove('active');
       document.body.style.overflow = '';
     };
 
+    function toggleMobileMenu(e) {
+      if (typeof window.toggleMobileMenu === 'function') {
+        window.toggleMobileMenu(e);
+      }
+    }
+
+    function closeMobileMenu() {
+      if (typeof window.closeMobileMenu === 'function') {
+        window.closeMobileMenu();
+      }
+    }
+
     document.addEventListener('click', function(e) {
-      if (window._justToggledMenu) return;
-      var drawer = document.getElementById('mobileNavDrawer');
-      if (drawer && (drawer.classList.contains('active') || drawer.style.opacity === '1')) {
-        var isInsideDrawer = drawer.contains(e.target);
-        var isBtnClick = e.target && e.target.closest && e.target.closest('#hamburgerBtn');
-        if (!isInsideDrawer && !isBtnClick) {
+      var d = document.getElementById('mobileNavDrawer');
+      if (d && d.classList.contains('active')) {
+        var clickedInsideDrawer = e.target && (d.contains(e.target) || (e.target.closest && e.target.closest('#mobileNavDrawer')));
+        var clickedOnBtn = e.target && (e.target.closest && (e.target.closest('#hamburgerBtn') || e.target.closest('.hamburger-btn')));
+        if (!clickedInsideDrawer && !clickedOnBtn) {
           window.closeMobileMenu();
         }
       }
     });
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        window.closeMobileMenu();
+      }
+    });
   </script>
 
+  <!-- Page Content Container -->
+  <div class="about-page-wrap">
 
-
-  <div class="about-hero">
+    <!-- Hero Section -->
+    <div class="about-hero">
+      <div class="about-hero-badge">
+        <span class="pulse-dot"></span> Verified Logistics Partner &bull; Estd 2024
+      </div>
       <h1>About Ghidora Transport</h1>
-      <p class="tagline">Moving Goods. Building Trust. Delivering Excellence.</p>
-  </div>
+      <p class="tagline">Moving Goods. Building Trust. Delivering Excellence across Chhattisgarh and Nationwide.</p>
+    </div>
 
-  <div class="about-section">
-      <p>Ghidora Transport एक modern और reliable transportation service platform है, जिसका उद्देश्य customers को सुरक्षित, तेज और transparent goods transportation सुविधा प्रदान करना है। हम technology और experienced drivers के साथ मिलकर ऐसा transport experience देने का प्रयास करते हैं जहाँ booking से लेकर delivery तक हर प्रक्रिया आसान और भरोसेमंद हो।</p>
-  </div>
-
-  <div class="about-section">
-      <h2>🌟 Who We Are</h2>
-      <p>Ghidora Transport एक customer-focused transport service है जो personal और business दोनों प्रकार के goods transportation solutions प्रदान करती है। हम छोटे से लेकर बड़े सामान तक के लिए सही vehicle और reliable service उपलब्ध कराने का लक्ष्य रखते हैं।</p>
-      <div class="priority-list">
-          <span>✅ Safe Transportation</span>
-          <span>✅ On-Time Delivery</span>
-          <span>✅ Transparent Pricing</span>
-          <span>✅ Customer Satisfaction</span>
+    <!-- Intro Card -->
+    <div class="about-section">
+      <div class="about-intro-card glow-card">
+        <p>Ghidora Transport एक modern और reliable transportation service platform है, जिसका उद्देश्य customers को सुरक्षित, तेज और transparent goods transportation सुविधा प्रदान करना है। हम technology और experienced drivers के साथ मिलकर ऐसा transport experience देने का प्रयास करते हैं जहाँ booking से लेकर delivery तक हर प्रक्रिया आसान, सुरक्षित और पूरी तरह भरोसेमंद हो।</p>
       </div>
-  </div>
+    </div>
 
-  <div class="about-section">
-      <h2>🚛 Our Services</h2>
+    <!-- Who We Are -->
+    <div class="about-section">
+      <div class="about-intro-card glow-card">
+        <h2>
+          <i class="fa-solid fa-shield-halved"></i> Who We Are
+        </h2>
+        <p>Ghidora Transport एक customer-focused transport service है जो personal और business दोनों प्रकार के goods transportation solutions प्रदान करती है। हम छोटे से लेकर बड़े सामान तक के लिए सही vehicle और reliable service उपलब्ध कराने का लक्ष्य रखते हैं।</p>
+        <div class="priority-list">
+          <div class="priority-item">
+            <i class="fa-solid fa-shield-heart" style="color: #34d399;"></i> Safe Transportation
+          </div>
+          <div class="priority-item">
+            <i class="fa-solid fa-clock-rotate-left" style="color: #00f2fe;"></i> On-Time Delivery
+          </div>
+          <div class="priority-item">
+            <i class="fa-solid fa-receipt" style="color: #fbbf24;"></i> Transparent Pricing
+          </div>
+          <div class="priority-item">
+            <i class="fa-solid fa-face-smile" style="color: #f472b6;"></i> Customer Satisfaction
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Our Services -->
+    <div class="about-section">
+      <h2>
+        <i class="fa-solid fa-truck-moving"></i> Our Services
+      </h2>
       <div class="services-grid">
-          <div class="service-card glow-card">
-              <span class="icon">📦</span>
-              <h3>Goods Transportation</h3>
-              <p>घर, दुकान और business के सामान के लिए reliable transport service।</p>
+        <div class="service-card glow-card">
+          <div class="icon-capsule cyan">
+            <i class="fa-solid fa-boxes-stacked"></i>
           </div>
-          <div class="service-card glow-card">
-              <span class="icon">🚚</span>
-              <h3>Pickup & Delivery Service</h3>
-              <p>Local और long-distance delivery solutions।</p>
+          <h3>Goods Transportation</h3>
+          <p>घर, दुकान और business के सामान के लिए reliable और 100% सुरक्षित transport service।</p>
+        </div>
+        <div class="service-card glow-card">
+          <div class="icon-capsule purple">
+            <i class="fa-solid fa-truck-fast"></i>
           </div>
-          <div class="service-card glow-card">
-              <span class="icon">🏢</span>
-              <h3>Business Transportation</h3>
-              <p>Shops, industries और businesses के लिए transportation support।</p>
+          <h3>Pickup &amp; Delivery</h3>
+          <p>Local और long-distance goods delivery solutions punctual schedules के साथ।</p>
+        </div>
+        <div class="service-card glow-card">
+          <div class="icon-capsule blue">
+            <i class="fa-solid fa-building-circle-arrow-right"></i>
           </div>
-          <div class="service-card glow-card">
-              <span class="icon">🏠</span>
-              <h3>Household Shifting</h3>
-              <p>घर के सामान को सुरक्षित तरीके से एक स्थान से दूसरे स्थान तक पहुँचाना।</p>
+          <h3>Business Logistics</h3>
+          <p>Shops, industries, wholesale dealers और businesses के लिए corporate supply transport।</p>
+        </div>
+        <div class="service-card glow-card">
+          <div class="icon-capsule emerald">
+            <i class="fa-solid fa-house-chimney"></i>
           </div>
+          <h3>Household Shifting</h3>
+          <p>घर के सामान को सुरक्षित तरीके से pack और transport करके नए स्थान तक सही सलामत पहुँचाना।</p>
+        </div>
       </div>
-  </div>
+    </div>
 
-  <div class="about-section">
-      <h2>💡 Technology Driven Transport</h2>
-      <p>Ghidora Transport traditional transport service को modern technology के साथ जोड़ता है। हमारे platform में:</p>
-      <div class="tech-features">
-          <span>📍 Smart Fare Calculation</span>
-          <span>📄 Digital Receipt System</span>
-          <span>📊 Booking Status Tracking</span>
-          <span>👨‍✈️ Driver Management</span>
-          <span>💬 Customer Support Integration</span>
+    <!-- Technology Driven Transport -->
+    <div class="about-section">
+      <div class="about-intro-card glow-card">
+        <h2>
+          <i class="fa-solid fa-microchip"></i> Technology Driven Transport
+        </h2>
+        <p>Ghidora Transport traditional transport service को modern technology के साथ जोड़ता है। हमारे digital logistics platform में:</p>
+        <div class="tech-features">
+          <div class="tech-pill">
+            <i class="fa-solid fa-calculator" style="color: #00f2fe;"></i> Smart Fare Calculation
+          </div>
+          <div class="tech-pill">
+            <i class="fa-solid fa-file-invoice-dollar" style="color: #34d399;"></i> Digital Receipt System
+          </div>
+          <div class="tech-pill">
+            <i class="fa-solid fa-chart-line" style="color: #c084fc;"></i> Booking Status Tracking
+          </div>
+          <div class="tech-pill">
+            <i class="fa-solid fa-id-card-clip" style="color: #fbbf24;"></i> Driver Management
+          </div>
+          <div class="tech-pill">
+            <i class="fa-solid fa-headset" style="color: #fb7185;"></i> 24/7 Customer Support
+          </div>
+        </div>
       </div>
-  </div>
+    </div>
 
-  <div class="about-section">
-      <h2>⭐ Why Choose Ghidora Transport?</h2>
+    <!-- Why Choose Ghidora Transport -->
+    <div class="about-section">
+      <h2>
+        <i class="fa-solid fa-award"></i> Why Choose Ghidora Transport?
+      </h2>
       <div class="why-grid">
-          <div class="why-card glow-card">
-              <span class="icon">🔹</span>
-              <h3>Reliable Service</h3>
-              <p>हम customer की जरूरत और समय की importance को समझते हैं।</p>
+        <div class="why-card glow-card">
+          <div class="icon-capsule cyan">
+            <i class="fa-solid fa-shield-check"></i>
           </div>
-          <div class="why-card glow-card">
-              <span class="icon">🔹</span>
-              <h3>Transparent Fare</h3>
-              <p>Booking से पहले estimated fare की जानकारी।</p>
+          <h3>Reliable Service</h3>
+          <p>हम customer की जरूरत और समय की importance को सर्वोच्च प्राथमिकता देते हैं।</p>
+        </div>
+        <div class="why-card glow-card">
+          <div class="icon-capsule amber">
+            <i class="fa-solid fa-scale-balanced"></i>
           </div>
-          <div class="why-card glow-card">
-              <span class="icon">🔹</span>
-              <h3>Professional Drivers</h3>
-              <p>Responsible और experienced drivers के माध्यम से सुरक्षित transportation।</p>
+          <h3>Transparent Fare</h3>
+          <p>बिना किसी hidden charge के booking से पहले estimated fare की स्पष्ट जानकारी।</p>
+        </div>
+        <div class="why-card glow-card">
+          <div class="icon-capsule purple">
+            <i class="fa-solid fa-user-tie"></i>
           </div>
-          <div class="why-card glow-card">
-              <span class="icon">🔹</span>
-              <h3>Digital Experience</h3>
-              <p>Online booking, receipt और tracking जैसी सुविधाएं।</p>
+          <h3>Professional Drivers</h3>
+          <p>Responsible और experienced drivers के माध्यम से सुरक्षित और smooth transportation।</p>
+        </div>
+        <div class="why-card glow-card">
+          <div class="icon-capsule emerald">
+            <i class="fa-solid fa-laptop-code"></i>
           </div>
+          <h3>Digital Experience</h3>
+          <p>Online booking, real-time live map, digital receipt और live tracking जैसी आधुनिक सुविधाएं।</p>
+        </div>
       </div>
-  </div>
+    </div>
 
-  <div class="about-section">
+    <!-- Mission & Vision -->
+    <div class="about-section">
       <div class="mission-vision-grid">
-          <div class="mv-card glow-card">
-              <h3>🎯 Our Mission</h3>
-              <p>हमारा mission है कि transportation को आसान, सुरक्षित और technology-friendly बनाया जाए ताकि हर customer बिना परेशानी के अपने सामान को सही जगह तक पहुँचा सके।</p>
-          </div>
-          <div class="mv-card glow-card">
-              <h3>🚀 Our Vision</h3>
-              <p>भविष्य में Ghidora Transport को एक ऐसा trusted transportation platform बनाना है जहाँ हर व्यक्ति और business को fast, safe और smart transport solution मिल सके।</p>
-          </div>
+        <div class="mv-card glow-card">
+          <h3>
+            <i class="fa-solid fa-bullseye"></i> Our Mission
+          </h3>
+          <p>हमारा mission है कि transportation को आसान, सुरक्षित और technology-friendly बनाया जाए ताकि हर customer बिना परेशानी के अपने सामान को सही समय पर सही जगह पहुँचा सके।</p>
+        </div>
+        <div class="mv-card glow-card">
+          <h3>
+            <i class="fa-solid fa-compass-drafting"></i> Our Vision
+          </h3>
+          <p>भविष्य में Ghidora Transport को एक ऐसा trusted transportation platform बनाना है जहाँ हर व्यक्ति और business को fast, safe, transparent और smart transport solution मिल सके।</p>
+        </div>
       </div>
-  </div>
+    </div>
 
-  <div class="about-section">
-      <div class="promise-box">
-          <p class="quote">"आपका सामान, हमारी जिम्मेदारी।"</p>
-          <p>हर delivery हमारे लिए सिर्फ एक काम नहीं, बल्कि customer के भरोसे की जिम्मेदारी है।</p>
+    <!-- Promise Box -->
+    <div class="about-section">
+      <div class="promise-box glow-card">
+        <p class="quote">
+          <i class="fa-solid fa-quote-left"></i> आपका सामान, हमारी जिम्मेदारी। <i class="fa-solid fa-quote-right"></i>
+        </p>
+        <p>हर delivery हमारे लिए सिर्फ एक consignment नहीं, बल्कि customer के भरोसे की अटूट जिम्मेदारी है।</p>
       </div>
-  </div>
+    </div>
 
-  <div class="team-section">
-      <h2 style="color:#4facfe; font-size:28px;">👥 हमारी टीम</h2>
-      <p style="color:#9aa5b8; font-size:13px; margin-top:-10px;">(details ke liye photo pe double-click karein)</p>
+    <!-- Our Team Section -->
+    <section class="team-section" id="team">
+      <h2 class="team-section-title">
+        <i class="fa-solid fa-users-gear" style="color: #38bdf8;"></i> हमारी टीम
+      </h2>
+      <p class="team-section-subtitle">(Click on member photo to view complete verified profile)</p>
+
       <div class="team-grid">
-          <div class="team-card glow-card"
-               ondblclick="showDetail(this)"
-               data-name="TARUN SAHU"
-               data-role="Founder & Owner"
-               data-photo="{% static 'images/owner.jpeg' %}"
-               data-phone="+91 7489297841"
-               data-location="Kodebod, Kurud, Dhamtari, Chhattisgarh"
-               data-gmail="ghidoratransport@gmail.com"
-               data-insta="hamar_kodebod05">
-              <img src="{% static 'images/owner.jpeg' %}" alt="Owner" class="team-photo">
-              <h3>TARUN SAHU</h3>
-              <p class="team-role">Founder & Owner</p>
+        <!-- Card 1: Tarun Sahu -->
+        <div class="team-card" onclick="openTeamMemberModal('tarun')" tabindex="0" role="button" aria-label="View Tarun Kumar Sahu profile" onkeydown="if(event.key==='Enter'||event.key===' ') openTeamMemberModal('tarun')">
+          <div class="team-avatar-wrapper">
+            <img src="{% static 'images/owner.jpeg' %}" alt="Tarun Kumar Sahu" class="team-avatar-img" onerror="this.onerror=null; this.src='{% static 'images/logo6.png' %}';">
           </div>
-          <div class="team-card glow-card"
-               ondblclick="showDetail(this)"
-               data-name="PANKAJ SAHU"
-               data-role="Professional Driver"
-               data-photo="{% static 'images/driver1.jpeg' %}"
-               data-phone="+91 6266014139"
-               data-location="Kodebod, Kurud, Dhamtari, Chhattisgarh"
-               data-gmail="ghidoratransport@gmail.com"
-               data-insta="hamar_kodebod05">
-              <img src="{% static 'images/driver1.jpeg' %}" alt="Driver" class="team-photo">
-              <h3>PANKAJ SAHU</h3>
-              <p class="team-role">Professional Driver</p>
-          </div>
+          <h3 class="team-card-name">TARUN SAHU</h3>
+          <p class="team-card-role">Founder &amp; Owner</p>
+          <span class="team-card-view-btn">
+            <i class="fa-solid fa-id-card"></i> View Profile
+          </span>
+        </div>
 
-          <div class="team-card glow-card"
-               ondblclick="showDetail(this)"
-               data-name="AMIT SAHU"
-               data-role="Website Developer"
-               data-photo="{% static 'images/developer.jpeg' %}"
-               data-phone="+91 0000000000"
-               data-location="Chhattisgarh"
-               data-gmail="youremail@gmail.com"
-               data-insta="yourusername">
-              <img src="{% static 'images/developer.jpeg' %}" alt="Developer" class="team-photo">
-              <h3>AMIT SAHU</h3>
-              <p class="team-role">website developer</p>
+        <!-- Card 2: Pankaj Sahu -->
+        <div class="team-card" onclick="openTeamMemberModal('pankaj')" tabindex="0" role="button" aria-label="View Pankaj Kumar Sahu profile" onkeydown="if(event.key==='Enter'||event.key===' ') openTeamMemberModal('pankaj')">
+          <div class="team-avatar-wrapper">
+            <img src="{% static 'images/driver1.jpeg' %}" alt="Pankaj Kumar Sahu" class="team-avatar-img" onerror="this.onerror=null; this.src='{% static 'images/logo6.png' %}';">
           </div>
+          <h3 class="team-card-name">PANKAJ SAHU</h3>
+          <p class="team-card-role">Professional Driver</p>
+          <span class="team-card-view-btn">
+            <i class="fa-solid fa-id-card"></i> View Profile
+          </span>
+        </div>
+
+        <!-- Card 3: Amit Sahu -->
+        <div class="team-card" onclick="openTeamMemberModal('amit')" tabindex="0" role="button" aria-label="View Amit Kumar Sahu profile" onkeydown="if(event.key==='Enter'||event.key===' ') openTeamMemberModal('amit')">
+          <div class="team-avatar-wrapper">
+            <img src="{% static 'images/developer.jpeg' %}" alt="Amit Kumar Sahu" class="team-avatar-img" onerror="this.onerror=null; this.src='{% static 'images/logo6.png' %}';">
+          </div>
+          <h3 class="team-card-name">AMIT SAHU</h3>
+          <p class="team-card-role">Website Developer</p>
+          <span class="team-card-view-btn">
+            <i class="fa-solid fa-id-card"></i> View Profile
+          </span>
+        </div>
       </div>
-  </div>
+    </section>
 
-  <div class="detail-overlay" id="detailOverlay" onclick="closeDetail()"></div>
-  <div class="detail-panel" id="detailPanel">
-      <button class="detail-close" onclick="closeDetail()">✕</button>
-      <img src="" alt="" class="detail-photo" id="detailPhoto">
-      <h3 class="detail-name" id="detailName"></h3>
-      <p class="detail-role" id="detailRole"></p>
-      <div class="detail-info">
-          <div class="detail-row">
-              <span class="d-label">Phone</span>
-              <a href="#" class="d-value" id="detailPhone"></a>
+    <!-- Dynamic Team Profile Modal Overlay -->
+    <div id="teamMemberModalOverlay" class="team-modal-overlay" onclick="handleTeamModalBackdropClick(event)" aria-modal="true" role="dialog" aria-labelledby="modalMemberName">
+      <div class="team-modal-card">
+        <button type="button" class="team-modal-close-btn" onclick="closeTeamMemberModal()" aria-label="Close Profile Modal">✕</button>
+
+        <div class="team-modal-body">
+          <!-- Left Side -->
+          <div class="team-modal-left">
+            <img id="modalMemberImg" src="" alt="Team Member Photo" class="team-modal-avatar">
+            <h3 id="modalMemberName" class="team-modal-name">-</h3>
+            <span id="modalMemberRoleBadge" class="team-modal-role-badge">-</span>
+            
+            <div class="team-modal-quote">
+              <span style="color: #a5b4fc; font-size: 18px; font-weight: bold;">“</span>
+              <span id="modalMemberQuoteText">-</span>
+              <span style="color: #a5b4fc; font-size: 18px; font-weight: bold;">”</span>
+            </div>
+
+            <div class="team-stats-row" id="modalMemberStats">
+              <!-- Stat cards injected dynamically -->
+            </div>
           </div>
-          <div class="detail-row">
-              <span class="d-label">Location</span>
-              <span class="d-value" id="detailLocation"></span>
+
+          <!-- Right Side -->
+          <div class="team-modal-right">
+            <div>
+              <div class="team-modal-sec-header">
+                <i class="fa-solid fa-address-card" style="color: #38bdf8;"></i>
+                <span>Personal Information</span>
+              </div>
+
+              <div class="team-info-rows" id="modalMemberInfoGrid">
+                <!-- Info rows injected dynamically -->
+              </div>
+            </div>
+
+            <div class="team-about-sec">
+              <div class="team-about-sec-header">
+                <i class="fa-solid fa-user-check"></i>
+                <span id="modalAboutTitleText">About Me</span>
+              </div>
+
+              <p id="modalMemberAboutText" class="team-about-p">
+                -
+              </p>
+            </div>
+
+            <!-- Bottom Contact Strip -->
+            <div class="team-modal-footer-strip" id="modalMemberFooterStrip">
+              <!-- Footer contact info -->
+            </div>
           </div>
-          <div class="detail-row">
-              <span class="d-label">Gmail</span>
-              <a href="#" target="_blank" class="d-value" id="detailGmail"></a>
-          </div>
-          <div class="detail-row">
-              <span class="d-label">Instagram</span>
-              <a href="#" target="_blank" class="d-value" id="detailInsta"></a>
-          </div>
+        </div>
       </div>
-  </div>
+    </div>
 
-  <div class="contact-box">
-      <h2>📞 Contact Us</h2>
-      <p><strong>Ghidora Transport</strong></p>
-      <p>📍 kodebod,kurud,Dhamtari, Chhattisgarh</p>
-      <p>+91 7489297841</p>
-      <p>+91 6266014139</p>
+    <!-- Contact Us Box -->
+    <div class="contact-box">
+      <div class="contact-box-inner glow-card">
+        <h2>
+          <i class="fa-solid fa-headset" style="color: #00f2fe;"></i> Get In Touch
+        </h2>
+        <p style="font-size: 17px; font-weight: 700; color: #ffffff; margin-bottom: 4px;">Ghidora Transport</p>
+        <p style="margin-bottom: 12px;">
+          <i class="fa-solid fa-location-dot" style="color: #f87171; margin-right: 6px;"></i> Kodebod, Kurud, Dhamtari, Chhattisgarh 493663
+        </p>
+        <p style="color: #94a3b8;">
+          <i class="fa-solid fa-phone" style="color: #38bdf8; margin-right: 6px;"></i> +91 6266014139 &bull; +91 7489297841
+        </p>
 
-      <div class="contact-links">
-          <a href="https://mail.google.com/mail/?view=cm&fs=1&to=ghidoratransport@gmail.com" target="_blank" class="icon-mail">
-              <span class="link-label">📧 Gmail</span>
-              <span class="link-value">ghidoratransport@gmail.com</span>
+        <div class="contact-links">
+          <a href="https://mail.google.com/mail/?view=cm&fs=1&to=ghidoratransport@gmail.com" target="_blank" class="contact-link-card">
+            <i class="fa-solid fa-envelope link-icon" style="color: #ea4335;"></i>
+            <span class="link-label">Gmail Direct</span>
+            <span class="link-value">ghidoratransport@gmail.com</span>
           </a>
-          <a href="https://instagram.com/hamar_kodebod05" target="_blank" class="icon-insta">
-              <span class="link-label">📸 Instagram</span>
-              <span class="link-value">@hamar_kodebod05</span>
+          <a href="https://www.instagram.com/ghidora__transport2286?stkn=c3Q0enVsbzl1dTB6" target="_blank" class="contact-link-card">
+            <i class="fa-brands fa-instagram link-icon" style="color: #e1306c;"></i>
+            <span class="link-label">Official Instagram</span>
+            <span class="link-value">@ghidora__transport2286</span>
           </a>
-          <a href="https://wa.me/916264588894" target="_blank" class="icon-whatsapp">
-              <span class="link-label">💬 WhatsApp</span>
-              <span class="link-value">+91 6264588894</span>
+          <a href="https://wa.me/916266014139" target="_blank" class="contact-link-card">
+            <i class="fa-brands fa-whatsapp link-icon" style="color: #25D366;"></i>
+            <span class="link-label">WhatsApp Enquiry</span>
+            <span class="link-value">+91 6266014139</span>
           </a>
+        </div>
       </div>
-  </div>
+    </div>
 
+  </div> <!-- End of about-page-wrap -->
+
+  {% include "booking/footer.html" %}
+
+  <!-- 3D PARTICLE CONSTELLATION ANIMATION ENGINE -->
   <script>
-    function callNow() {
-      let confirmCall = confirm("Kya aap Ghidora Transport ko call karna chahte hain?");
-      if (confirmCall) {
-        window.location.href = "tel:+916264588894";
+    (function() {
+      const canvas = document.getElementById('aboutBgCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      let width = canvas.width = window.innerWidth;
+      let height = canvas.height = window.innerHeight;
+
+      window.addEventListener('resize', () => {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+      });
+
+      const particles = [];
+      const count = 55;
+
+      for (let i = 0; i < count; i++) {
+        particles.push({
+          x: Math.random() * width,
+          y: Math.random() * height,
+          vx: (Math.random() - 0.5) * 0.75,
+          vy: (Math.random() - 0.5) * 0.75,
+          radius: Math.random() * 2 + 1.2,
+          color: i % 2 === 0 ? 'rgba(0, 242, 254, ' : 'rgba(255, 0, 127, '
+        });
+      }
+
+      function animate() {
+        ctx.clearRect(0, 0, width, height);
+
+        for (let i = 0; i < count; i++) {
+          const p = particles[i];
+          p.x += p.vx;
+          p.y += p.vy;
+
+          if (p.x < 0 || p.x > width) p.vx *= -1;
+          if (p.y < 0 || p.y > height) p.vy *= -1;
+
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+          ctx.fillStyle = p.color + '0.75)';
+          ctx.shadowBlur = 10;
+          ctx.shadowColor = p.color + '1)';
+          ctx.fill();
+
+          for (let j = i + 1; j < count; j++) {
+            const p2 = particles[j];
+            const dx = p.x - p2.x;
+            const dy = p.y - p2.y;
+            const dist = Math.hypot(dx, dy);
+
+            if (dist < 135) {
+              ctx.beginPath();
+              ctx.moveTo(p.x, p.y);
+              ctx.lineTo(p2.x, p2.y);
+              ctx.strokeStyle = `rgba(0, 242, 254, ${0.16 * (1 - dist / 135)})`;
+              ctx.lineWidth = 0.8;
+              ctx.stroke();
+            }
+          }
+        }
+
+        requestAnimationFrame(animate);
+      }
+
+      animate();
+    })();
+
+    // ===== Team Members Data Registry =====
+    const TEAM_MEMBERS_DATA = {
+      tarun: {
+        id: "tarun",
+        name: "TARUN KUMAR SAHU",
+        role: "Founder & Owner",
+        roleBadge: "Founder & Owner",
+        age: 48,
+        phone: "6266014139",
+        phoneDisplay: "+91 6266014139",
+        email: "tarunsahu2407@gmail.com",
+        location: "Kodebod, Kurud, Dhamtari, Chhattisgarh",
+        image: "{% static 'images/owner.jpeg' %}",
+        quote: "Driving excellence in every journey, every day.",
+        stats: [
+          { icon: `<i class="fa-solid fa-briefcase"></i>`, val: "25+", lbl: "Years Experience" },
+          { icon: `<i class="fa-solid fa-shield-halved"></i>`, val: "100%", lbl: "Commitment" },
+          { icon: `<i class="fa-solid fa-users"></i>`, val: "500+", lbl: "Happy Clients" }
+        ],
+        aboutTitle: "About Me",
+        aboutText: "I am the Founder & Owner of Ghidora Transport. With over two decades of experience in the transport industry, my goal is to provide reliable, safe, and timely transport solutions with customer satisfaction as our top priority."
+      },
+      pankaj: {
+        id: "pankaj",
+        name: "PANKAJ KUMAR SAHU",
+        role: "Professional Driver",
+        roleBadge: "Professional Driver",
+        age: 24,
+        phone: "7489297841",
+        phoneDisplay: "+91 7489297841",
+        email: "piku626458@gmail.com",
+        instagramHandle: "@peetar.0007",
+        instagramUrl: "https://www.instagram.com/peetar.0007",
+        image: "{% static 'images/driver1.jpeg' %}",
+        quote: "Safe driving and customer-focused service on every journey.",
+        stats: [
+          { icon: `<i class="fa-solid fa-shield-heart"></i>`, val: "100%", lbl: "Safe & Responsible" },
+          { icon: `<i class="fa-solid fa-star"></i>`, val: "Top Rated", lbl: "Customer Focused" },
+          { icon: `<i class="fa-solid fa-truck-fast"></i>`, val: "Trusted", lbl: "Professional Service" }
+        ],
+        aboutTitle: "Driver Profile",
+        aboutText: "Professional Driver at Ghidora Transport. Experienced, responsible, and customer-focused with a strict emphasis on safe driving, careful cargo handling, and punctual arrivals."
+      },
+      amit: {
+        id: "amit",
+        name: "AMIT KUMAR SAHU",
+        role: "Website Developer",
+        roleBadge: "Website Developer",
+        age: 22,
+        phone: "6268814185",
+        phoneDisplay: "+91 6268814185",
+        email: "dmtamit789@gmail.com",
+        instagramHandle: "@amitsahu_018",
+        instagramUrl: "https://www.instagram.com/amitsahu_018",
+        linkedinHandle: "@amit-kumar-sahu",
+        linkedinUrl: "https://www.linkedin.com/in/amit-kumar-sahu-980a4236b?utm_source=share_via&utm_content=profile&utm_medium=member_android",
+        portfolioUrl: "https://portfolio-website-delta-one-38.vercel.app/",
+        image: "{% static 'images/developer.jpeg' %}",
+        quote: "Building modern, intuitive web experiences for smart transport logistics.",
+        stats: [
+          { icon: `<i class="fa-solid fa-code"></i>`, val: "Full Stack", lbl: "Frontend & Backend" },
+          { icon: `<i class="fa-solid fa-laptop-code"></i>`, val: "Modern", lbl: "Web Experience" },
+          { icon: `<i class="fa-solid fa-palette"></i>`, val: "UI / UX", lbl: "Interactive Design" }
+        ],
+        aboutTitle: "Developer Profile",
+        aboutText: "Website Developer crafting modern web solutions, responsive UI/UX design, interactive booking systems, and seamless digital logistics experiences for Ghidora Transport."
+      }
+    };
+
+    function openTeamMemberModal(memberKey) {
+      const member = TEAM_MEMBERS_DATA[memberKey];
+      if (!member) return;
+
+      const imgEl = document.getElementById('modalMemberImg');
+      if (imgEl) {
+        imgEl.src = member.image;
+        imgEl.alt = member.name;
+        imgEl.onerror = function() { this.src = '{% static "images/logo6.png" %}'; };
+      }
+
+      document.getElementById('modalMemberName').innerText = member.name;
+      document.getElementById('modalMemberRoleBadge').innerText = member.roleBadge;
+      document.getElementById('modalMemberQuoteText').innerText = member.quote;
+
+      const statsContainer = document.getElementById('modalMemberStats');
+      if (statsContainer) {
+        statsContainer.innerHTML = member.stats.map(s => `
+          <div class="team-stat-box">
+            <div class="team-stat-box-icon">${s.icon}</div>
+            <div class="team-stat-box-val">${s.val}</div>
+            <div class="team-stat-box-lbl">${s.lbl}</div>
+          </div>
+        `).join('');
+      }
+
+      const infoGrid = document.getElementById('modalMemberInfoGrid');
+      if (infoGrid) {
+        let rowsHtml = `
+          <div class="team-info-row-card">
+            <div class="team-info-row-icon purple">
+              <i class="fa-solid fa-user"></i>
+            </div>
+            <div class="team-info-row-label purple">Name</div>
+            <div class="team-info-row-val">${member.name}</div>
+          </div>
+
+          <div class="team-info-row-card">
+            <div class="team-info-row-icon cyan">
+              <i class="fa-solid fa-calendar-days"></i>
+            </div>
+            <div class="team-info-row-label cyan">Age</div>
+            <div class="team-info-row-val">${member.age}</div>
+          </div>
+
+          <div class="team-info-row-card">
+            <div class="team-info-row-icon green">
+              <i class="fa-solid fa-phone"></i>
+            </div>
+            <div class="team-info-row-label green">Contact Number</div>
+            <div class="team-info-row-val"><a href="tel:${member.phone}">${member.phoneDisplay}</a></div>
+          </div>
+
+          <div class="team-info-row-card">
+            <div class="team-info-row-icon pink">
+              <i class="fa-solid fa-envelope"></i>
+            </div>
+            <div class="team-info-row-label pink">Gmail</div>
+            <div class="team-info-row-val"><a href="mailto:${member.email}">${member.email}</a></div>
+          </div>
+        `;
+
+        if (member.portfolioUrl) {
+          rowsHtml += `
+            <div class="team-info-row-card" style="background: rgba(56, 189, 248, 0.08) !important; border: 1.5px solid rgba(56, 189, 248, 0.35) !important;">
+              <div class="team-info-row-icon cyan" style="background: rgba(56, 189, 248, 0.22) !important; color: #38bdf8 !important;">
+                <i class="fa-solid fa-globe"></i>
+              </div>
+              <div class="team-info-row-label cyan" style="color: #38bdf8 !important; font-weight: 800 !important;">Portfolio</div>
+              <div class="team-info-row-val"><a href="${member.portfolioUrl}" target="_blank" rel="noopener noreferrer" style="color: #38bdf8 !important; font-weight: 800 !important; text-decoration: underline !important;">View Portfolio ↗</a></div>
+            </div>
+          `;
+        }
+
+        if (member.instagramHandle && member.instagramUrl) {
+          rowsHtml += `
+            <div class="team-info-row-card">
+              <div class="team-info-row-icon pink" style="background: rgba(225, 48, 108, 0.2); color: #f43f5e;">
+                <i class="fa-brands fa-instagram"></i>
+              </div>
+              <div class="team-info-row-label pink" style="color: #f43f5e;">Instagram</div>
+              <div class="team-info-row-val"><a href="${member.instagramUrl}" target="_blank" rel="noopener noreferrer" style="color: #f43f5e;">${member.instagramHandle} ↗</a></div>
+            </div>
+          `;
+        }
+
+        if (member.linkedinHandle && member.linkedinUrl) {
+          rowsHtml += `
+            <div class="team-info-row-card" style="background: rgba(10, 102, 194, 0.08) !important; border: 1.5px solid rgba(10, 102, 194, 0.35) !important;">
+              <div class="team-info-row-icon cyan" style="background: rgba(10, 102, 194, 0.22) !important; color: #0077b5 !important;">
+                <i class="fa-brands fa-linkedin"></i>
+              </div>
+              <div class="team-info-row-label cyan" style="color: #0077b5 !important; font-weight: 800 !important;">LinkedIn</div>
+              <div class="team-info-row-val"><a href="${member.linkedinUrl}" target="_blank" rel="noopener noreferrer" style="color: #0077b5 !important; font-weight: 800 !important; text-decoration: underline !important;">View Profile ↗</a></div>
+            </div>
+          `;
+        }
+
+        infoGrid.innerHTML = rowsHtml;
+      }
+
+      document.getElementById('modalAboutTitleText').innerText = member.aboutTitle;
+      document.getElementById('modalMemberAboutText').innerText = member.aboutText;
+
+      const footerStrip = document.getElementById('modalMemberFooterStrip');
+      if (footerStrip) {
+        let footerHtml = '';
+        if (member.location) {
+          footerHtml += `
+            <div class="team-footer-item">
+              <span class="team-footer-item-label" style="color: #f87171;"><i class="fa-solid fa-location-dot"></i> Location</span>
+              <span class="team-footer-item-val">${member.location}</span>
+            </div>
+          `;
+        }
+        footerHtml += `
+          <div class="team-footer-item">
+            <span class="team-footer-item-label" style="color: #38bdf8;"><i class="fa-solid fa-phone"></i> Phone</span>
+            <span class="team-footer-item-val"><a href="tel:${member.phone}">${member.phoneDisplay}</a></span>
+          </div>
+          <div class="team-footer-item">
+            <span class="team-footer-item-label" style="color: #c084fc;"><i class="fa-solid fa-envelope"></i> Email</span>
+            <span class="team-footer-item-val"><a href="mailto:${member.email}">${member.email}</a></span>
+          </div>
+        `;
+        if (member.portfolioUrl) {
+          footerHtml += `
+            <div class="team-footer-item">
+              <span class="team-footer-item-label" style="color: #38bdf8;"><i class="fa-solid fa-globe"></i> Portfolio</span>
+              <span class="team-footer-item-val"><a href="${member.portfolioUrl}" target="_blank" rel="noopener noreferrer">View Portfolio ↗</a></span>
+            </div>
+          `;
+        }
+        if (member.instagramUrl) {
+          footerHtml += `
+            <div class="team-footer-item">
+              <span class="team-footer-item-label" style="color: #f43f5e;"><i class="fa-brands fa-instagram"></i> Instagram</span>
+              <span class="team-footer-item-val"><a href="${member.instagramUrl}" target="_blank" rel="noopener noreferrer">${member.instagramHandle} ↗</a></span>
+            </div>
+          `;
+        }
+        if (member.linkedinUrl) {
+          footerHtml += `
+            <div class="team-footer-item">
+              <span class="team-footer-item-label" style="color: #0077b5;"><i class="fa-brands fa-linkedin"></i> LinkedIn</span>
+              <span class="team-footer-item-val"><a href="${member.linkedinUrl}" target="_blank" rel="noopener noreferrer">View Profile ↗</a></span>
+            </div>
+          `;
+        }
+        footerStrip.innerHTML = footerHtml;
+      }
+
+      const overlay = document.getElementById('teamMemberModalOverlay');
+      if (overlay) {
+        overlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
       }
     }
+
+    function closeTeamMemberModal() {
+      const overlay = document.getElementById('teamMemberModalOverlay');
+      if (overlay) {
+        overlay.classList.remove('active');
+      }
+      document.body.style.overflow = '';
+    }
+
+    function handleTeamModalBackdropClick(e) {
+      if (e.target.id === 'teamMemberModalOverlay') {
+        closeTeamMemberModal();
+      }
+    }
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        closeTeamMemberModal();
+      }
+    });
 
     // ===== Cursor-following spotlight glow =====
     document.querySelectorAll('.glow-card').forEach(function (card) {

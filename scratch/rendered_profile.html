@@ -1,0 +1,2092 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ghidora (@ghidora) • Ghidora Social</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<!-- Tabler Icons CDN -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<!-- Ghidora Social Stylesheet -->
+<link rel="stylesheet" href="/static/social/css/social.css">
+
+<style>
+  :root{
+    --bg-0:#04060b;
+    --bg-1:#080d18;
+    --bg-2:#0d1526;
+    --blue:#3fa4ff;
+    --blue-soft:#7cc4ff;
+    --cyan:#1fe6c8;
+    --amber:#ff9142;
+    --amber-soft:#ffb578;
+    --text-hi:#eef3fb;
+    --text-mid:#aab7cf;
+    --text-lo:#647192;
+    --glass-fill: rgba(14,22,40,0.55);
+    --glass-fill-hi: rgba(18,27,48,0.75);
+    --glass-border: rgba(130,185,255,0.18);
+    --glass-border-hi: rgba(160,205,255,0.4);
+    --danger:#ff5f6d;
+    --success:#1fe6c8;
+    --radius-lg:20px;
+    --radius-md:14px;
+    --radius-sm:10px;
+    --ff-display:'Space Grotesk', sans-serif;
+    --ff-body:'Inter', sans-serif;
+    --ff-mono:'JetBrains Mono', monospace;
+  }
+
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; min-height:100%; }
+
+  body{
+    background:
+      radial-gradient(90% 60% at 15% 0%, rgba(63,164,255,0.08), transparent 55%),
+      radial-gradient(70% 50% at 100% 10%, rgba(31,230,200,0.06), transparent 55%),
+      var(--bg-0);
+    color:var(--text-hi);
+    font-family:var(--ff-body);
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+  }
+
+  a{ color:inherit; }
+  ::selection{ background:rgba(63,164,255,0.35); }
+
+  /* ============ NAVBAR ============ */
+  .nav{
+    position:sticky; top:0; z-index:50;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:14px clamp(16px,3vw,40px);
+    background:rgba(6,9,17,0.72);
+    backdrop-filter:blur(18px) saturate(140%);
+    -webkit-backdrop-filter:blur(18px) saturate(140%);
+    border-bottom:1px solid var(--glass-border);
+  }
+
+  .nav-left{ display:flex; align-items:center; gap:34px; }
+
+  .brand{ display:flex; align-items:center; gap:10px; text-decoration:none; }
+  .brand-mark{
+    width:30px; height:30px; border-radius:8px; flex:none;
+    background:conic-gradient(from 220deg, var(--blue), var(--cyan), var(--amber), var(--blue));
+    position:relative;
+    box-shadow:0 0 16px rgba(63,164,255,0.45);
+  }
+  .brand-mark::before{
+    content:''; position:absolute; inset:4px; background:var(--bg-0); border-radius:5px;
+    clip-path:polygon(20% 85%, 20% 35%, 50% 15%, 80% 35%, 80% 85%, 65% 85%, 65% 45%, 50% 35%, 35% 45%, 35% 85%);
+  }
+  .brand-text{ font-family:var(--ff-display); font-weight:600; font-size:16.5px; letter-spacing:0.01em; }
+  .brand-text small{ display:block; font-family:var(--ff-mono); font-weight:400; font-size:8.5px; letter-spacing:0.2em; color:var(--text-lo); text-transform:uppercase; }
+
+  .nav-links{ display:flex; align-items:center; gap:4px; list-style:none; margin:0; padding:0; }
+  .nav-links a{
+    display:flex; align-items:center; gap:7px;
+    text-decoration:none; color:var(--text-mid); font-size:13.5px; font-weight:500;
+    padding:8px 13px; border-radius:9px; transition:all .2s ease;
+    position:relative;
+  }
+  .nav-links a:hover{ color:var(--text-hi); background:rgba(255,255,255,0.05); }
+  .nav-links a.active{ color:var(--blue-soft); background:rgba(63,164,255,0.1); }
+  .nav-links a.active::after{
+    content:''; position:absolute; left:13px; right:13px; bottom:-1px; height:2px;
+    background:linear-gradient(90deg, var(--blue), var(--cyan)); border-radius:2px;
+    box-shadow:0 0 8px rgba(63,164,255,0.6);
+  }
+
+  @media (max-width:920px){
+    .nav{ padding: 10px 12px; flex-wrap: nowrap; overflow-x: hidden; }
+    .nav-left{ gap: 10px; }
+    .brand-text{ font-size: 14px; }
+    .nav-links{ display:none; }
+  }
+
+  .nav-right{ display:flex; align-items:center; gap:14px; }
+
+  .nav-icon-btn{
+    width:36px; height:36px; border-radius:10px;
+    display:flex; align-items:center; justify-content:center;
+    background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08);
+    color:var(--text-mid); cursor:pointer; text-decoration:none;
+    transition:all .2s ease;
+  }
+  .nav-icon-btn:hover{ background:rgba(255,255,255,0.08); color:var(--text-hi); }
+
+  .user-chip{
+    display:flex; align-items:center; gap:9px;
+    padding:5px 12px 5px 5px; border-radius:24px;
+    background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08);
+    text-decoration:none; cursor:pointer; transition:all .2s ease;
+  }
+  .user-chip:hover{ background:rgba(255,255,255,0.08); border-color:var(--glass-border-hi); }
+  .user-avatar{
+    width:26px; height:26px; border-radius:50%; flex:none;
+    background:linear-gradient(135deg, var(--blue), var(--cyan));
+    display:flex; align-items:center; justify-content:center;
+    font-family:var(--ff-display); font-weight:600; font-size:11px; color:#04060b;
+  }
+  .user-name{ font-size:13px; font-weight:500; color:var(--text-hi); }
+  @media (max-width:560px){ .user-name{ display:none; } }
+
+  .btn-login{
+    font-family:var(--ff-body); font-weight:600; font-size:13.5px;
+    padding:9px 18px; border-radius:10px; text-decoration:none;
+    background:linear-gradient(135deg, var(--blue), var(--amber));
+    color:#04060b;
+    box-shadow:0 8px 20px -8px rgba(63,164,255,0.55);
+  }
+
+  /* ============ PAGE / MESSAGES ============ */
+  .page{
+    flex:1; width:100%; max-width:1080px; margin:0 auto;
+    padding:clamp(20px,3vw,40px) clamp(16px,3vw,40px) 60px;
+  }
+
+  .messages{ list-style:none; margin:0 0 20px; padding:0; display:flex; flex-direction:column; gap:8px; }
+  .messages li{
+    font-size:13.5px; padding:12px 16px; border-radius:var(--radius-sm);
+    background:var(--glass-fill); border:1px solid var(--glass-border);
+    display:flex; align-items:center; gap:10px;
+  }
+  .messages li.success{ border-color:rgba(31,230,200,0.35); color:var(--success); }
+  .messages li.error{ border-color:rgba(255,95,109,0.35); color:var(--danger); }
+  .messages li.info{ color:var(--blue-soft); }
+
+  /* ============ REUSABLE GLASS CARD (use in child templates) ============ */
+  .card{
+    background:var(--glass-fill);
+    border:1px solid var(--glass-border);
+    border-radius:var(--radius-lg);
+    padding:24px;
+    backdrop-filter:blur(16px) saturate(130%);
+    -webkit-backdrop-filter:blur(16px) saturate(130%);
+    box-shadow:0 20px 44px -24px rgba(0,0,0,0.6);
+  }
+
+  .card + .card{ margin-top:16px; }
+
+  .card h1, .card h2{ font-family:var(--ff-display); font-weight:600; margin:0 0 4px; }
+  .card p{ color:var(--text-mid); font-size:14px; line-height:1.6; margin:0; }
+
+  input[type="text"], input[type="email"], input[type="password"], input[type="tel"], input[type="number"], textarea, select{
+    width:100%; background:rgba(6,10,20,0.55); border:1px solid rgba(255,255,255,0.09);
+    border-radius:var(--radius-sm); color:var(--text-hi); font-family:var(--ff-body); font-size:14px;
+    padding:11px 13px; outline:none; transition:border-color .2s, box-shadow .2s;
+  }
+  input:focus, textarea:focus, select:focus{
+    border-color:var(--blue); box-shadow:0 0 0 3px rgba(63,164,255,0.14);
+  }
+  textarea{ resize:vertical; min-height:80px; font-family:var(--ff-body); }
+
+  button, .btn{
+    font-family:var(--ff-body); font-weight:600; font-size:13.5px;
+    border:none; border-radius:var(--radius-sm); padding:10px 20px; cursor:pointer;
+    background:linear-gradient(135deg, var(--blue), var(--amber)); color:#04060b;
+    transition:transform .15s ease, box-shadow .2s ease;
+  }
+  button:hover, .btn:hover{ box-shadow:0 10px 24px -10px rgba(63,164,255,0.55); }
+  button:active, .btn:active{ transform:scale(0.98); }
+
+  button.secondary, .btn.secondary{
+    background:rgba(255,255,255,0.05); color:var(--text-hi); border:1px solid rgba(255,255,255,0.12);
+  }
+
+  /* ============ FOOTER ============ */
+  .site-footer{
+    border-top:1px solid var(--glass-border);
+    padding:20px clamp(16px,3vw,40px);
+    display:flex; align-items:center; justify-content:space-between;
+    font-family:var(--ff-mono); font-size:11px; color:var(--text-lo); letter-spacing:0.04em;
+  }
+  @media (max-width:560px){ .site-footer{ flex-direction:column; gap:6px; text-align:center; } }
+
+  
+</style>
+</head>
+<body>
+
+
+  <!-- ========================================== -->
+  <!-- DEDICATED GHIDORA SOCIAL NAVBAR -->
+  <!-- Bespoke social media interface completely separated from transport booking -->
+  <!-- ========================================== -->
+  <header class="gs-navbar">
+    <!-- Left: Brand & Search Trigger -->
+    <div class="gs-nav-left">
+      <a href="/social/" class="gs-nav-brand" title="Ghidora Social Home">
+        <div class="gs-brand-mark"></div>
+        <div class="gs-brand-title">
+          GHIDORA <span class="gs-social-tag">SOCIAL</span>
+        </div>
+      </a>
+
+      <div class="gs-search-pill" onclick="openSearchModal()" title="Search users, tags, fleet...">
+        <i class="ti ti-search"></i>
+        <span>Search Ghidora...</span>
+        <kbd>/</kbd>
+      </div>
+    </div>
+
+    <!-- Center: Primary Social Tabs -->
+    <nav class="gs-nav-center">
+      <div class="gs-nav-tabs">
+        <a href="/social/" class="gs-tab-link ">
+          <i class="ti ti-home-2"></i> <span>Feed</span>
+        </a>
+        <a href="/social/explore/" class="gs-tab-link ">
+          <i class="ti ti-compass"></i> <span>Explore</span>
+        </a>
+        <a href="/social/reels/" class="gs-tab-link ">
+          <i class="ti ti-movie"></i> <span>Reels</span>
+        </a>
+        <a href="/social/saved/" class="gs-tab-link ">
+          <i class="ti ti-bookmark"></i> <span>Saved</span>
+        </a>
+      </div>
+    </nav>
+
+    <!-- Right: Action Controls & User Dropdown -->
+    <div class="gs-nav-right">
+      
+        <!-- Create Post (+) Gradient Button -->
+        <button type="button" class="gs-btn-create" onclick="if(typeof openPostCreateModal==='function'){openPostCreateModal();}else{window.location.href='/social/?compose=1';}" title="Create New Post">
+          <i class="ti ti-plus"></i> <span>Create</span>
+        </button>
+
+        <!-- Direct Messages Icon -->
+        <a href="/social/messages/" class="gs-nav-icon" title="Messages">
+          <i class="ti ti-message-2"></i>
+          
+        </a>
+
+        <!-- Notifications Heart Icon -->
+        <button type="button" class="gs-nav-icon" onclick="openNotificationsModal()" title="Notifications">
+          <i class="ti ti-heart"></i>
+          <span class="gs-nav-badge" id="gsNotifBadge" style="display:none;">0</span>
+        </button>
+
+        <!-- User Profile Chip & Dropdown Trigger -->
+        <div class="gs-user-chip" onclick="toggleGsProfileDropdown(event)" title="Profile & Account">
+          
+            <img src="/media/avatars/logo6.png" alt="ghidora" class="gs-user-chip-avatar">
+          
+          <span class="gs-user-chip-name">ghidora</span>
+          <i class="ti ti-chevron-down" style="font-size: 0.8rem; color: var(--ig-text-muted);"></i>
+        </div>
+
+        <!-- Floating Profile Dropdown -->
+        <div class="gs-profile-dropdown" id="gsProfileDropdown">
+          <a href="/social/profile/ghidora/" class="ig-dropdown-item">
+            <i class="ti ti-user"></i> My Profile
+          </a>
+          <a href="/social/saved/" class="ig-dropdown-item">
+            <i class="ti ti-bookmark"></i> Saved Posts
+          </a>
+          <a href="/social/profile/edit/" class="ig-dropdown-item">
+            <i class="ti ti-settings"></i> Edit Profile & Handle
+          </a>
+          <button type="button" class="ig-dropdown-item" onclick="openReportModal('problem', 0)">
+            <i class="ti ti-alert-circle"></i> Report a Problem
+          </button>
+          <div class="ig-dropdown-divider"></div>
+          <a href="/" class="ig-dropdown-item" style="color: #EF9F27;">
+            <i class="ti ti-truck" style="color: #EF9F27;"></i> Switch to Transport Hub ↗
+          </a>
+          <div class="ig-dropdown-divider"></div>
+          <form action="/logout/" method="post" style="margin:0;">
+            <input type="hidden" name="csrfmiddlewaretoken" value="ztGD1qF4bwx5sbnWA2lANrUUrK3MJTTjdvc3PkZ2YcuCVqYKVweEHUfeX4GZEq6z">
+            <button type="submit" class="ig-dropdown-item" style="color:var(--ig-red); width: 100%; text-align: left; background: transparent; border: none; cursor: pointer; padding: 10px 12px; display: flex; align-items: center; gap: 8px;">
+              <i class="ti ti-logout" style="color:var(--ig-red);"></i> Log Out
+            </button>
+          </form>
+        </div>
+
+        <!-- Fast Switch to Transport Portal -->
+        <a href="/" class="gs-portal-link" title="Go to Ghidora Transport & Logistics">
+          <i class="ti ti-truck"></i> <span>Transport</span>
+        </a>
+      
+    </div>
+  </header>
+
+  <!-- Main Content Area for Social (No Sidebar Margin) -->
+  <div class="gs-social-layout" style="width:100%; min-height:100vh;">
+
+
+
+  <main class="page">
+    
+
+    
+<div class="ig-profile-container">
+
+  <!-- Instagram Profile Header -->
+  <div class="ig-profile-header">
+    
+    <!-- Left: Avatar + Floating Note Bubble -->
+    <div class="ig-profile-avatar-wrap" onclick="openChangePhotoModal()" style="cursor:pointer;" title="Change profile photo">
+      
+        <div class="ig-avatar-note">Available 24/7 for shifting</div>
+      
+
+      
+        <img class="ig-profile-avatar-large" src="/media/avatars/logo6.png" alt="ghidora">
+      
+    </div>
+
+    <!-- Right: Profile Info -->
+    <div class="ig-profile-info">
+      
+      <!-- Row 1: Username & Action Buttons -->
+      <div class="ig-profile-row-top">
+        <span class="ig-profile-username">ghidora</span>
+
+        
+          <span class="gs-badge-owner" title="Ghidora Owner / Verified" style="font-size:1.2rem;"><i class="ti ti-circle-check-filled"></i></span>
+        
+
+        
+
+        <div class="ig-profile-actions">
+          
+            <button type="button" class="ig-btn-profile" onclick="openQuickEditModal()"><i class="ti ti-edit"></i> Edit profile</button>
+            <a href="/social/saved/" class="ig-btn-profile"><i class="ti ti-bookmark"></i> Saved</a>
+            <a href="/social/profile/edit/" class="ig-icon-btn" title="Account Settings"><i class="ti ti-settings"></i></a>
+          
+        </div>
+      </div>
+
+      <!-- Row 2: Stats (Posts, Followers, Following) -->
+      <div class="ig-profile-stats">
+        <span><strong style="color:var(--ig-text);">6</strong> posts</span>
+        <span style="cursor:pointer;" onclick="openFollowersModal('ghidora')" title="View followers">
+          <strong id="profileFollowersCount" style="color:var(--ig-text);"></strong> followers
+        </span>
+        <span style="cursor:pointer;" onclick="openFollowingModal('ghidora')" title="View following">
+          <strong id="profileFollowingCount" style="color:var(--ig-text);">0</strong> following
+        </span>
+      </div>
+
+      <!-- Row 3: Display Name & Bio -->
+      <div class="ig-profile-bio-box">
+        
+          <div class="ig-profile-fullname">GHIDORA ★</div>
+        
+
+        
+          <div style="white-space: pre-line;">हर प्रकार की पिकअप सेवा उपलब्ध 🚚
+
+माल ढुलाई, शिफ्टिंग एवं अन्य कार्य | Kodebod, Kurud, Dhamtari (C.G.)
+
+Contact for bookings &amp; transport services.</div>
+        
+
+        
+          <div style="margin-top: 4px;">
+            <a href="https://ghidoratransport.onrender.com/" target="_blank" rel="noopener" style="color: var(--ig-gold); text-decoration: none; font-weight: 600; font-size: 0.88rem;">
+              <i class="ti ti-link"></i> https://ghidoratransport.onrender.com/
+            </a>
+          </div>
+        
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Story Highlights Row -->
+  <div class="ig-highlights-row">
+    
+      <div class="ig-highlight-item" onclick="openHighlightViewer(2, 'ghidora', '/media/avatars/logo6.png')">
+        <div class="ig-highlight-circle">
+          
+            <img src="/media/highlights/2026/08/jagjitsingh.png" alt="FEV SINGER" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">
+          
+        </div>
+        <span class="ig-highlight-label">FEV SINGER</span>
+      </div>
+
+      <!-- JSON Script for Highlight Items -->
+      <script id="highlight-data-2" type="application/json">
+        [
+          
+            {
+              "id": 2,
+              "media_url": "/media/highlights/2026/08/jagjitsingh_p8LCEdY.png",
+              "is_video": false,
+              "caption": "",
+              "time": "2 weeks, 4 days"
+            }
+          
+        ]
+      </script>
+    
+      <div class="ig-highlight-item" onclick="openHighlightViewer(1, 'ghidora', '/media/avatars/logo6.png')">
+        <div class="ig-highlight-circle">
+          
+            <img src="/media/highlights/2026/08/roadpikuup.mp4" alt="PIKUP" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">
+          
+        </div>
+        <span class="ig-highlight-label">PIKUP</span>
+      </div>
+
+      <!-- JSON Script for Highlight Items -->
+      <script id="highlight-data-1" type="application/json">
+        [
+          
+            {
+              "id": 1,
+              "media_url": "/media/highlights/2026/08/roadpikuup_EE6m6oX.mp4",
+              "is_video": true,
+              "caption": "",
+              "time": "2 weeks, 4 days"
+            }
+          
+        ]
+      </script>
+    
+
+    
+      <div class="ig-highlight-item" onclick="openNewHighlightModal()">
+        <div class="ig-highlight-circle">
+          <i class="ti ti-plus"></i>
+        </div>
+        <span class="ig-highlight-label">New</span>
+      </div>
+    
+  </div>
+
+  <!-- Profile Navigation Tabs (Instagram Style) -->
+  <div class="ig-profile-tabs" style="display: flex; justify-content: center; gap: 60px; border-top: 1px solid var(--ig-card-border); margin-top: 16px;">
+    <div class="ig-tab-btn active" id="tabBtnPosts" onclick="switchProfileTab('posts')" style="background: none !important; border: none !important; border-top: 1px solid #ffffff !important; border-radius: 0 !important; margin-top: -1px; padding: 16px 0; color: #ffffff !important; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; display: inline-flex; align-items: center; gap: 6px; cursor: pointer;">
+      <i class="ti ti-grid-dots" style="font-size: 1.1rem;"></i> POSTS
+    </div>
+
+    <div class="ig-tab-btn" id="tabBtnReels" onclick="switchProfileTab('reels')" style="background: none !important; border: none !important; border-top: 1px solid transparent !important; border-radius: 0 !important; margin-top: -1px; padding: 16px 0; color: var(--ig-text-muted) !important; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; display: inline-flex; align-items: center; gap: 6px; cursor: pointer;">
+      <i class="ti ti-player-play" style="font-size: 1.1rem;"></i> REELS
+    </div>
+
+    
+    <div class="ig-tab-btn" id="tabBtnSaved" onclick="switchProfileTab('saved')" style="background: none !important; border: none !important; border-top: 1px solid transparent !important; border-radius: 0 !important; margin-top: -1px; padding: 16px 0; color: var(--ig-text-muted) !important; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; display: inline-flex; align-items: center; gap: 6px; cursor: pointer;">
+      <i class="ti ti-bookmark" style="font-size: 1.1rem;"></i> SAVED
+    </div>
+    
+
+    <div class="ig-tab-btn" id="tabBtnTagged" onclick="switchProfileTab('tagged')" style="background: none !important; border: none !important; border-top: 1px solid transparent !important; border-radius: 0 !important; margin-top: -1px; padding: 16px 0; color: var(--ig-text-muted) !important; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; display: inline-flex; align-items: center; gap: 6px; cursor: pointer;">
+      <i class="ti ti-user-check" style="font-size: 1.1rem;"></i> TAGGED
+    </div>
+  </div>
+
+
+
+  <!-- User Posts Grid -->
+  <div id="userPostsGrid">
+    
+      <div class="ig-explore-grid" style="margin-top: 16px;">
+        
+          <a href="/social/post/8/" class="ig-explore-item" title="Post by @ghidora">
+            
+              
+                <img src="/media/posts/2026/09/ganesh_mFGtHR9.jpeg" alt="Post thumbnail" loading="lazy">
+              
+              
+            
+          </a>
+        
+          <a href="/social/post/6/" class="ig-explore-item" title="Post by @ghidora">
+            
+              
+                <img src="/media/posts/2026/08/raksha_bd0IjMO.jpeg" alt="Post thumbnail" loading="lazy">
+              
+              
+            
+          </a>
+        
+          <a href="/social/post/5/" class="ig-explore-item" title="Post by @ghidora">
+            
+              
+                <img src="/media/posts/2026/08/nadiya_ke_par_GeLNidN.png" alt="Post thumbnail" loading="lazy">
+              
+              
+            
+          </a>
+        
+          <a href="/social/post/4/" class="ig-explore-item" title="Post by @ghidora">
+            
+              
+                <img src="/media/posts/2026/08/NEW_FEATURE_ADED__nbm1dkT.png" alt="Post thumbnail" loading="lazy">
+              
+              
+            
+          </a>
+        
+          <a href="/social/post/3/" class="ig-explore-item" title="Post by @ghidora">
+            
+              
+                <img src="/media/posts/2026/08/pikupwala.png" alt="Post thumbnail" loading="lazy">
+              
+            
+          </a>
+        
+          <a href="/social/post/1/" class="ig-explore-item" title="Post by @ghidora">
+            
+              
+                <img src="/media/posts/2026/07/developer.jpeg" alt="Post thumbnail" loading="lazy">
+              
+            
+          </a>
+        
+      </div>
+    
+  </div>
+
+  <!-- User Reels Grid -->
+  <div id="userReelsGrid" style="display: none;">
+    
+      <div class="ig-explore-grid" style="margin-top: 16px;">
+        
+          <a href="/social/reels/#reel-item-5" class="ig-explore-item" style="aspect-ratio: 9/16; position: relative;">
+            <video src="/media/reels/2026/09/cartoon_gannu.mp4" style="width:100%; height:100%; object-fit:cover;" muted preload="metadata"></video>
+            <div style="position: absolute; left: 10px; bottom: 10px; color: #fff; text-shadow: 0 1px 4px rgba(0,0,0,0.8); font-weight: 700; font-size: 0.85rem; display: flex; align-items: center; gap: 4px;">
+              <i class="ti ti-player-play-filled"></i> 0
+            </div>
+          </a>
+        
+          <a href="/social/reels/#reel-item-4" class="ig-explore-item" style="aspect-ratio: 9/16; position: relative;">
+            <video src="/media/reels/2026/09/modak.mp4" style="width:100%; height:100%; object-fit:cover;" muted preload="metadata"></video>
+            <div style="position: absolute; left: 10px; bottom: 10px; color: #fff; text-shadow: 0 1px 4px rgba(0,0,0,0.8); font-weight: 700; font-size: 0.85rem; display: flex; align-items: center; gap: 4px;">
+              <i class="ti ti-player-play-filled"></i> 0
+            </div>
+          </a>
+        
+          <a href="/social/reels/#reel-item-2" class="ig-explore-item" style="aspect-ratio: 9/16; position: relative;">
+            <video src="/media/reels/2026/08/how_to_find_us.mp4" style="width:100%; height:100%; object-fit:cover;" muted preload="metadata"></video>
+            <div style="position: absolute; left: 10px; bottom: 10px; color: #fff; text-shadow: 0 1px 4px rgba(0,0,0,0.8); font-weight: 700; font-size: 0.85rem; display: flex; align-items: center; gap: 4px;">
+              <i class="ti ti-player-play-filled"></i> 2
+            </div>
+          </a>
+        
+          <a href="/social/reels/#reel-item-1" class="ig-explore-item" style="aspect-ratio: 9/16; position: relative;">
+            <video src="/media/reels/2026/08/360vd.mp4" style="width:100%; height:100%; object-fit:cover;" muted preload="metadata"></video>
+            <div style="position: absolute; left: 10px; bottom: 10px; color: #fff; text-shadow: 0 1px 4px rgba(0,0,0,0.8); font-weight: 700; font-size: 0.85rem; display: flex; align-items: center; gap: 4px;">
+              <i class="ti ti-player-play-filled"></i> 1
+            </div>
+          </a>
+        
+      </div>
+    
+  </div>
+
+  
+  <!-- User Saved Grid -->
+  <div id="userSavedGrid" style="display: none;">
+    
+      <div class="ig-empty-feed" style="margin-top: 24px;">
+        <i class="ti ti-bookmark ig-empty-icon"></i>
+        <h3>Save</h3>
+        <p>Save photos and videos that you want to see again. No one is notified, and only you can see what you've saved.</p>
+      </div>
+    
+  </div>
+  
+
+  <!-- User Tagged Grid -->
+  <div id="userTaggedGrid" style="display: none;">
+    <div class="ig-empty-feed" style="margin-top: 24px;">
+      <i class="ti ti-user-check ig-empty-icon"></i>
+      <h3>Photos of you</h3>
+      <p>When people tag you in transport updates or photos, they'll appear here.</p>
+    </div>
+  </div>
+
+</div>
+
+<!-- ========================================== -->
+<!-- Fullscreen Instagram Highlight Viewer (Matching Screenshot 1) -->
+<!-- ========================================== -->
+<div class="ig-modal" id="highlightViewerModal" style="display:none; z-index:99999; align-items:center; justify-content:center;">
+  <div class="ig-modal-backdrop" onclick="closeHighlightViewer()" style="background:rgba(0,0,0,0.92);"></div>
+  
+  <div style="position:relative; z-index:100000; display:flex; align-items:center; justify-content:center; width:100%; height:100vh;">
+    
+    <!-- Close Button Top-Right -->
+    <button type="button" onclick="closeHighlightViewer()" style="position:fixed; top:20px; right:24px; background:transparent; border:none; color:#fff; font-size:2rem; cursor:pointer; z-index:100002;">
+      <i class="ti ti-x"></i>
+    </button>
+
+    <!-- Prev Chevron -->
+    <button type="button" id="hlPrevBtn" onclick="prevHighlightSlide(event)" style="position:absolute; left:max(16px, calc(50vw - 260px)); background:rgba(255,255,255,0.18); border:none; color:#fff; width:44px; height:44px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.4rem; cursor:pointer; z-index:100002; transition:all 0.2s;">
+      <i class="ti ti-chevron-left"></i>
+    </button>
+
+    <!-- Main Active Phone Card -->
+    <div id="hlCardContainer" style="width:360px; max-width:90vw; height:640px; max-height:85vh; background:#000; border-radius:16px; overflow:hidden; position:relative; display:flex; flex-direction:column; box-shadow:0 24px 48px rgba(0,0,0,0.8); border:1px solid rgba(255,255,255,0.15);">
+      
+      <!-- Top Progress Bars -->
+      <div id="hlProgressBarWrap" style="position:absolute; top:12px; left:12px; right:12px; display:flex; gap:4px; z-index:10;"></div>
+
+      <!-- Top Header Row -->
+      <div style="position:absolute; top:24px; left:12px; right:12px; display:flex; align-items:center; justify-content:space-between; z-index:10; color:#fff; text-shadow:0 1px 4px rgba(0,0,0,0.8);">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <img id="hlUserAvatar" src="" style="width:32px; height:32px; border-radius:50%; object-fit:cover; border:1px solid #fff;">
+          <div>
+            <div id="hlUsername" style="font-weight:700; font-size:0.88rem; line-height:1.2;"></div>
+            <div id="hlTime" style="font-size:0.7rem; opacity:0.85;"></div>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:12px;">
+          <button type="button" onclick="toggleHighlightMute()" style="background:transparent; border:none; color:#fff; font-size:1.2rem; cursor:pointer;" id="hlMuteBtn" title="Mute/Unmute"><i class="ti ti-volume"></i></button>
+          <button type="button" onclick="toggleHighlightPause()" style="background:transparent; border:none; color:#fff; font-size:1.2rem; cursor:pointer;" id="hlPauseBtn" title="Pause/Play"><i class="ti ti-pause"></i></button>
+        </div>
+      </div>
+
+      <!-- Left / Right Click Nav Zones -->
+      <div onclick="prevHighlightSlide(event)" style="position:absolute; top:60px; left:0; width:35%; bottom:60px; z-index:8; cursor:pointer;"></div>
+      <div onclick="nextHighlightSlide(event)" style="position:absolute; top:60px; right:0; width:65%; bottom:60px; z-index:8; cursor:pointer;"></div>
+
+      <!-- Media Content (Image or Video) -->
+      <div style="flex:1; width:100%; height:100%; position:relative; background:#000; display:flex; align-items:center; justify-content:center;">
+        <img id="hlActiveImg" src="" style="width:100%; height:100%; object-fit:cover; display:none;">
+        <video id="hlActiveVid" src="" style="width:100%; height:100%; object-fit:cover; display:none;" playsinline webkit-playsinline></video>
+      </div>
+
+      <!-- Caption Overlay at Bottom -->
+      <div id="hlCaption" style="position:absolute; bottom:16px; left:16px; right:16px; color:#fff; font-size:0.88rem; text-shadow:0 1px 4px rgba(0,0,0,0.9); z-index:10; background:rgba(0,0,0,0.5); padding:8px 12px; border-radius:8px; display:none;"></div>
+    </div>
+
+    <!-- Next Chevron -->
+    <button type="button" id="hlNextBtn" onclick="nextHighlightSlide(event)" style="position:absolute; right:max(16px, calc(50vw - 260px)); background:rgba(255,255,255,0.18); border:none; color:#fff; width:44px; height:44px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.4rem; cursor:pointer; z-index:100002; transition:all 0.2s;">
+      <i class="ti ti-chevron-right"></i>
+    </button>
+  </div>
+</div>
+
+<!-- ========================================== -->
+<!-- New Highlight Modal -->
+<!-- ========================================== -->
+<div class="ig-modal" id="newHighlightModal" style="display:none;">
+  <div class="ig-modal-backdrop" onclick="closeNewHighlightModal()"></div>
+  <div class="ig-modal-box" style="max-width: 420px; width: 90%; border-radius: 16px; background: #161920; overflow: hidden; padding: 0;">
+    <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-bottom: 1px solid var(--ig-card-border);">
+      <button type="button" class="ig-modal-close" onclick="closeNewHighlightModal()"><i class="ti ti-x"></i></button>
+      <h3 style="margin: 0; font-size: 1rem; font-weight: 700; color: var(--ig-text);">New Highlight</h3>
+      <button type="submit" form="newHighlightForm" style="background: transparent; border: none; color: #38bdf8; font-weight: 700; font-size: 0.95rem; cursor: pointer;">Next</button>
+    </div>
+
+    <form method="post" enctype="multipart/form-data" action="/social/highlight/create/" id="newHighlightForm" style="padding: 20px; display: flex; flex-direction: column; gap: 16px;">
+      <input type="hidden" name="csrfmiddlewaretoken" value="ztGD1qF4bwx5sbnWA2lANrUUrK3MJTTjdvc3PkZ2YcuCVqYKVweEHUfeX4GZEq6z">
+      <input type="text" name="title" class="ig-input" placeholder="Highlight Name" required style="border-radius: 8px; padding: 12px; font-size: 0.95rem;">
+
+      <div class="ig-file-picker">
+        <label class="ig-file-label" style="display: flex; align-items: center; justify-content: center; gap: 8px; padding: 16px; border: 1px dashed var(--ig-gold); border-radius: 8px; color: var(--ig-gold); font-weight: 600; cursor: pointer;">
+          <i class="ti ti-photo-plus" style="font-size: 1.3rem;"></i>
+          <span>Choose Photo or Video</span>
+          <input type="file" name="media" accept="image/*,video/*" required style="display: none;" onchange="previewHighlightMedia(event)">
+        </label>
+      </div>
+
+      <div id="highlightMediaPreviewWrap" style="display: none; max-height: 200px; text-align: center; overflow: hidden; border-radius: 8px; background: #000;">
+        <img id="highlightPreviewImg" src="" style="max-height: 200px; max-width: 100%; object-fit: contain; display: none;">
+        <video id="highlightPreviewVid" controls style="max-height: 200px; max-width: 100%; display: none;"></video>
+      </div>
+    </form>
+  </div>
+</div>
+
+
+<!-- Change Profile Photo Modal -->
+<div class="ig-modal" id="changePhotoModal" style="display:none;">
+  <div class="ig-modal-backdrop" onclick="closeChangePhotoModal()"></div>
+  <div class="ig-modal-box" style="max-width: 380px; width: 90%; text-align: center; padding: 0; border-radius: 16px; overflow: hidden; background: #161920;">
+    <div style="padding: 24px 16px; font-weight: 700; font-size: 1.1rem; color: var(--ig-text); border-bottom: 1px solid var(--ig-card-border);">
+      Change Profile Photo
+    </div>
+
+    <!-- Upload Photo Form -->
+    <form method="post" enctype="multipart/form-data" action="/social/profile/edit/" id="uploadPhotoForm">
+      <input type="hidden" name="csrfmiddlewaretoken" value="ztGD1qF4bwx5sbnWA2lANrUUrK3MJTTjdvc3PkZ2YcuCVqYKVweEHUfeX4GZEq6z">
+      <label style="display: block; padding: 14px; color: #38bdf8; font-weight: 700; font-size: 0.95rem; border-bottom: 1px solid var(--ig-card-border); cursor: pointer; margin: 0;">
+        Upload Photo
+        <input type="file" name="avatar" accept="image/*" style="display:none;" onchange="document.getElementById('uploadPhotoForm').submit()">
+      </label>
+    </form>
+
+    <!-- Remove Current Photo Form -->
+    
+      <form method="post" action="/social/profile/edit/">
+        <input type="hidden" name="csrfmiddlewaretoken" value="ztGD1qF4bwx5sbnWA2lANrUUrK3MJTTjdvc3PkZ2YcuCVqYKVweEHUfeX4GZEq6z">
+        <input type="hidden" name="remove_avatar" value="1">
+        <button type="submit" style="width: 100%; padding: 14px; color: #ef4444; font-weight: 700; font-size: 0.95rem; background: transparent; border: none; border-bottom: 1px solid var(--ig-card-border); cursor: pointer;">
+          Remove Current Photo
+        </button>
+      </form>
+    
+
+    <!-- Cancel Button -->
+    <button type="button" onclick="closeChangePhotoModal()" style="width: 100%; padding: 14px; color: var(--ig-text); font-size: 0.95rem; background: transparent; border: none; cursor: pointer;">
+      Cancel
+    </button>
+  </div>
+</div>
+
+<!-- ========================================== -->
+<!-- Quick Edit Profile & Name Customization Modal -->
+<!-- ========================================== -->
+<div class="ig-modal" id="quickEditProfileModal" style="display:none; z-index:99992;">
+  <div class="ig-modal-backdrop" onclick="closeQuickEditModal()"></div>
+  <div class="ig-modal-box" style="max-width: 520px; width: 92%; border-radius: 16px; background: #161920; overflow: hidden; border: 1px solid var(--ig-card-border); box-shadow: 0 20px 50px rgba(0,0,0,0.8);">
+    <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--ig-card-border);">
+      <h3 style="margin: 0; font-size: 1.1rem; font-weight: 700; color: var(--ig-text); display: flex; align-items: center; gap: 8px;">
+        <i class="ti ti-user-edit" style="color: var(--ig-gold);"></i> Edit Profile & Handle
+      </h3>
+      <button type="button" class="ig-modal-close" onclick="closeQuickEditModal()"><i class="ti ti-x"></i></button>
+    </div>
+
+    <form method="post" action="/social/profile/edit/" id="quickEditProfileForm" onsubmit="handleQuickEditSubmit(event)" style="padding: 20px; display: flex; flex-direction: column; gap: 16px; max-height: calc(85vh - 70px); overflow-y: auto;">
+      <input type="hidden" name="csrfmiddlewaretoken" value="ztGD1qF4bwx5sbnWA2lANrUUrK3MJTTjdvc3PkZ2YcuCVqYKVweEHUfeX4GZEq6z">
+      <input type="hidden" name="ajax" value="1">
+      <div id="quickEditAlert" style="display: none; padding: 10px 14px; border-radius: 8px; font-size: 0.85rem;"></div>
+
+      <!-- Quick Avatar Preview & Change Action -->
+      <div style="display: flex; align-items: center; gap: 14px; padding: 12px 14px; background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px solid rgba(255,255,255,0.06);">
+        
+          <img src="/media/avatars/logo6.png" alt="ghidora" style="width: 46px; height: 46px; border-radius: 50%; object-fit: cover; border: 1.5px solid var(--ig-gold);">
+        
+        <div style="flex: 1;">
+          <div style="font-weight: 700; font-size: 0.95rem; color: var(--ig-text);">@<span id="quickHandleHeader">ghidora</span></div>
+          <div style="font-size: 0.78rem; color: var(--ig-text-muted);">Change photo via Settings or Profile Photo</div>
+        </div>
+        <button type="button" class="ig-btn-secondary" onclick="closeQuickEditModal(); openChangePhotoModal();" style="font-size: 0.8rem; padding: 6px 12px;">Change Photo</button>
+      </div>
+
+      <!-- Display Name -->
+      <div>
+        <label style="font-size: 0.85rem; font-weight: 700; color: var(--ig-text); display: flex; justify-content: space-between; margin-bottom: 6px;">
+          <span>Display Name (Full Name)</span>
+          <span style="font-size: 0.75rem; color: var(--ig-text-muted);">Shown on profile & posts</span>
+        </label>
+        <input type="text" name="first_name" id="quickEditFirstName" value="GHIDORA" class="ig-input" placeholder="e.g. Ashutosh Sharma" maxlength="50">
+      </div>
+
+      <!-- Username Handle -->
+      <div>
+        <label style="font-size: 0.85rem; font-weight: 700; color: var(--ig-text); display: flex; justify-content: space-between; margin-bottom: 6px;">
+          <span>Username (@handle)</span>
+          <span style="font-size: 0.75rem; color: var(--ig-gold);">Unique ID</span>
+        </label>
+        <div style="position: relative;">
+          <span style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--ig-gold); font-weight: 700; font-size: 1rem;">@</span>
+          <input type="text" name="username" id="quickEditUsername" value="ghidora" class="ig-input" style="padding-left: 30px; font-weight: 600;" required pattern="^[a-zA-Z0-9._]+$" title="Only letters, numbers, underscores and periods allowed" oninput="document.getElementById('quickHandlePreview').textContent = this.value.trim(); document.getElementById('quickHandleHeader').textContent = this.value.trim();">
+        </div>
+        <div style="font-size: 0.75rem; color: var(--ig-text-muted); margin-top: 4px;">
+          Your custom profile URL will be: <code>/social/profile/<span id="quickHandlePreview" style="color:var(--ig-gold);">ghidora</span>/</code>
+        </div>
+      </div>
+
+      <!-- Bio -->
+      <div>
+        <label style="font-size: 0.85rem; font-weight: 700; color: var(--ig-text); display: block; margin-bottom: 6px;">Bio</label>
+        <textarea name="bio" id="quickEditBio" rows="3" class="ig-textarea" placeholder="Write something about yourself or your transport fleet..." maxlength="200">हर प्रकार की पिकअप सेवा उपलब्ध 🚚
+
+माल ढुलाई, शिफ्टिंग एवं अन्य कार्य | Kodebod, Kurud, Dhamtari (C.G.)
+
+Contact for bookings &amp; transport services.</textarea>
+      </div>
+
+      <!-- Status Note -->
+      <div>
+        <label style="font-size: 0.85rem; font-weight: 700; color: var(--ig-text); display: block; margin-bottom: 6px;">Status Note (Bubble above avatar)</label>
+        <input type="text" name="note" id="quickEditNote" value="Available 24/7 for shifting" class="ig-input" placeholder="e.g. On Highway NH48 🚛 / Available" maxlength="60">
+      </div>
+
+      <!-- Website -->
+      <div>
+        <label style="font-size: 0.85rem; font-weight: 700; color: var(--ig-text); display: block; margin-bottom: 6px;">Website Link</label>
+        <input type="url" name="website" id="quickEditWebsite" value="https://ghidoratransport.onrender.com/" class="ig-input" placeholder="https://ghidoratransport.com">
+      </div>
+
+      <!-- Actions -->
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 6px; border-top: 1px solid var(--ig-card-border); padding-top: 14px;">
+        <a href="/social/profile/edit/" style="color: var(--ig-text-muted); font-size: 0.82rem; text-decoration: none; display: flex; align-items: center; gap: 4px;">
+          <i class="ti ti-settings"></i> Advanced Settings →
+        </a>
+        <div style="display: flex; gap: 8px;">
+          <button type="button" class="ig-btn-secondary" onclick="closeQuickEditModal()">Cancel</button>
+          <button type="submit" class="ig-btn-primary" id="quickEditSubmitBtn">Save Changes</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+
+<script>
+let activeHighlightItems = [];
+let activeHighlightIdx = 0;
+let hlTimer = null;
+let isHlPaused = false;
+let isHlMuted = false;
+
+function openHighlightViewer(hlId, username, avatarUrl) {
+  const dataScript = document.getElementById(`highlight-data-${hlId}`);
+  if (!dataScript) return;
+
+  try {
+    activeHighlightItems = JSON.parse(dataScript.textContent);
+  } catch (e) {
+    activeHighlightItems = [];
+  }
+
+  if (!activeHighlightItems || activeHighlightItems.length === 0) return;
+
+  activeHighlightIdx = 0;
+  isHlPaused = false;
+
+  document.getElementById('hlUsername').textContent = username;
+  const avatarEl = document.getElementById('hlUserAvatar');
+  if (avatarUrl) {
+    avatarEl.src = avatarUrl;
+    avatarEl.style.display = 'block';
+  } else {
+    avatarEl.style.display = 'none';
+  }
+
+  const modal = document.getElementById('highlightViewerModal');
+  if (modal) modal.style.display = 'flex';
+
+  renderHighlightSlide();
+}
+
+function closeHighlightViewer() {
+  const modal = document.getElementById('highlightViewerModal');
+  if (modal) modal.style.display = 'none';
+
+  clearTimeout(hlTimer);
+  const vid = document.getElementById('hlActiveVid');
+  if (vid) {
+    vid.pause();
+    vid.src = '';
+  }
+}
+
+function renderHighlightSlide() {
+  clearTimeout(hlTimer);
+  const item = activeHighlightItems[activeHighlightIdx];
+  if (!item) return;
+
+  // Build Progress Bars
+  const progressWrap = document.getElementById('hlProgressBarWrap');
+  progressWrap.innerHTML = '';
+  activeHighlightItems.forEach((_, idx) => {
+    const bar = document.createElement('div');
+    bar.style.flex = '1';
+    bar.style.height = '3px';
+    bar.style.background = 'rgba(255,255,255,0.3)';
+    bar.style.borderRadius = '2px';
+    bar.style.overflow = 'hidden';
+
+    const fill = document.createElement('div');
+    fill.className = `hl-progress-fill-${idx}`;
+    fill.style.height = '100%';
+    fill.style.background = '#fff';
+    fill.style.width = idx < activeHighlightIdx ? '100%' : '0%';
+    fill.style.transition = 'width 0.1s linear';
+    bar.appendChild(fill);
+    progressWrap.appendChild(bar);
+  });
+
+  const img = document.getElementById('hlActiveImg');
+  const vid = document.getElementById('hlActiveVid');
+  const captionEl = document.getElementById('hlCaption');
+  const timeEl = document.getElementById('hlTime');
+
+  if (timeEl) timeEl.textContent = item.time ? `${item.time} ago` : '';
+
+  if (captionEl) {
+    if (item.caption) {
+      captionEl.textContent = item.caption;
+      captionEl.style.display = 'block';
+    } else {
+      captionEl.style.display = 'none';
+    }
+  }
+
+  const activeFill = progressWrap.querySelector(`.hl-progress-fill-${activeHighlightIdx}`);
+
+  if (item.is_video) {
+    img.style.display = 'none';
+    vid.style.display = 'block';
+    vid.src = item.media_url;
+    vid.muted = isHlMuted;
+    vid.currentTime = 0;
+    vid.play().catch(() => {});
+
+    vid.onended = () => {
+      nextHighlightSlide();
+    };
+
+    vid.ontimeupdate = () => {
+      if (vid.duration && activeFill) {
+        const pct = (vid.currentTime / vid.duration) * 100;
+        activeFill.style.width = `${pct}%`;
+      }
+    };
+  } else {
+    vid.pause();
+    vid.style.display = 'none';
+    img.style.display = 'block';
+    img.src = item.media_url;
+
+    let startTime = Date.now();
+    const duration = 5000;
+
+    function step() {
+      if (isHlPaused) {
+        hlTimer = setTimeout(step, 100);
+        return;
+      }
+      const elapsed = Date.now() - startTime;
+      const pct = Math.min(100, (elapsed / duration) * 100);
+      if (activeFill) activeFill.style.width = `${pct}%`;
+
+      if (elapsed >= duration) {
+        nextHighlightSlide();
+      } else {
+        hlTimer = setTimeout(step, 50);
+      }
+    }
+    step();
+  }
+}
+
+function nextHighlightSlide(e) {
+  if (e) e.stopPropagation();
+  if (activeHighlightIdx < activeHighlightItems.length - 1) {
+    activeHighlightIdx++;
+    renderHighlightSlide();
+  } else {
+    closeHighlightViewer();
+  }
+}
+
+function prevHighlightSlide(e) {
+  if (e) e.stopPropagation();
+  if (activeHighlightIdx > 0) {
+    activeHighlightIdx--;
+    renderHighlightSlide();
+  }
+}
+
+function toggleHighlightMute() {
+  isHlMuted = !isHlMuted;
+  const vid = document.getElementById('hlActiveVid');
+  if (vid) vid.muted = isHlMuted;
+  const btn = document.getElementById('hlMuteBtn');
+  if (btn) btn.innerHTML = isHlMuted ? '<i class="ti ti-volume-3"></i>' : '<i class="ti ti-volume"></i>';
+}
+
+function toggleHighlightPause() {
+  isHlPaused = !isHlPaused;
+  const vid = document.getElementById('hlActiveVid');
+  if (vid) {
+    if (isHlPaused) vid.pause();
+    else vid.play().catch(() => {});
+  }
+  const btn = document.getElementById('hlPauseBtn');
+  if (btn) btn.innerHTML = isHlPaused ? '<i class="ti ti-player-play"></i>' : '<i class="ti ti-pause"></i>';
+}
+
+function openChangePhotoModal() {
+  const modal = document.getElementById('changePhotoModal');
+  if (modal) modal.style.display = 'flex';
+}
+function closeChangePhotoModal() {
+  const modal = document.getElementById('changePhotoModal');
+  if (modal) modal.style.display = 'none';
+}
+function openNewHighlightModal() {
+  const modal = document.getElementById('newHighlightModal');
+  if (modal) modal.style.display = 'flex';
+}
+function closeNewHighlightModal() {
+  const modal = document.getElementById('newHighlightModal');
+  if (modal) modal.style.display = 'none';
+}
+function previewHighlightMedia(e) {
+  const wrap = document.getElementById('highlightMediaPreviewWrap');
+  const img = document.getElementById('highlightPreviewImg');
+  const vid = document.getElementById('highlightPreviewVid');
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const url = URL.createObjectURL(file);
+  wrap.style.display = 'block';
+
+  if (file.type.startsWith('video/')) {
+    img.style.display = 'none';
+    vid.style.display = 'inline-block';
+    vid.src = url;
+  } else {
+    vid.style.display = 'none';
+    img.style.display = 'inline-block';
+    img.src = url;
+  }
+}
+function switchProfileTab(tab) {
+  const postsGrid = document.getElementById('userPostsGrid');
+  const reelsGrid = document.getElementById('userReelsGrid');
+  const savedGrid = document.getElementById('userSavedGrid');
+  const taggedGrid = document.getElementById('userTaggedGrid');
+
+  const btnPosts = document.getElementById('tabBtnPosts');
+  const btnReels = document.getElementById('tabBtnReels');
+  const btnSaved = document.getElementById('tabBtnSaved');
+  const btnTagged = document.getElementById('tabBtnTagged');
+
+  // Hide all grids
+  if (postsGrid) postsGrid.style.display = 'none';
+  if (reelsGrid) reelsGrid.style.display = 'none';
+  if (savedGrid) savedGrid.style.display = 'none';
+  if (taggedGrid) taggedGrid.style.display = 'none';
+
+  // Reset all buttons
+  const resetBtn = (btn) => {
+    if (btn) {
+      btn.style.setProperty('border-top-color', 'transparent', 'important');
+      btn.style.setProperty('color', 'var(--ig-text-muted)', 'important');
+      btn.style.fontWeight = '600';
+    }
+  };
+  const activeBtn = (btn) => {
+    if (btn) {
+      btn.style.setProperty('border-top-color', '#ffffff', 'important');
+      btn.style.setProperty('color', '#ffffff', 'important');
+      btn.style.fontWeight = '700';
+    }
+  };
+
+  resetBtn(btnPosts);
+  resetBtn(btnReels);
+  resetBtn(btnSaved);
+  resetBtn(btnTagged);
+
+  if (tab === 'reels') {
+    if (reelsGrid) reelsGrid.style.display = 'block';
+    activeBtn(btnReels);
+  } else if (tab === 'saved') {
+    if (savedGrid) savedGrid.style.display = 'block';
+    activeBtn(btnSaved);
+  } else if (tab === 'tagged') {
+    if (taggedGrid) taggedGrid.style.display = 'block';
+    activeBtn(btnTagged);
+  } else {
+    if (postsGrid) postsGrid.style.display = 'block';
+    activeBtn(btnPosts);
+  }
+}
+
+function openQuickEditModal() {
+  const modal = document.getElementById('quickEditProfileModal');
+  if (modal) modal.style.display = 'flex';
+}
+
+function closeQuickEditModal() {
+  const modal = document.getElementById('quickEditProfileModal');
+  if (modal) modal.style.display = 'none';
+  const alertBox = document.getElementById('quickEditAlert');
+  if (alertBox) alertBox.style.display = 'none';
+}
+
+async function handleQuickEditSubmit(e) {
+  e.preventDefault();
+  const form = e.target;
+  const btn = document.getElementById('quickEditSubmitBtn');
+  const alertBox = document.getElementById('quickEditAlert');
+  const oldText = btn.innerHTML;
+
+  btn.disabled = true;
+  btn.innerHTML = '<i class="ti ti-loader animate-spin"></i> Saving...';
+  if (alertBox) alertBox.style.display = 'none';
+
+  try {
+    const formData = new FormData(form);
+    const res = await fetch(form.action, {
+      method: 'POST',
+      body: formData,
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest'
+      }
+    });
+
+    const data = await res.json();
+    if (res.ok && data.ok) {
+      if (alertBox) {
+        alertBox.style.display = 'block';
+        alertBox.style.background = 'rgba(34, 197, 94, 0.15)';
+        alertBox.style.border = '1px solid #22c55e';
+        alertBox.style.color = '#86efac';
+        alertBox.innerHTML = '<i class="ti ti-circle-check"></i> ' + data.message;
+      }
+      setTimeout(() => {
+        if (data.redirect_url) {
+          window.location.href = data.redirect_url;
+        } else {
+          window.location.reload();
+        }
+      }, 500);
+    } else {
+      let msg = 'Failed to update profile.';
+      if (data.errors) {
+        msg = Object.entries(data.errors).map(([k, v]) => `<strong>${k}:</strong> ${Array.isArray(v) ? v.join(', ') : v}`).join('<br>');
+      }
+      if (alertBox) {
+        alertBox.style.display = 'block';
+        alertBox.style.background = 'rgba(239, 68, 68, 0.15)';
+        alertBox.style.border = '1px solid #ef4444';
+        alertBox.style.color = '#fca5a5';
+        alertBox.innerHTML = '<i class="ti ti-alert-triangle"></i> ' + msg;
+      }
+      btn.disabled = false;
+      btn.innerHTML = oldText;
+    }
+  } catch (err) {
+    console.error('Profile update error:', err);
+    // Fallback to standard form submission
+    form.submit();
+  }
+}
+</script>
+
+  </main>
+
+  <footer class="site-footer">
+    <span>© 2026 GHIDORA TRANSPORT NETWORK</span>
+    <span>SYSTEM STATUS: ONLINE</span>
+  </footer>
+</div>
+
+<!-- Mobile Bottom Tab Navigation (Authenticated Users) -->
+
+  <nav class="ig-mobile-bottom-nav">
+    <a href="/social/" class="ig-mob-tab " title="Home">
+      <i class="ti ti-home"></i>
+    </a>
+    <button type="button" class="ig-mob-tab" onclick="openSearchModal()" title="Search">
+      <i class="ti ti-search"></i>
+    </button>
+    <button type="button" class="ig-mob-tab ig-mob-create-btn" onclick="if(typeof openPostCreateModal==='function'){openPostCreateModal();}else{window.location.href='/social/?compose=1';}" title="Create Post">
+      <i class="ti ti-square-plus"></i>
+    </button>
+    <a href="/social/reels/" class="ig-mob-tab " title="Reels">
+      <i class="ti ti-video"></i>
+    </a>
+    <a href="/social/profile/ghidora/" class="ig-mob-tab ig-mob-avatar-tab active" title="Profile">
+      
+        <img src="/media/avatars/logo6.png" alt="ghidora" class="ig-mob-avatar-img">
+      
+    </a>
+  </nav>
+
+
+<!-- Global Search Modal (Debounced Live Search) -->
+<div class="ig-modal" id="searchModalOverlay" style="display:none; z-index:99990;">
+  <div class="ig-modal-backdrop" onclick="closeSearchModal()"></div>
+  <div class="ig-modal-box" style="max-width:480px; width:92%; max-height:80vh; display:flex; flex-direction:column; border-radius:16px; overflow:hidden;">
+    <div class="ig-modal-header" style="padding:12px 16px;">
+      <div style="display:flex; align-items:center; gap:10px; width:100%;">
+        <i class="ti ti-search" style="color:var(--ig-text-muted); font-size:1.2rem;"></i>
+        <input type="text" id="searchInputField" class="ig-input" placeholder="Search profiles, #hashtags, routes..." autocomplete="off" oninput="handleSearchDebounce(event)" style="border:none; background:transparent; font-size:0.95rem; padding:6px 0; width:100%; box-shadow:none;">
+      </div>
+      <button class="ig-modal-close" onclick="closeSearchModal()"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="ig-modal-body" id="searchResultsContainer" style="overflow-y:auto; flex:1; max-height:60vh; padding:12px 16px;">
+      <div style="text-align:center; padding:30px 10px; color:var(--ig-text-muted);">
+        <i class="ti ti-search" style="font-size:2rem; margin-bottom:8px; display:block; opacity:0.5;"></i>
+        <p style="margin:0; font-size:0.88rem;">Search for drivers, clients, transport updates, or #hashtags</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Global Notifications Modal -->
+<div class="ig-modal" id="notificationsModalOverlay" style="display:none; z-index:99990;">
+  <div class="ig-modal-backdrop" onclick="closeNotificationsModal()"></div>
+  <div class="ig-modal-box" style="max-width:480px; width:92%; max-height:80vh; display:flex; flex-direction:column; border-radius:16px; overflow:hidden;">
+    <div class="ig-modal-header" style="justify-content:space-between; padding:14px 16px;">
+      <h3 style="margin:0; font-size:1.05rem; font-weight:700;">Activity</h3>
+      <div style="display:flex; align-items:center; gap:12px;">
+        <button type="button" class="ig-btn-text" onclick="markAllNotificationsRead()" style="font-size:0.78rem; color:var(--blue-soft); background:none; border:none; cursor:pointer;">Mark all read</button>
+        <button class="ig-modal-close" onclick="closeNotificationsModal()"><i class="ti ti-x"></i></button>
+      </div>
+    </div>
+    <div class="ig-modal-body" id="notificationsListContainer" style="overflow-y:auto; flex:1; max-height:60vh; padding:8px 16px;">
+      <div style="text-align:center; padding:30px 10px; color:var(--ig-text-muted);">
+        <i class="ti ti-loader" style="font-size:2rem; margin-bottom:8px; display:block;"></i>
+        <p style="margin:0; font-size:0.88rem;">Loading activity...</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Followers / Following List Modal -->
+<div class="ig-modal" id="userListModal" style="display:none; z-index:99992;">
+  <div class="ig-modal-backdrop" onclick="closeUserListModal()"></div>
+  <div class="ig-modal-box" style="max-width:420px; width:90%; max-height:75vh; display:flex; flex-direction:column; border-radius:16px; overflow:hidden; position:relative;">
+    <div class="ig-modal-header" style="padding:14px 16px;">
+      <h3 id="userListModalTitle" style="margin:0; font-size:1rem; font-weight:700; width:100%; text-align:center;">Followers</h3>
+      <button class="ig-modal-close" onclick="closeUserListModal()" style="position:absolute; right:16px; top:50%; transform:translateY(-50%);"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="ig-modal-body" id="userListModalBody" style="overflow-y:auto; flex:1; max-height:60vh; padding:8px 16px;">
+      <div style="text-align:center; padding:24px; color:var(--ig-text-muted);">Loading...</div>
+    </div>
+  </div>
+</div>
+
+<!-- Report Modal -->
+<div class="ig-modal" id="reportModal" style="display:none; z-index:99995;">
+  <div class="ig-modal-backdrop" onclick="closeReportModal()"></div>
+  <div class="ig-modal-box" style="max-width:440px; width:90%; border-radius:16px; overflow:hidden;">
+    <div class="ig-modal-header" style="padding:14px 16px;">
+      <h3 style="margin:0; font-size:1rem; font-weight:700;">Report to Ghidora Moderation</h3>
+      <button class="ig-modal-close" onclick="closeReportModal()"><i class="ti ti-x"></i></button>
+    </div>
+    <form onsubmit="submitReportAJAX(event)">
+      <input type="hidden" name="csrfmiddlewaretoken" value="ztGD1qF4bwx5sbnWA2lANrUUrK3MJTTjdvc3PkZ2YcuCVqYKVweEHUfeX4GZEq6z">
+      <input type="hidden" id="reportTargetType" value="post">
+      <input type="hidden" id="reportTargetId" value="0">
+      <div class="ig-modal-body" style="padding:16px; display:flex; flex-direction:column; gap:12px;">
+        <label style="font-size:0.85rem; font-weight:600; color:var(--text-hi);">Why are you reporting this?</label>
+        <select id="reportReasonSelect" class="ig-input" required>
+          <option value="spam">Spam or unwanted advertising</option>
+          <option value="inappropriate">Inappropriate or offensive content</option>
+          <option value="harassment">Harassment or bullying</option>
+          <option value="false_info">False transport info or scam</option>
+          <option value="other">Other issue</option>
+        </select>
+        <label style="font-size:0.85rem; font-weight:600; color:var(--text-hi); margin-top:4px;">Additional Details (Optional):</label>
+        <textarea id="reportDetailsInput" rows="3" class="ig-textarea" placeholder="Provide extra context to help our moderation team..."></textarea>
+      </div>
+      <div class="ig-modal-footer" style="padding:12px 16px; display:flex; justify-content:flex-end; gap:8px;">
+        <button type="button" class="ig-btn-secondary" onclick="closeReportModal()">Cancel</button>
+        <button type="submit" class="ig-btn-primary" style="background:var(--danger); color:#fff;">Submit Report</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Share Modal -->
+<div class="ig-modal" id="shareModal" style="display:none; z-index:99993;">
+  <div class="ig-modal-backdrop" onclick="closeShareModal()"></div>
+  <div class="ig-modal-box" style="max-width:440px; width:90%; border-radius:16px; overflow:hidden;">
+    <div class="ig-modal-header" style="padding:14px 16px;">
+      <h3 style="margin:0; font-size:1rem; font-weight:700;">Share Post</h3>
+      <button class="ig-modal-close" onclick="closeShareModal()"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="ig-modal-body" style="padding:16px; display:flex; flex-direction:column; gap:16px;">
+      <input type="hidden" id="sharePostUrl" value="">
+      <input type="hidden" id="sharePostId" value="">
+      <div style="display:flex; gap:10px;">
+        <button type="button" class="ig-btn-secondary" onclick="copyShareModalLink()" style="flex:1; display:flex; align-items:center; justify-content:center; gap:6px; padding:10px;">
+          <i class="ti ti-link"></i> Copy Link
+        </button>
+        <button type="button" class="ig-btn-secondary" onclick="shareOnWhatsApp()" style="flex:1; display:flex; align-items:center; justify-content:center; gap:6px; padding:10px; color:#25D366;">
+          <i class="ti ti-brand-whatsapp"></i> WhatsApp
+        </button>
+      </div>
+      <div style="border-top:1px solid var(--glass-border); padding-top:12px;">
+        <label style="font-size:0.82rem; font-weight:600; color:var(--text-mid); display:block; margin-bottom:8px;">Send via Ghidora Direct Message</label>
+        <div style="display:flex; gap:8px;">
+          <input type="text" id="shareDmUsernameInput" class="ig-input" placeholder="Enter username (e.g. driver_john)..." style="flex:1;">
+          <button type="button" class="ig-btn-primary" onclick="sendPostViaDMAJAX()" style="padding:0 16px;">Send</button>
+        </div>
+        <div id="shareDmStatus" style="font-size:0.8rem; margin-top:6px; display:none;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Story Viewers Modal -->
+<div class="ig-modal" id="storyViewersModal" style="display:none; z-index:99996;">
+  <div class="ig-modal-backdrop" onclick="closeStoryViewersModal()"></div>
+  <div class="ig-modal-box" style="max-width:400px; width:90%; border-radius:16px; overflow:hidden; position:relative;">
+    <div class="ig-modal-header" style="padding:14px 16px;">
+      <h3 style="margin:0; font-size:1rem; font-weight:700;">Story Viewers</h3>
+      <button class="ig-modal-close" onclick="closeStoryViewersModal()"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="ig-modal-body" id="storyViewersList" style="padding:12px 16px; max-height:60vh; overflow-y:auto;">
+      <div style="text-align:center; padding:20px; color:var(--ig-text-muted);">Loading viewers...</div>
+    </div>
+  </div>
+</div>
+
+<!-- Global Create Post & Story Modals -->
+<!-- ========================================== -->
+<!-- Global Create New Post Modal (Creative Studio: Crop, Rotate, Filters & Grading) -->
+<!-- ========================================== -->
+<div class="ig-modal" id="createPostModal" style="display:none; z-index:99990;">
+  <div class="ig-modal-backdrop" onclick="closePostCreateModal()"></div>
+  <div class="ig-modal-box gs-studio-modal" id="studioModalBox" style="width: 780px; max-width: 95%; max-height: 90vh; display: flex; flex-direction: column; border-radius: 18px; background: #12151d; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 24px 60px rgba(0,0,0,0.85);">
+    
+    <!-- Modal Header with Dynamic Title & Navigation -->
+    <div class="ig-modal-header" style="display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; border-bottom: 1px solid var(--ig-card-border); background: #161922;">
+      <button type="button" id="studioBackBtn" onclick="handleStudioBack()" style="display:none; background:transparent; border:none; color:var(--ig-text); font-size:1.1rem; cursor:pointer; padding:4px;" title="Back">
+        <i class="ti ti-arrow-left"></i>
+      </button>
+      <div id="studioModalTitle" style="font-size: 1rem; font-weight: 700; color: var(--ig-text); flex:1; text-align:center;">Create new post</div>
+      <button type="button" id="studioNextBtn" onclick="handleStudioNext()" style="display:none; background:transparent; border:none; color:#38bdf8; font-weight:700; font-size:0.92rem; cursor:pointer; padding:4px 8px;" title="Next">
+        Next
+      </button>
+      <button type="button" class="ig-modal-close" onclick="closePostCreateModal()"><i class="ti ti-x"></i></button>
+    </div>
+
+    <!-- Main Studio Body -->
+    <form method="post" enctype="multipart/form-data" action="/social/" id="createPostForm" onsubmit="handlePostSubmit(event)" style="display: flex; flex-direction: column; flex: 1; overflow: hidden; margin: 0;">
+      <input type="hidden" name="csrfmiddlewaretoken" value="ztGD1qF4bwx5sbnWA2lANrUUrK3MJTTjdvc3PkZ2YcuCVqYKVweEHUfeX4GZEq6z">
+      <input type="file" name="image" id="hiddenFinalPostImage" style="display:none;">
+
+      <!-- ============================================== -->
+      <!-- STEP 0: Initial Dropzone                       -->
+      <!-- ============================================== -->
+      <div id="studioStepDropzone" style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px 20px; text-align: center; gap: 16px; min-height: 420px;">
+        <div style="width: 86px; height: 86px; border-radius: 50%; background: rgba(56,189,248,0.1); display: flex; align-items: center; justify-content: center; font-size: 3rem; color: #38bdf8; margin-bottom: 4px; box-shadow: 0 0 24px rgba(56,189,248,0.2);">
+          <i class="ti ti-photo-circle"></i>
+        </div>
+        <div style="font-size: 1.4rem; font-weight: 600; color: var(--ig-text);">Drag photos and videos here</div>
+        <div style="font-size: 0.88rem; color: var(--ig-text-muted); max-width: 360px; line-height: 1.5;">
+          Share transport moments, highway journeys, truck fleets, and delivery milestones.
+        </div>
+        
+        <label class="ig-btn-primary" style="background: linear-gradient(135deg, #38bdf8, #EF9F27); color: #04060b; font-weight: 700; padding: 11px 26px; border-radius: 12px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; margin-top: 8px; box-shadow: 0 6px 18px rgba(56,189,248,0.35);">
+          <i class="ti ti-upload"></i> Select from computer
+          <input type="file" id="studioFileInput" accept="image/*,video/*" style="display: none;" onchange="handleStudioFileSelect(event)">
+        </label>
+      </div>
+
+      <!-- ============================================== -->
+      <!-- STEP 1: Crop & Aspect Ratio Studio             -->
+      <!-- ============================================== -->
+      <div id="studioStepCrop" style="display: none; flex-direction: column; flex: 1; overflow: hidden;">
+        <div style="flex: 1; background: #07090e; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; min-height: 380px; max-height: 500px; padding: 16px;">
+          <div id="cropViewport" style="position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 40px rgba(0,0,0,0.9); border: 1.5px solid rgba(255,255,255,0.12); border-radius: 8px; background: #000;">
+            <canvas id="studioCropCanvas" style="display: block; max-width: 100%; max-height: 100%;"></canvas>
+          </div>
+        </div>
+
+        <!-- Crop Controls Toolbar -->
+        <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; background: #161922; border-top: 1px solid var(--ig-card-border); gap: 12px; flex-wrap: wrap;">
+          <!-- Aspect Presets -->
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <span style="font-size: 0.72rem; font-weight: 800; color: var(--ig-text-muted); margin-right: 4px; letter-spacing: 0.05em;">CROP:</span>
+            <button type="button" class="gs-aspect-btn active" data-ratio="original" onclick="changeStudioAspect('original', this)"><i class="ti ti-arrows-maximize"></i> Fit</button>
+            <button type="button" class="gs-aspect-btn" data-ratio="1:1" onclick="changeStudioAspect('1:1', this)"><i class="ti ti-square"></i> 1:1</button>
+            <button type="button" class="gs-aspect-btn" data-ratio="4:5" onclick="changeStudioAspect('4:5', this)"><i class="ti ti-rectangle-vertical"></i> 4:5</button>
+            <button type="button" class="gs-aspect-btn" data-ratio="16:9" onclick="changeStudioAspect('16:9', this)"><i class="ti ti-rectangle"></i> 16:9</button>
+          </div>
+
+          <!-- Zoom & Rotation -->
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="display: flex; align-items: center; gap: 6px;" title="Zoom image">
+              <i class="ti ti-zoom-in" style="color: var(--ig-text-muted); font-size: 1.1rem;"></i>
+              <input type="range" id="studioZoomRange" min="1" max="2.5" step="0.05" value="1" oninput="changeStudioZoom(this.value)" class="gs-range-slider" style="width: 85px;">
+            </div>
+            <button type="button" class="gs-aspect-btn" onclick="rotateStudioImage()" title="Rotate 90° Clockwise">
+              <i class="ti ti-rotate-clockwise"></i> Rotate 90°
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============================================== -->
+      <!-- STEP 2: Color Filters & Color Grading Studio   -->
+      <!-- ============================================== -->
+      <div id="studioStepFilters" style="display: none; flex: 1; overflow: hidden;">
+        <!-- Left: Image Preview with Active Filters -->
+        <div style="flex: 1.25; background: #07090e; display: flex; align-items: center; justify-content: center; overflow: hidden; min-height: 380px; padding: 16px;">
+          <canvas id="studioFilterCanvas" style="max-width: 100%; max-height: 480px; border-radius: 8px; box-shadow: 0 8px 30px rgba(0,0,0,0.8);"></canvas>
+        </div>
+
+        <!-- Right: Filter Presets & Adjustment Controls -->
+        <div style="flex: 1; width: 320px; background: #161922; border-left: 1px solid var(--ig-card-border); display: flex; flex-direction: column; overflow: hidden;">
+          
+          <!-- Mode Switcher -->
+          <div style="display: flex; border-bottom: 1px solid var(--ig-card-border);">
+            <button type="button" id="tabBtnFilters" class="gs-studio-subtab active" onclick="switchFilterSubtab('presets')">
+              <i class="ti ti-sparkles"></i> Filters
+            </button>
+            <button type="button" id="tabBtnAdjust" class="gs-studio-subtab" onclick="switchFilterSubtab('adjust')">
+              <i class="ti ti-adjustments"></i> Adjust
+            </button>
+          </div>
+
+          <!-- Subtab 1: Presets Grid -->
+          <div id="studioPresetsPanel" style="flex: 1; overflow-y: auto; padding: 16px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+            <div class="gs-filter-card active" onclick="applyStudioFilter('normal', this)">
+              <div class="gs-filter-swatch filter-normal">Normal</div>
+              <span>Normal</span>
+            </div>
+            <div class="gs-filter-card" onclick="applyStudioFilter('clarendon', this)">
+              <div class="gs-filter-swatch filter-clarendon">Cyan</div>
+              <span>Clarendon</span>
+            </div>
+            <div class="gs-filter-card" onclick="applyStudioFilter('ghidora_gold', this)">
+              <div class="gs-filter-swatch filter-gold">Gold</div>
+              <span>Ghidora Gold</span>
+            </div>
+            <div class="gs-filter-card" onclick="applyStudioFilter('cyberpunk', this)">
+              <div class="gs-filter-swatch filter-cyber">Neon</div>
+              <span>Cyberpunk</span>
+            </div>
+            <div class="gs-filter-card" onclick="applyStudioFilter('sunset', this)">
+              <div class="gs-filter-swatch filter-sunset">Warm</div>
+              <span>Sunset</span>
+            </div>
+            <div class="gs-filter-card" onclick="applyStudioFilter('noir', this)">
+              <div class="gs-filter-swatch filter-noir">B&W</div>
+              <span>Noir</span>
+            </div>
+            <div class="gs-filter-card" onclick="applyStudioFilter('vintage', this)">
+              <div class="gs-filter-swatch filter-vintage">Retro</div>
+              <span>Vintage</span>
+            </div>
+            <div class="gs-filter-card" onclick="applyStudioFilter('vivid', this)">
+              <div class="gs-filter-swatch filter-vivid">Punch</div>
+              <span>Vivid</span>
+            </div>
+          </div>
+
+          <!-- Subtab 2: Fine-Tuning Sliders -->
+          <div id="studioAdjustPanel" style="display: none; flex: 1; overflow-y: auto; padding: 18px 16px; flex-direction: column; gap: 16px;">
+            <div>
+              <div style="display: flex; justify-content: space-between; font-size: 0.82rem; margin-bottom: 6px; color: var(--ig-text);">
+                <span>Brightness</span>
+                <span id="valBrightness" style="color: #38bdf8; font-weight: 700;">0%</span>
+              </div>
+              <input type="range" id="sliderBrightness" min="-50" max="50" value="0" oninput="changeAdjustValue('brightness', this.value)" class="gs-range-slider">
+            </div>
+
+            <div>
+              <div style="display: flex; justify-content: space-between; font-size: 0.82rem; margin-bottom: 6px; color: var(--ig-text);">
+                <span>Contrast</span>
+                <span id="valContrast" style="color: #38bdf8; font-weight: 700;">0%</span>
+              </div>
+              <input type="range" id="sliderContrast" min="-50" max="50" value="0" oninput="changeAdjustValue('contrast', this.value)" class="gs-range-slider">
+            </div>
+
+            <div>
+              <div style="display: flex; justify-content: space-between; font-size: 0.82rem; margin-bottom: 6px; color: var(--ig-text);">
+                <span>Saturation</span>
+                <span id="valSaturation" style="color: #38bdf8; font-weight: 700;">0%</span>
+              </div>
+              <input type="range" id="sliderSaturation" min="-50" max="100" value="0" oninput="changeAdjustValue('saturation', this.value)" class="gs-range-slider">
+            </div>
+
+            <div>
+              <div style="display: flex; justify-content: space-between; font-size: 0.82rem; margin-bottom: 6px; color: var(--ig-text);">
+                <span>Warmth / Amber Tint</span>
+                <span id="valWarmth" style="color: #EF9F27; font-weight: 700;">0%</span>
+              </div>
+              <input type="range" id="sliderWarmth" min="0" max="100" value="0" oninput="changeAdjustValue('warmth', this.value)" class="gs-range-slider">
+            </div>
+
+            <button type="button" class="ig-btn-secondary" onclick="resetAdjustSliders()" style="margin-top: 8px; font-size: 0.8rem; padding: 6px 12px; align-self: flex-start;">
+              Reset Adjustments
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ============================================== -->
+      <!-- STEP 3: Caption, Location & Share Post         -->
+      <!-- ============================================== -->
+      <div id="studioStepCaption" style="display: none; flex: 1; overflow: hidden;">
+        <!-- Left: Final Graded Image Preview -->
+        <div style="flex: 1.15; background: #07090e; display: flex; align-items: center; justify-content: center; padding: 16px; position: relative;">
+          <img id="finalPostPreviewImg" src="" alt="Final preview" style="max-width: 100%; max-height: 440px; border-radius: 10px; box-shadow: 0 12px 36px rgba(0,0,0,0.85); object-fit: contain;">
+        </div>
+
+        <!-- Right: Caption & Sharing Form -->
+        <div style="flex: 1; background: #161922; border-left: 1px solid var(--ig-card-border); padding: 20px; display: flex; flex-direction: column; gap: 16px; overflow-y: auto;">
+          <!-- User info -->
+          <div style="display: flex; align-items: center; gap: 10px;">
+            
+              <img src="/media/avatars/logo6.png" alt="ghidora" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover;">
+            
+            <span style="font-weight: 700; font-size: 0.92rem; color: var(--ig-text);">ghidora</span>
+          </div>
+
+          <!-- Caption Textarea -->
+          <div style="position: relative;">
+            <textarea name="content" id="studioPostCaption" rows="4" class="ig-textarea" placeholder="Write a caption... #ghidora #transport #highway" required style="resize: none;"></textarea>
+          </div>
+
+          <!-- Location Input -->
+          <div style="position: relative;">
+            <i class="ti ti-map-pin" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--ig-text-muted); font-size: 1.1rem; pointer-events: none;"></i>
+            <input type="text" name="location" id="studioPostLocation" class="ig-input" placeholder="Add location (e.g. NH48 Logistics Hub, Mumbai)..." style="padding-left: 36px; height: 42px; font-size: 0.88rem;">
+          </div>
+
+          <!-- Video Audio Tag (if video) -->
+          <div id="studioAudioTagWrap" style="display: none; position: relative;">
+            <i class="ti ti-music" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--ig-text-muted); font-size: 1.1rem; pointer-events: none;"></i>
+            <input type="text" name="audio_title" class="ig-input" placeholder="Audio track name..." value="Original audio" style="padding-left: 36px; height: 42px; font-size: 0.88rem;">
+          </div>
+
+          <!-- Share Button Area -->
+          <div style="margin-top: auto; padding-top: 14px; border-top: 1px solid var(--ig-card-border); display: flex; justify-content: space-between; align-items: center;">
+            <button type="button" class="ig-btn-secondary" onclick="setStudioStep(2)">Back to Filters</button>
+            <button type="submit" class="ig-btn-primary" id="studioShareBtn" style="background: linear-gradient(135deg, #38bdf8, #EF9F27); color: #04060b; font-weight: 700; padding: 10px 24px; box-shadow: 0 4px 14px rgba(56,189,248,0.35);">
+              Share Post
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </form>
+  </div>
+</div>
+
+<!-- ========================================== -->
+<!-- Global Upload Story Modal                  -->
+<!-- ========================================== -->
+<div class="ig-modal" id="uploadStoryModal" style="display:none; z-index:99990;">
+  <div class="ig-modal-backdrop" onclick="closeStoryUploadModal()"></div>
+  <div class="ig-modal-box" style="max-height:85vh; display:flex; flex-direction:column;">
+    <div class="ig-modal-header">
+      <h3>Add to Story</h3>
+      <button class="ig-modal-close" onclick="closeStoryUploadModal()"><i class="ti ti-x"></i></button>
+    </div>
+    <form method="post" enctype="multipart/form-data" action="/social/story/create/" style="display:flex; flex-direction:column; flex:1; overflow:hidden;">
+      <input type="hidden" name="csrfmiddlewaretoken" value="ztGD1qF4bwx5sbnWA2lANrUUrK3MJTTjdvc3PkZ2YcuCVqYKVweEHUfeX4GZEq6z">
+      <div class="ig-modal-body" style="overflow-y:auto; flex:1;">
+        <div class="ig-file-picker">
+          <label class="ig-file-label">
+            <i class="ti ti-camera"></i>
+            <span>Choose Story Media</span>
+            <input type="file" name="media" id="storyMediaInput" accept="image/*,video/*" required onchange="previewStoryImage(event)">
+          </label>
+        </div>
+
+        <div class="ig-aspect-selector" id="storyAspectSelector" style="display:none; margin-top:8px;">
+          <span style="font-size:0.75rem; font-weight:700; color:var(--ig-text-muted); margin-right:4px;">Size:</span>
+          <button type="button" class="ig-aspect-btn active" onclick="setStoryAspect('fit', this)"><i class="ti ti-arrows-maximize"></i> Fit</button>
+          <button type="button" class="ig-aspect-btn" onclick="setStoryAspect('9:16', this)"><i class="ti ti-device-mobile"></i> 9:16 Story</button>
+          <button type="button" class="ig-aspect-btn" onclick="setStoryAspect('1:1', this)"><i class="ti ti-square"></i> 1:1 Square</button>
+        </div>
+
+        <div class="ig-story-preview-container" id="storyPreviewWrap" style="display:none; max-height:220px; overflow:hidden; text-align:center; margin:10px 0; background:#000; border-radius:8px;">
+          <img id="storyPreviewImg" src="" alt="Story preview" style="max-height:220px; max-width:100%; object-fit:contain; border-radius:8px;">
+        </div>
+        <input type="text" name="caption" class="ig-input" placeholder="Add a caption (optional)...">
+      </div>
+
+      <div class="ig-modal-footer" style="flex-shrink:0;">
+        <button type="button" class="ig-btn-secondary" onclick="closeStoryUploadModal()">Cancel</button>
+        <button type="submit" class="ig-btn-primary">Post Story</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ========================================== -->
+<!-- Global Upload Reel Modal                   -->
+<!-- ========================================== -->
+<div class="ig-modal" id="createReelModal" style="display:none; z-index:99995;">
+  <div class="ig-modal-backdrop" onclick="closeCreateReelModal()"></div>
+  <div class="ig-modal-box" style="max-width: 440px; width: 90%; border-radius: 16px; background: #161920; overflow: hidden; padding: 0; border: 1px solid var(--ig-card-border);">
+    <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-bottom: 1px solid var(--ig-card-border);">
+      <h3 style="margin: 0; font-size: 1rem; font-weight: 700; color: var(--ig-text);">Create New Reel</h3>
+      <button type="button" class="ig-modal-close" onclick="closeCreateReelModal()"><i class="ti ti-x"></i></button>
+    </div>
+
+    <form method="post" enctype="multipart/form-data" action="/social/reels/create/" style="padding: 20px; display: flex; flex-direction: column; gap: 16px;">
+      <input type="hidden" name="csrfmiddlewaretoken" value="ztGD1qF4bwx5sbnWA2lANrUUrK3MJTTjdvc3PkZ2YcuCVqYKVweEHUfeX4GZEq6z">
+      
+      <div class="ig-file-picker">
+        <label class="ig-file-label" style="display: flex; align-items: center; justify-content: center; gap: 8px; padding: 20px; border: 2px dashed #38bdf8; border-radius: 12px; color: #38bdf8; font-weight: 700; cursor: pointer;">
+          <i class="ti ti-video" style="font-size: 1.6rem;"></i>
+          <span>Select Reel Video</span>
+          <input type="file" name="video" accept="video/*" required style="display: none;" onchange="previewReelVideoGlobal(event)">
+        </label>
+      </div>
+
+      <div id="globalReelPreviewWrap" style="display: none; max-height: 220px; text-align: center; overflow: hidden; border-radius: 8px; background: #000;">
+        <video id="globalReelPreviewVid" controls style="max-height: 220px; max-width: 100%;"></video>
+      </div>
+
+      <div>
+        <label style="font-size: 0.85rem; font-weight: 700; color: var(--ig-text); display: block; margin-bottom: 6px;">Reel Caption</label>
+        <textarea name="caption" rows="2" class="ig-textarea" placeholder="Write a caption for your reel..."></textarea>
+      </div>
+
+      <div>
+        <label style="font-size: 0.85rem; font-weight: 700; color: var(--ig-text); display: block; margin-bottom: 6px;">Audio Title</label>
+        <input type="text" name="audio_title" class="ig-input" placeholder="e.g. Original Audio" value="Original audio">
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 4px;">
+        <button type="button" class="ig-btn-secondary" onclick="closeCreateReelModal()">Cancel</button>
+        <button type="submit" class="ig-btn-primary" style="background: #38bdf8; color: #04060b;">Share Reel</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+/* Global Post Creative Studio State */
+const studioState = {
+  step: 0, // 0: dropzone, 1: crop, 2: filters, 3: caption
+  rawFile: null,
+  rawImage: null,
+  isVideo: false,
+  aspectRatio: 'original',
+  zoom: 1.0,
+  rotation: 0,
+  filter: 'normal',
+  adjust: {
+    brightness: 0,
+    contrast: 0,
+    saturation: 0,
+    warmth: 0
+  },
+  finalBlob: null
+};
+
+function openPostCreateModal() {
+  const modal = document.getElementById('createPostModal');
+  if (modal) {
+    modal.style.display = 'flex';
+    if (studioState.step === 0) {
+      setStudioStep(0);
+    }
+  }
+}
+
+function closePostCreateModal() {
+  const modal = document.getElementById('createPostModal');
+  if (modal) modal.style.display = 'none';
+}
+
+function setStudioStep(step) {
+  studioState.step = step;
+  const dropzone = document.getElementById('studioStepDropzone');
+  const cropStep = document.getElementById('studioStepCrop');
+  const filterStep = document.getElementById('studioStepFilters');
+  const captionStep = document.getElementById('studioStepCaption');
+  const backBtn = document.getElementById('studioBackBtn');
+  const nextBtn = document.getElementById('studioNextBtn');
+  const title = document.getElementById('studioModalTitle');
+  const modalBox = document.getElementById('studioModalBox');
+
+  if (dropzone) dropzone.style.display = 'none';
+  if (cropStep) cropStep.style.display = 'none';
+  if (filterStep) filterStep.style.display = 'none';
+  if (captionStep) captionStep.style.display = 'none';
+  if (backBtn) backBtn.style.display = 'none';
+  if (nextBtn) nextBtn.style.display = 'none';
+
+  if (step === 0) {
+    if (dropzone) dropzone.style.display = 'flex';
+    if (title) title.textContent = 'Create new post';
+    if (modalBox) modalBox.style.width = '520px';
+  } else if (step === 1) {
+    if (cropStep) cropStep.style.display = 'flex';
+    if (backBtn) backBtn.style.display = 'block';
+    if (nextBtn) {
+      nextBtn.style.display = 'block';
+      nextBtn.textContent = 'Next';
+    }
+    if (title) title.textContent = 'Crop & Resize';
+    if (modalBox) modalBox.style.width = '640px';
+    renderCropCanvas();
+  } else if (step === 2) {
+    if (filterStep) filterStep.style.display = 'flex';
+    if (backBtn) backBtn.style.display = 'block';
+    if (nextBtn) {
+      nextBtn.style.display = 'block';
+      nextBtn.textContent = 'Next';
+    }
+    if (title) title.textContent = 'Color & Filters';
+    if (modalBox) modalBox.style.width = '820px';
+    renderFilterCanvas();
+  } else if (step === 3) {
+    if (captionStep) captionStep.style.display = 'flex';
+    if (backBtn) backBtn.style.display = 'block';
+    if (title) title.textContent = 'Create new post';
+    if (modalBox) modalBox.style.width = '780px';
+    renderFinalPreview();
+  }
+}
+
+function handleStudioBack() {
+  if (studioState.step === 1) {
+    setStudioStep(0);
+  } else if (studioState.step === 2) {
+    setStudioStep(1);
+  } else if (studioState.step === 3) {
+    if (studioState.isVideo) {
+      setStudioStep(0);
+    } else {
+      setStudioStep(2);
+    }
+  }
+}
+
+function handleStudioNext() {
+  if (studioState.step === 1) {
+    setStudioStep(2);
+  } else if (studioState.step === 2) {
+    setStudioStep(3);
+  }
+}
+
+function handleStudioFileSelect(e) {
+  const file = e.target.files && e.target.files[0];
+  if (!file) return;
+  studioState.rawFile = file;
+
+  if (file.type.startsWith('video/')) {
+    studioState.isVideo = true;
+    // For video, skip canvas crop/filters straight to caption
+    const audioWrap = document.getElementById('studioAudioTagWrap');
+    if (audioWrap) audioWrap.style.display = 'block';
+    const previewImg = document.getElementById('finalPostPreviewImg');
+    if (previewImg) {
+      previewImg.src = '';
+      previewImg.style.display = 'none';
+    }
+    setStudioStep(3);
+    return;
+  }
+
+  studioState.isVideo = false;
+  const reader = new FileReader();
+  reader.onload = (evt) => {
+    const img = new Image();
+    img.onload = () => {
+      studioState.rawImage = img;
+      studioState.zoom = 1.0;
+      studioState.rotation = 0;
+      studioState.aspectRatio = 'original';
+      const zoomInput = document.getElementById('studioZoomRange');
+      if (zoomInput) zoomInput.value = 1.0;
+      setStudioStep(1);
+    };
+    img.src = evt.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function changeStudioAspect(ratio, btn) {
+  studioState.aspectRatio = ratio;
+  document.querySelectorAll('.gs-aspect-btn[data-ratio]').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  renderCropCanvas();
+}
+
+function changeStudioZoom(val) {
+  studioState.zoom = parseFloat(val);
+  renderCropCanvas();
+}
+
+function rotateStudioImage() {
+  studioState.rotation = (studioState.rotation + 90) % 360;
+  renderCropCanvas();
+}
+
+function renderCropCanvas() {
+  const canvas = document.getElementById('studioCropCanvas');
+  const viewport = document.getElementById('cropViewport');
+  const img = studioState.rawImage;
+  if (!canvas || !img) return;
+
+  const ctx = canvas.getContext('2d');
+  const ratio = studioState.aspectRatio;
+
+  let targetW = 600;
+  let targetH = 600;
+
+  if (ratio === '1:1') {
+    targetW = 600;
+    targetH = 600;
+  } else if (ratio === '4:5') {
+    targetW = 480;
+    targetH = 600;
+  } else if (ratio === '16:9') {
+    targetW = 640;
+    targetH = 360;
+  } else {
+    // Original fit
+    targetW = img.naturalWidth || 600;
+    targetH = img.naturalHeight || 600;
+    const maxDim = 600;
+    if (targetW > maxDim || targetH > maxDim) {
+      if (targetW > targetH) {
+        targetH = Math.round((targetH / targetW) * maxDim);
+        targetW = maxDim;
+      } else {
+        targetW = Math.round((targetW / targetH) * maxDim);
+        targetH = maxDim;
+      }
+    }
+  }
+
+  canvas.width = targetW;
+  canvas.height = targetH;
+  if (viewport) {
+    viewport.style.aspectRatio = `${targetW} / ${targetH}`;
+  }
+
+  ctx.clearRect(0, 0, targetW, targetH);
+  ctx.save();
+  ctx.translate(targetW / 2, targetH / 2);
+  ctx.rotate((studioState.rotation * Math.PI) / 180);
+  ctx.scale(studioState.zoom, studioState.zoom);
+
+  // Compute cover dimensions
+  const isRotated = studioState.rotation === 90 || studioState.rotation === 270;
+  const srcW = isRotated ? img.naturalHeight : img.naturalWidth;
+  const srcH = isRotated ? img.naturalWidth : img.naturalHeight;
+  const scale = Math.max(targetW / srcW, targetH / srcH);
+  const drawW = img.naturalWidth * scale;
+  const drawH = img.naturalHeight * scale;
+
+  ctx.drawImage(img, -drawW / 2, -drawH / 2, drawW, drawH);
+  ctx.restore();
+}
+
+function switchFilterSubtab(tab) {
+  const presetsPanel = document.getElementById('studioPresetsPanel');
+  const adjustPanel = document.getElementById('studioAdjustPanel');
+  const btnPresets = document.getElementById('tabBtnFilters');
+  const btnAdjust = document.getElementById('tabBtnAdjust');
+
+  if (tab === 'adjust') {
+    if (presetsPanel) presetsPanel.style.display = 'none';
+    if (adjustPanel) adjustPanel.style.display = 'flex';
+    if (btnPresets) btnPresets.classList.remove('active');
+    if (btnAdjust) btnAdjust.classList.add('active');
+  } else {
+    if (presetsPanel) presetsPanel.style.display = 'grid';
+    if (adjustPanel) adjustPanel.style.display = 'none';
+    if (btnPresets) btnPresets.classList.add('active');
+    if (btnAdjust) btnAdjust.classList.remove('active');
+  }
+}
+
+function applyStudioFilter(name, cardEl) {
+  studioState.filter = name;
+  document.querySelectorAll('.gs-filter-card').forEach(c => c.classList.remove('active'));
+  if (cardEl) cardEl.classList.add('active');
+  renderFilterCanvas();
+}
+
+function changeAdjustValue(prop, val) {
+  studioState.adjust[prop] = parseInt(val, 10);
+  const label = document.getElementById(`val${prop.charAt(0).toUpperCase() + prop.slice(1)}`);
+  if (label) label.textContent = `${val > 0 ? '+' : ''}${val}%`;
+  renderFilterCanvas();
+}
+
+function resetAdjustSliders() {
+  studioState.adjust = { brightness: 0, contrast: 0, saturation: 0, warmth: 0 };
+  ['Brightness', 'Contrast', 'Saturation', 'Warmth'].forEach(k => {
+    const input = document.getElementById(`slider${k}`);
+    const label = document.getElementById(`val${k}`);
+    if (input) input.value = 0;
+    if (label) label.textContent = '0%';
+  });
+  renderFilterCanvas();
+}
+
+function buildCanvasFilterString() {
+  const f = studioState.filter;
+  const adj = studioState.adjust;
+  let brightness = 1 + (adj.brightness / 100);
+  let contrast = 1 + (adj.contrast / 100);
+  let saturation = 1 + (adj.saturation / 100);
+  let sepia = adj.warmth / 100;
+  let hue = 0;
+
+  if (f === 'clarendon') {
+    contrast *= 1.2;
+    saturation *= 1.25;
+    brightness *= 1.05;
+  } else if (f === 'ghidora_gold') {
+    contrast *= 1.15;
+    saturation *= 1.35;
+    sepia = Math.max(sepia, 0.25);
+    brightness *= 1.08;
+  } else if (f === 'cyberpunk') {
+    contrast *= 1.35;
+    saturation *= 1.5;
+    hue += 15;
+  } else if (f === 'sunset') {
+    saturation *= 1.4;
+    contrast *= 1.1;
+    sepia = Math.max(sepia, 0.35);
+  } else if (f === 'noir') {
+    contrast *= 1.45;
+    saturation = 0;
+  } else if (f === 'vintage') {
+    sepia = Math.max(sepia, 0.5);
+    contrast *= 0.9;
+    brightness *= 1.05;
+  } else if (f === 'vivid') {
+    saturation *= 1.6;
+    contrast *= 1.2;
+  }
+
+  return `brightness(${brightness}) contrast(${contrast}) saturate(${saturation}) sepia(${sepia}) hue-rotate(${hue}deg)`;
+}
+
+function renderFilterCanvas() {
+  const cropCanvas = document.getElementById('studioCropCanvas');
+  const filterCanvas = document.getElementById('studioFilterCanvas');
+  if (!cropCanvas || !filterCanvas) return;
+
+  filterCanvas.width = cropCanvas.width;
+  filterCanvas.height = cropCanvas.height;
+  const ctx = filterCanvas.getContext('2d');
+
+  ctx.clearRect(0, 0, filterCanvas.width, filterCanvas.height);
+  ctx.filter = buildCanvasFilterString();
+  ctx.drawImage(cropCanvas, 0, 0);
+  ctx.filter = 'none';
+}
+
+function renderFinalPreview() {
+  if (studioState.isVideo) return;
+  const filterCanvas = document.getElementById('studioFilterCanvas');
+  const previewImg = document.getElementById('finalPostPreviewImg');
+  if (!filterCanvas || !previewImg) return;
+
+  renderFilterCanvas();
+  const dataUrl = filterCanvas.toDataURL('image/jpeg', 0.92);
+  previewImg.src = dataUrl;
+  previewImg.style.display = 'block';
+}
+
+async function handlePostSubmit(e) {
+  e.preventDefault();
+  const form = e.target;
+  const btn = document.getElementById('studioShareBtn');
+  const oldText = btn.innerHTML;
+
+  btn.disabled = true;
+  btn.innerHTML = '<i class="ti ti-loader animate-spin"></i> Sharing...';
+
+  try {
+    const formData = new FormData(form);
+
+    if (!studioState.isVideo) {
+      const filterCanvas = document.getElementById('studioFilterCanvas');
+      if (filterCanvas) {
+        renderFilterCanvas();
+        const blob = await new Promise(resolve => filterCanvas.toBlob(resolve, 'image/jpeg', 0.92));
+        if (blob) {
+          formData.delete('image');
+          formData.delete('images');
+          formData.append('image', blob, 'ghidora_post.jpg');
+          formData.append('images', blob, 'ghidora_post.jpg');
+        }
+      }
+    } else if (studioState.rawFile) {
+      formData.append('video', studioState.rawFile);
+    }
+
+    const res = await fetch(form.action, {
+      method: 'POST',
+      body: formData,
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest'
+      }
+    });
+
+    const data = await res.json();
+    if (res.ok && data.ok) {
+      closePostCreateModal();
+      window.location.reload();
+    } else {
+      let err = 'Failed to create post.';
+      if (data.errors) {
+        err = Object.values(data.errors).flat().join(', ');
+      }
+      alert(err);
+      btn.disabled = false;
+      btn.innerHTML = oldText;
+    }
+  } catch (err) {
+    console.error('Post submit error:', err);
+    // Fallback: normal submission
+    form.submit();
+  }
+}
+
+function openCreateReelModal() {
+  const modal = document.getElementById('createReelModal');
+  if (modal) modal.style.display = 'flex';
+}
+function closeCreateReelModal() {
+  const modal = document.getElementById('createReelModal');
+  if (modal) modal.style.display = 'none';
+}
+function previewReelVideoGlobal(e) {
+  const wrap = document.getElementById('globalReelPreviewWrap');
+  const vid = document.getElementById('globalReelPreviewVid');
+  const file = e.target.files[0];
+  if (file) {
+    vid.src = URL.createObjectURL(file);
+    wrap.style.display = 'block';
+  }
+}
+function previewStoryImage(e) {
+  const wrap = document.getElementById('storyPreviewWrap');
+  const img = document.getElementById('storyPreviewImg');
+  const selector = document.getElementById('storyAspectSelector');
+  const file = e.target.files[0];
+  if (file) {
+    img.src = URL.createObjectURL(file);
+    wrap.style.display = 'block';
+    if (selector) selector.style.display = 'flex';
+  }
+}
+function closeStoryUploadModal() {
+  const modal = document.getElementById('uploadStoryModal');
+  if (modal) modal.style.display = 'none';
+}
+function setStoryAspect(aspect, btn) {
+  const selector = document.getElementById('storyAspectSelector');
+  if (selector) {
+    selector.querySelectorAll('.ig-aspect-btn').forEach(b => b.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+  }
+  const img = document.getElementById('storyPreviewImg');
+  if (img) {
+    if (aspect === '9:16') {
+      img.style.aspectRatio = '9/16';
+      img.style.objectFit = 'cover';
+    } else if (aspect === '1:1') {
+      img.style.aspectRatio = '1/1';
+      img.style.objectFit = 'cover';
+    } else {
+      img.style.aspectRatio = 'unset';
+      img.style.objectFit = 'contain';
+    }
+  }
+}
+</script>
+
+
+<script src="/static/social/js/social.js"></script>
+
+</body>
+</html>

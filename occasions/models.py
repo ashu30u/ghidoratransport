@@ -92,3 +92,39 @@ class OccasionSettings(models.Model):
     class Meta:
         verbose_name = "Occasion System Setting"
         verbose_name_plural = "Occasion System Settings"
+
+
+class OccasionRecipient(models.Model):
+    email = models.EmailField(
+        unique=True,
+        verbose_name="Gmail / Email Address",
+        help_text="Gmail or email address that will receive festival and occasion greetings automatically."
+    )
+    name = models.CharField(
+        max_length=150,
+        blank=True,
+        verbose_name="Recipient Name / Label",
+        help_text="Name or reference label (e.g., Admin, VIP Client, Owner, Partner, Family)."
+    )
+    is_active = models.BooleanField(
+        default=True,
+        verbose_name="Active (Receive Greetings)",
+        help_text="Only active emails will receive occasion greetings when dispatched."
+    )
+    notes = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text="Optional internal note"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Occasion Email Recipient"
+        verbose_name_plural = "Occasion Email Recipients (Gmail List)"
+        ordering = ['-created_at']
+
+    def __str__(self):
+        if self.name:
+            return f"{self.name} <{self.email}>"
+        return self.email

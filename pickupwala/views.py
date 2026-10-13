@@ -1,7 +1,9 @@
 import os
+import re
 import sqlite3
+import urllib.parse
 from django.conf import settings
-from django.http import JsonResponse
+from django.http import Http404, HttpResponse, JsonResponse
 from django.shortcuts import render
 
 from .models import Shayari, Song, ChaiMessage, HornSound
@@ -155,6 +157,12 @@ def seed_data_sqlite():
     except Exception as e:
         print("SQLite data seeding notice:", e)
 
+    try:
+        from .importer import auto_import_songs
+        auto_import_songs()
+    except Exception as e:
+        print("Auto song import notice:", e)
+
 
 # Run direct database seeding on import
 seed_data_sqlite()
@@ -174,6 +182,9 @@ def playlist_api(request):
         audio_url = s.audio_file.url if s.audio_file else ""
         if not audio_url:
             audio_url = "https://stream.zeno.fm/f3wvbb142p8uv"
+        else:
+            audio_url = urllib.parse.unquote(audio_url)
+            audio_url = urllib.parse.quote(audio_url, safe="/:@&=+$,-_.!~*'()%")
             
         tracks.append({
             "id": s.id,
@@ -209,8 +220,59 @@ def playlist_api(request):
     try:
         for h in HornSound.objects.filter(is_active=True).order_by("order", "id"):
             if h.audio_file:
-                horns.append({"id": h.id, "title": h.title, "url": h.audio_file.url})
-    except Exception:
+                audio_url = h.audio_file.url
+                audio_url = urllib.parse.unquote(audio_url)
+                audio_url = urllib.parse.quote(audio_url, safe="/:@&=+$,-_.!~*'()%")
+                horns.append({"id": h.id, "title": h.title, "url": audio_url})
+    except Exception as e:
+        print("HornSound API fetch notice:", e)
         horns = []
 
     return JsonResponse({"tracks": tracks, "shayari": shayari, "chai": chai, "horns": horns})
+
+
+def ranged_media_serve(request, path):
+    """
+    HTTP 206 Partial Content (Byte Range) media server for Django development server.
+    Enables HTML5 Audio seeking (currentTime) without resetting to 0:00.
+    """
+    file_path = os.path.join(settings.MEDIA_ROOT, path)
+    if not os.path.exists(file_path) or os.path.isdir(file_path):
+        raise Http404("Media file not found")
+
+    file_size = os.path.getsize(file_path)
+    import mimetypes
+    content_type, _ = mimetypes.guess_type(file_path)
+    if not content_type:
+        content_type = "audio/mpeg"
+
+    range_header = request.META.get('HTTP_RANGE', '').strip()
+    range_match = re.match(r'bytes=(\d+)-(\d+)?', range_header)
+
+    if range_match:
+        first_byte = int(range_match.group(1))
+        last_byte = int(range_match.group(2)) if range_match.group(2) else file_size - 1
+        if first_byte >= file_size:
+            response = HttpResponse(status=416)
+            response['Content-Range'] = f'bytes */{file_size}'
+            return response
+        last_byte = min(last_byte, file_size - 1)
+        length = last_byte - first_byte + 1
+
+        with open(file_path, 'rb') as f:
+            f.seek(first_byte)
+            data = f.read(length)
+
+        response = HttpResponse(data, status=206, content_type=content_type)
+        response['Content-Range'] = f'bytes {first_byte}-{last_byte}/{file_size}'
+        response['Content-Length'] = str(length)
+        response['Accept-Ranges'] = 'bytes'
+        return response
+    else:
+        with open(file_path, 'rb') as f:
+            data = f.read()
+        response = HttpResponse(data, content_type=content_type)
+        response['Content-Length'] = str(file_size)
+        response['Accept-Ranges'] = 'bytes'
+        return response
+

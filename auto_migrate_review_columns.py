@@ -111,6 +111,60 @@ try:
         print("Notice updating is_approved:", e)
 
     print("✅ booking_review table schema check completed.")
+
+    # Ensure booking_giabookingrecord table and missing columns (email, etc.) exist
+    try:
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS booking_giabookingrecord (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            booking_id VARCHAR(30) UNIQUE NOT NULL,
+            customer_name VARCHAR(100) NOT NULL DEFAULT 'Gia AI Customer',
+            phone VARCHAR(20) NOT NULL,
+            email VARCHAR(254) NULL,
+            pickup VARCHAR(200) NOT NULL,
+            destination VARCHAR(200) NOT NULL,
+            goods_type VARCHAR(200) NULL,
+            weight_kg INTEGER NOT NULL DEFAULT 500,
+            weight_display VARCHAR(50) NOT NULL DEFAULT '500 kg',
+            distance_km INTEGER NOT NULL DEFAULT 50,
+            vehicle_assigned VARCHAR(100) NOT NULL DEFAULT 'Mahindra Pickup',
+            total_fare REAL NOT NULL DEFAULT 0.0,
+            status VARCHAR(30) NOT NULL DEFAULT 'Confirmed',
+            source VARCHAR(50) NOT NULL DEFAULT 'Gia AI Assistant',
+            created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+        );
+        """)
+        conn.commit()
+
+        cursor.execute("PRAGMA table_info(booking_giabookingrecord)")
+        gia_rows = cursor.fetchall()
+        gia_cols = {col[1] for col in gia_rows}
+        
+        gia_alter_statements = [
+            ("email", "ALTER TABLE booking_giabookingrecord ADD COLUMN email VARCHAR(254) NULL"),
+            ("customer_name", "ALTER TABLE booking_giabookingrecord ADD COLUMN customer_name VARCHAR(100) DEFAULT 'Gia AI Customer'"),
+            ("goods_type", "ALTER TABLE booking_giabookingrecord ADD COLUMN goods_type VARCHAR(200) NULL"),
+            ("weight_kg", "ALTER TABLE booking_giabookingrecord ADD COLUMN weight_kg INTEGER DEFAULT 500"),
+            ("weight_display", "ALTER TABLE booking_giabookingrecord ADD COLUMN weight_display VARCHAR(50) DEFAULT '500 kg'"),
+            ("distance_km", "ALTER TABLE booking_giabookingrecord ADD COLUMN distance_km INTEGER DEFAULT 50"),
+            ("vehicle_assigned", "ALTER TABLE booking_giabookingrecord ADD COLUMN vehicle_assigned VARCHAR(100) DEFAULT 'Mahindra Pickup'"),
+            ("total_fare", "ALTER TABLE booking_giabookingrecord ADD COLUMN total_fare REAL DEFAULT 0.0"),
+            ("status", "ALTER TABLE booking_giabookingrecord ADD COLUMN status VARCHAR(30) DEFAULT 'Confirmed'"),
+            ("source", "ALTER TABLE booking_giabookingrecord ADD COLUMN source VARCHAR(50) DEFAULT 'Gia AI Assistant'"),
+        ]
+
+        for col_name, sql in gia_alter_statements:
+            if col_name not in gia_cols:
+                try:
+                    cursor.execute(sql)
+                    print(f"✅ Added missing column '{col_name}' to booking_giabookingrecord table.")
+                except Exception as e:
+                    print(f"Notice adding {col_name} to booking_giabookingrecord: {e}")
+        conn.commit()
+        print("✅ booking_giabookingrecord table schema check completed.")
+    except Exception as gia_e:
+        print(f"Notice in booking_giabookingrecord migration: {gia_e}")
+
 except Exception as main_e:
     print(f"Notice in auto_migrate: {main_e}")
 

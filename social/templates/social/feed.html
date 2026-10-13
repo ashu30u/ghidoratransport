@@ -1,49 +1,377 @@
 {% extends "base.html" %}
-{% load static %}
+{% load static social_extras %}
+
+{% block title %}Feed • Ghidora Social{% endblock %}
 
 {% block extra_css %}
+<!-- Tabler Icons CDN -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
 <link rel="stylesheet" href="{% static 'social/css/social.css' %}">
+<style>
+  /* 🎬 Instagram-Style Reels Shelf (Horizontal Scroll) */
+  .ig-reels-shelf {
+    background: rgba(15, 23, 42, 0.7);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 18px;
+    padding: 14px 16px 12px;
+    margin-bottom: 20px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  }
+  .ig-reels-shelf-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .ig-reels-shelf-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+    font-weight: 800;
+    color: #ffffff;
+  }
+  .ig-reels-badge {
+    background: linear-gradient(135deg, #ff0844, #ffb199);
+    color: #ffffff;
+    font-size: 10px;
+    font-weight: 800;
+    padding: 2px 7px;
+    border-radius: 999px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .ig-reel-add-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 11.5px;
+    font-weight: 700;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: all 0.2s ease;
+  }
+  .ig-reel-add-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+  }
+  .ig-reels-all-link {
+    color: #38bdf8;
+    font-size: 12px;
+    font-weight: 700;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    transition: color 0.2s ease;
+  }
+  .ig-reels-all-link:hover {
+    color: #7dd3fc;
+  }
+  .ig-reels-scroll-row {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    padding-bottom: 6px;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .ig-reels-scroll-row::-webkit-scrollbar {
+    display: none;
+  }
+  .ig-reel-card {
+    position: relative;
+    width: 130px;
+    height: 210px;
+    flex-shrink: 0;
+    border-radius: 14px;
+    overflow: hidden;
+    background: #000000;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
+    text-decoration: none;
+    transition: transform 0.25s cubic-bezier(0.2, 0.9, 0.25, 1), box-shadow 0.25s ease;
+    display: block;
+  }
+  .ig-reel-card:hover {
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.8), 0 0 15px rgba(255, 59, 48, 0.4);
+  }
+  .ig-reel-video-wrap {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    background: #090d16;
+  }
+  .ig-reel-thumb-video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .ig-reel-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: #475569;
+  }
+  .ig-reel-play-icon {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(6px);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+  }
+  .ig-reel-gradient-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent 40%, rgba(0, 0, 0, 0.4) 65%, rgba(0, 0, 0, 0.9) 100%);
+    pointer-events: none;
+  }
+  .ig-reel-card-info {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 8px 10px;
+    z-index: 2;
+    pointer-events: none;
+  }
+  .ig-reel-author-row {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-bottom: 3px;
+  }
+  .ig-reel-avatar {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid rgba(255, 255, 255, 0.8);
+  }
+  .ig-reel-avatar-fallback {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #ff7a1a;
+    color: #fff;
+    font-size: 9px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .ig-reel-username {
+    font-size: 11px;
+    font-weight: 700;
+    color: #ffffff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .ig-reel-caption {
+    font-size: 10.5px;
+    color: #e2e8f0;
+    line-height: 1.25;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 4px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+  }
+  .ig-reel-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 10px;
+    color: #cbd5e1;
+    font-weight: 600;
+  }
+  .ig-reel-audio {
+    font-size: 9px;
+    color: #94a3b8;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  @media (max-width: 600px) {
+    .ig-reels-shelf {
+      padding: 12px 10px 10px;
+      margin-bottom: 16px;
+      border-radius: 14px;
+    }
+    .ig-reel-card {
+      width: 115px;
+      height: 185px;
+      border-radius: 12px;
+    }
+  }
+</style>
 {% endblock %}
 
 {% block content %}
-<div class="gs-wrap">
-  <h1 class="gs-title" style="font-size:1.6rem; margin-bottom:18px;">Feed</h1>
+<div class="ig-feed-container">
 
-  <div class="gs-composer">
-    <form method="post" enctype="multipart/form-data">
-      {% csrf_token %}
-      {{ form.content }}
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
-        <label class="gs-btn-ghost" style="border-radius:8px; padding:6px 10px; font-size:0.85rem; cursor:pointer;">
-          📷 Photo
-          {{ form.image }}
-        </label>
-        <button type="submit" class="gs-btn">Post</button>
-      </div>
-    </form>
+  <!-- Feed Navbar / Top Header -->
+  <header class="ig-feed-header">
+    <div class="ig-brand">
+      <span class="ig-brand-text">Ghidora <span class="ig-gold">Social</span></span>
+    </div>
+    <div class="ig-header-actions">
+      <button class="ig-header-btn" onclick="openStoryUploadModal()" title="Add Story">
+        <i class="ti ti-circle-plus"></i>
+      </button>
+      <button class="ig-header-btn" onclick="openNotificationsModal()" title="Notifications" style="position:relative;">
+        <i class="ti ti-heart"></i>
+        {% if unread_notifications_count %}
+          <span class="ig-header-badge">{{ unread_notifications_count }}</span>
+        {% endif %}
+      </button>
+      <a href="{% url 'social:inbox' %}" class="ig-header-btn" title="Messages" style="position:relative; text-decoration:none;">
+        <i class="ti ti-message-circle"></i>
+        {% if unread_messages_count %}
+          <span class="ig-header-badge">{{ unread_messages_count }}</span>
+        {% endif %}
+      </a>
+    </div>
+  </header>
+
+  <!-- Stories Bar (Horizontal Scroll) -->
+  {% include "social/partials/stories_row.html" %}
+
+  <!-- Quick Composer Trigger / Collapsible Composer -->
+  <div class="ig-composer-card">
+    <div class="ig-composer-top">
+      {% if request.user.profile.avatar %}
+        <img class="ig-avatar" src="{{ request.user.profile.avatar.url }}" alt="{{ request.user.username }}">
+      {% else %}
+        <div class="ig-avatar ig-avatar-fallback">{{ request.user|get_initials }}</div>
+      {% endif %}
+      <button type="button" class="ig-composer-trigger" onclick="openPostCreateModal()">
+        Share a transport update, photo, or route...
+      </button>
+    </div>
   </div>
 
-  {% if messages %}
-    {% for message in messages %}
-      <div style="color: var(--gs-accent); font-size:0.85rem; margin-bottom:12px;">{{ message }}</div>
-    {% endfor %}
-  {% endif %}
-
-  {% if posts %}
-    {% for post in posts %}
-      {% include "social/partials/post_card.html" %}
-    {% endfor %}
-
-    <div style="display:flex; justify-content:center; gap:12px; margin-top:20px;">
-      {% if page_obj.has_previous %}
-        <a class="gs-btn-ghost gs-btn" href="?page={{ page_obj.previous_page_number }}">← Newer</a>
-      {% endif %}
-      {% if page_obj.has_next %}
-        <a class="gs-btn-ghost gs-btn" href="?page={{ page_obj.next_page_number }}">Older →</a>
-      {% endif %}
+  <!-- 🎬 Instagram-Style Trending Reels Carousel Shelf -->
+  {% if reels %}
+  <div class="ig-reels-shelf">
+    <div class="ig-reels-shelf-header">
+      <div class="ig-reels-shelf-title">
+        <i class="ti ti-movie" style="color: #ff3b30; font-size: 1.3rem;"></i>
+        <span>Reels</span>
+        <span class="ig-reels-badge">Trending</span>
+      </div>
+      <div style="display:flex; align-items:center; gap:8px;">
+        <button type="button" class="ig-reel-add-btn" onclick="{% if user.is_authenticated %}openCreateReelModal(){% else %}window.location.href='{% url 'login' %}?next={% url 'social:feed' %}';{% endif %}" title="Create Reel" style="cursor: pointer; font-family: inherit;">
+          <i class="ti ti-plus"></i> Add Reel
+        </button>
+        <a href="{% url 'social:reels_feed' %}" class="ig-reels-all-link">
+          Watch All <i class="ti ti-chevron-right"></i>
+        </a>
+      </div>
     </div>
-  {% else %}
-    <div class="gs-empty">No posts yet — be the first to share an update.</div>
+
+    <div class="ig-reels-scroll-row">
+      {% for reel in reels %}
+        <a href="{% url 'social:reels_feed' %}?reel={{ reel.id }}" class="ig-reel-card" title="{{ reel.caption|default:'Watch Reel' }}">
+          <div class="ig-reel-video-wrap">
+            {% if reel.video %}
+              <video src="{{ reel.video.url }}" preload="metadata" muted playsinline class="ig-reel-thumb-video"></video>
+            {% else %}
+              <div class="ig-reel-placeholder">
+                <i class="ti ti-video"></i>
+              </div>
+            {% endif %}
+            <div class="ig-reel-play-icon">
+              <i class="ti ti-player-play-filled"></i>
+            </div>
+          </div>
+          <div class="ig-reel-gradient-overlay"></div>
+          <div class="ig-reel-card-info">
+            <div class="ig-reel-author-row">
+              {% if reel.author.profile.avatar %}
+                <img src="{{ reel.author.profile.avatar.url }}" alt="{{ reel.author.username }}" class="ig-reel-avatar">
+              {% else %}
+                <div class="ig-reel-avatar-fallback">{{ reel.author.username|slice:":1"|upper }}</div>
+              {% endif %}
+              <span class="ig-reel-username">@{{ reel.author.username }}</span>
+            </div>
+            {% if reel.caption %}
+              <div class="ig-reel-caption">{{ reel.caption }}</div>
+            {% endif %}
+            <div class="ig-reel-meta">
+              <span><i class="ti ti-heart-filled" style="color:#ff3b30; font-size:11px;"></i> {{ reel.likes.count }}</span>
+              {% if reel.audio_title %}
+                <span class="ig-reel-audio"><i class="ti ti-music"></i> {{ reel.audio_title|truncatechars:12 }}</span>
+              {% endif %}
+            </div>
+          </div>
+        </a>
+      {% endfor %}
+    </div>
+  </div>
   {% endif %}
+
+  {% if messages %}
+    <div class="ig-messages-wrap">
+      {% for message in messages %}
+        <div class="ig-alert ig-alert-{{ message.tags|default:'info' }}">{{ message }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <!-- Posts Feed -->
+  {% if posts %}
+    <div class="ig-posts-list">
+      {% for post in posts %}
+        {% include "social/post_card.html" with post=post %}
+      {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+      <div class="ig-pagination">
+        {% if page_obj.has_previous %}
+          <a href="?page={{ page_obj.previous_page_number }}" class="ig-page-btn">Previous</a>
+        {% endif %}
+
+        <span class="ig-page-info">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+
+        {% if page_obj.has_next %}
+          <a href="?page={{ page_obj.next_page_number }}" class="ig-page-btn">Next</a>
+        {% endif %}
+      </div>
+    {% endif %}
+
+  {% else %}
+    <div class="ig-empty-feed">
+      <i class="ti ti-camera ig-empty-icon"></i>
+      <h3>No Posts Yet</h3>
+      <p>Follow users or post an update to see content in your feed.</p>
+      <button class="ig-btn-primary" onclick="openPostCreateModal()" style="margin-top: 12px;">Create First Post</button>
+    </div>
+  {% endif %}
+
 </div>
+
 {% endblock %}
+

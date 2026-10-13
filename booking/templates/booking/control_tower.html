@@ -21,9 +21,168 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-    <link rel="stylesheet" href="/static/control-tower/styles.css">
+    <link rel="stylesheet" href="/static/control-tower/styles.css?v={% now "U" %}">
+
+    <style>
+        /* 🌌 Guaranteed 3D Particle Constellation & Ambient Glowing Orbs (from Quote Form) */
+        @keyframes orbGlowFloat1 {
+            0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.5; }
+            50% { transform: translate(65px, -45px) scale(1.25); opacity: 0.85; }
+        }
+        @keyframes orbGlowFloat2 {
+            0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.45; }
+            50% { transform: translate(-55px, 50px) scale(1.3); opacity: 0.8; }
+        }
+        #controlTowerBgCanvas {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            z-index: 0 !important;
+            pointer-events: none !important;
+        }
+        .ambient-orb-1 {
+            position: fixed !important;
+            top: 8% !important;
+            left: 10% !important;
+            width: 360px !important;
+            height: 360px !important;
+            background: radial-gradient(circle, rgba(0, 242, 254, 0.35), rgba(0, 114, 255, 0.12) 60%, transparent 80%) !important;
+            filter: blur(60px) !important;
+            border-radius: 50% !important;
+            pointer-events: none !important;
+            z-index: 0 !important;
+            animation: orbGlowFloat1 7s infinite ease-in-out !important;
+        }
+        .ambient-orb-2 {
+            position: fixed !important;
+            bottom: 10% !important;
+            right: 10% !important;
+            width: 420px !important;
+            height: 420px !important;
+            background: radial-gradient(circle, rgba(255, 0, 127, 0.3), rgba(121, 40, 202, 0.15) 60%, transparent 80%) !important;
+            filter: blur(70px) !important;
+            border-radius: 50% !important;
+            pointer-events: none !important;
+            z-index: 0 !important;
+            animation: orbGlowFloat2 8s infinite ease-in-out !important;
+        }
+        .hidden {
+            display: none !important;
+        }
+    </style>
 </head>
 <body class="dark-theme">
+
+    <!-- 🌌 3D Animated Background Canvas & Floating Ambient Orbs (from Image 3) -->
+    <canvas id="controlTowerBgCanvas"></canvas>
+    <div class="ambient-orb-1"></div>
+    <div class="ambient-orb-2"></div>
+
+    <!-- 🎬 Instant Inline Particle Constellation Engine & Realtime Greeting -->
+    <script>
+        (function() {
+            // Instant 3D Particle Constellation Engine
+            function initBg() {
+                const canvas = document.getElementById('controlTowerBgCanvas');
+                if (!canvas) return;
+                const ctx = canvas.getContext('2d');
+                let width = canvas.width = window.innerWidth;
+                let height = canvas.height = window.innerHeight;
+
+                window.addEventListener('resize', () => {
+                    width = canvas.width = window.innerWidth;
+                    height = canvas.height = window.innerHeight;
+                });
+
+                const particles = [];
+                const count = 55;
+                for (let i = 0; i < count; i++) {
+                    particles.push({
+                        x: Math.random() * width,
+                        y: Math.random() * height,
+                        vx: (Math.random() - 0.5) * 0.8,
+                        vy: (Math.random() - 0.5) * 0.8,
+                        radius: Math.random() * 2 + 1.2,
+                        color: i % 2 === 0 ? 'rgba(0, 242, 254, ' : 'rgba(255, 0, 127, '
+                    });
+                }
+
+                function animate() {
+                    ctx.clearRect(0, 0, width, height);
+                    for (let i = 0; i < count; i++) {
+                        const p = particles[i];
+                        p.x += p.vx;
+                        p.y += p.vy;
+                        if (p.x < 0 || p.x > width) p.vx *= -1;
+                        if (p.y < 0 || p.y > height) p.vy *= -1;
+
+                        ctx.beginPath();
+                        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                        ctx.fillStyle = p.color + '0.85)';
+                        ctx.shadowBlur = 12;
+                        ctx.shadowColor = p.color + '1)';
+                        ctx.fill();
+
+                        for (let j = i + 1; j < count; j++) {
+                            const p2 = particles[j];
+                            const dx = p.x - p2.x;
+                            const dy = p.y - p2.y;
+                            const dist = Math.hypot(dx, dy);
+                            if (dist < 135) {
+                                ctx.beginPath();
+                                ctx.moveTo(p.x, p.y);
+                                ctx.lineTo(p2.x, p2.y);
+                                ctx.strokeStyle = `rgba(0, 242, 254, ${0.2 * (1 - dist / 135)})`;
+                                ctx.lineWidth = 0.9;
+                                ctx.stroke();
+                            }
+                        }
+                    }
+                    requestAnimationFrame(animate);
+                }
+                animate();
+            }
+
+            // Real-Time Time Greeting (Immediate Calculation on Load)
+            function initTimeGreeting() {
+                const hour = new Date().getHours();
+                let salutation, btnText, context;
+                if (hour >= 4 && hour < 12) {
+                    salutation = 'Good Morning Amit Sahu!';
+                    btnText = 'Play Morning Briefing';
+                    context = 'Today 18 bookings are active. 12 vehicles on road, 3 available. 2 drivers on leave.';
+                } else if (hour >= 12 && hour < 17) {
+                    salutation = 'Good Afternoon Amit Sahu!';
+                    btnText = 'Play Afternoon Briefing';
+                    context = 'This afternoon 18 bookings are active. 12 vehicles on road, 3 available at hub.';
+                } else if (hour >= 17 && hour < 22) {
+                    salutation = 'Good Evening Amit Sahu!';
+                    btnText = 'Play Evening Briefing';
+                    context = 'Good evening! 18 bookings active today with evening return transits underway.';
+                } else {
+                    salutation = 'Late Night Shift • Amit Sahu!';
+                    btnText = 'Play Night Shift Briefing';
+                    context = 'Overnight highway telematics and emergency safety surveillance active.';
+                }
+
+                const btn = document.getElementById('briefingBtnText');
+                if (btn) btn.innerText = btnText;
+                const quote = document.getElementById('aiGreetingText');
+                if (quote) quote.innerText = `"${salutation} ${context} Heavy Rain alert on Raipur Route. 2 Insurance renewals due in 5 days."`;
+                const hud = document.getElementById('audioHudText');
+                if (hud) hud.innerText = `"${salutation} Ghidora AI Transport Control Tower connected."`;
+            }
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', () => { initBg(); initTimeGreeting(); });
+            } else {
+                initBg();
+                initTimeGreeting();
+            }
+        })();
+    </script>
 
     <!-- Top Notification Bar / AI Audio Announcer Status -->
     <header class="top-header">
@@ -42,19 +201,26 @@
         </div>
 
         <div class="header-center">
-            <button id="btnVoiceGreet" class="btn-voice-greet pulse-button">
-                <i class="fa-solid fa-volume-high"></i>
-                <span>Play Morning Briefing</span>
+            <button id="btnVoiceGreet" class="btn-voice-greet pulse-button" title="Click to listen to AI audio briefing">
+                <i class="fa-solid fa-volume-high" id="briefingIcon"></i>
+                <span id="briefingBtnText">Play Audio Briefing</span>
+                <span id="briefingAudioWave" class="audio-wave hidden">
+                    <span class="audio-bar"></span><span class="audio-bar"></span><span class="audio-bar"></span><span class="audio-bar"></span>
+                </span>
             </button>
-            <button id="btnMicGlobal" class="btn-mic-global">
+            <button id="btnMicGlobal" class="btn-mic-global" title="Click to open voice/text command console">
                 <i class="fa-solid fa-microphone"></i>
-                <span>Voice Command (Hinglish/English)</span>
+                <span>Voice Command</span>
+            </button>
+            <button id="btnVoiceSettings" class="btn-voice-settings" onclick="openVoiceSettingsModal()" title="Voice & Indian Accent Settings" style="background: rgba(255, 215, 0, 0.12); border: 1px solid rgba(255, 215, 0, 0.35); color: #ffd700; padding: 7px 14px; border-radius: 20px; font-size: 11.5px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+                <i class="fa-solid fa-sliders"></i>
+                <span id="voiceBadgeLabel">Voice: Priya (Indian Female)</span>
             </button>
         </div>
 
         <div class="header-right">
-            <div class="health-meter-box">
-                <div class="health-label">Business Health</div>
+            <div class="health-meter-box" id="btnSystemHealth" style="cursor: pointer;" title="Click for Live Diagnostics & Fleet Health">
+                <div class="health-label">Business Health <i class="fa-solid fa-circle-info text-cyan" style="font-size: 10px;"></i></div>
                 <div class="health-value">96% <i class="fa-solid fa-circle-check"></i></div>
             </div>
             <div class="user-profile">
@@ -66,6 +232,13 @@
             </div>
         </div>
     </header>
+
+    <!-- Audio Subtitle HUD Banner -->
+    <div id="audioHudBanner" class="audio-hud-banner hidden">
+        <i class="fa-solid fa-volume-high text-cyan"></i>
+        <span id="audioHudText">"Ghidora AI Transport Control Tower connected..."</span>
+        <button class="btn-close" onclick="stopSpeech()" style="font-size: 16px; margin-left: 10px;">&times;</button>
+    </div>
 
     <!-- App Container -->
     <div class="app-layout">
@@ -136,55 +309,55 @@
                             "Good Morning Amit Sahu! Today 18 bookings are active. 12 vehicles on road, 3 available. 2 drivers on leave. Heavy Rain alert on Raipur Route. 2 Insurance renewals due in 5 days."
                         </h2>
                         <div class="ai-action-pills">
-                            <span class="pill pill-info"><i class="fa-solid fa-route"></i> Raipur Route: +24% Profitability</span>
-                            <span class="pill pill-warning"><i class="fa-solid fa-droplet"></i> Nagpur Route: Fuel +15%</span>
-                            <span class="pill pill-alert"><i class="fa-solid fa-shield-exclamation"></i> Insurance Expiring: CG04XX1234</span>
+                            <span class="pill pill-info" onclick="switchSection('sec-fuel-weather')" style="cursor: pointer;" title="Click to view Fuel & Weather"><i class="fa-solid fa-route"></i> Raipur Route: +24% Profitability</span>
+                            <span class="pill pill-warning" onclick="activateAlternateRouteB()" style="cursor: pointer;" title="Click to apply Route B"><i class="fa-solid fa-droplet"></i> Nagpur Route: Fuel +15%</span>
+                            <span class="pill pill-alert" onclick="triggerAlertAction('alt-1')" style="cursor: pointer;" title="Click to renew insurance"><i class="fa-solid fa-shield-exclamation"></i> Insurance Expiring: CG04XX1234</span>
                         </div>
                     </div>
                 </div>
 
                 <!-- KPI Metric Grid -->
                 <div class="kpi-grid">
-                    <div class="kpi-card glass-card">
+                    <div class="kpi-card glass-card" onclick="openKpiModal('bookings')" style="cursor: pointer;" title="Click to view today's active bookings">
                         <div class="kpi-icon icon-blue"><i class="fa-solid fa-box-archive"></i></div>
                         <div class="kpi-data">
-                            <span class="kpi-title">Today's Bookings</span>
+                            <span class="kpi-title">Today's Bookings <i class="fa-solid fa-up-right-from-square" style="font-size: 10px; opacity: 0.6;"></i></span>
                             <span class="kpi-value" id="kpiBookings">18</span>
                             <span class="kpi-sub text-green"><i class="fa-solid fa-arrow-trend-up"></i> +18% vs Last Week</span>
                         </div>
                     </div>
 
-                    <div class="kpi-card glass-card">
+                    <div class="kpi-card glass-card" onclick="openKpiModal('revenue')" style="cursor: pointer;" title="Click to view revenue breakdown">
                         <div class="kpi-icon icon-emerald"><i class="fa-solid fa-indian-rupee-sign"></i></div>
                         <div class="kpi-data">
-                            <span class="kpi-title">Today's Revenue</span>
+                            <span class="kpi-title">Today's Revenue <i class="fa-solid fa-up-right-from-square" style="font-size: 10px; opacity: 0.6;"></i></span>
                             <span class="kpi-value" id="kpiRevenue">₹48,500</span>
                             <span class="kpi-sub text-green">Target ₹50k (97%)</span>
                         </div>
                     </div>
 
-                    <div class="kpi-card glass-card">
+                    <div class="kpi-card glass-card" onclick="switchSection('sec-gps')" style="cursor: pointer;" title="Click to open Live GPS Telematics">
                         <div class="kpi-icon icon-purple"><i class="fa-solid fa-truck-moving"></i></div>
                         <div class="kpi-data">
-                            <span class="kpi-title">Active Vehicles</span>
+                            <span class="kpi-title">Active Vehicles <i class="fa-solid fa-up-right-from-square" style="font-size: 10px; opacity: 0.6;"></i></span>
                             <span class="kpi-value">12 / 15</span>
                             <span class="kpi-sub text-cyan">3 Vehicles Available</span>
                         </div>
                     </div>
 
-                    <div class="kpi-card glass-card">
+                    <div class="kpi-card glass-card" onclick="openKpiModal('drivers')" style="cursor: pointer;" title="Click to view driver duty roster">
                         <div class="kpi-icon icon-gold"><i class="fa-solid fa-id-card"></i></div>
                         <div class="kpi-data">
-                            <span class="kpi-title">Drivers Available</span>
+                            <span class="kpi-title">Drivers Available <i class="fa-solid fa-up-right-from-square" style="font-size: 10px; opacity: 0.6;"></i></span>
                             <span class="kpi-value">5</span>
                             <span class="kpi-sub text-amber">2 Drivers on Leave</span>
                         </div>
                     </div>
 
-                    <div class="kpi-card glass-card">
+                    <div class="kpi-card glass-card" onclick="openKpiModal('payments')" style="cursor: pointer;" title="Click to view pending payments">
                         <div class="kpi-icon icon-rose"><i class="fa-solid fa-clock-rotate-left"></i></div>
                         <div class="kpi-data">
-                            <span class="kpi-title">Pending Payment</span>
+                            <span class="kpi-title">Pending Payment <i class="fa-solid fa-up-right-from-square" style="font-size: 10px; opacity: 0.6;"></i></span>
                             <span class="kpi-value">₹22,000</span>
                             <span class="kpi-sub text-rose">Customer Amit ₹3,500</span>
                         </div>
@@ -216,6 +389,7 @@
                                 <div class="bi-content">
                                     <h4>Raipur Route Most Profitable</h4>
                                     <p>Lowest Fuel Cost, Highest Booking Demand & Fast Delivery turnarounds this month.</p>
+                                    <button class="btn-chip-action" onclick="switchSection('sec-analytics')"><i class="fa-solid fa-chart-line"></i> View Route Margins</button>
                                 </div>
                             </div>
 
@@ -224,6 +398,7 @@
                                 <div class="bi-content">
                                     <h4>Nagpur Route Diesel Cost Increased +15%</h4>
                                     <p>Reason: Longer detours & traffic congestion. <strong>AI Suggestion:</strong> Try Alternate Route B to save ₹350 per trip.</p>
+                                    <button class="btn-chip-action text-green" onclick="activateAlternateRouteB()"><i class="fa-solid fa-route"></i> Apply Route B (Save ₹350)</button>
                                 </div>
                             </div>
 
@@ -232,27 +407,185 @@
                                 <div class="bi-content">
                                     <h4>Furniture Transport Demand Peak</h4>
                                     <p>Furniture transport is the #1 booked category this week (42% total cargo volume).</p>
+                                    <button class="btn-chip-action" onclick="switchSection('sec-recommendations')"><i class="fa-solid fa-truck-fast"></i> Open Dispatcher</button>
                                 </div>
                             </div>
                         </div>
+                <!-- Secondary Row: Fastag Toll Wallet & Driver Sobriety AI Biometrics -->
+                <div class="two-col-grid" style="margin-top: 20px;">
+                    <!-- Driver Sobriety & Biometric Safety Scanner -->
+                    <div class="glass-card panel-box">
+                        <div class="panel-header">
+                            <h3><i class="fa-solid fa-user-shield text-cyan"></i> Driver Sobriety &amp; AI Safety Scanner</h3>
+                            <button class="btn-chip-action" onclick="triggerBiometricVerificationAll()"><i class="fa-solid fa-camera"></i> Scan All Drivers</button>
+                        </div>
+                        <div class="sobriety-grid" id="sobrietyGrid">
+                            <div class="sobriety-driver-card">
+                                <div class="driver-head">
+                                    <span class="driver-name">Ramesh Kumar (Pickup)</span>
+                                    <span class="badge badge-delayed">Fatigue: High</span>
+                                </div>
+                                <div class="metric-row">
+                                    <span>Alcohol Breathalyzer:</span>
+                                    <strong class="text-green">0.00% (Pass)</strong>
+                                </div>
+                                <div class="metric-row">
+                                    <span>Eye-Blink Alertness:</span>
+                                    <strong class="text-amber">72% (Sluggish)</strong>
+                                </div>
+                                <div class="metric-row">
+                                    <span>Continuous Driving:</span>
+                                    <strong class="text-rose">12 Hours</strong>
+                                </div>
+                                <button class="btn-secondary" style="padding: 4px 8px; font-size: 10px; margin-top: 4px;" onclick="triggerAlertAction('alt-2')">
+                                    <i class="fa-solid fa-bed"></i> Enforce Rest Order
+                                </button>
+                            </div>
+
+                            <div class="sobriety-driver-card">
+                                <div class="driver-head">
+                                    <span class="driver-name">Sunil Verma (Tata Ace)</span>
+                                    <span class="badge badge-active">Fit &amp; Ready</span>
+                                </div>
+                                <div class="metric-row">
+                                    <span>Alcohol Breathalyzer:</span>
+                                    <strong class="text-green">0.00% (Pass)</strong>
+                                </div>
+                                <div class="metric-row">
+                                    <span>Eye-Blink Alertness:</span>
+                                    <strong class="text-green">98% (Sharp)</strong>
+                                </div>
+                                <div class="metric-row">
+                                    <span>Rest Logged:</span>
+                                    <strong class="text-green">10 Hours</strong>
+                                </div>
+                                <span style="font-size: 10px; color: var(--status-green);"><i class="fa-solid fa-circle-check"></i> 100% Fit for Transit</span>
+                            </div>
+
+                            <div class="sobriety-driver-card">
+                                <div class="driver-head">
+                                    <span class="driver-name">Vikram Singh (16T)</span>
+                                    <span class="badge badge-active">BAC Clear</span>
+                                </div>
+                                <div class="metric-row">
+                                    <span>Alcohol Breathalyzer:</span>
+                                    <strong class="text-green">0.00% (Pass)</strong>
+                                </div>
+                                <div class="metric-row">
+                                    <span>Eye-Blink Alertness:</span>
+                                    <strong class="text-green">91% (Normal)</strong>
+                                </div>
+                                <div class="metric-row">
+                                    <span>Halt Location:</span>
+                                    <span class="text-cyan">Bypass KM 42</span>
+                                </div>
+                                <button class="btn-secondary" style="padding: 4px 8px; font-size: 10px; margin-top: 4px;" onclick="showToast('Driver Vikram Singh selfie verification passed. No impairment detected.', 'success', 'Verification Passed')">
+                                    <i class="fa-solid fa-fingerprint"></i> Ping Check
+                                </button>
+                            </div>
+
+                            <div class="sobriety-driver-card">
+                                <div class="driver-head">
+                                    <span class="driver-name">Anil Yadav (Eicher)</span>
+                                    <span class="badge badge-active">BAC Clear</span>
+                                </div>
+                                <div class="metric-row">
+                                    <span>Alcohol Breathalyzer:</span>
+                                    <strong class="text-green">0.00% (Pass)</strong>
+                                </div>
+                                <div class="metric-row">
+                                    <span>Eye-Blink Alertness:</span>
+                                    <strong class="text-green">94% (Alert)</strong>
+                                </div>
+                                <div class="metric-row">
+                                    <span>Speed Telemetry:</span>
+                                    <span class="text-green">62 km/h (Safe)</span>
+                                </div>
+                                <span style="font-size: 10px; color: var(--status-green);"><i class="fa-solid fa-circle-check"></i> On Route NH-130</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Fastag Expressway Wallet & Toll Plaza Monitor -->
+                    <div class="glass-card panel-box">
+                        <div class="panel-header">
+                            <h3><i class="fa-solid fa-credit-card text-gold"></i> Live Fastag Fleet Wallet &amp; Tolls</h3>
+                            <span class="tag-ai">ICICI Corporate Fastag</span>
+                        </div>
+                        <div class="fastag-box">
+                            <div class="fastag-balance-bar">
+                                <div>
+                                    <div style="font-size: 11px; color: var(--text-muted);">Fleet Wallet Balance</div>
+                                    <div style="font-size: 22px; font-weight: 700; color: var(--status-green);" id="fastagBalanceDisplay">₹14,250</div>
+                                    <div style="font-size: 10px; color: var(--text-muted);"><i class="fa-solid fa-rotate text-cyan"></i> Auto-recharge below ₹3,000</div>
+                                </div>
+                                <button class="btn-primary" style="padding: 8px 16px; font-size: 11px;" onclick="openFastagTopupModal()">
+                                    <i class="fa-solid fa-bolt"></i> Instant Top-Up (UPI)
+                                </button>
+                            </div>
+
+                            <div style="font-size: 12px; color: #fff; font-weight: 600; margin-top: 4px;">Recent Toll Deductions (Today)</div>
+                            <div class="fastag-toll-item">
+                                <div>
+                                    <strong class="text-cyan">Kumhari Toll Plaza (NH-53)</strong>
+                                    <div style="font-size: 10px; color: var(--text-muted);">CG04XX1234 (Mahindra Pickup) • 10:42 AM</div>
+                                </div>
+                                <strong class="text-rose">-₹140</strong>
+                            </div>
+                            <div class="fastag-toll-item">
+                                <div>
+                                    <strong class="text-cyan">Simga Toll Plaza (NH-130)</strong>
+                                    <div style="font-size: 10px; color: var(--text-muted);">CG04ZZ9900 (Eicher Pro) • 11:05 AM</div>
+                                </div>
+                                <strong class="text-rose">-₹185</strong>
+                            </div>
+                            <div class="fastag-toll-item">
+                                <div>
+                                    <strong class="text-cyan">Kurud Toll Plaza (NH-30)</strong>
+                                    <div style="font-size: 10px; color: var(--text-muted);">CG04YY5678 (Ashok Leyland) • 09:18 AM</div>
+                                </div>
+                                <strong class="text-rose">-₹260</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Emergency SOS & Highway Breakdown Rescue Protocol -->
+                <div class="sos-quick-bar">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <i class="fa-solid fa-triangle-exclamation text-rose" style="font-size: 24px;"></i>
+                        <div>
+                            <strong style="color: #fff; font-size: 13px;">🚨 24x7 Chhattisgarh Highway Emergency &amp; Fleet SOS Dispatch</strong>
+                            <div style="font-size: 11px; color: var(--text-muted);">Instant GPS dispatch for Heavy Crane, Breakdown Van, Ambulance &amp; Highway Police Patrol.</div>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn-sos" onclick="openSosModal()">
+                            <i class="fa-solid fa-truck-pickup"></i> Trigger Highway SOS Protocol
+                        </button>
                     </div>
                 </div>
             </section>
 
             <!-- SECTION 2: SMART ALERTS SYSTEM -->
             <section id="sec-alerts" class="content-section">
-                <div class="section-title-bar">
+                <div class="section-title-bar" style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 14px; margin-bottom: 16px;">
                     <div>
                         <h2>🚨 AI Smart Alert System</h2>
                         <p>Continuous AI surveillance monitoring vehicles, drivers, route hazards, compliance & payments.</p>
                     </div>
-                    <div class="alert-filter-tabs">
-                        <button class="filter-tab active" data-filter="all">All Alerts</button>
-                        <button class="filter-tab" data-filter="compliance">Compliance & Insurance</button>
-                        <button class="filter-tab" data-filter="driver">Driver Safety</button>
-                        <button class="filter-tab" data-filter="weather">Weather & GPS</button>
-                        <button class="filter-tab" data-filter="payment">Pending Payments</button>
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn-primary" style="padding: 8px 16px; font-size: 12px;" onclick="openCreateAlertModal()"><i class="fa-solid fa-plus"></i> Add Custom Alert</button>
+                        <button class="btn-secondary" style="padding: 8px 16px; font-size: 12px;" onclick="resolveAllAlerts()"><i class="fa-solid fa-check-double text-green"></i> Resolve All</button>
                     </div>
+                </div>
+
+                <div class="alert-filter-tabs" style="margin-bottom: 18px;">
+                    <button class="filter-tab active" data-filter="all">All Alerts (<span id="countTabAll">6</span>)</button>
+                    <button class="filter-tab" data-filter="compliance">Compliance & Insurance</button>
+                    <button class="filter-tab" data-filter="driver">Driver Safety</button>
+                    <button class="filter-tab" data-filter="weather">Weather & GPS</button>
+                    <button class="filter-tab" data-filter="payment">Pending Payments</button>
                 </div>
 
                 <div class="alerts-grid" id="fullAlertsGrid">
@@ -345,12 +678,39 @@
 
                         <div class="rec-action-footer">
                             <div class="est-cost">
-                                Estimated Diesel Cost: <strong class="text-green" id="estFuelCost">₹840</strong> | Distance: <strong>78 KM</strong>
+                                Estimated Diesel Cost: <strong class="text-green" id="estFuelCost">₹840</strong> | Distance: <strong id="estDistance">78 KM</strong>
                             </div>
                             <button id="btnAssignDispatch" class="btn-accent btn-large">
                                 <i class="fa-solid fa-paper-plane"></i> One-Click Assign Dispatch
                             </button>
                         </div>
+                    </div>
+                </div>
+
+                <!-- Active Dispatches Log Table -->
+                <div class="glass-card dispatches-table-box">
+                    <div class="panel-header">
+                        <h3><i class="fa-solid fa-list-check text-cyan"></i> Live Fleet Dispatch Log</h3>
+                        <span class="tag-ai">Realtime Assignment Registry</span>
+                    </div>
+                    <div style="overflow-x: auto;">
+                        <table class="dispatches-table">
+                            <thead>
+                                <tr>
+                                    <th>Dispatch ID</th>
+                                    <th>Cargo &amp; Weight</th>
+                                    <th>Assigned Vehicle</th>
+                                    <th>Driver</th>
+                                    <th>Route</th>
+                                    <th>Est. Diesel</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dispatchTableBody">
+                                <!-- Injected by JS -->
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </section>
@@ -363,8 +723,9 @@
                         <p>Live vehicle tracking with automated AI detection for unexpected stops & route deviations.</p>
                     </div>
                     <div class="map-actions">
-                        <button class="btn-secondary" id="btnSimulateStop"><i class="fa-solid fa-circle-pause"></i> Trigger 25-Min Stop Alert</button>
-                        <button class="btn-secondary" id="btnSimulateDeviate"><i class="fa-solid fa-diamond-turn-right"></i> Trigger Route Deviation</button>
+                        <button class="btn-primary" id="btnToggleMotion"><i class="fa-solid fa-play"></i> <span id="motionBtnText">Start Realtime GPS Motion</span></button>
+                        <button class="btn-secondary" id="btnSimulateStop"><i class="fa-solid fa-circle-pause"></i> 25-Min Stop Alert</button>
+                        <button class="btn-secondary" id="btnSimulateDeviate"><i class="fa-solid fa-diamond-turn-right"></i> Route Deviation Alert</button>
                     </div>
                 </div>
 
@@ -376,7 +737,16 @@
 
                     <!-- Fleet Live Status Sidebar -->
                     <div class="glass-card fleet-status-card">
-                        <h3><i class="fa-solid fa-radar"></i> Live Vehicle Surveillance</h3>
+                        <div class="panel-header" style="margin-bottom: 8px;">
+                            <h3><i class="fa-solid fa-radar text-cyan"></i> Live Fleet Radar</h3>
+                            <span class="badge" style="background: rgba(0,230,118,0.2); color: var(--status-green); font-size: 11px; padding: 2px 8px; border-radius: 10px;">4 Monitored</span>
+                        </div>
+                        <div style="display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap;">
+                            <button class="chip-btn active" onclick="filterFleet('all', this)">All (4)</button>
+                            <button class="chip-btn" onclick="filterFleet('Running', this)">Running (2)</button>
+                            <button class="chip-btn" onclick="filterFleet('Idle', this)">Idle (1)</button>
+                            <button class="chip-btn" onclick="filterFleet('Stopped', this)">Stopped (1)</button>
+                        </div>
                         <div class="fleet-list" id="fleetList">
                             <!-- Injected by JS -->
                         </div>
@@ -386,10 +756,51 @@
 
             <!-- SECTION 5: FUEL & WEATHER AI OPTIMIZATION -->
             <section id="sec-fuel-weather" class="content-section">
-                <div class="section-title-bar">
+                <div class="section-title-bar" style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 14px;">
                     <div>
                         <h2>⛽ Fuel Optimization & 🌦 Weather Decision Engine</h2>
-                        <p>Smart route comparison and weather-based dispatch advisories.</p>
+                        <p>Smart route comparison, automated diesel anomaly detection, and weather-based fleet advisories.</p>
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn-primary" style="padding: 8px 16px; font-size: 12px;" onclick="openWeatherBroadcastModal()">
+                            <i class="fa-solid fa-tower-broadcast"></i> Broadcast Weather Advisory
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Live Fuel Metrics Bar -->
+                <div class="kpi-grid" style="margin-bottom: 20px;">
+                    <div class="kpi-card glass-card">
+                        <div class="kpi-icon icon-green"><i class="fa-solid fa-gas-pump"></i></div>
+                        <div class="kpi-data">
+                            <span class="kpi-title">Today's Diesel Rate</span>
+                            <span class="kpi-value">₹94.50 / L</span>
+                            <span class="kpi-sub text-green"><i class="fa-solid fa-arrow-down"></i> -₹0.40 vs yesterday</span>
+                        </div>
+                    </div>
+                    <div class="kpi-card glass-card">
+                        <div class="kpi-icon icon-cyan"><i class="fa-solid fa-gauge-high"></i></div>
+                        <div class="kpi-data">
+                            <span class="kpi-title">Fleet Avg Mileage</span>
+                            <span class="kpi-value">12.4 KM/L</span>
+                            <span class="kpi-sub text-cyan">+1.2 KM/L (Eco Mode)</span>
+                        </div>
+                    </div>
+                    <div class="kpi-card glass-card">
+                        <div class="kpi-icon icon-purple"><i class="fa-solid fa-piggy-bank"></i></div>
+                        <div class="kpi-data">
+                            <span class="kpi-title">AI Route Savings</span>
+                            <span class="kpi-value text-green">₹24,850</span>
+                            <span class="kpi-sub text-green">Saved this month</span>
+                        </div>
+                    </div>
+                    <div class="kpi-card glass-card">
+                        <div class="kpi-icon icon-rose"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                        <div class="kpi-data">
+                            <span class="kpi-title">Fuel Theft Risk</span>
+                            <span class="kpi-value text-amber">1 Anomaly</span>
+                            <span class="kpi-sub text-rose">Simga Bypass Flagged</span>
+                        </div>
                     </div>
                 </div>
 
@@ -401,7 +812,7 @@
                             <span class="tag-ai">Save ₹350 / Trip</span>
                         </div>
                         <div class="route-compare-box">
-                            <div class="route-card route-b-selected border-green">
+                            <div class="route-card route-b-selected border-green" id="cardRouteB">
                                 <div class="route-tag tag-recommended"><i class="fa-solid fa-thumbs-up"></i> Recommended: Route B</div>
                                 <h4>Raipur → Durg via Bypass (Route B)</h4>
                                 <div class="route-metrics">
@@ -411,6 +822,11 @@
                                 </div>
                                 <div class="route-benefit">
                                     <i class="fa-solid fa-piggy-bank text-green"></i> <strong>Fuel Saving: ₹350</strong> compared to Highway Route A
+                                </div>
+                                <div style="margin-top: 10px;">
+                                    <button class="btn-primary" style="padding: 6px 14px; font-size: 11px;" onclick="activateAlternateRouteB()">
+                                        <i class="fa-solid fa-circle-check"></i> <span id="btnRouteBText">Active Route (Enforced)</span>
+                                    </button>
                                 </div>
                             </div>
 
@@ -422,6 +838,33 @@
                                     <span>Traffic: Heavy Bottleneck</span>
                                     <span>Diesel Cost: <strong class="text-rose">₹1,800</strong></span>
                                 </div>
+                                <div style="margin-top: 10px;">
+                                    <span class="badge" style="background: rgba(255,23,68,0.15); color: var(--status-rose); font-size: 11px; padding: 4px 8px; border-radius: 6px;">
+                                        <i class="fa-solid fa-ban"></i> Detour Penalty +₹350
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Fuel Theft / Anomaly alert widget -->
+                        <div class="fuel-anomaly-box" style="margin-top: 16px;">
+                            <div class="anomaly-head">
+                                <div>
+                                    <i class="fa-solid fa-triangle-exclamation text-rose"></i>
+                                    <strong>Diesel Sensor Anomaly: CG04ZZ9900</strong>
+                                </div>
+                                <span class="badge badge-critical">12L Sudden Drop</span>
+                            </div>
+                            <p style="margin: 8px 0; font-size: 12px; color: var(--text-muted);">
+                                Tank level plunged from 68L to 56L in 10 mins during unapproved stop at Simga Bypass. Possible fuel siphon or sensor fault.
+                            </p>
+                            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                                <button class="btn-secondary" style="padding: 5px 12px; font-size: 11px;" onclick="investigateFuelAnomaly('CG04ZZ9900')">
+                                    <i class="fa-solid fa-magnifying-glass-chart"></i> View Tank Graph
+                                </button>
+                                <button class="btn-accent" style="padding: 5px 12px; font-size: 11px;" onclick="pingDriverFuelAlert('Anil Yadav', '9826100000')">
+                                    <i class="fa-solid fa-phone"></i> Contact Driver Anil
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -436,10 +879,15 @@
                             <div class="weather-alert-box border-warning">
                                 <div class="weather-icon-large"><i class="fa-solid fa-cloud-showers-water text-cyan"></i></div>
                                 <div class="weather-text">
-                                    <h4>Raipur & Dhamtari Belt: Tomorrow Heavy Rain Warning</h4>
+                                    <h4>Raipur &amp; Dhamtari Belt: Tomorrow Heavy Rain Warning</h4>
                                     <p>Forecast indicates 85mm rainfall starting tomorrow morning 6:00 AM with possible highway flash flooding.</p>
                                     <div class="ai-recommendation-pill">
                                         <i class="fa-solid fa-robot"></i> <strong>AI Recommendation:</strong> Dispatch Today Recommended to avoid 40+ minute delivery delays.
+                                    </div>
+                                    <div style="margin-top: 10px; display: flex; gap: 8px;">
+                                        <button class="btn-primary" style="padding: 6px 12px; font-size: 11px;" onclick="openWeatherBroadcastModal()">
+                                            <i class="fa-solid fa-bullhorn"></i> Send Warning to Drivers
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -448,7 +896,12 @@
                                 <div class="weather-icon-large"><i class="fa-solid fa-smog text-purple"></i></div>
                                 <div class="weather-text">
                                     <h4>Nagpur Pass: Morning Fog Alert</h4>
-                                    <p>Low visibility (< 100 meters) expected between 4:00 AM - 8:00 AM.</p>
+                                    <p>Low visibility (&lt; 100 meters) expected between 4:00 AM - 8:00 AM. AI Speed Advisory: Cap limit to 45 km/h.</p>
+                                    <div style="margin-top: 8px;">
+                                        <button class="btn-secondary" style="padding: 4px 10px; font-size: 11px;" onclick="showToast('Speed advisory (45 km/h) sent to vehicle IoT telematics for Nagpur pass.', 'info', 'Speed Cap Active')">
+                                            <i class="fa-solid fa-gauge"></i> Push 45 km/h Telematics Cap
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -458,10 +911,17 @@
 
             <!-- SECTION 6: BI & PREDICTIVE ANALYTICS -->
             <section id="sec-analytics" class="content-section">
-                <div class="section-title-bar">
+                <div class="section-title-bar" style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 14px; margin-bottom: 16px;">
                     <div>
-                        <h2>📈 Business Intelligence & Future AI Predictions</h2>
-                        <p>Historical trends analysis, expense breakdown, and revenue forecasting.</p>
+                        <h2>📈 Business Intelligence &amp; Future AI Predictions</h2>
+                        <p>Historical trends analysis, route profit margins, expense breakdown, and revenue forecasting.</p>
+                    </div>
+                    <div class="time-range-tabs">
+                        <button class="time-tab" onclick="switchAnalyticsRange('today', this)">Today</button>
+                        <button class="time-tab" onclick="switchAnalyticsRange('week', this)">This Week</button>
+                        <button class="time-tab active" onclick="switchAnalyticsRange('month', this)">This Month</button>
+                        <button class="time-tab" onclick="switchAnalyticsRange('6m', this)">6 Months</button>
+                        <button class="time-tab" onclick="switchAnalyticsRange('year', this)">1 Year</button>
                     </div>
                 </div>
 
@@ -469,17 +929,17 @@
                     <!-- Chart 1: Revenue & Booking Future Prediction -->
                     <div class="glass-card panel-box">
                         <div class="panel-header">
-                            <h3><i class="fa-solid fa-chart-area text-cyan"></i> 🔮 Revenue Forecast & Booking Prediction</h3>
+                            <h3><i class="fa-solid fa-chart-area text-cyan"></i> 🔮 Revenue Forecast &amp; Booking Prediction</h3>
                             <span class="tag-ai">AI Confidence: 94.2%</span>
                         </div>
                         <div class="prediction-highlight">
                             <div class="pred-item">
-                                <span class="lbl">Expected Next Month Revenue</span>
-                                <span class="val text-green">₹8,50,000</span>
+                                <span class="lbl" id="analyticsPredLabel">Expected Next Month Revenue</span>
+                                <span class="val text-green" id="analyticsPredVal">₹8,50,000</span>
                             </div>
                             <div class="pred-item">
-                                <span class="lbl">Booking Surge Expected</span>
-                                <span class="val text-cyan">+18% Increase</span>
+                                <span class="lbl" id="analyticsSurgeLabel">Booking Surge Expected</span>
+                                <span class="val text-cyan" id="analyticsSurgeVal">+18% Increase</span>
                             </div>
                         </div>
                         <div class="chart-wrapper">
@@ -490,16 +950,77 @@
                     <!-- Chart 2: Monthly Expense Analysis -->
                     <div class="glass-card panel-box">
                         <div class="panel-header">
-                            <h3><i class="fa-solid fa-chart-pie text-rose"></i> 💰 Expense & Diesel Cost Breakdown</h3>
-                            <span class="tag-warning">Diesel Cost +10%</span>
+                            <h3><i class="fa-solid fa-chart-pie text-rose"></i> 💰 Expense &amp; Diesel Cost Breakdown</h3>
+                            <span class="tag-warning" id="expenseBadge">Diesel Cost +10%</span>
                         </div>
                         <div class="expense-insight-box">
                             <i class="fa-solid fa-circle-info text-amber"></i>
-                            <span>AI Finding: Diesel costs increased 10% this month due to longer detours & increased AC usage in extreme heat.</span>
+                            <span id="expenseInsightText">AI Finding: Diesel costs increased 10% this month due to longer detours &amp; increased AC usage in extreme heat.</span>
                         </div>
                         <div class="chart-wrapper">
                             <canvas id="expenseChart"></canvas>
                         </div>
+                    </div>
+                </div>
+
+                <!-- Route Profitability & Margin Matrix -->
+                <div class="glass-card dispatches-table-box" style="margin-top: 22px;">
+                    <div class="panel-header">
+                        <h3><i class="fa-solid fa-layer-group text-gold"></i> Route Profitability &amp; Operating Margin Matrix</h3>
+                        <span class="tag-ai">AI Efficiency Analysis</span>
+                    </div>
+                    <div style="overflow-x: auto;">
+                        <table class="dispatches-table">
+                            <thead>
+                                <tr>
+                                    <th>Route Corridor</th>
+                                    <th>Trips Done</th>
+                                    <th>Gross Revenue</th>
+                                    <th>Fuel &amp; Toll Cost</th>
+                                    <th>Net Operational Profit</th>
+                                    <th>Margin %</th>
+                                    <th>AI Operational Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Dhamtari ⇄ Raipur</strong></td>
+                                    <td>84 Trips</td>
+                                    <td class="text-green">₹2,45,000</td>
+                                    <td>₹48,200</td>
+                                    <td><strong>₹1,96,800</strong></td>
+                                    <td><span class="status-badge badge-active" style="font-weight: 700;">+34.2%</span></td>
+                                    <td><span class="status-pill-matched"><i class="fa-solid fa-crown text-gold"></i> #1 Star Profit Route</span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Raipur ⇄ Durg</strong></td>
+                                    <td>62 Trips</td>
+                                    <td class="text-green">₹1,86,000</td>
+                                    <td>₹42,000</td>
+                                    <td><strong>₹1,44,000</strong></td>
+                                    <td><span class="status-badge badge-active">+28.5%</span></td>
+                                    <td><span class="text-cyan"><i class="fa-solid fa-check"></i> High Turnaround</span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Raipur ⇄ Bilaspur</strong></td>
+                                    <td>38 Trips</td>
+                                    <td class="text-green">₹1,90,000</td>
+                                    <td>₹58,000</td>
+                                    <td><strong>₹1,32,000</strong></td>
+                                    <td><span class="status-badge" style="background: rgba(0,242,254,0.15); color: var(--accent-cyan);">+22.1%</span></td>
+                                    <td><span class="text-muted"><i class="fa-solid fa-arrow-trend-up"></i> Growing Volume</span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Raipur ⇄ Nagpur</strong></td>
+                                    <td>24 Trips</td>
+                                    <td class="text-green">₹1,94,400</td>
+                                    <td class="text-rose">₹76,800</td>
+                                    <td><strong>₹1,17,600</strong></td>
+                                    <td><span class="status-badge badge-delayed">+14.2%</span></td>
+                                    <td><span class="text-amber"><i class="fa-solid fa-triangle-exclamation"></i> Detour Penalty (Route B suggested)</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </section>
@@ -508,7 +1029,7 @@
             <section id="sec-ai-chat" class="content-section">
                 <div class="section-title-bar">
                     <div>
-                        <h2>📞 Ghidora AI Manager (Voice & Text Assistant)</h2>
+                        <h2>📞 Ghidora AI Manager (Voice &amp; Text Assistant)</h2>
                         <p>Ask anything about bookings, empty vehicles, revenue, or pending payments in natural Hinglish or English.</p>
                     </div>
                 </div>
@@ -519,7 +1040,7 @@
                             <div class="bot-avatar"><i class="fa-solid fa-headset"></i></div>
                             <div>
                                 <span class="bot-name">Ghidora AI Transport Assistant</span>
-                                <span class="bot-status"><span class="dot green-pulse"></span> Online & Listening</span>
+                                <span class="bot-status"><span class="dot green-pulse"></span> Online &amp; Listening</span>
                             </div>
                         </div>
                         <div class="quick-questions">
@@ -527,6 +1048,7 @@
                             <button class="chip-btn" onclick="sendQuickQuery('कौन-सी गाड़ी खाली है?')">कौन-सी गाड़ी खाली है?</button>
                             <button class="chip-btn" onclick="sendQuickQuery('सबसे ज्यादा कमाई किस vehicle ने की?')">सबसे ज्यादा कमाई?</button>
                             <button class="chip-btn" onclick="sendQuickQuery('Pending payment कितना है?')">Pending payment?</button>
+                            <button class="chip-btn" onclick="sendQuickQuery('Raipur route ka kya status hai?')">Raipur route status?</button>
                         </div>
                     </div>
 
@@ -534,7 +1056,7 @@
                         <div class="msg msg-bot">
                             <div class="msg-avatar"><i class="fa-solid fa-robot"></i></div>
                             <div class="msg-bubble">
-                                Namaste Amit ji! Main Ghidora AI Assistant hoon. Aap mujhse voice ya text me transport company ke bare me koi bhi sawal pooch sakte hain.
+                                Namaste Amit ji! Main Ghidora AI Assistant hoon. Aap mujhse voice ya text me transport company ke bare me koi bhi sawal pooch sakte hain. (Hinglish / Hindi / English supported)
                             </div>
                         </div>
                     </div>
@@ -543,7 +1065,7 @@
                         <button id="btnVoiceInputChat" class="btn-icon-mic" title="Click to speak">
                             <i class="fa-solid fa-microphone"></i>
                         </button>
-                        <input type="text" id="chatInputText" placeholder="Type your query (e.g. Aaj kitni booking hui?)..." class="chat-input">
+                        <input type="text" id="chatInputText" placeholder="Type your query (e.g. Aaj kitni booking hui? / Kaunsi gaadi khali hai?)..." class="chat-input">
                         <button id="btnSendChat" class="btn-primary">
                             <i class="fa-solid fa-paper-plane"></i> Send
                         </button>
@@ -564,15 +1086,15 @@
                     <div class="reports-header-controls">
                         <div class="report-type-selector">
                             <label>Report Frequency:</label>
-                            <select id="reportFreq" class="form-input">
-                                <option value="Daily">Daily Report (Today)</option>
-                                <option value="Weekly">Weekly Executive Summary</option>
-                                <option value="Monthly" selected>Monthly Financial & Fleet Report</option>
-                                <option value="Yearly">Annual Growth Report</option>
+                            <select id="reportFreq" class="form-input" onchange="generateReportPreview()">
+                                <option value="Daily">Daily Operations Summary (Today)</option>
+                                <option value="Weekly">Weekly Logistics Performance</option>
+                                <option value="Monthly" selected>Monthly Financial &amp; Fleet Report</option>
+                                <option value="Yearly">Annual Executive Growth Report</option>
                             </select>
                         </div>
                         <div class="report-actions">
-                            <button class="btn-secondary" onclick="generateReportPreview()"><i class="fa-solid fa-eye"></i> Generate Preview</button>
+                            <button class="btn-secondary" onclick="generateReportPreview()"><i class="fa-solid fa-arrows-rotate"></i> Refresh Preview</button>
                             <button class="btn-primary" onclick="downloadReport('PDF')"><i class="fa-solid fa-file-pdf"></i> Export PDF</button>
                             <button class="btn-accent" onclick="downloadReport('CSV')"><i class="fa-solid fa-file-csv"></i> Download CSV</button>
                         </div>
@@ -584,17 +1106,17 @@
                                 <i class="fa-solid fa-brain"></i>
                                 <div>
                                     <h3>GHIDORA TRANSPORT LOGISTICS</h3>
-                                    <span>AI Automated Executive Report</span>
+                                    <span id="reportHeaderSubtitle">AI Automated Executive Report</span>
                                 </div>
                             </div>
                             <div class="sheet-meta">
-                                <div><strong>Report Period:</strong> August 2026</div>
-                                <div><strong>Generated On:</strong> 05 Aug 2026, 09:00 AM</div>
+                                <div><strong>Report Period:</strong> <span id="reportPeriodText">August 2026</span></div>
+                                <div><strong>Generated On:</strong> <span id="reportGeneratedTime">13 Sep 2026, 11:30 PM</span></div>
                             </div>
                         </div>
 
-                        <div class="sheet-body">
-                            <h4>1. Operations & Financial Performance</h4>
+                        <div class="sheet-body" id="reportSheetBody">
+                            <h4>1. Operations &amp; Financial Performance</h4>
                             <table class="report-table">
                                 <thead>
                                     <tr>
@@ -671,22 +1193,376 @@
         </main>
     </div>
 
+    <!-- TOAST CONTAINER FOR MODERN ENTERPRISE NOTIFICATIONS -->
+    <div class="toast-container" id="toastContainer"></div>
+
     <!-- Alert Action Modal -->
     <div id="actionModal" class="modal-backdrop hidden">
         <div class="modal-box glass-card">
             <div class="modal-header">
                 <h3 id="modalTitle">Action Required</h3>
-                <button class="btn-close" onclick="closeModal()">&times;</button>
+                <button class="btn-close" onclick="closeModal('actionModal')">&times;</button>
             </div>
             <div class="modal-body" id="modalBody">
                 <!-- Injected by JS -->
             </div>
             <div class="modal-footer" id="modalFooter">
-                <button class="btn-secondary" onclick="closeModal()">Close</button>
+                <button class="btn-secondary" onclick="closeModal('actionModal')">Close</button>
             </div>
         </div>
     </div>
 
-    <script src="/static/control-tower/app.js"></script>
+    <!-- KPI Drilldown Modal -->
+    <div id="kpiModal" class="modal-backdrop hidden">
+        <div class="modal-box glass-card" style="max-width: 720px;">
+            <div class="modal-header">
+                <h3 id="kpiModalTitle"><i class="fa-solid fa-chart-line text-cyan"></i> Operational Details</h3>
+                <button class="btn-close" onclick="closeModal('kpiModal')">&times;</button>
+            </div>
+            <div class="modal-body" id="kpiModalBody" style="max-height: 480px; overflow-y: auto;">
+                <!-- Injected by JS -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeModal('kpiModal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Voice Command Assistant Modal -->
+    <div id="voiceCommandModal" class="modal-backdrop hidden">
+        <div class="modal-box glass-card" style="max-width: 550px; text-align: center;">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-microphone-lines text-cyan"></i> Ghidora AI Voice Command</h3>
+                <button class="btn-close" onclick="closeModal('voiceCommandModal')">&times;</button>
+            </div>
+            <div class="modal-body" style="padding: 24px 10px;">
+                <div id="voiceMicVisual" style="width: 80px; height: 80px; margin: 0 auto 18px; border-radius: 50%; background: linear-gradient(135deg, #00f2fe, #ff007f); display: flex; align-items: center; justify-content: center; font-size: 32px; color: #fff; box-shadow: 0 0 25px rgba(0, 242, 254, 0.4);">
+                    <i class="fa-solid fa-microphone"></i>
+                </div>
+                <h4 id="voiceModalStatus" style="color: #fff; font-size: 17px; margin-bottom: 8px;">Listening for command...</h4>
+                <p id="voiceModalSubtitle" style="color: var(--text-muted); font-size: 13px; margin-bottom: 20px;">Speak naturally in Hindi, Hinglish or English</p>
+                <div id="voiceModalTranscript" style="min-height: 44px; background: rgba(0,0,0,0.3); border: 1px dashed rgba(255,255,255,0.15); border-radius: 8px; padding: 10px; font-size: 14px; color: #00f2fe; margin-bottom: 18px;">
+                    "Aaj kitni gaadiyan road par hain?"
+                </div>
+
+                <div style="text-align: left; margin-top: 10px;">
+                    <span style="font-size: 12px; color: var(--text-muted); display: block; margin-bottom: 8px;"><i class="fa-solid fa-lightbulb text-gold"></i> Or click any instant voice action:</span>
+                    <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                        <button class="chip-btn" onclick="runVoiceCommandPrompt('play_morning_brief')">▶ Play Morning Briefing</button>
+                        <button class="chip-btn" onclick="runVoiceCommandPrompt('check_revenue')">💰 Today's Revenue</button>
+                        <button class="chip-btn" onclick="runVoiceCommandPrompt('free_vehicles')">🚛 Available Vehicles</button>
+                        <button class="chip-btn" onclick="runVoiceCommandPrompt('pending_payments')">⏳ Pending Payments</button>
+                        <button class="chip-btn" onclick="runVoiceCommandPrompt('weather_advisory')">🌦 Weather Warning</button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="justify-content: center;">
+                <button class="btn-secondary" onclick="closeModal('voiceCommandModal')">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Weather Broadcast Modal -->
+    <div id="weatherBroadcastModal" class="modal-backdrop hidden">
+        <div class="modal-box glass-card" style="max-width: 600px;">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-tower-broadcast text-cyan"></i> Broadcast Weather Hazard Advisory</h3>
+                <button class="btn-close" onclick="closeModal('weatherBroadcastModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 14px;">
+                    Send immediate high-priority SMS &amp; In-App push notifications to all 12 active drivers in Chhattisgarh territory.
+                </p>
+                <div class="form-group">
+                    <label><i class="fa-solid fa-cloud-bolt text-amber"></i> Hazard Type</label>
+                    <input type="text" class="form-input" id="hazardTypeInput" value="Heavy Rain Warning & Highway Flooding (Dhamtari-Raipur)">
+                </div>
+                <div class="form-group">
+                    <label><i class="fa-solid fa-comment-sms"></i> Message Payload (Driver SMS Preview)</label>
+                    <textarea class="form-input" id="hazardMessageInput" rows="3" style="resize: none;">GHIDORA ALERT: Heavy rainfall forecasted starting 6:00 AM on Dhamtari-Raipur stretch. Maintain speed below 45 km/h, keep headlights on. For route assistance call Control Tower: +91-9826100000.</textarea>
+                </div>
+                <div class="form-group">
+                    <label><i class="fa-solid fa-truck"></i> Target Recipients</label>
+                    <div style="font-size: 12px; color: var(--status-green); background: rgba(0,230,118,0.1); border: 1px solid var(--status-green); padding: 8px 12px; border-radius: 6px;">
+                        <i class="fa-solid fa-circle-check"></i> 12 Active On-Road Drivers Selected (All Raipur / Durg / Dhamtari routes)
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeModal('weatherBroadcastModal')">Cancel</button>
+                <button class="btn-primary" onclick="sendWeatherBroadcastAction()"><i class="fa-solid fa-paper-plane"></i> Send Broadcast Now</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- System Health & Telematics Diagnostics Modal -->
+    <div id="systemHealthModal" class="modal-backdrop hidden">
+        <div class="modal-box glass-card" style="max-width: 620px;">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-heart-pulse text-green"></i> Enterprise Telematics &amp; AI Health</h3>
+                <button class="btn-close" onclick="closeModal('systemHealthModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; margin-bottom: 16px;">
+                    <div style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08); text-align: center;">
+                        <div style="font-size: 11px; color: var(--text-muted);">Overall Health</div>
+                        <div style="font-size: 20px; font-weight: 700; color: var(--status-green);">96%</div>
+                        <div style="font-size: 10px; color: var(--status-green);">Optimal</div>
+                    </div>
+                    <div style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08); text-align: center;">
+                        <div style="font-size: 11px; color: var(--text-muted);">GPS Latency</div>
+                        <div style="font-size: 20px; font-weight: 700; color: var(--accent-cyan);">42 ms</div>
+                        <div style="font-size: 10px; color: var(--status-green);">Realtime</div>
+                    </div>
+                    <div style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08); text-align: center;">
+                        <div style="font-size: 11px; color: var(--text-muted);">AI Inference</div>
+                        <div style="font-size: 20px; font-weight: 700; color: #ff007f;">0.18s</div>
+                        <div style="font-size: 10px; color: var(--status-green);">Fast</div>
+                    </div>
+                    <div style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.08); text-align: center;">
+                        <div style="font-size: 11px; color: var(--text-muted);">Edge Telematics</div>
+                        <div style="font-size: 20px; font-weight: 700; color: var(--status-green);">15/15</div>
+                        <div style="font-size: 10px; color: var(--status-green);">Connected</div>
+                    </div>
+                </div>
+
+                <h4 style="font-size: 13px; color: #fff; margin-bottom: 8px;">Subsystem Diagnostics</h4>
+                <div style="font-size: 12px; color: var(--text-muted); line-height: 1.8;">
+                    <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.06); padding: 4px 0;">
+                        <span><i class="fa-solid fa-satellite-dish text-cyan"></i> GPS Telematics Gateway</span>
+                        <span class="text-green"><i class="fa-solid fa-check"></i> Connected (Port 8080)</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.06); padding: 4px 0;">
+                        <span><i class="fa-solid fa-microchip text-purple"></i> AI Recommendation Engine</span>
+                        <span class="text-green"><i class="fa-solid fa-check"></i> 99.8% Uptime</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.06); padding: 4px 0;">
+                        <span><i class="fa-solid fa-shield-virus text-amber"></i> Compliance &amp; RTO Sync</span>
+                        <span class="text-green"><i class="fa-solid fa-check"></i> Parivahan Vahan API Active</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 4px 0;">
+                        <span><i class="fa-solid fa-cloud-sun-rain text-cyan"></i> OpenWeather Telemetry</span>
+                        <span class="text-green"><i class="fa-solid fa-check"></i> Synced (Updated 3m ago)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-primary" onclick="closeModal('systemHealthModal')">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Custom Alert Modal -->
+    <div id="createAlertModal" class="modal-backdrop hidden">
+        <div class="modal-box glass-card" style="max-width: 550px;">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-triangle-exclamation text-rose"></i> Create Custom Fleet Alert</h3>
+                <button class="btn-close" onclick="closeModal('createAlertModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Alert Category</label>
+                    <select class="form-input" id="newAlertCategory">
+                        <option value="driver">Driver Safety &amp; Rest</option>
+                        <option value="compliance">Compliance / RTO / Insurance</option>
+                        <option value="weather">Weather &amp; Road Hazards</option>
+                        <option value="payment">Payment Follow-up</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Severity Level</label>
+                    <select class="form-input" id="newAlertSeverity">
+                        <option value="critical">Critical (Red Flag)</option>
+                        <option value="warning" selected>Warning (Yellow Flag)</option>
+                        <option value="info">Informational (Blue Flag)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Alert Title</label>
+                    <input type="text" class="form-input" id="newAlertTitle" placeholder="e.g. Tyres Maintenance Due">
+                </div>
+                <div class="form-group">
+                    <label>Vehicle / Driver / Customer</label>
+                    <input type="text" class="form-input" id="newAlertTarget" placeholder="e.g. CG04XX1234 or Ramesh Kumar">
+                </div>
+                <div class="form-group">
+                    <label>Detailed Description</label>
+                    <textarea class="form-input" id="newAlertDesc" rows="2" style="resize: none;" placeholder="Brief details of the alert..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Recommended Action Text</label>
+                    <input type="text" class="form-input" id="newAlertAction" placeholder="e.g. Send for Tyre Rotation">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeModal('createAlertModal')">Cancel</button>
+                <button class="btn-primary" onclick="submitNewCustomAlert()"><i class="fa-solid fa-plus"></i> Add Alert</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Voice & Indian Accent Customization Modal -->
+    <div id="voiceSettingsModal" class="modal-backdrop hidden">
+        <div class="modal-box glass-card" style="max-width: 600px;">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-headset text-gold"></i> AI Voice &amp; Indian Accent Customization</h3>
+                <button class="btn-close" onclick="closeModal('voiceSettingsModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 12px;">
+                    Select Indian voice personas, language tone, pitch and speed for natural Hindi and Hinglish speech synthesis.
+                </p>
+
+                <!-- Voice Persona Selection Cards -->
+                <div style="font-size: 12px; font-weight: 600; color: #fff; margin-bottom: 6px;">Select Voice Persona:</div>
+                <div class="voice-preset-grid">
+                    <div class="voice-preset-card active" id="presetPriya" onclick="selectVoicePreset('priya')">
+                        <div class="preset-icon"><i class="fa-solid fa-user-astronaut"></i></div>
+                        <span class="preset-name">Priya (Indian Female)</span>
+                        <span class="preset-sub">Smooth, Calm &amp; Clear</span>
+                    </div>
+                    <div class="voice-preset-card" id="presetRohan" onclick="selectVoicePreset('rohan')">
+                        <div class="preset-icon"><i class="fa-solid fa-user-tie"></i></div>
+                        <span class="preset-name">Rohan (Indian Male)</span>
+                        <span class="preset-sub">Authoritative Command</span>
+                    </div>
+                    <div class="voice-preset-card" id="presetHindi" onclick="selectVoicePreset('hindi')">
+                        <div class="preset-icon"><i class="fa-solid fa-om"></i></div>
+                        <span class="preset-name">Swara (Shuddh Hindi)</span>
+                        <span class="preset-sub">Pure Hindi Diction</span>
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-top: 14px;">
+                    <label><i class="fa-solid fa-language text-cyan"></i> Language Delivery Style</label>
+                    <select class="form-input" id="voiceLanguageStyle" onchange="updateVoiceLanguageStyle(this.value)">
+                        <option value="hinglish" selected>Hinglish (भारत का ट्रांसपोर्ट AI - Mix Hindi &amp; English)</option>
+                        <option value="hindi">Pure Hindi (शुद्ध हिंदी - प्रामाणिक भारतीय उच्चारण)</option>
+                        <option value="indian_english">Indian English (Professional Command Accent)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fa-solid fa-microchip"></i> Detected Browser / System Voice</label>
+                    <select class="form-input" id="voiceSystemSelector" onchange="onManualVoiceSelect(this.value)">
+                        <option value="auto">Auto Detect Best Indian Voice (Recommended)</option>
+                    </select>
+                    <span style="font-size: 11px; color: var(--text-muted); margin-top: 4px; display: block;">
+                        *Automatically utilizes Microsoft Heera, Neerja, Prabhat, Swara, Hemant or Google हिन्दी if installed on device.
+                    </span>
+                </div>
+
+                <div class="form-row" style="display: flex; gap: 14px; margin-top: 10px;">
+                    <div class="form-group" style="flex: 1;">
+                        <label>Speech Speed (<span id="voiceRateVal">0.95x</span>)</label>
+                        <input type="range" id="voiceRateSlider" min="0.7" max="1.3" step="0.05" value="0.95" class="form-input" oninput="document.getElementById('voiceRateVal').innerText = this.value + 'x'">
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label>Voice Pitch (<span id="voicePitchVal">1.0x</span>)</label>
+                        <input type="range" id="voicePitchSlider" min="0.7" max="1.3" step="0.05" value="1.0" class="form-input" oninput="document.getElementById('voicePitchVal').innerText = this.value + 'x'">
+                    </div>
+                </div>
+
+                <div style="background: rgba(0, 242, 254, 0.08); border: 1px solid var(--accent-cyan); border-radius: 8px; padding: 12px; margin-top: 12px; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <strong style="color: #fff; font-size: 12px;"><i class="fa-solid fa-volume-high text-cyan"></i> Test Current Voice Tone:</strong>
+                        <div style="font-size: 11px; color: var(--text-muted);" id="voiceTestSampleText">"नमस्ते अमित जी! घिडोरा कंट्रोल टॉवर में आपका स्वागत है।"</div>
+                    </div>
+                    <button class="btn-primary" style="padding: 6px 14px; font-size: 11px; white-space: nowrap;" onclick="testActiveVoiceSound()">
+                        <i class="fa-solid fa-play"></i> Test Voice
+                    </button>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeModal('voiceSettingsModal')">Close</button>
+                <button class="btn-primary" onclick="saveVoiceSettings()"><i class="fa-solid fa-circle-check"></i> Save &amp; Apply</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Highway SOS & Breakdown Rescue Modal -->
+    <div id="sosModal" class="modal-backdrop hidden">
+        <div class="modal-box glass-card" style="max-width: 600px;">
+            <div class="modal-header">
+                <h3 style="color: var(--status-rose);"><i class="fa-solid fa-truck-pickup"></i> 🚨 Highway Fleet SOS Protocol Dispatch</h3>
+                <button class="btn-close" onclick="closeModal('sosModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 12px;">
+                    Trigger emergency rescue for any stranded vehicle or highway breakdown in Chhattisgarh network.
+                </p>
+                <div class="form-group">
+                    <label>Select Stranded Vehicle</label>
+                    <select class="form-input" id="sosVehicleSelect">
+                        <option value="CG04YY5678">CG04YY5678 - Ashok Leyland 16T (Halted at Bypass KM 42)</option>
+                        <option value="CG04XX1234">CG04XX1234 - Mahindra Pickup (Dhamtari Route)</option>
+                        <option value="CG04ZZ9900">CG04ZZ9900 - Eicher Pro 2059 (Bilaspur NH-130)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Incident Severity</label>
+                    <select class="form-input" id="sosTypeSelect">
+                        <option value="mechanical">Mechanical Breakdown (Axle/Engine/Tyre Burst)</option>
+                        <option value="accident">Accident / Collision Rescue (Ambulance Required)</option>
+                        <option value="fuel_theft">Security / Fuel Theft Lockout</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Action &amp; Dispatch Units</label>
+                    <div style="background: rgba(255,23,68,0.1); border: 1px solid var(--status-rose); border-radius: 8px; padding: 12px; font-size: 12px; color: #fff;">
+                        <i class="fa-solid fa-circle-check text-rose"></i> Automated Action:
+                        <ul style="margin: 6px 0 0 16px; color: var(--text-muted);">
+                            <li>Dispatch nearest Heavy Towing Crane from Durg Hub</li>
+                            <li>Send Highway Patrol SMS with live GPS lat/lng</li>
+                            <li>Alert Fleet Owner Amit Sahu &amp; Insurance Surveyor</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeModal('sosModal')">Cancel</button>
+                <button class="btn-sos" onclick="dispatchSosRescueNow()">
+                    <i class="fa-solid fa-bolt"></i> Dispatch Emergency Units Now
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fastag Instant Top-up Modal -->
+    <div id="fastagTopupModal" class="modal-backdrop hidden">
+        <div class="modal-box glass-card" style="max-width: 500px;">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-credit-card text-green"></i> Instant Fastag Fleet Recharge</h3>
+                <button class="btn-close" onclick="closeModal('fastagTopupModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div style="background: rgba(0,230,118,0.08); border: 1px solid var(--status-green); border-radius: 8px; padding: 12px; margin-bottom: 14px;">
+                    <div style="font-size: 11px; color: var(--text-muted);">Current Fleet Balance:</div>
+                    <div style="font-size: 20px; font-weight: 700; color: var(--status-green);">₹14,250</div>
+                </div>
+                <div class="form-group">
+                    <label>Select Recharge Amount</label>
+                    <select class="form-input" id="fastagRechargeAmt">
+                        <option value="3000">₹3,000 (Standard Buffer)</option>
+                        <option value="5000" selected>₹5,000 (Recommended for 15 Vehicles)</option>
+                        <option value="10000">₹10,000 (Monthly Expressway Pass)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Payment Source</label>
+                    <select class="form-input">
+                        <option>HDFC Bank Corporate UPI (amit.sahu@upi)</option>
+                        <option>ICICI Fleet Fastag NetBanking</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeModal('fastagTopupModal')">Cancel</button>
+                <button class="btn-primary" onclick="completeFastagRecharge()"><i class="fa-solid fa-bolt"></i> Pay &amp; Recharge Instantly</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/control-tower/app.js?v={% now "U" %}"></script>
 </body>
 </html>

@@ -1,0 +1,146 @@
+erDiagram
+    %% =======================================================
+    %% GHIDORA TRANSPORT - Online Booking Transport Platform
+    %% Entity-Relationship Model (Mermaid Notation)
+    %% =======================================================
+
+    USER ||--o{ BOOKING : "places / books (1 to 0..*)"
+    USER ||--o{ REVIEW : "submits (1 to 0..*)"
+    BOOKING ||--o{ BOOKING_ATTACHMENT : "includes (1 to 0..*)"
+    BOOKING ||--o{ PAYMENT_REQUEST : "generates (1 to 0..*)"
+    PAYMENT_REQUEST ||--o| RECEIPT : "issues (1 to 0..1)"
+    BOOKING }o--o| DRIVER : "assigns (0..* to 0..1)"
+    DRIVER ||--|| VEHICLE : "operates / owns (1 to 1)"
+    BOOKING |o--o{ REVIEW : "receives feedback (0..1 to 0..*)"
+    BOOKING }o--o| PREDEFINED_ROUTE_FARE : "applies fixed route fare"
+    BOOKING }o--o| PREDEFINED_ROUTE_DISTANCE : "measures fixed distance"
+
+    USER {
+        bigint id PK "Primary Key"
+        varchar username "User Login Name"
+        varchar email "Email Address"
+        varchar first_name "First Name"
+        varchar last_name "Last Name"
+        boolean is_staff "Admin/Staff Status"
+        datetime date_joined "Account Registration Timestamp"
+    }
+
+    BOOKING {
+        bigint id PK "Primary Key"
+        varchar booking_id UK "Unique Reference e.g. GT4592"
+        bigint user_id FK "Registered Customer (Nullable)"
+        bigint assigned_driver_id FK "Assigned Driver (Nullable)"
+        varchar name "Customer Name"
+        varchar phone "Customer Phone Number"
+        varchar email "Customer Email (Nullable)"
+        varchar pickup "Pickup Address / Location"
+        varchar destination "Destination Address / Location"
+        float pickup_lat "Pickup Latitude GPS"
+        float pickup_lng "Pickup Longitude GPS"
+        float destination_lat "Destination Latitude GPS"
+        float destination_lng "Destination Longitude GPS"
+        varchar duration_text "Google Route Travel Duration"
+        float distance "Route Distance in KM"
+        varchar distance_source "Google Maps Route / Manual"
+        float fare "Base Journey Fare in INR"
+        varchar fare_type "Predefined Route / Distance Based"
+        float toll_charges "Toll Plaza Charges"
+        float parking_charges "Parking Fees"
+        varchar vehicle_type "Mahindra Pickup, Bolero, etc."
+        varchar trip_type "One Way / Round Trip"
+        varchar cargo_type "Type of Goods Transported"
+        decimal weight_value "Cargo Weight"
+        varchar weight_unit "kg / ton"
+        varchar status "Pending, Confirmed, Completed, Cancelled"
+        varchar payment_status "Pending, Paid, Partial, Failed"
+        datetime booking_date "Booking Creation Timestamp"
+        date journey_date "Scheduled Date of Travel"
+    }
+
+    DRIVER {
+        bigint id PK "Primary Key"
+        varchar name "Driver Full Name"
+        varchar mobile UK "10-Digit Mobile Number"
+        varchar license_number UK "Commercial Driving License Number"
+        varchar address "Driver Residence Address"
+        int experience_years "Driving Experience in Years"
+        varchar status "available / busy"
+        boolean is_default "Auto-Assign Default Driver Flag"
+        datetime created_at "Registration Timestamp"
+    }
+
+    VEHICLE {
+        bigint id PK "Primary Key"
+        bigint driver_id FK,UK "One-To-One Assigned Driver"
+        varchar vehicle_number UK "Vehicle Registration Number (e.g. CG05 AB 1234)"
+        varchar vehicle_type "Vehicle Model / Category"
+        varchar capacity "Load Carrying Capacity (e.g. 1 Ton)"
+        varchar rc_number "Registration Certificate Number"
+    }
+
+    PAYMENT_REQUEST {
+        bigint id PK "Primary Key"
+        varchar payment_id UK "Unique Payment Tracking Code e.g. PAY-A1B2C3"
+        bigint booking_id FK "Foreign Key to Booking"
+        bigint created_by_id FK "Admin User Who Created Request"
+        varchar payment_type "full / advance / remaining"
+        decimal amount "Payment Requested Amount in INR"
+        decimal total_fare "Total Booking Trip Fare in INR"
+        decimal amount_already_paid "Previously Received Payment"
+        varchar status "pending / submitted / verified / rejected"
+        datetime due_date "Payment Expiry / Due Timestamp"
+        varchar preferred_method "qr / upi / bank"
+        varchar gateway "manual / razorpay / phonepe"
+        datetime created_at "Creation Timestamp"
+    }
+
+    RECEIPT {
+        bigint id PK "Primary Key"
+        varchar receipt_id UK "Unique Receipt Number e.g. RCPT-X9Y8"
+        bigint payment_request_id FK,UK "One-To-One Payment Request Link"
+        varchar pdf_file "Generated PDF Receipt File Path"
+        datetime generated_at "Receipt Generation Timestamp"
+        varchar sent_to_email "Recipient Customer Email"
+        boolean is_sent "Email Dispatch Status"
+    }
+
+    BOOKING_ATTACHMENT {
+        bigint id PK "Primary Key"
+        bigint booking_id FK "Foreign Key to Booking"
+        varchar attachment_type "voice / photo / video"
+        varchar file "Uploaded Media File Path"
+        datetime uploaded_at "Upload Timestamp"
+    }
+
+    REVIEW {
+        bigint id PK "Primary Key"
+        bigint booking_id FK "Foreign Key to Booking (Nullable)"
+        bigint user_id FK "Foreign Key to User (Nullable)"
+        varchar guest_name "Guest Reviewer Name"
+        int rating "Star Rating 1 to 5"
+        text comment "Customer Review Feedback"
+        varchar service_used "Transport Service Utilized"
+        boolean is_approved "Admin Moderation Approval Flag"
+        boolean is_verified "Verified Customer Badge"
+        datetime created_at "Submission Timestamp"
+    }
+
+    PREDEFINED_ROUTE_FARE {
+        bigint id PK "Primary Key"
+        varchar from_location "Origin City / Village"
+        varchar to_location "Destination City / Village"
+        decimal fixed_fare "Single Trip One-Way Fixed Rate in INR"
+        decimal double_trip_fare "Round Trip Fixed Rate in INR"
+        decimal distance_km "Pre-Calculated Route Distance in KM"
+        boolean same_direction_both "Bi-directional Route Active Flag (Both Ways)"
+        boolean is_active "Route Active / Inactive Status"
+    }
+
+    PREDEFINED_ROUTE_DISTANCE {
+        bigint id PK "Primary Key"
+        varchar from_location "Origin City / Village"
+        varchar to_location "Destination City / Village"
+        decimal distance_km "Official Fixed Distance in KM"
+        boolean same_direction_both "Bi-directional Distance Active Flag"
+        boolean is_active "Record Active / Inactive Status"
+    }

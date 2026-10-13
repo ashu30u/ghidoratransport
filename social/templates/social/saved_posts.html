@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% load static social_extras %}
+
+{% block title %}Saved Posts • Ghidora Social{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<link rel="stylesheet" href="{% static 'social/css/social.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="ig-feed-container" style="max-width: 935px;">
+
+  <!-- Header -->
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px 0 24px; border-bottom: 1px solid var(--ig-card-border);">
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <a href="{% url 'social:profile' username=request.user.username %}" class="ig-icon-btn" title="Back to Profile" style="text-decoration: none;">
+        <i class="ti ti-arrow-left"></i>
+      </a>
+      <div>
+        <h2 style="margin: 0; font-size: 1.3rem; font-weight: 700; color: var(--ig-text); display: flex; align-items: center; gap: 8px;">
+          <i class="ti ti-bookmark" style="color: var(--ig-gold);"></i> Saved Posts
+        </h2>
+        <span style="font-size: 0.8rem; color: var(--ig-text-muted);">Only you can see what you've saved</span>
+      </div>
+    </div>
+    <span style="font-size: 0.85rem; font-weight: 600; color: var(--ig-text-muted);">
+      {{ saved_posts|length }} item{{ saved_posts|length|pluralize }}
+    </span>
+  </div>
+
+  <!-- Saved Posts Grid -->
+  {% if saved_posts %}
+    <div class="ig-explore-grid" style="margin-top: 24px;">
+      {% for item in saved_posts %}
+        {% with post=item.post %}
+          <a href="{% url 'social:post_detail' pk=post.pk %}" class="ig-explore-item" title="Post by @{{ post.author.username }}">
+            {% if post.images.all %}
+              {% if post.images.all.0.is_video %}
+                <video src="{{ post.images.all.0.image.url }}" style="width:100%; height:100%; object-fit:cover;"></video>
+              {% else %}
+                <img src="{{ post.images.all.0.image.url }}" alt="Saved post thumbnail" loading="lazy">
+              {% endif %}
+              {% if post.images.all|length > 1 %}
+                <div class="ig-explore-badge" title="Multiple items"><i class="ti ti-copy"></i></div>
+              {% endif %}
+            {% elif post.image %}
+              {% if post.is_video %}
+                <video src="{{ post.image.url }}" style="width:100%; height:100%; object-fit:cover;"></video>
+              {% else %}
+                <img src="{{ post.image.url }}" alt="Saved post thumbnail" loading="lazy">
+              {% endif %}
+            {% else %}
+              <div class="ig-explore-text-thumb">
+                <span>{{ post.content|truncatechars:80 }}</span>
+              </div>
+            {% endif %}
+            
+            <div class="ig-explore-overlay">
+              <div class="ig-overlay-stat"><i class="ti ti-heart-filled"></i> {{ post.like_count }}</div>
+              <div class="ig-overlay-stat"><i class="ti ti-message-circle-2-filled"></i> {{ post.comment_count }}</div>
+            </div>
+          </a>
+        {% endwith %}
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="ig-empty-feed" style="margin-top: 48px; text-align: center; padding: 60px 20px;">
+      <div style="width: 72px; height: 72px; border-radius: 50%; border: 2px solid var(--ig-gold); display: inline-flex; align-items: center; justify-content: center; margin-bottom: 16px;">
+        <i class="ti ti-bookmark" style="font-size: 2.2rem; color: var(--ig-gold);"></i>
+      </div>
+      <h3 style="margin: 0 0 8px; color: var(--ig-text);">Save</h3>
+      <p style="color: var(--ig-text-muted); max-width: 360px; margin: 0 auto 20px; font-size: 0.9rem;">
+        Save photos and updates that you want to see again. No one is notified, and only you can see what you've saved.
+      </p>
+      <a href="{% url 'social:feed' %}" class="ig-btn-primary" style="text-decoration: none; display: inline-block;">
+        Explore Feed
+      </a>
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}

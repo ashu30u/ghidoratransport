@@ -95,31 +95,38 @@ button{font-family:inherit; border:none; background:none; color:inherit; cursor:
   100%{transform:translate(-50%,-50%) scale(1);}
 }
 
-/* ---------- Shayari Container (Transparent Glassmorphism + Hover Effect + Centered Text + Near Music Bar) ---------- */
+/* ---------- Overlay Stack System for Floating Info Cards above Player ---------- */
+.overlay-stack {
+  position: absolute; left: 50%; bottom: 120px;
+  transform: translateX(-50%);
+  display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
+  gap: 14px; z-index: 28; width: max-content; max-width: 94vw;
+  pointer-events: none;
+}
 .signage-wrap{
-  position:absolute; left:50%; bottom:94px; top:auto;
-  transform:translateX(-50%);
-  width:max-content; max-width:92vw; text-align:center; z-index:25; pointer-events:auto;
+  position: relative; left: auto; bottom: auto; top: auto;
+  transform: none;
+  width: max-content; max-width: 92vw; text-align: center; z-index: 25; pointer-events: auto;
 }
 .signage{
-  display:inline-flex; align-items:center; justify-content:center; text-align:center; gap:8px;
-  background:rgba(255, 255, 255, 0.14);
-  backdrop-filter:blur(20px) saturate(180%);
-  -webkit-backdrop-filter:blur(20px) saturate(180%);
-  border:1.5px solid rgba(255, 255, 255, 0.32);
-  box-shadow:0 8px 32px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.35);
-  padding:8px 24px; border-radius:999px;
-  font-family:'Baloo 2',sans-serif; font-size:15px; font-weight:700;
-  color:#ffffff;
-  cursor:pointer;
-  transition:all 0.35s cubic-bezier(0.2, 0.9, 0.25, 1);
+  display: inline-flex; align-items: center; justify-content: center; text-align: center; gap: 8px;
+  background: rgba(255, 255, 255, 0.14);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1.5px solid rgba(255, 255, 255, 0.32);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.35);
+  padding: 8px 24px; border-radius: 999px;
+  font-family: 'Baloo 2', sans-serif; font-size: 15px; font-weight: 700;
+  color: #ffffff;
+  cursor: pointer;
+  transition: all 0.35s cubic-bezier(0.2, 0.9, 0.25, 1);
 }
 .signage:hover{
-  transform:translateY(-3px) scale(1.04);
-  background:rgba(255, 255, 255, 0.24);
-  border-color:rgba(255, 198, 92, 0.8);
-  box-shadow:0 14px 40px rgba(0,0,0,0.6), 0 0 25px rgba(255, 198, 92, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.6);
-  color:#ffdf9e;
+  transform: translateY(-3px) scale(1.04);
+  background: rgba(255, 255, 255, 0.24);
+  border-color: rgba(255, 198, 92, 0.8);
+  box-shadow: 0 14px 40px rgba(0,0,0,0.6), 0 0 25px rgba(255, 198, 92, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  color: #ffdf9e;
 }
 .signage.fade{opacity:0; transform:translateY(4px);}
 .signage.radio-on{
@@ -136,12 +143,12 @@ button{font-family:inherit; border:none; background:none; color:inherit; cursor:
 
 /* ---------- Chai Break Popup Card (Matching Reference Design) ---------- */
 .chai-popup {
-  position: absolute;
-  left: 50%;
-  bottom: 86px;
-  transform: translateX(-50%) translateY(8px) scale(0.95);
+  position: relative;
+  left: auto;
+  bottom: auto;
+  transform: translateY(6px) scale(0.95);
   z-index: 28;
-  display: flex;
+  display: none;
   align-items: center;
   gap: 12px;
   background: rgba(44, 24, 18, 0.94);
@@ -157,18 +164,12 @@ button{font-family:inherit; border:none; background:none; color:inherit; cursor:
 }
 
 .chai-popup.active {
+  display: flex;
   opacity: 1;
   pointer-events: auto;
-  transform: translateX(-50%) translateY(0) scale(1);
+  transform: translateY(0) scale(1);
 }
 
-.chai-popup.active ~ .signage-wrap,
-.chai-popup.active + .signage-wrap,
-.stage:has(.chai-popup.active) .signage-wrap {
-  display: none !important;
-  opacity: 0 !important;
-  pointer-events: none !important;
-}
 
 .chai-icon-wrap {
   width: 38px;
@@ -257,29 +258,54 @@ button{font-family:inherit; border:none; background:none; color:inherit; cursor:
   background:rgba(255,255,255,0.15);
   overflow:visible;
 }
-.road-fill{position:absolute; left:0; top:0; bottom:0; width:0%; background:var(--marigold);}
+.road-fill{position:absolute; left:0; top:0; bottom:0; width:0%; background:var(--marigold); transition:none;}
 .progress-truck{
   position:absolute; top:50%; left:0%;
-  transform:translate(-50%,-50%) scaleX(-1);
-  font-size:24px; line-height:1;
-  filter:drop-shadow(0 2px 5px rgba(0,0,0,0.9));
-  transition:left 0.22s linear;
-  z-index:5;
+  height:32px; width:auto; max-width:55px;
+  display:flex; align-items:center; justify-content:center;
+  transform:translate(-50%,-60%);
+  filter:drop-shadow(0 3px 6px rgba(0,0,0,0.85));
+  transition:none;
+  z-index:30;
+  pointer-events:auto;
+  cursor:grab;
+  user-select:none;
+  -webkit-user-drag:none;
+  touch-action:none;
+}
+.truck-img-inner{
+  height:32px; width:auto; max-width:55px;
+  object-fit:contain;
+  transform:scaleX(1);
+  display:block;
   pointer-events:none;
+  user-select:none;
+  -webkit-user-drag:none;
+}
+.progress-truck:active, .progress-truck.dragging, .road-progress.dragging .progress-truck {
+  cursor:grabbing;
+  transform:translate(-50%,-60%) scale(1.1);
+  transition:none !important;
 }
 .km-readout{display:flex; justify-content:space-between; margin-top:2px; font-family:'Space Mono',monospace; font-size:9.5px; color:rgba(255,255,255,0.6);}
 
 /* Controls Group */
-.controls{display:flex; align-items:center; gap:8px; flex:none;}
+.controls{display:flex; align-items:center; gap:6px; flex:none;}
 .ctrl-icon-btn{
   width:32px; height:32px; border-radius:50%;
   display:flex; align-items:center; justify-content:center;
   font-size:14px; color:rgba(255,255,255,0.85);
   transition:all 0.15s ease;
+  border:1px solid transparent;
 }
 .ctrl-icon-btn:hover{color:#ffffff; transform:scale(1.1);}
 .ctrl-icon-btn:active{transform:scale(0.9);}
-.ctrl-icon-btn.active{color:#3fe0a0;}
+.ctrl-icon-btn.active{
+  color:#3fe0a0;
+  background:rgba(63, 224, 160, 0.2);
+  border:1px solid rgba(63, 224, 160, 0.5);
+  box-shadow:0 0 12px rgba(63, 224, 160, 0.35);
+}
 
 /* White Round Play/Pause Main Button (Exact Reference Match) */
 .play-main{
@@ -293,6 +319,16 @@ button{font-family:inherit; border:none; background:none; color:inherit; cursor:
 }
 .play-main:hover{transform:scale(1.06); box-shadow:0 6px 18px rgba(255,255,255,0.5);}
 .play-main:active{transform:scale(0.94);}
+.play-main.buffering {
+  animation: pulseBuffering 1.2s infinite ease-in-out;
+  background: #ffdf9e;
+  color: #120e1c;
+}
+@keyframes pulseBuffering {
+  0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 223, 158, 0.7); }
+  50% { transform: scale(1.08); box-shadow: 0 0 0 10px rgba(255, 223, 158, 0); }
+  100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 223, 158, 0); }
+}
 
 .playlist-btn{color:rgba(255,255,255,0.85);}
 
@@ -334,12 +370,13 @@ button{font-family:inherit; border:none; background:none; color:inherit; cursor:
 
 @media (max-width: 680px) {
   .player{width:96vw; bottom:12px;}
-  .player-inner{padding:6px 12px; gap:8px;}
-  .cassette-wrap{width:36px; height:36px;}
-  .play-main{width:36px; height:36px; font-size:14px;}
-  .ctrl-icon-btn{width:26px; height:26px; font-size:13px;}
-  .signage-wrap{bottom:78px;}
-  .chai-popup{bottom:74px; padding:8px 16px;}
+  .player-inner{padding:6px 8px; gap:4px;}
+  .controls{gap:3px;}
+  .cassette-wrap{width:34px; height:34px;}
+  .play-main{width:34px; height:34px; font-size:13px;}
+  .ctrl-icon-btn{width:25px; height:25px; font-size:12px;}
+  .overlay-stack{bottom:94px; gap:10px;}
+  .chai-popup{padding:8px 16px;}
   .signage{font-size:12.5px; padding:5px 14px;}
   .truck-zone{width:min(82vw, 300px); top:42%;}
 }
@@ -348,8 +385,7 @@ button{font-family:inherit; border:none; background:none; color:inherit; cursor:
 @media (min-width:880px){
   .topbar{padding:24px 34px 0 34px;}
   .truck-zone{top:45%; width:min(44vmin, 400px);}
-  .signage-wrap{bottom:92px;}
-  .chai-popup{bottom:86px;}
+  .overlay-stack{bottom:124px; gap:16px;}
   .signage{font-size:14px;}
   .player{bottom:22px;}
   .playlist-sheet{
@@ -361,3 +397,4 @@ button{font-family:inherit; border:none; background:none; color:inherit; cursor:
   }
   .playlist-sheet.open{transform:translate(-50%,-50%) scale(1); opacity:1; pointer-events:auto;}
 }
+

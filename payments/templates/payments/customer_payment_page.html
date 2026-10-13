@@ -84,6 +84,19 @@
           <span class="dot"></span>{{ payment_request.get_status_display }}
         </span>
       </div>
+
+      <!-- ⚠️ Toll / Parking / Extra Charges Notice -->
+      <div class="alert alert-warning border-warning-subtle bg-warning bg-opacity-10 text-light mt-3 p-3 rounded-3" style="border: 1px solid rgba(245, 158, 11, 0.35);">
+        <div class="d-flex align-items-center gap-2 mb-1 text-warning fw-bold small">
+          <i class="bi bi-exclamation-triangle-fill"></i> महत्वपूर्ण सूचना (Billing Notice)
+        </div>
+        <p class="small mb-1 text-light" style="font-size: 11.5px; line-height: 1.5;">
+          यह केवल वाहन का <strong>बेस ट्रांसपोर्ट किराया</strong> है। यात्रा के दौरान लगने वाले <strong>टोल टैक्स (Toll Tax), पार्किंग (Parking)</strong> व अन्य अतिरिक्त शुल्क इसमें शामिल नहीं हैं। ट्रिप पूर्ण होने पर यह अलग से देय होंगे।
+        </p>
+        <p class="text-muted small mb-0" style="font-size: 10.5px;">
+          <em>Toll, parking & extra charges are excluded from base fare and payable upon delivery.</em>
+        </p>
+      </div>
     </div>
   </div>
 

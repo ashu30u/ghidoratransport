@@ -1,0 +1,1302 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>User Dashboard — Ghidora Transport</title>
+
+<!-- Fonts & Icons -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+<style>
+  :root {
+    --bg-dark: #040814;
+    --bg-surface: #091124;
+    --card-bg: rgba(14, 25, 48, 0.72);
+    --card-border: rgba(130, 185, 255, 0.18);
+    --card-border-glow: rgba(56, 189, 248, 0.4);
+    --brand-orange: #ff7a1a;
+    --brand-cyan: #00f2fe;
+    --brand-blue: #38bdf8;
+    --brand-purple: #a855f7;
+    --brand-emerald: #10b981;
+    --brand-rose: #f43f5e;
+    --brand-amber: #f59e0b;
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+  }
+
+  body {
+    background: var(--bg-dark);
+    color: var(--text-primary);
+    min-height: 100vh;
+    position: relative;
+    overflow-x: hidden;
+    padding-bottom: 60px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Ambient Glow Background */
+  .bg-glow {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background:
+      radial-gradient(800px circle at 15% 10%, rgba(56, 189, 248, 0.08), transparent 60%),
+      radial-gradient(700px circle at 85% 30%, rgba(255, 122, 26, 0.07), transparent 60%),
+      radial-gradient(600px circle at 50% 90%, rgba(16, 185, 129, 0.05), transparent 50%);
+  }
+
+  /* ===== TOP STICKY NAVBAR ===== */
+  .nav-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(6, 12, 26, 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--card-border);
+    padding: 12px clamp(16px, 4vw, 48px);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    color: #ffffff;
+    font-size: 19px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+  }
+
+  .nav-brand img {
+    height: 36px;
+    width: auto;
+    border-radius: 8px;
+  }
+
+  .nav-brand .accent {
+    color: var(--brand-orange);
+  }
+
+  .nav-menu {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    list-style: none;
+  }
+
+  .nav-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 8px 14px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    transition: all 0.2s ease;
+  }
+
+  .nav-link:hover {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.06);
+  }
+
+  .nav-link.active {
+    color: var(--brand-blue);
+    background: rgba(56, 189, 248, 0.12);
+  }
+
+  .nav-admin-btn {
+    background: linear-gradient(135deg, rgba(0, 242, 254, 0.2), rgba(56, 189, 248, 0.25));
+    border: 1px solid var(--brand-cyan);
+    color: var(--brand-cyan) !important;
+    font-weight: 700;
+    box-shadow: 0 0 16px rgba(0, 242, 254, 0.25);
+  }
+
+  .nav-admin-btn:hover {
+    background: var(--brand-cyan) !important;
+    color: #040814 !important;
+    transform: translateY(-1px);
+  }
+
+  .nav-user-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .user-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    background: rgba(15, 23, 42, 0.8);
+    border: 1px solid var(--card-border);
+    border-radius: 30px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #ffffff;
+  }
+
+  .badge-role {
+    font-size: 10px;
+    padding: 2px 7px;
+    border-radius: 6px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+  }
+
+  .badge-admin {
+    background: linear-gradient(135deg, #ffd700, #ff9f43);
+    color: #040814;
+  }
+
+  .badge-user {
+    background: rgba(56, 189, 248, 0.2);
+    color: var(--brand-blue);
+    border: 1px solid rgba(56, 189, 248, 0.4);
+  }
+
+  .logout-btn {
+    background: rgba(239, 68, 68, 0.15);
+    border: 1px solid rgba(239, 68, 68, 0.4);
+    color: #fca5a5;
+    padding: 6px 12px;
+    border-radius: 9px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .logout-btn:hover {
+    background: #ef4444;
+    color: #ffffff;
+  }
+
+  .mobile-menu-btn {
+    display: none;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--card-border);
+    color: #ffffff;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    font-size: 18px;
+    cursor: pointer;
+  }
+
+  /* ===== MAIN CONTAINER ===== */
+  .dashboard-wrapper {
+    position: relative;
+    z-index: 1;
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 28px 20px;
+  }
+
+  /* Messages Alert */
+  .alert-success {
+    background: rgba(16, 185, 129, 0.15);
+    border: 1px solid rgba(16, 185, 129, 0.4);
+    color: #34d399;
+    padding: 14px 20px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  /* ===== HERO WELCOME BANNER ===== */
+  .welcome-banner {
+    background: linear-gradient(135deg, rgba(14, 25, 48, 0.95), rgba(8, 16, 34, 0.85));
+    border: 1px solid var(--card-border);
+    border-radius: 20px;
+    padding: 32px 36px;
+    margin-bottom: 28px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 16px 40px -15px rgba(0, 0, 0, 0.6);
+  }
+
+  .welcome-banner::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 320px;
+    height: 100%;
+    background: radial-gradient(circle at 80% 50%, rgba(255, 122, 26, 0.12), transparent 70%);
+    pointer-events: none;
+  }
+
+  .banner-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+
+  .welcome-text h1 {
+    font-size: clamp(24px, 3.5vw, 32px);
+    font-weight: 800;
+    color: #ffffff;
+    margin-bottom: 6px;
+    letter-spacing: -0.5px;
+  }
+
+  .welcome-text p {
+    color: var(--text-secondary);
+    font-size: 14.5px;
+    font-weight: 500;
+  }
+
+  .banner-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .btn-action-primary {
+    background: linear-gradient(135deg, var(--brand-orange), #ea580c);
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 14px;
+    padding: 12px 22px;
+    border-radius: 12px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    box-shadow: 0 8px 24px rgba(255, 122, 26, 0.35);
+    transition: all 0.25s ease;
+    border: none;
+    cursor: pointer;
+  }
+
+  .btn-action-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 30px rgba(255, 122, 26, 0.5);
+  }
+
+  .btn-action-secondary {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid var(--card-border);
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 14px;
+    padding: 12px 20px;
+    border-radius: 12px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+  }
+
+  .btn-action-secondary:hover {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+  }
+
+  /* ===== METRICS GRID ===== */
+  .metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 18px;
+    margin-bottom: 32px;
+  }
+
+  .metric-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 18px;
+    padding: 22px 24px;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    transition: transform 0.25s ease, border-color 0.25s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .metric-card:hover {
+    transform: translateY(-3px);
+    border-color: var(--card-border-glow);
+  }
+
+  .metric-card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+
+  .metric-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+  }
+
+  .metric-icon-box {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+  }
+
+  .metric-value {
+    font-size: 32px;
+    font-weight: 800;
+    color: #ffffff;
+    letter-spacing: -0.5px;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+
+  .metric-desc {
+    font-size: 12.5px;
+    color: var(--text-muted);
+  }
+
+  /* ===== LIVE ACTIVE BOOKING TRACKER BANNER ===== */
+  {% if latest_active_booking and latest_active_booking.status != 'Completed' and latest_active_booking.status != 'Cancelled' %}
+  .tracker-card {
+    background: linear-gradient(135deg, rgba(16, 28, 54, 0.9), rgba(11, 20, 39, 0.9));
+    border: 1.5px solid var(--brand-blue);
+    border-radius: 20px;
+    padding: 26px 30px;
+    margin-bottom: 32px;
+    box-shadow: 0 14px 36px -10px rgba(56, 189, 248, 0.2);
+  }
+
+  .tracker-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 22px;
+  }
+
+  .tracker-header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .pulse-indicator {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--brand-cyan);
+    box-shadow: 0 0 12px var(--brand-cyan);
+    animation: pulse 1.8s infinite;
+  }
+
+  @keyframes pulse {
+    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 242, 254, 0.7); }
+    70% { transform: scale(1.1); box-shadow: 0 0 0 10px rgba(0, 242, 254, 0); }
+    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 242, 254, 0); }
+  }
+
+  .step-bar-wrapper {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    position: relative;
+    margin: 20px 0 16px;
+  }
+
+  .step-node {
+    text-align: center;
+    position: relative;
+    z-index: 2;
+  }
+
+  .step-circle {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #0f1c36;
+    border: 2px solid #334155;
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 8px;
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .step-node.completed .step-circle {
+    background: var(--brand-emerald);
+    border-color: var(--brand-emerald);
+    color: #040814;
+  }
+
+  .step-node.active .step-circle {
+    background: var(--brand-blue);
+    border-color: #ffffff;
+    color: #040814;
+    box-shadow: 0 0 16px rgba(56, 189, 248, 0.7);
+  }
+
+  .step-label {
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--text-secondary);
+  }
+
+  .step-node.completed .step-label,
+  .step-node.active .step-label {
+    color: #ffffff;
+  }
+  {% endif %}
+
+  /* ===== SECTION HEADERS ===== */
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .section-title {
+    font-size: 20px;
+    font-weight: 800;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  /* ===== BOOKINGS TABLE & CARDS ===== */
+  .table-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 20px;
+    overflow: hidden;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    margin-bottom: 36px;
+  }
+
+  .table-responsive {
+    width: 100%;
+    overflow-x: auto;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    min-width: 780px;
+  }
+
+  thead th {
+    background: rgba(6, 14, 30, 0.75);
+    padding: 16px 20px;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--text-secondary);
+    border-bottom: 1px solid var(--card-border);
+  }
+
+  tbody td {
+    padding: 18px 20px;
+    font-size: 13.5px;
+    color: var(--text-primary);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    vertical-align: middle;
+  }
+
+  tbody tr:hover {
+    background: rgba(255, 255, 255, 0.02);
+  }
+
+  .booking-id-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    font-size: 13px;
+    color: var(--brand-blue);
+    background: rgba(56, 189, 248, 0.12);
+    border: 1px solid rgba(56, 189, 248, 0.3);
+    padding: 3px 8px;
+    border-radius: 6px;
+    display: inline-block;
+  }
+
+  .route-text {
+    font-weight: 600;
+    color: #ffffff;
+  }
+
+  .route-distance {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 3px;
+  }
+
+  .status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11.5px;
+    font-weight: 800;
+    padding: 4px 10px;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .status-pending { background: rgba(245, 158, 11, 0.15); border: 1px solid #f59e0b; color: #fbbf24; }
+  .status-confirmed { background: rgba(56, 189, 248, 0.15); border: 1px solid #38bdf8; color: #38bdf8; }
+  .status-completed { background: rgba(16, 185, 129, 0.15); border: 1px solid #10b981; color: #34d399; }
+  .status-cancelled { background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; color: #f87171; }
+
+  .action-btns {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .btn-sm-action {
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+  }
+
+  .btn-track {
+    background: rgba(56, 189, 248, 0.15);
+    border: 1px solid rgba(56, 189, 248, 0.4);
+    color: var(--brand-blue);
+  }
+  .btn-track:hover {
+    background: var(--brand-blue);
+    color: #040814;
+  }
+
+  .btn-receipt {
+    background: rgba(16, 185, 129, 0.15);
+    border: 1px solid rgba(16, 185, 129, 0.4);
+    color: #34d399;
+  }
+  .btn-receipt:hover {
+    background: #10b981;
+    color: #ffffff;
+  }
+
+  .btn-review {
+    background: rgba(255, 122, 26, 0.15);
+    border: 1px solid rgba(255, 122, 26, 0.4);
+    color: var(--brand-orange);
+  }
+  .btn-review:hover {
+    background: var(--brand-orange);
+    color: #ffffff;
+  }
+
+  /* Empty State */
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+  }
+  .empty-state i {
+    font-size: 54px;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+  }
+  .empty-state h3 {
+    font-size: 18px;
+    color: #ffffff;
+    margin-bottom: 8px;
+  }
+  .empty-state p {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-bottom: 20px;
+  }
+
+  /* ===== 2-COLUMN BOTTOM SECTION (PROFILE & SAVED ROUTES) ===== */
+  .bottom-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+
+  .card-container {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 20px;
+    padding: 26px;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+  }
+
+  .card-head-title {
+    font-size: 16px;
+    font-weight: 800;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--card-border);
+  }
+
+  /* Profile Details */
+  .profile-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    font-size: 13.5px;
+  }
+  .profile-label {
+    color: var(--text-secondary);
+    font-weight: 500;
+  }
+  .profile-val {
+    color: #ffffff;
+    font-weight: 700;
+  }
+
+  .profile-form {
+    margin-top: 18px;
+    padding-top: 16px;
+    border-top: 1px solid var(--card-border);
+  }
+
+  .form-field {
+    margin-bottom: 14px;
+  }
+  .form-field label {
+    display: block;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+  }
+  .form-input {
+    width: 100%;
+    background: rgba(6, 12, 26, 0.8);
+    border: 1px solid var(--card-border);
+    border-radius: 10px;
+    padding: 10px 14px;
+    color: #ffffff;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s ease;
+  }
+  .form-input:focus {
+    border-color: var(--brand-blue);
+  }
+
+  /* Saved Route Cards */
+  .route-shortcut-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--card-border);
+    border-radius: 14px;
+    margin-bottom: 12px;
+    transition: all 0.2s ease;
+  }
+  .route-shortcut-card:hover {
+    background: rgba(255, 255, 255, 0.07);
+    border-color: var(--brand-orange);
+    transform: translateX(4px);
+  }
+
+  /* Mobile Drawer Overlay */
+  .mobile-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(4, 7, 15, 0.72);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    z-index: 9998;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.25s ease, visibility 0.25s ease;
+  }
+  .mobile-overlay.open {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+
+  .mobile-drawer {
+    display: flex;
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: min(310px, calc(100vw - 20px));
+    height: 100%;
+    background: #080f1e;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border-left: 2px solid #ff7a1a;
+    z-index: 9999;
+    padding: 24px 18px;
+    box-shadow: -10px 0 40px rgba(0, 0, 0, 0.85);
+    flex-direction: column;
+    gap: 10px;
+    transform: translateX(110%);
+    transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .mobile-drawer.open {
+    transform: translateX(0);
+  }
+
+  @media (max-width: 992px) {
+    .nav-menu { display: none; }
+    .mobile-menu-btn { display: inline-flex; align-items: center; justify-content: center; }
+    .bottom-grid { grid-template-columns: 1fr; }
+  }
+
+  @media (max-width: 768px) {
+    .user-pill, .nav-user-actions > form {
+      display: none !important;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .dashboard-wrapper { padding: 16px 12px; }
+    .welcome-banner { padding: 22px 18px; }
+    .metrics-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+    .metric-value { font-size: 24px; }
+    .step-label { font-size: 10px; }
+    .nav-brand { font-size: 14px; gap: 8px; }
+    .nav-brand img { height: 30px; }
+  }
+
+  @media (max-width: 480px) {
+    .nav-brand span { font-size: 13px; }
+  }
+</style>
+</head>
+
+<body>
+
+<div class="bg-glow"></div>
+
+<!-- Top Sticky Navbar -->
+<header class="nav-header">
+  <a href="{% url 'home' %}" class="nav-brand">
+    <img src="{% static 'images/logo6.png' %}" alt="Ghidora Transport Logo">
+    <span>GHIDORA <span class="accent">TRANSPORT</span></span>
+  </a>
+
+  <!-- Desktop Navigation Links -->
+  <ul class="nav-menu">
+    <li><a href="{% url 'home' %}" class="nav-link"><i class="fa-solid fa-house"></i> Home</a></li>
+    <li><a href="{% url 'home' %}#booking" class="nav-link"><i class="fa-solid fa-truck-fast"></i> Book Transport</a></li>
+    <li><a href="{% url 'user_dashboard' %}" class="nav-link active"><i class="fa-solid fa-gauge-high"></i> Dashboard</a></li>
+    <li><a href="{% url 'services' %}" class="nav-link"><i class="fa-solid fa-truck-ramp-box"></i> Services</a></li>
+    <li><a href="{% url 'about' %}" class="nav-link"><i class="fa-solid fa-circle-info"></i> About</a></li>
+    <li><a href="{% url 'contact_us' %}" class="nav-link"><i class="fa-solid fa-headset"></i> Contact</a></li>
+  </ul>
+
+  <!-- Right Actions -->
+  <div class="nav-user-actions">
+    <div class="user-pill">
+      <i class="fa-solid fa-circle-user" style="color: var(--brand-blue);"></i>
+      <span style="max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: inline-block; vertical-align: middle;">{{ user.first_name|default:user.username }}</span>
+      {% if user.is_staff or user.is_superuser %}
+        <span class="badge-role badge-admin">ADMIN</span>
+      {% else %}
+        <span class="badge-role badge-user">USER</span>
+      {% endif %}
+    </div>
+
+    <form method="post" action="{% url 'logout' %}" style="display: inline;">
+      {% csrf_token %}
+      <button type="submit" class="logout-btn" title="Sign out of Ghidora Transport">
+        <i class="fa-solid fa-right-from-bracket"></i> Logout
+      </button>
+    </form>
+
+    <button class="mobile-menu-btn" onclick="toggleDashboardDrawer()" aria-label="Toggle Navigation" title="Open Menu" style="display: inline-flex; align-items: center; gap: 5px; padding: 6px 10px;">
+      <i class="fa-solid fa-bars"></i>
+      <span style="font-size: 11px; font-weight: 800; text-transform: uppercase;">Menu</span>
+    </button>
+  </div>
+</header>
+
+<!-- Mobile Navigation Drawer -->
+<div class="mobile-overlay" id="mobileOverlay" onclick="toggleDashboardDrawer()"></div>
+<div class="mobile-drawer" id="mobileDrawer">
+  <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--card-border); padding-bottom: 12px; margin-bottom: 8px;">
+    <div style="font-weight: 800; font-size: 15px; color: var(--brand-orange);">
+      <i class="fa-solid fa-compass"></i> Navigation
+    </div>
+    <button onclick="toggleDashboardDrawer()" style="background: none; border: none; color: #fff; font-size: 18px; cursor: pointer;">✕</button>
+  </div>
+
+  <a href="{% url 'home' %}" class="nav-link"><i class="fa-solid fa-house"></i> Home</a>
+  <a href="{% url 'home' %}#booking" class="nav-link"><i class="fa-solid fa-truck-fast"></i> Book Transport</a>
+  <a href="{% url 'status' %}" class="nav-link"><i class="fa-solid fa-magnifying-glass-location"></i> Track Booking</a>
+  <a href="{% url 'user_dashboard' %}" class="nav-link active"><i class="fa-solid fa-gauge-high"></i> User Dashboard</a>
+  <a href="{% url 'services' %}" class="nav-link"><i class="fa-solid fa-truck-ramp-box"></i> Services</a>
+  <a href="{% url 'about' %}" class="nav-link"><i class="fa-solid fa-circle-info"></i> About Us</a>
+  <a href="{% url 'contact_us' %}" class="nav-link"><i class="fa-solid fa-headset"></i> Contact Us</a>
+
+  {% if user.is_staff or user.is_superuser %}
+    <a href="{% url 'dashboard' %}" class="nav-link nav-admin-btn" style="margin-top: 10px;">
+      <i class="fa-solid fa-crown" style="color: #ffd700;"></i> Open Admin Dashboard
+    </a>
+  {% endif %}
+
+  <div style="margin-top: auto; padding-top: 16px; border-top: 1px solid var(--card-border);">
+    <form method="post" action="{% url 'logout' %}">
+      {% csrf_token %}
+      <button type="submit" class="logout-btn" style="width: 100%; justify-content: center; padding: 10px;">
+        <i class="fa-solid fa-right-from-bracket"></i> Logout
+      </button>
+    </form>
+  </div>
+</div>
+
+<!-- Main Dashboard Body -->
+<main class="dashboard-wrapper">
+
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert-success">
+        <i class="fa-solid fa-circle-check"></i> {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <!-- Hero Welcome Banner -->
+  <section class="welcome-banner">
+    <div class="banner-content">
+      <div class="welcome-text">
+        <div style="font-size: 12px; font-weight: 800; letter-spacing: 1.5px; color: var(--brand-orange); text-transform: uppercase; margin-bottom: 4px;">
+          CUSTOMER LOGISTICS PORTAL
+        </div>
+        <h1>Welcome, {{ user.first_name|default:user.username }}!</h1>
+        <p>Manage your commercial vehicle bookings, track statewide freight, and access receipts.</p>
+      </div>
+
+      <div class="banner-actions">
+        <a href="{% url 'home' %}#booking" class="btn-action-primary">
+          <i class="fa-solid fa-truck-moving"></i> Book New Transport
+        </a>
+        <a href="{% url 'status' %}" class="btn-action-secondary">
+          <i class="fa-solid fa-magnifying-glass"></i> Track by ID
+        </a>
+        {% if user.is_staff or user.is_superuser %}
+          <a href="{% url 'dashboard' %}" class="btn-action-secondary" style="border-color: var(--brand-cyan); color: var(--brand-cyan);">
+            <i class="fa-solid fa-crown" style="color: #ffd700;"></i> Admin Center
+          </a>
+        {% endif %}
+      </div>
+    </div>
+  </section>
+
+  <!-- Metric Summary Cards -->
+  <section class="metrics-grid">
+    <div class="metric-card">
+      <div class="metric-card-top">
+        <span class="metric-title">Total Bookings</span>
+        <div class="metric-icon-box" style="background: rgba(56, 189, 248, 0.15); color: var(--brand-blue);">
+          <i class="fa-solid fa-boxes-stacked"></i>
+        </div>
+      </div>
+      <div class="metric-value">{{ total_my_bookings }}</div>
+      <div class="metric-desc">Lifetime transport orders placed</div>
+    </div>
+
+    <div class="metric-card">
+      <div class="metric-card-top">
+        <span class="metric-title">Active Trips</span>
+        <div class="metric-icon-box" style="background: rgba(245, 158, 11, 0.15); color: var(--brand-amber);">
+          <i class="fa-solid fa-truck-fast"></i>
+        </div>
+      </div>
+      <div class="metric-value" style="color: #fbbf24;">{{ active_count }}</div>
+      <div class="metric-desc">Pending dispatch or en-route</div>
+    </div>
+
+    <div class="metric-card">
+      <div class="metric-card-top">
+        <span class="metric-title">Completed Trips</span>
+        <div class="metric-icon-box" style="background: rgba(16, 185, 129, 0.15); color: var(--brand-emerald);">
+          <i class="fa-solid fa-circle-check"></i>
+        </div>
+      </div>
+      <div class="metric-value" style="color: #34d399;">{{ completed_count }}</div>
+      <div class="metric-desc">Safely delivered freight orders</div>
+    </div>
+
+    <div class="metric-card">
+      <div class="metric-card-top">
+        <span class="metric-title">Total Freight Spent</span>
+        <div class="metric-icon-box" style="background: rgba(255, 122, 26, 0.15); color: var(--brand-orange);">
+          <i class="fa-solid fa-wallet"></i>
+        </div>
+      </div>
+      <div class="metric-value">₹{{ total_spent }}</div>
+      <div class="metric-desc">Total invoice value settled</div>
+    </div>
+  </section>
+
+  <!-- Live Booking Tracker (if an active booking exists) -->
+  {% if latest_active_booking and latest_active_booking.status != 'Completed' and latest_active_booking.status != 'Cancelled' %}
+  <section class="tracker-card">
+    <div class="tracker-header">
+      <div class="tracker-header-left">
+        <div class="pulse-indicator"></div>
+        <div>
+          <h3 style="font-size: 16px; font-weight: 800; color: #ffffff;">Active Trip Progress: {{ latest_active_booking.booking_id }}</h3>
+          <p style="font-size: 13px; color: var(--text-secondary);">
+            {{ latest_active_booking.pickup }} ➔ {{ latest_active_booking.destination }} ({{ latest_active_booking.vehicle_type }})
+          </p>
+        </div>
+      </div>
+      <div>
+        <span class="status-pill {% if latest_active_booking.status == 'Pending' %}status-pending{% elif latest_active_booking.status == 'Confirmed' %}status-confirmed{% endif %}">
+          ● Status: {{ latest_active_booking.status }}
+        </span>
+      </div>
+    </div>
+
+    <!-- 4-Step Visual Progress Bar -->
+    <div class="step-bar-wrapper">
+      <div class="step-node completed">
+        <div class="step-circle"><i class="fa-solid fa-check"></i></div>
+        <div class="step-label">1. Booking Placed</div>
+      </div>
+
+      <div class="step-node {% if latest_active_booking.status == 'Confirmed' %}active{% else %}pending{% endif %}">
+        <div class="step-circle">{% if latest_active_booking.status == 'Confirmed' %}<i class="fa-solid fa-truck"></i>{% else %}2{% endif %}</div>
+        <div class="step-label">2. Driver Assigned</div>
+      </div>
+
+      <div class="step-node {% if latest_active_booking.status == 'Confirmed' %}pending{% endif %}">
+        <div class="step-circle">3</div>
+        <div class="step-label">3. On Route</div>
+      </div>
+
+      <div class="step-node">
+        <div class="step-circle">4</div>
+        <div class="step-label">4. Delivered</div>
+      </div>
+    </div>
+
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; padding-top: 14px; border-top: 1px solid rgba(255, 255, 255, 0.08); font-size: 13px;">
+      <span style="color: var(--text-secondary);">Journey Date: <strong style="color: #fff;">{{ latest_active_booking.journey_date }}</strong> | Est. Fare: <strong style="color: #34d399;">₹{{ latest_active_booking.fare }}</strong></span>
+      <a href="{% url 'status' %}?booking_id={{ latest_active_booking.booking_id }}" class="btn-sm-action btn-track">
+        <i class="fa-solid fa-location-arrow"></i> View Live Tracking Details
+      </a>
+    </div>
+  </section>
+  {% endif %}
+
+  <!-- My Bookings Table & History -->
+  <section id="my-bookings">
+    <div class="section-header">
+      <h2 class="section-title">
+        <i class="fa-solid fa-clipboard-list" style="color: var(--brand-blue);"></i> My Transport Orders & History
+      </h2>
+      <a href="{% url 'home' %}#booking" class="btn-sm-action btn-track">
+        <i class="fa-solid fa-plus"></i> New Order
+      </a>
+    </div>
+
+    <div class="table-card">
+      {% if bookings %}
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>Booking ID</th>
+                <th>Route (Pickup ➔ Drop)</th>
+                <th>Vehicle Type</th>
+                <th>Journey Date</th>
+                <th>Fare</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for b in bookings %}
+                <tr>
+                  <td>
+                    <span class="booking-id-tag">{{ b.booking_id }}</span>
+                    <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">{{ b.booking_date|date:"d M Y" }}</div>
+                  </td>
+                  <td>
+                    <div class="route-text">{{ b.pickup }} ➔ {{ b.destination }}</div>
+                    <div class="route-distance"><i class="fa-solid fa-road"></i> {{ b.distance }} KM ({{ b.trip_type }})</div>
+                  </td>
+                  <td>
+                    <strong style="color: #ffffff;">{{ b.vehicle_type }}</strong>
+                    {% if b.cargo_type %}<div style="font-size: 11px; color: var(--text-muted);">📦 {{ b.cargo_type }}</div>{% endif %}
+                  </td>
+                  <td>
+                    <span style="color: #cbd5e1; font-weight: 600;">{{ b.journey_date|date:"d M, Y" }}</span>
+                  </td>
+                  <td>
+                    <strong style="color: #34d399; font-size: 15px;">₹{{ b.fare }}</strong>
+                    <div style="font-size: 11px; color: var(--text-muted);">{{ b.fare_type|default:"Standard Rate" }}</div>
+                  </td>
+                  <td>
+                    {% if b.status == 'Pending' %}
+                      <span class="status-pill status-pending"><i class="fa-solid fa-clock"></i> Pending</span>
+                    {% elif b.status == 'Confirmed' %}
+                      <span class="status-pill status-confirmed"><i class="fa-solid fa-truck-arrow-right"></i> Confirmed</span>
+                    {% elif b.status == 'Completed' %}
+                      <span class="status-pill status-completed"><i class="fa-solid fa-circle-check"></i> Completed</span>
+                    {% else %}
+                      <span class="status-pill status-cancelled"><i class="fa-solid fa-ban"></i> Cancelled</span>
+                    {% endif %}
+                  </td>
+                  <td>
+                    <div class="action-btns">
+                      <a href="{% url 'status' %}?booking_id={{ b.booking_id }}" class="btn-sm-action btn-track" title="Track this booking">
+                        <i class="fa-solid fa-location-crosshairs"></i> Track
+                      </a>
+
+                      <a href="{% url 'download_receipt' b.id %}" class="btn-sm-action btn-receipt" title="Download Official Tax Receipt">
+                        <i class="fa-solid fa-file-arrow-down"></i> Receipt
+                      </a>
+
+                      {% if b.status == 'Completed' %}
+                        <a href="{% url 'add_review' b.id %}" class="btn-sm-action btn-review" title="Rate this completed trip">
+                          <i class="fa-solid fa-star"></i> Review
+                        </a>
+                      {% endif %}
+                    </div>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div class="empty-state">
+          <i class="fa-solid fa-truck-ramp-box"></i>
+          <h3>No bookings found on your account</h3>
+          <p>You haven't booked any vehicles yet. Book your first commercial pickup or bolero now!</p>
+          <a href="{% url 'home' %}#booking" class="btn-action-primary">
+            <i class="fa-solid fa-truck-moving"></i> Book Transport Now
+          </a>
+        </div>
+      {% endif %}
+    </div>
+  </section>
+
+  <!-- Bottom 2-Column Grid: Customer Profile & Saved Routes -->
+  <section class="bottom-grid">
+
+    <!-- Profile Management Card -->
+    <div class="card-container" id="profile">
+      <div class="card-head-title">
+        <i class="fa-solid fa-id-card-clip" style="color: var(--brand-blue);"></i> My Profile Information
+      </div>
+
+      <div class="profile-row">
+        <span class="profile-label">Username:</span>
+        <span class="profile-val" style="font-family: 'JetBrains Mono', monospace;">{{ user.username }}</span>
+      </div>
+
+      <div class="profile-row">
+        <span class="profile-label">Full Name:</span>
+        <span class="profile-val">{{ user.get_full_name|default:"Not specified" }}</span>
+      </div>
+
+      <div class="profile-row">
+        <span class="profile-label">Email Address:</span>
+        <span class="profile-val">{{ user.email|default:"Not linked" }}</span>
+      </div>
+
+      <div class="profile-row">
+        <span class="profile-label">Account Role:</span>
+        <span class="profile-val">
+          {% if user.is_staff or user.is_superuser %}
+            <span class="badge-role badge-admin">ADMINISTRATOR</span>
+          {% else %}
+            <span class="badge-role badge-user">VERIFIED CUSTOMER</span>
+          {% endif %}
+        </span>
+      </div>
+
+      <div class="profile-row">
+        <span class="profile-label">Member Since:</span>
+        <span class="profile-val">{{ user.date_joined|date:"d M Y" }}</span>
+      </div>
+
+      <!-- Edit Profile Form -->
+      <form method="post" class="profile-form">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="update_profile">
+        <div style="font-size: 13px; font-weight: 700; color: #fff; margin-bottom: 12px;">
+          <i class="fa-solid fa-user-pen"></i> Update Personal Details
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div class="form-field">
+            <label for="first_name">First Name</label>
+            <input type="text" id="first_name" name="first_name" class="form-input" value="{{ user.first_name }}">
+          </div>
+          <div class="form-field">
+            <label for="last_name">Last Name</label>
+            <input type="text" id="last_name" name="last_name" class="form-input" value="{{ user.last_name }}">
+          </div>
+        </div>
+
+        <div class="form-field">
+          <label for="email">Email Address</label>
+          <input type="email" id="email" name="email" class="form-input" value="{{ user.email }}">
+        </div>
+
+        <button type="submit" class="btn-sm-action btn-track" style="padding: 10px 18px; cursor: pointer; border: none;">
+          <i class="fa-solid fa-floppy-disk"></i> Save Profile Changes
+        </button>
+      </form>
+    </div>
+
+    <!-- Frequent Routes & Quick Rebooking -->
+    <div class="card-container">
+      <div class="card-head-title">
+        <i class="fa-solid fa-route" style="color: var(--brand-orange);"></i> Frequent Routes & 1-Click Re-book
+      </div>
+
+      {% if frequent_routes %}
+        <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 16px;">
+          Quickly re-book your most frequently used transport routes:
+        </p>
+
+        {% for route in frequent_routes %}
+          <div class="route-shortcut-card">
+            <div>
+              <div style="font-weight: 700; color: #ffffff; font-size: 14px;">
+                {{ route.pickup }} ➔ {{ route.destination }}
+              </div>
+              <div style="font-size: 12px; color: var(--text-muted); margin-top: 3px;">
+                Preferred: {{ route.vehicle_type }} (Booked {{ route.total_trips }} time{{ route.total_trips|pluralize }})
+              </div>
+            </div>
+
+            <a href="{% url 'home' %}#booking" class="btn-sm-action btn-review" style="font-size: 12px;">
+              <i class="fa-solid fa-repeat"></i> Book Again
+            </a>
+          </div>
+        {% endfor %}
+      {% else %}
+        <div style="text-align: center; padding: 30px 10px; color: var(--text-secondary);">
+          <i class="fa-solid fa-map-location-dot" style="font-size: 38px; color: var(--text-muted); margin-bottom: 12px;"></i>
+          <p style="font-size: 13.5px;">Once you complete bookings, your favourite and frequent routes will appear here for 1-click rebooking.</p>
+        </div>
+      {% endif %}
+
+      <!-- Customer Reviews History -->
+      <div style="margin-top: 24px; padding-top: 18px; border-top: 1px solid var(--card-border);">
+        <div style="font-size: 14px; font-weight: 700; color: #ffffff; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between;">
+          <span><i class="fa-solid fa-star" style="color: #ffd700;"></i> My Reviews ({{ user_reviews.count }})</span>
+          <a href="{% url 'home' %}#reviews" style="color: var(--brand-blue); text-decoration: none; font-size: 12px;">View All Reviews ➔</a>
+        </div>
+
+        {% if user_reviews %}
+          {% for r in user_reviews|slice:":2" %}
+            <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 10px 14px; margin-bottom: 8px; font-size: 12.5px;">
+              <div style="color: #ffd700; font-size: 11px; margin-bottom: 3px;">
+                {% for _ in "x"|rjust:r.rating %}⭐{% endfor %}
+              </div>
+              <p style="color: #cbd5e1;">"{{ r.comment|default:r.review }}"</p>
+            </div>
+          {% endfor %}
+        {% else %}
+          <p style="font-size: 12.5px; color: var(--text-muted);">You haven't submitted any reviews yet. Completed trips can be reviewed above!</p>
+        {% endif %}
+      </div>
+
+    </div>
+
+  </section>
+
+</main>
+
+{% include "booking/footer.html" %}
+
+<script>
+  function toggleDashboardDrawer() {
+    const drawer = document.getElementById('mobileDrawer');
+    const overlay = document.getElementById('mobileOverlay');
+    if (drawer && overlay) {
+      const isOpen = drawer.classList.toggle('open');
+      overlay.classList.toggle('open');
+      document.body.style.overflow = isOpen ? 'hidden' : '';
+    }
+  }
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      const drawer = document.getElementById('mobileDrawer');
+      const overlay = document.getElementById('mobileOverlay');
+      if (drawer && drawer.classList.contains('open')) {
+        drawer.classList.remove('open');
+        if (overlay) overlay.classList.remove('open');
+        document.body.style.overflow = '';
+      }
+    }
+  });
+</script>
+
+</body>
+</html>

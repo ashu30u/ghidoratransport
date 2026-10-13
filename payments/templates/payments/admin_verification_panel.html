@@ -60,6 +60,26 @@
       </div>
     </div>
 
+    <div class="glass-card p-4 mb-4 border border-success bg-opacity-10 bg-success">
+      <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <div>
+          <h5 class="font-display text-success mb-1">
+            <i class="bi bi-patch-check-fill me-2"></i>One-Click All Done
+          </h5>
+          <p class="small text-muted mb-0">
+            Verify payment immediately, generate official PDF receipt with stamp/signature, and send it directly to <strong>{{ payment_request.booking.email|default:"customer" }}</strong>.
+          </p>
+        </div>
+        <div>
+          <a href="{% url 'payments:admin_mark_all_done' payment_request.payment_id %}" 
+             class="btn btn-success fw-bold px-3 py-2 shadow-sm"
+             onclick="return confirm('Confirm All Done: This will verify the payment, generate the official PDF receipt with stamp/signature, and email it directly to customer?');">
+            <i class="bi bi-send-check-fill me-1"></i> Mark ALL DONE &amp; Send Receipt
+          </a>
+        </div>
+      </div>
+    </div>
+
     <div class="glass-card p-4">
       <h5 class="font-display mb-3">Verification Decision</h5>
       <form method="post" class="glass-form">
@@ -73,8 +93,13 @@
         <label class="form-label small text-muted-soft mt-3">Notes</label>
         {{ form.notes }}
 
-        <div class="d-flex gap-2 mt-4">
+        <div class="d-flex gap-2 mt-4 flex-wrap">
           <button type="submit" class="btn btn-route"><i class="bi bi-check2-circle me-1"></i>Save Decision</button>
+          <a href="{% url 'payments:admin_mark_all_done' payment_request.payment_id %}" 
+             class="btn btn-outline-success fw-semibold"
+             onclick="return confirm('Confirm All Done: This will verify the payment, generate the official PDF receipt with stamp/signature, and email it directly to customer?');">
+            <i class="bi bi-patch-check-fill me-1"></i>All Done &amp; Send Receipt
+          </a>
           <a href="{% url 'payments:admin_dashboard' %}" class="btn btn-ghost-glass">Back to Dashboard</a>
         </div>
       </form>

@@ -1,8 +1,15 @@
 import os
+import sys
 import json
 import urllib.request
 import warnings
 warnings.filterwarnings('ignore')
+
+if hasattr(sys.stdout, 'reconfigure'):
+    try:
+        sys.stdout.reconfigure(errors='replace')
+    except Exception:
+        pass
 
 import django
 
@@ -15,7 +22,7 @@ RENDER_EXPORT_URL = "https://ghidoratransport.onrender.com/api/export-bookings/"
 RENDER_REVIEWS_EXPORT_URL = "https://ghidoratransport.onrender.com/api/export-reviews/"
 
 def sync_bookings_from_render():
-    print(f"📡 Connecting to Render Server: {RENDER_EXPORT_URL} ...")
+    print(f"[SYNC] Connecting to Render Server: {RENDER_EXPORT_URL} ...")
     try:
         req = urllib.request.Request(
             RENDER_EXPORT_URL,
@@ -23,21 +30,21 @@ def sync_bookings_from_render():
         )
         with urllib.request.urlopen(req, timeout=20) as response:
             if response.status != 200:
-                print(f"❌ Server returned HTTP status: {response.status}")
+                print(f"[ERROR] Server returned HTTP status: {response.status}")
                 return
 
             raw_data = response.read().decode('utf-8')
             payload = json.loads(raw_data)
             
             if not payload.get('success'):
-                print("❌ API returned error payload:", payload)
+                print("[ERROR] API returned error payload:", payload)
                 return
 
             bookings_data = payload.get('bookings', [])
-            print(f"🟢 Connected successfully! Total bookings on Render server: {len(bookings_data)}")
+            print(f"[OK] Connected successfully! Total bookings on Render server: {len(bookings_data)}")
 
             if len(bookings_data) == 0:
-                print("ℹ️ Currently there are 0 customer bookings on Render server. Test by submitting a new booking on https://ghidoratransport.onrender.com !")
+                print("[INFO] Currently there are 0 customer bookings on Render server.")
                 return
 
             imported_count = 0

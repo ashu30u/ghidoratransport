@@ -1,0 +1,266 @@
+{% load static social_extras %}
+<article class="ig-card" id="post-{{ post.id }}">
+  
+  <!-- Header row -->
+  <div class="ig-card-header">
+    <a href="{% url 'social:profile' post.author.username %}" class="ig-author-link">
+      {% if post.author.profile.avatar %}
+        <img class="ig-avatar" src="{{ post.author.profile.avatar.url }}" alt="{{ post.author.username }}">
+      {% else %}
+        <div class="ig-avatar ig-avatar-fallback">{{ post.author|get_initials }}</div>
+      {% endif %}
+      <div class="ig-author-info">
+        <div class="ig-author-name-row">
+          <span class="ig-author-name">
+            {{ post.author.get_full_name|default:post.author.username }}
+            {% if post.author.is_superuser or post.author.is_staff or 'ghidora' in post.author.username.lower %}
+              <span class="gs-badge-owner" title="Ghidora Owner / Verified"><i class="ti ti-circle-check-filled"></i></span>
+            {% endif %}
+            {% if post.author.profile.is_driver %}
+              <span class="gs-badge-driver">DRIVER</span>
+            {% endif %}
+          </span>
+          <span class="ig-timestamp">• {{ post.created_at|timesince }} ago</span>
+        </div>
+        {% if post.location %}
+          <div class="ig-post-location" title="{{ post.location }}">
+            <i class="ti ti-map-pin"></i> <span>{{ post.location }}</span>
+          </div>
+        {% endif %}
+      </div>
+    </a>
+    
+    <div class="ig-menu-dropdown">
+      <button class="ig-icon-btn ig-menu-btn" onclick="togglePostMenu({{ post.id }})" aria-label="More options">
+        <i class="ti ti-dots"></i>
+      </button>
+      <div class="ig-menu-popup" id="menu-popup-{{ post.id }}">
+        {% if post.author == request.user %}
+          <a href="{% url 'social:delete_post' post.pk %}" class="ig-menu-item danger">
+            <i class="ti ti-trash"></i> Delete Post
+          </a>
+        {% endif %}
+        <button type="button" class="ig-menu-item" onclick="openShareModal('{% url 'social:post_detail' post.pk %}', {{ post.id }})">
+          <i class="ti ti-share"></i> Share Post
+        </button>
+        <button type="button" class="ig-menu-item" onclick="copyPostLink('{% url 'social:post_detail' post.pk %}')">
+          <i class="ti ti-link"></i> Copy Link
+        </button>
+        {% if post.author != request.user %}
+          <button type="button" class="ig-menu-item danger" onclick="openReportModal('post', {{ post.id }})">
+            <i class="ti ti-flag"></i> Report Post
+          </button>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Media area (Carousel or Single Image/Video or Fallback) -->
+  <div class="ig-media-area">
+    {% if post.images.all %}
+      <div class="ig-carousel" id="carousel-{{ post.id }}">
+        {% if post.images.all|length > 1 %}
+          <div class="ig-carousel-badge">1/{{ post.images.all|length }}</div>
+          <button class="ig-carousel-nav prev" onclick="slideCarousel({{ post.id }}, -1)"><i class="ti ti-chevron-left"></i></button>
+          <button class="ig-carousel-nav next" onclick="slideCarousel({{ post.id }}, 1)"><i class="ti ti-chevron-right"></i></button>
+        {% endif %}
+        <div class="ig-carousel-track">
+          {% for item in post.images.all %}
+            <div class="ig-carousel-slide">
+              {% if item.is_video %}
+                <video src="{{ item.image.url }}" controls loop style="width:100%; max-height:500px; background:#000; object-fit:contain;"></video>
+              {% else %}
+                <img src="{{ item.image.url }}" alt="Post media {{ forloop.counter }}" loading="lazy" ondblclick="quickLikePost({{ post.id }})">
+              {% endif %}
+            </div>
+          {% endfor %}
+        </div>
+        {% if post.images.all|length > 1 %}
+          <div class="ig-carousel-dots">
+            {% for item in post.images.all %}
+              <span class="dot {% if forloop.first %}active{% endif %}"></span>
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
+    {% elif post.image %}
+      <div class="ig-carousel-slide">
+        {% if post.is_video %}
+          <video src="{{ post.image.url }}" controls loop style="width:100%; max-height:500px; background:#000; object-fit:contain;"></video>
+        {% else %}
+          <img src="{{ post.image.url }}" alt="Post media" loading="lazy" ondblclick="quickLikePost({{ post.id }})">
+        {% endif %}
+      </div>
+    {% else %}
+      <div class="ig-text-post-bg" ondblclick="quickLikePost({{ post.id }})">
+        <div class="ig-text-post-content">{{ post.content|format_social_text }}</div>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Action row -->
+  <div class="ig-action-row">
+    <div class="ig-action-group">
+      {% with liked=post|is_liked_by:request.user %}
+        <button type="button" 
+                class="ig-action-btn like-btn {% if liked %}liked{% endif %}" 
+                id="like-btn-{{ post.id }}"
+                onclick="toggleLikeAJAX({{ post.id }})" 
+                aria-label="Like post">
+          <i class="ti {% if liked %}ti-heart-filled{% else %}ti-heart{% endif %}"></i>
+        </button>
+      {% endwith %}
+
+      <button type="button" class="ig-action-btn" onclick="focusCommentInput({{ post.id }})" aria-label="Comment">
+        <i class="ti ti-message-circle"></i>
+      </button>
+
+      <button type="button" class="ig-action-btn" onclick="openShareModal('{% url 'social:post_detail' post.pk %}', {{ post.id }})" aria-label="Share">
+        <i class="ti ti-send"></i>
+      </button>
+    </div>
+
+    <!-- Bookmark / Save Button -->
+    <div class="ig-action-save">
+      {% with saved=post|is_saved_by:request.user %}
+        <button type="button" 
+                class="ig-action-btn save-btn {% if saved %}saved{% endif %}" 
+                id="save-btn-{{ post.id }}" 
+                onclick="toggleSaveAJAX({{ post.id }})" 
+                aria-label="Save post" 
+                title="{% if saved %}Remove from Saved{% else %}Save Post{% endif %}">
+          <i class="ti {% if saved %}ti-bookmark-filled{% else %}ti-bookmark{% endif %}"></i>
+        </button>
+      {% endwith %}
+    </div>
+  </div>
+
+  <!-- Like count line -->
+  <div class="ig-likes-line">
+    <button type="button" class="ig-likes-btn" onclick="showLikesModal({{ post.id }})">
+      <span class="ig-bold" id="like-count-{{ post.id }}">{{ post.like_count }}</span> likes
+    </button>
+  </div>
+
+  <!-- Caption line -->
+  {% if post.content %}
+    <div class="ig-caption-line">
+      <a href="{% url 'social:profile' post.author.username %}" class="ig-bold-user">
+        {{ post.author.username }}
+      </a>
+      <span class="ig-caption-text" id="caption-{{ post.id }}">
+        {{ post.content|format_social_text }}
+      </span>
+      {% if post.content|length > 110 %}
+        <button class="ig-more-btn" onclick="expandCaption({{ post.id }})">more</button>
+      {% endif %}
+    </div>
+  {% endif %}
+
+  <!-- Comments section -->
+  <div class="ig-comments-section" id="comments-sec-{{ post.id }}">
+    {% if post.comment_count > 2 %}
+      <button type="button" class="ig-view-comments-btn" onclick="expandComments({{ post.id }})" id="view-comments-btn-{{ post.id }}">
+        View all {{ post.comment_count }} comments
+      </button>
+    {% endif %}
+
+    <div class="ig-comments-list" id="comments-list-{{ post.id }}">
+      {% for comment in post.comments.all %}
+        {% if not comment.parent %}
+          <div class="ig-comment-row {% if forloop.counter > 2 %}hidden-comment{% endif %}" id="comment-row-{{ comment.id }}">
+            <div class="ig-comment-main">
+              <a href="{% url 'social:profile' comment.author.username %}" class="ig-bold-user">
+                {{ comment.author.username }}
+              </a>
+              <span class="ig-comment-text">{{ comment.content|format_social_text }}</span>
+              <div class="ig-comment-meta">
+                <span class="ig-comment-time">{{ comment.created_at|timesince }}</span>
+                <span class="ig-comment-likes-count" id="comment-like-count-{{ comment.id }}">
+                  {% if comment.like_count > 0 %}{{ comment.like_count }} like{{ comment.like_count|pluralize }}{% endif %}
+                </span>
+                <button type="button" class="ig-comment-reply-btn" onclick="prepareCommentReply({{ post.id }}, {{ comment.id }}, '{{ comment.author.username|escapejs }}')">Reply</button>
+                {% if comment.author == request.user or post.author == request.user %}
+                  <button type="button" class="ig-comment-delete-btn" onclick="deleteCommentAJAX({{ comment.id }}, {{ post.id }})" title="Delete comment">
+                    <i class="ti ti-trash"></i>
+                  </button>
+                {% endif %}
+              </div>
+            </div>
+
+            <!-- Comment Like Heart Icon Button -->
+            <button type="button" 
+                    class="ig-comment-like-btn {% if comment|is_comment_liked_by:request.user %}liked{% endif %}" 
+                    id="comment-like-btn-{{ comment.id }}" 
+                    onclick="toggleCommentLikeAJAX({{ comment.id }})" 
+                    title="Like comment">
+              <i class="ti {% if comment|is_comment_liked_by:request.user %}ti-heart-filled{% else %}ti-heart{% endif %}"></i>
+            </button>
+          </div>
+
+          <!-- Nested Replies (if any) -->
+          {% for reply in comment.replies.all %}
+            <div class="ig-comment-row ig-reply-row" id="comment-row-{{ reply.id }}">
+              <div class="ig-comment-main">
+                <a href="{% url 'social:profile' reply.author.username %}" class="ig-bold-user">
+                  {{ reply.author.username }}
+                </a>
+                <span class="ig-comment-text">{{ reply.content|format_social_text }}</span>
+                <div class="ig-comment-meta">
+                  <span class="ig-comment-time">{{ reply.created_at|timesince }}</span>
+                  <span class="ig-comment-likes-count" id="comment-like-count-{{ reply.id }}">
+                    {% if reply.like_count > 0 %}{{ reply.like_count }} like{{ reply.like_count|pluralize }}{% endif %}
+                  </span>
+                  <button type="button" class="ig-comment-reply-btn" onclick="prepareCommentReply({{ post.id }}, {{ comment.id }}, '{{ reply.author.username|escapejs }}')">Reply</button>
+                  {% if reply.author == request.user or post.author == request.user %}
+                    <button type="button" class="ig-comment-delete-btn" onclick="deleteCommentAJAX({{ reply.id }}, {{ post.id }})" title="Delete reply">
+                      <i class="ti ti-trash"></i>
+                    </button>
+                  {% endif %}
+                </div>
+              </div>
+
+              <!-- Reply Like Heart Icon Button -->
+              <button type="button" 
+                      class="ig-comment-like-btn {% if reply|is_comment_liked_by:request.user %}liked{% endif %}" 
+                      id="comment-like-btn-{{ reply.id }}" 
+                      onclick="toggleCommentLikeAJAX({{ reply.id }})" 
+                      title="Like reply">
+                <i class="ti {% if reply|is_comment_liked_by:request.user %}ti-heart-filled{% else %}ti-heart{% endif %}"></i>
+              </button>
+            </div>
+          {% endfor %}
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Pinned Comment Input at bottom -->
+  <div class="ig-comment-input-area">
+    <!-- Active reply indicator -->
+    <div class="ig-reply-indicator" id="reply-indicator-{{ post.id }}" style="display:none;">
+      <span>Replying to <strong id="reply-username-{{ post.id }}">@user</strong></span>
+      <button type="button" onclick="cancelCommentReply({{ post.id }})" title="Cancel reply"><i class="ti ti-x"></i></button>
+    </div>
+
+    <div class="ig-comment-input-row">
+      {% if request.user.profile.avatar %}
+        <img class="ig-comment-avatar" src="{{ request.user.profile.avatar.url }}" alt="{{ request.user.username }}">
+      {% else %}
+        <div class="ig-comment-avatar ig-avatar-fallback">{{ request.user|get_initials }}</div>
+      {% endif %}
+      
+      <form onsubmit="submitCommentAJAX(event, {{ post.id }})" class="ig-comment-form">
+        {% csrf_token %}
+        <input type="hidden" id="comment-parent-{{ post.id }}" name="parent_id" value="">
+        <input type="text" 
+               id="comment-input-{{ post.id }}" 
+               class="ig-comment-input-field" 
+               placeholder="Add a comment..." 
+               autocomplete="off">
+        <button type="submit" class="ig-comment-post-btn" id="comment-btn-{{ post.id }}" disabled>Post</button>
+      </form>
+    </div>
+  </div>
+
+</article>
