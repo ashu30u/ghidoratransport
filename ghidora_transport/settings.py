@@ -206,6 +206,11 @@ CACHES = {
     }
 }
 WHITENOISE_MAX_AGE = 31536000  # Cache static assets in browser for 1 year
+WHITENOISE_SKIP_COMPRESS_EXTENSIONS = (
+    'jpg', 'jpeg', 'png', 'gif', 'webp', 'zip', 'gz', 'tgz', 'bz2', 'tbz', 'xz',
+    'br', 'mp3', 'mp4', 'mpeg', 'ogg', 'wav', 'mov', 'flv', 'm4a', 'aac', 'svg',
+    'woff', 'woff2', 'ttf', 'eot'
+)
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
