@@ -12,36 +12,65 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.CreateModel(
-            name='Shayari',
-            fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('text', models.CharField(help_text="Trucker slogan / shayari line shown on the signage board, e.g. 'देखो मगर प्यार से'", max_length=300)),
-                ('is_active', models.BooleanField(default=True, help_text='Uncheck to hide without deleting')),
-                ('order', models.PositiveIntegerField(default=0, help_text='Lower numbers show first')),
+        migrations.SeparateDatabaseAndState(
+            state_operations=[
+                migrations.CreateModel(
+                    name='Shayari',
+                    fields=[
+                        ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                        ('text', models.CharField(help_text="Trucker slogan / shayari line shown on the signage board, e.g. 'देखो मगर प्यार से'", max_length=300)),
+                        ('is_active', models.BooleanField(default=True, help_text='Uncheck to hide without deleting')),
+                        ('order', models.PositiveIntegerField(default=0, help_text='Lower numbers show first')),
+                    ],
+                    options={
+                        'verbose_name': 'Shayari',
+                        'verbose_name_plural': 'Shayaris',
+                        'ordering': ['order', 'id'],
+                    },
+                ),
+                migrations.CreateModel(
+                    name='Song',
+                    fields=[
+                        ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                        ('title', models.CharField(max_length=150)),
+                        ('artist', models.CharField(max_length=150)),
+                        ('audio_file', models.FileField(help_text='mp3 / wav / m4a file', upload_to=pickupwala.models.song_audio_path)),
+                        ('cover_image', models.ImageField(blank=True, help_text='Optional cassette/cover art. If left blank the player shows the default cassette icon.', null=True, upload_to=pickupwala.models.song_cover_path)),
+                        ('duration_seconds', models.PositiveIntegerField(default=0, help_text="Song length in seconds, used for the progress bar. Leave 0 and the player will fall back to the audio file's own length.")),
+                        ('trip_km', models.PositiveIntegerField(default=150, help_text="Distance shown on the road progress readout for this song (purely cosmetic, e.g. '150 km')")),
+                        ('is_active', models.BooleanField(default=True, help_text='Uncheck to remove from the live playlist without deleting')),
+                        ('order', models.PositiveIntegerField(default=0, help_text='Playlist order, lower numbers play first')),
+                        ('added_on', models.DateTimeField(auto_now_add=True)),
+                    ],
+                    options={
+                        'ordering': ['order', 'id'],
+                    },
+                ),
             ],
-            options={
-                'verbose_name': 'Shayari',
-                'verbose_name_plural': 'Shayaris',
-                'ordering': ['order', 'id'],
-            },
-        ),
-        migrations.CreateModel(
-            name='Song',
-            fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('title', models.CharField(max_length=150)),
-                ('artist', models.CharField(max_length=150)),
-                ('audio_file', models.FileField(help_text='mp3 / wav / m4a file', upload_to=pickupwala.models.song_audio_path)),
-                ('cover_image', models.ImageField(blank=True, help_text='Optional cassette/cover art. If left blank the player shows the default cassette icon.', null=True, upload_to=pickupwala.models.song_cover_path)),
-                ('duration_seconds', models.PositiveIntegerField(default=0, help_text="Song length in seconds, used for the progress bar. Leave 0 and the player will fall back to the audio file's own length.")),
-                ('trip_km', models.PositiveIntegerField(default=150, help_text="Distance shown on the road progress readout for this song (purely cosmetic, e.g. '150 km')")),
-                ('is_active', models.BooleanField(default=True, help_text='Uncheck to remove from the live playlist without deleting')),
-                ('order', models.PositiveIntegerField(default=0, help_text='Playlist order, lower numbers play first')),
-                ('added_on', models.DateTimeField(auto_now_add=True)),
-            ],
-            options={
-                'ordering': ['order', 'id'],
-            },
+            database_operations=[
+                migrations.RunSQL(
+                    sql="""
+                    CREATE TABLE IF NOT EXISTS pickupwala_shayari (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        text VARCHAR(300) NOT NULL,
+                        is_active BOOL NOT NULL DEFAULT 1,
+                        "order" UNSIGNED INT NOT NULL DEFAULT 0
+                    );
+                    CREATE TABLE IF NOT EXISTS pickupwala_song (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        title VARCHAR(150) NOT NULL,
+                        artist VARCHAR(150) NOT NULL,
+                        audio_file VARCHAR(100) NOT NULL,
+                        cover_image VARCHAR(100) NULL,
+                        duration_seconds UNSIGNED INT NOT NULL DEFAULT 0,
+                        trip_km UNSIGNED INT NOT NULL DEFAULT 150,
+                        is_active BOOL NOT NULL DEFAULT 1,
+                        "order" UNSIGNED INT NOT NULL DEFAULT 0,
+                        added_on DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+                    );
+                    """,
+                    reverse_sql="DROP TABLE IF EXISTS pickupwala_shayari; DROP TABLE IF EXISTS pickupwala_song;"
+                )
+            ]
         ),
     ]

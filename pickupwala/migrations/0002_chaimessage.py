@@ -10,19 +10,37 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.CreateModel(
-            name='ChaiMessage',
-            fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('title', models.CharField(default='Chai pe charcha! ☕', help_text="Title for Chai break popup, e.g. 'Chai pe charcha! ☕'", max_length=150)),
-                ('message', models.CharField(default='Music baad mein, pehle chai!', help_text="Subtitle/message shown on Chai break popup, e.g. 'Music baad mein, pehle chai!'", max_length=300)),
-                ('is_active', models.BooleanField(default=True, help_text='Uncheck to hide without deleting')),
-                ('order', models.PositiveIntegerField(default=0, help_text='Lower numbers show first')),
+        migrations.SeparateDatabaseAndState(
+            state_operations=[
+                migrations.CreateModel(
+                    name='ChaiMessage',
+                    fields=[
+                        ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                        ('title', models.CharField(default='Chai pe charcha! ☕', help_text="Title for Chai break popup, e.g. 'Chai pe charcha! ☕'", max_length=150)),
+                        ('message', models.CharField(default='Music baad mein, pehle chai!', help_text="Subtitle/message shown on Chai break popup, e.g. 'Music baad mein, pehle chai!'", max_length=300)),
+                        ('is_active', models.BooleanField(default=True, help_text='Uncheck to hide without deleting')),
+                        ('order', models.PositiveIntegerField(default=0, help_text='Lower numbers show first')),
+                    ],
+                    options={
+                        'verbose_name': 'Chai Break Message',
+                        'verbose_name_plural': 'Chai Break Messages',
+                        'ordering': ['order', 'id'],
+                    },
+                ),
             ],
-            options={
-                'verbose_name': 'Chai Break Message',
-                'verbose_name_plural': 'Chai Break Messages',
-                'ordering': ['order', 'id'],
-            },
+            database_operations=[
+                migrations.RunSQL(
+                    sql="""
+                    CREATE TABLE IF NOT EXISTS pickupwala_chaimessage (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        title VARCHAR(150) NOT NULL,
+                        message VARCHAR(300) NOT NULL,
+                        is_active BOOL NOT NULL DEFAULT 1,
+                        "order" UNSIGNED INT NOT NULL DEFAULT 0
+                    );
+                    """,
+                    reverse_sql="DROP TABLE IF EXISTS pickupwala_chaimessage;"
+                )
+            ]
         ),
     ]

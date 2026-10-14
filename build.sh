@@ -10,5 +10,5 @@ export LC_ALL=C.UTF-8
 pip install -r requirements.txt
 
 python manage.py collectstatic --no-input
-python manage.py migrate --no-input
+python manage.py migrate --fake-initial --no-input
 python auto_migrate_review_columns.py || true
