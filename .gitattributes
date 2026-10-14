@@ -1,3 +1,6 @@
+# Enforce Linux LF line endings for all shell scripts
+*.sh text eol=lf
+
 # Disable delta compression for large media assets so git packing is instantaneous
 *.mp3 -delta
 *.mp4 -delta

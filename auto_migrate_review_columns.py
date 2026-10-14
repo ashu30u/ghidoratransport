@@ -1,26 +1,35 @@
 import os
+import sys
 import sqlite3
-import django
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'ghidora_transport.settings')
-django.setup()
-
-from django.conf import settings
+# Force UTF-8 stdout/stderr to avoid UnicodeEncodeError in non-UTF-8 terminals
+if hasattr(sys.stdout, 'reconfigure'):
+    try:
+        sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+        sys.stderr.reconfigure(encoding='utf-8', errors='replace')
+    except Exception:
+        pass
 
 try:
+    import django
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'ghidora_transport.settings')
+    django.setup()
+
+    from django.conf import settings
+
     db_path = settings.DATABASES['default']['NAME']
     print(f"Connecting to SQLite database at: {db_path}")
 
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
 
-    # Get existing columns in booking_review
+    # 1. Check existing columns in booking_review
     try:
         cursor.execute("PRAGMA table_info(booking_review)")
         rows = cursor.fetchall()
         existing_cols = {col[1]: col for col in rows}
     except Exception as e:
-        print(f"Notice: booking_review table check skipped/error: {e}")
+        print(f"Notice: booking_review table check skipped: {e}")
         existing_cols = {}
 
     alter_statements = [
@@ -48,14 +57,9 @@ try:
     except Exception:
         pass
 
-    # Check if booking_id has NOT NULL constraint (notnull == 1)
+    # Check if booking_id has NOT NULL constraint
     booking_col = existing_cols.get('booking_id')
-    needs_table_recreation = False
     if booking_col and booking_col[3] == 1:
-        needs_table_recreation = True
-
-    # Recreate table if booking_id is NOT NULL
-    if needs_table_recreation:
         print("Fixing booking_id NOT NULL constraint in booking_review table...")
         try:
             cursor.execute("PRAGMA foreign_keys = OFF;")
@@ -88,7 +92,7 @@ try:
             cursor.execute("ALTER TABLE booking_review_new RENAME TO booking_review;")
             cursor.execute("COMMIT;")
             cursor.execute("PRAGMA foreign_keys = ON;")
-            print("✅ Successfully updated booking_review table! booking_id is now NULLable.")
+            print("[OK] Successfully updated booking_review table! booking_id is now NULLable.")
         except Exception as e:
             try:
                 cursor.execute("ROLLBACK;")
@@ -97,22 +101,12 @@ try:
             print("Notice fixing table constraint:", e)
 
     try:
-        conn.close()
-    except Exception:
-        pass
-
-    try:
-        conn = sqlite3.connect(db_path)
-        cursor = conn.cursor()
         cursor.execute("UPDATE booking_review SET is_approved = 1 WHERE is_approved IS NULL OR is_approved = 0")
         conn.commit()
-        conn.close()
     except Exception as e:
         print("Notice updating is_approved:", e)
 
-    print("✅ booking_review table schema check completed.")
-
-    # Ensure booking_giabookingrecord table and missing columns (email, etc.) exist
+    # 2. Ensure booking_giabookingrecord table and missing columns exist
     try:
         cursor.execute("""
         CREATE TABLE IF NOT EXISTS booking_giabookingrecord (
@@ -157,50 +151,19 @@ try:
             if col_name not in gia_cols:
                 try:
                     cursor.execute(sql)
-                    print(f"✅ Added missing column '{col_name}' to booking_giabookingrecord table.")
+                    print(f"[OK] Added missing column '{col_name}' to booking_giabookingrecord table.")
                 except Exception as e:
                     print(f"Notice adding {col_name} to booking_giabookingrecord: {e}")
         conn.commit()
-        print("✅ booking_giabookingrecord table schema check completed.")
     except Exception as gia_e:
         print(f"Notice in booking_giabookingrecord migration: {gia_e}")
 
+    try:
+        conn.close()
+    except Exception:
+        pass
+
+    print("[OK] Schema checks completed successfully.")
+
 except Exception as main_e:
     print(f"Notice in auto_migrate: {main_e}")
-
-
-def ensure_google_social_app():
-    try:
-        from django.contrib.sites.models import Site
-        from allauth.socialaccount.models import SocialApp
-        
-        # 1. Live Production Site (ID 1)
-        live_site, _ = Site.objects.get_or_create(id=1, defaults={'domain': 'ghidoratransport.onrender.com', 'name': 'Ghidora Transport (Live)'})
-        live_site.domain = 'ghidoratransport.onrender.com'
-        live_site.name = 'Ghidora Transport (Live)'
-        live_site.save()
-
-        # 2. Local Development Site (ID 2)
-        local_site, _ = Site.objects.get_or_create(id=2, defaults={'domain': '127.0.0.1:8000', 'name': 'Ghidora Transport (Local)'})
-        local_site.domain = '127.0.0.1:8000'
-        local_site.name = 'Ghidora Transport (Local)'
-        local_site.save()
-
-        client_id = '520482080238-ejsi630q0nv6na0de3if97ug73f5rmmt.apps.googleusercontent.com'
-
-        app, created = SocialApp.objects.get_or_create(
-            provider='google',
-            defaults={
-                'name': 'Google Login',
-                'client_id': client_id,
-                'secret': 'GOCSPX-dummy_secret',
-            }
-        )
-        app.client_id = client_id
-        app.sites.add(live_site, local_site)
-        app.save()
-        print(f"✅ Google SocialApp configured for Live ({live_site.domain}) and Local ({local_site.domain})")
-    except Exception as e:
-        print("❌ Error ensuring Google SocialApp:", e)
-
-ensure_google_social_app()

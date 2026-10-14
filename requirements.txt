@@ -10,3 +10,4 @@ sqlparse>=0.4.4
 asgiref>=3.7.0
 qrcode>=7.4.2
 xhtml2pdf>=0.2.15
+python-dotenv>=1.0.0
