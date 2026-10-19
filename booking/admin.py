@@ -1,6 +1,13 @@
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.utils.html import format_html
-from .models import Booking, Review, BookingAttachment, ContactMessage, PredefinedRouteFare, PredefinedRouteDistance
+from django.utils.safestring import mark_safe
+from django.urls import path
+from django.shortcuts import redirect
+from django.core.cache import cache
+from .models import (
+    Booking, Review, ReviewSetting, BookingAttachment, 
+    ContactMessage, PredefinedRouteFare, PredefinedRouteDistance
+)
 
 
 @admin.register(PredefinedRouteDistance)
@@ -415,15 +422,29 @@ class BookingAdmin(admin.ModelAdmin):
                 )
 
 
+@admin.register(ReviewSetting)
+class ReviewSettingAdmin(admin.ModelAdmin):
+    list_display = ("__str__", "auto_approve_reviews", "auto_verify_logged_in", "updated_at")
+    list_editable = ("auto_approve_reviews", "auto_verify_logged_in")
+
+    def has_add_permission(self, request):
+        return not ReviewSetting.objects.exists()
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
 @admin.register(Review)
 class ReviewAdmin(admin.ModelAdmin):
+    change_list_template = "admin/booking/review/change_list.html"
 
     list_display = (
         "customer_name",
         "rating_stars",
         "short_comment",
-        "is_approved",
-        "is_verified",
+        "approval_badge",
+        "verified_badge",
+        "quick_actions",
         "created_at",
     )
 
@@ -447,6 +468,89 @@ class ReviewAdmin(admin.ModelAdmin):
     ordering = ("-created_at",)
     actions = ["approve_reviews", "unapprove_reviews", "mark_verified", "unmark_verified"]
 
+    def changelist_view(self, request, extra_context=None):
+        extra_context = extra_context or {}
+        extra_context["review_setting"] = ReviewSetting.get_settings()
+        return super().changelist_view(request, extra_context=extra_context)
+
+    def get_urls(self):
+        urls = super().get_urls()
+        custom_urls = [
+            path(
+                "toggle-auto-publish/",
+                self.admin_site.admin_view(self.toggle_auto_publish),
+                name="review_toggle_auto_publish",
+            ),
+            path(
+                "<int:review_id>/quick-approve/",
+                self.admin_site.admin_view(self.quick_approve),
+                name="review_quick_approve",
+            ),
+            path(
+                "<int:review_id>/quick-unapprove/",
+                self.admin_site.admin_view(self.quick_unapprove),
+                name="review_quick_unapprove",
+            ),
+            path(
+                "<int:review_id>/quick-toggle-verify/",
+                self.admin_site.admin_view(self.quick_toggle_verify),
+                name="review_quick_toggle_verify",
+            ),
+        ]
+        return custom_urls + urls
+
+    def toggle_auto_publish(self, request):
+        setting = ReviewSetting.get_settings()
+        setting.auto_approve_reviews = not setting.auto_approve_reviews
+        setting.save()
+        if setting.auto_approve_reviews:
+            self.message_user(
+                request,
+                "⚡ Mode Switched: AUTOMATIC PUBLISH IS NOW ON! Naye reviews bina admin verify ke turant website par show honge.",
+                level=messages.SUCCESS,
+            )
+        else:
+            self.message_user(
+                request,
+                "🛡️ Mode Switched: MANUAL VERIFICATION IS NOW ON! Naye reviews Pending rahenge aur Admin ke Approve karne par hi website par show honge.",
+                level=messages.WARNING,
+            )
+        return redirect("admin:booking_review_changelist")
+
+    def quick_approve(self, request, review_id):
+        try:
+            rev = Review.objects.get(pk=review_id)
+            rev.is_approved = True
+            rev.save(update_fields=["is_approved"])
+            cache.delete("home_reviews_summary_data")
+            self.message_user(request, f"✅ Review #{rev.id} ({rev.display_name}) is now APPROVED & visible on website!", level=messages.SUCCESS)
+        except Review.DoesNotExist:
+            self.message_user(request, "Review not found.", level=messages.ERROR)
+        return redirect("admin:booking_review_changelist")
+
+    def quick_unapprove(self, request, review_id):
+        try:
+            rev = Review.objects.get(pk=review_id)
+            rev.is_approved = False
+            rev.save(update_fields=["is_approved"])
+            cache.delete("home_reviews_summary_data")
+            self.message_user(request, f"⏳ Review #{rev.id} ({rev.display_name}) is now HIDDEN (Set to Pending)!", level=messages.WARNING)
+        except Review.DoesNotExist:
+            self.message_user(request, "Review not found.", level=messages.ERROR)
+        return redirect("admin:booking_review_changelist")
+
+    def quick_toggle_verify(self, request, review_id):
+        try:
+            rev = Review.objects.get(pk=review_id)
+            rev.is_verified = not rev.is_verified
+            rev.save(update_fields=["is_verified"])
+            cache.delete("home_reviews_summary_data")
+            status_text = "Verified Customer" if rev.is_verified else "Unverified"
+            self.message_user(request, f"🛡️ Review #{rev.id} status changed to {status_text}!", level=messages.INFO)
+        except Review.DoesNotExist:
+            self.message_user(request, "Review not found.", level=messages.ERROR)
+        return redirect("admin:booking_review_changelist")
+
     def customer_name(self, obj):
         return obj.display_name
     customer_name.short_description = "Customer"
@@ -460,13 +564,57 @@ class ReviewAdmin(admin.ModelAdmin):
         return txt[:50] + "..." if len(txt) > 50 else txt
     short_comment.short_description = "Review Text"
 
+    def approval_badge(self, obj):
+        if obj.is_approved:
+            return mark_safe(
+                '<span style="background:#10B981; color:#ffffff; padding:4px 10px; border-radius:12px; font-weight:700; font-size:11px; display:inline-block; white-space:nowrap;">🟢 Live on Website</span>'
+            )
+        else:
+            return mark_safe(
+                '<span style="background:#F59E0B; color:#ffffff; padding:4px 10px; border-radius:12px; font-weight:700; font-size:11px; display:inline-block; white-space:nowrap;">⏳ Pending Approval</span>'
+            )
+    approval_badge.short_description = "Website Status"
+
+    def verified_badge(self, obj):
+        if obj.is_verified:
+            return mark_safe(
+                '<span style="background:#3B82F6; color:#ffffff; padding:3px 8px; border-radius:10px; font-weight:600; font-size:10px; display:inline-block; white-space:nowrap;">🛡️ Verified</span>'
+            )
+        else:
+            return mark_safe(
+                '<span style="color:#94A3B8; font-size:11px; white-space:nowrap;">⚪ Unverified</span>'
+            )
+    verified_badge.short_description = "Badge"
+
+    def quick_actions(self, obj):
+        buttons = []
+        if not obj.is_approved:
+            buttons.append(
+                f'<a href="{obj.id}/quick-approve/" style="background:#10B981; color:#fff; padding:4px 10px; border-radius:6px; font-weight:700; font-size:11px; text-decoration:none; display:inline-block; white-space:nowrap; margin-right:4px;">✅ Approve</a>'
+            )
+        else:
+            buttons.append(
+                f'<a href="{obj.id}/quick-unapprove/" style="background:#EF4444; color:#fff; padding:4px 10px; border-radius:6px; font-weight:700; font-size:11px; text-decoration:none; display:inline-block; white-space:nowrap; margin-right:4px;">⏳ Hide</a>'
+            )
+
+        if not obj.is_verified:
+            buttons.append(
+                f'<a href="{obj.id}/quick-toggle-verify/" style="background:#3B82F6; color:#fff; padding:4px 8px; border-radius:6px; font-weight:600; font-size:11px; text-decoration:none; display:inline-block; white-space:nowrap;">🛡️ Verify</a>'
+            )
+        else:
+            buttons.append(
+                f'<a href="{obj.id}/quick-toggle-verify/" style="background:#64748B; color:#fff; padding:4px 8px; border-radius:6px; font-weight:600; font-size:11px; text-decoration:none; display:inline-block; white-space:nowrap;">⚪ Unverify</a>'
+            )
+
+        return mark_safe(f'<div style="display:inline-flex; align-items:center; gap:4px;">{"".join(buttons)}</div>')
+    quick_actions.short_description = "Quick Actions"
+
     def approve_reviews(self, request, queryset):
         rows = 0
         for rev in queryset:
             rev.is_approved = True
-            rev.save()
+            rev.save(update_fields=["is_approved"])
             rows += 1
-        from django.core.cache import cache
         cache.delete("home_reviews_summary_data")
         self.message_user(request, f"✅ {rows} review(s) approved and published on Home Page!")
     approve_reviews.short_description = "✅ Approve Selected Reviews"
@@ -475,35 +623,30 @@ class ReviewAdmin(admin.ModelAdmin):
         rows = 0
         for rev in queryset:
             rev.is_approved = False
-            rev.save()
+            rev.save(update_fields=["is_approved"])
             rows += 1
-        from django.core.cache import cache
         cache.delete("home_reviews_summary_data")
         self.message_user(request, f"⏳ {rows} review(s) hidden / set to Pending!")
     unapprove_reviews.short_description = "⏳ Set Selected Reviews to Pending"
 
     def mark_verified(self, request, queryset):
         rows = queryset.update(is_verified=True)
-        from django.core.cache import cache
         cache.delete("home_reviews_summary_data")
         self.message_user(request, f"🟢 {rows} review(s) marked as Verified Customer!")
     mark_verified.short_description = "🟢 Mark as Verified Customer"
 
     def unmark_verified(self, request, queryset):
         rows = queryset.update(is_verified=False)
-        from django.core.cache import cache
         cache.delete("home_reviews_summary_data")
         self.message_user(request, f"⚪ {rows} review(s) un-marked from Verified!")
     unmark_verified.short_description = "⚪ Unmark Verified Status"
 
     def save_model(self, request, obj, form, change):
         super().save_model(request, obj, form, change)
-        from django.core.cache import cache
         cache.delete("home_reviews_summary_data")
 
     def delete_model(self, request, obj):
         super().delete_model(request, obj)
-        from django.core.cache import cache
         cache.delete("home_reviews_summary_data")
 
 

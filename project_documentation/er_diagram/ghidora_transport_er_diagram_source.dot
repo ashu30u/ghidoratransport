@@ -1,10 +1,10 @@
 /*
  * GHIDORA TRANSPORT - Online Booking Transport Platform
- * Database ER Diagram (Graphviz DOT Source)
+ * Database ER Diagram (Graphviz DOT Source - Black & White Edition)
  * College Minor Project Database Architecture
  */
 
-graph GhidoraTransportER {
+graph GhidoraTransportER_BW {
     layout=neato;
     overlap=false;
     splines=true;
@@ -12,14 +12,14 @@ graph GhidoraTransportER {
 
     // Global Font Settings
     node [fontname="Segoe UI, Helvetica, Arial", fontsize=12];
-    edge [fontname="Segoe UI, Helvetica, Arial", fontsize=11, color="#1D4ED8", penwidth=2.0];
+    edge [fontname="Segoe UI, Helvetica, Arial", fontsize=11, color="#000000", penwidth=2.0];
 
     // ==========================================
-    // ENTITY SETS (Blue Rectangles)
+    // ENTITY SETS (Classic Black & White Boxes)
     // ==========================================
-    node [shape=box, style="filled,rounded", fillcolor="#1E3A8A", fontcolor="#FFFFFF", fontname="Segoe UI Bold", fontsize=14, margin="0.25,0.15", penwidth=2.5, color="#0F172A"];
+    node [shape=box, style="filled", fillcolor="#FFFFFF", fontcolor="#000000", fontname="Segoe UI Bold", fontsize=14, margin="0.25,0.15", penwidth=2.5, color="#000000"];
     User [label="Customer (User)\n[auth_user]"];
-    Booking [label="Booking\n[booking_booking]"];
+    Booking [label="Booking\n[booking_booking]", penwidth=3.5];
     BookingAttachment [label="BookingAttachment\n[booking_bookingattachment]"];
     PaymentRequest [label="PaymentRequest\n[payments_paymentrequest]"];
     Receipt [label="Receipt\n[payments_receipt]"];
@@ -30,10 +30,10 @@ graph GhidoraTransportER {
     PredefinedRouteDistance [label="PredefinedRouteDistance\n[booking_predefinedroutedistance]"];
 
     // ==========================================
-    // RELATIONSHIPS (Red Diamonds)
+    // RELATIONSHIPS (Classic Diamonds)
     // ==========================================
-    node [shape=diamond, style=filled, fillcolor="#DC2626", fontcolor="#FFFFFF", fontname="Segoe UI Bold Italic", fontsize=12, margin="0.15,0.1", penwidth=2.0, color="#991B1B"];
-    rel_books [label="books"];
+    node [shape=diamond, style=filled, fillcolor="#FFFFFF", fontcolor="#000000", fontname="Segoe UI Bold Italic", fontsize=12, margin="0.15,0.1", penwidth=2.0, color="#000000"];
+    rel_books [label="places / books"];
     rel_includes [label="includes"];
     rel_generates [label="generates"];
     rel_issues [label="issues"];
@@ -45,15 +45,13 @@ graph GhidoraTransportER {
     rel_measures [label="measures"];
 
     // ==========================================
-    // ATTRIBUTES (Green Ovals)
+    // ATTRIBUTES (Clean Ovals with Key Annotations)
     // ==========================================
-    node [shape=ellipse, style=filled, fillcolor="#DCFCE7", fontcolor="#064E3B", fontname="Segoe UI Semibold", fontsize=11, margin="0.1,0.05", penwidth=1.8, color="#15803D"];
+    node [shape=ellipse, style=filled, fillcolor="#FFFFFF", fontcolor="#000000", fontname="Segoe UI Semibold", fontsize=11, margin="0.1,0.05", penwidth=1.6, color="#000000"];
     
     // User Attributes
-    node [fillcolor="#FEF3C7", fontname="Segoe UI Bold"];
-    u_id [label=<<u>id</u>>];
-    node [fillcolor="#DCFCE7", fontname="Segoe UI Semibold"];
-    u_username [label="username"];
+    u_id [label=<<u>id [PK]</u>>, penwidth=2.4];
+    u_username [label="username [UK]"];
     u_email [label="email"];
     u_phone [label="phone", peripheries=2];
     u_fname [label="first_name"];
@@ -61,10 +59,10 @@ graph GhidoraTransportER {
     u_date_joined [label="date_joined"];
 
     // Booking Attributes
-    node [fillcolor="#FEF3C7", fontname="Segoe UI Bold"];
-    b_id [label=<<u>id</u>>];
-    node [fillcolor="#DCFCE7", fontname="Segoe UI Semibold"];
-    b_booking_id [label="booking_id"];
+    b_id [label=<<u>id</u> [PK]>, penwidth=2.4];
+    b_booking_id [label="booking_id [UK]"];
+    b_uid [label="user_id [FK]", style="dashed"];
+    b_adid [label="assigned_driver_id [FK]", style="dashed"];
     b_pickup [label="pickup"];
     b_dest [label="destination"];
     b_pickup_coords [label="pickup_lat/lng"];
@@ -80,109 +78,112 @@ graph GhidoraTransportER {
     b_cargo_type [label="cargo_type"];
 
     // Driver Attributes
-    node [fillcolor="#FEF3C7", fontname="Segoe UI Bold"];
-    dr_id [label=<<u>id</u>>];
-    node [fillcolor="#DCFCE7", fontname="Segoe UI Semibold"];
+    dr_id [label=<<u>id</u> [PK]>, penwidth=2.4];
     dr_name [label="name"];
-    dr_mobile [label="mobile", peripheries=2];
-    dr_license [label="license_number"];
+    dr_mobile [label="mobile [UK]", peripheries=2];
+    dr_license [label="license_number [UK]"];
     dr_exp [label="experience_years"];
     dr_status [label="status"];
 
     // Vehicle Attributes
-    node [fillcolor="#FEF3C7", fontname="Segoe UI Bold"];
-    vh_id [label=<<u>id</u>>];
-    node [fillcolor="#DCFCE7", fontname="Segoe UI Semibold"];
-    vh_num [label="vehicle_number"];
+    vh_id [label=<<u>id</u> [PK]>, penwidth=2.4];
+    vh_driver [label="driver_id [FK, 1:1]", style="dashed"];
+    vh_num [label="vehicle_number [UK]"];
     vh_type [label="vehicle_type"];
     vh_capacity [label="capacity"];
     vh_rc [label="rc_number"];
 
     // PaymentRequest Attributes
-    node [fillcolor="#FEF3C7", fontname="Segoe UI Bold"];
-    pay_id [label=<<u>id</u>>];
-    node [fillcolor="#DCFCE7", fontname="Segoe UI Semibold"];
-    pay_payment_id [label="payment_id"];
-    pay_amount [label="amount"];
-    pay_total_fare [label="total_fare"];
+    pay_id [label=<<u>id</u> [PK]>, penwidth=2.4];
+    pay_pid [label="payment_id [UK]"];
+    pay_bid [label="booking_id [FK]", style="dashed"];
+    pay_amt [label="amount"];
+    pay_tot [label="total_fare"];
     pay_status [label="status"];
-    pay_method [label="preferred_method"];
+    pay_type [label="payment_type"];
+    pay_meth [label="preferred_method"];
 
     // Receipt Attributes
-    node [fillcolor="#FEF3C7", fontname="Segoe UI Bold"];
-    rc_id [label=<<u>id</u>>];
-    node [fillcolor="#DCFCE7", fontname="Segoe UI Semibold"];
-    rc_receipt_id [label="receipt_id"];
+    rc_id [label=<<u>id</u> [PK]>, penwidth=2.4];
+    rc_rid [label="receipt_id [UK]"];
+    rc_prid [label="payment_request_id [FK, 1:1]", style="dashed"];
     rc_pdf [label="pdf_file"];
-    rc_sent [label="sent_to_email"];
+    rc_date [label="generated_at"];
+    rc_sent [label="is_sent"];
+
+    // BookingAttachment Attributes
+    att_id [label=<<u>id</u> [PK]>, penwidth=2.4];
+    att_bid [label="booking_id [FK]", style="dashed"];
+    att_type [label="attachment_type"];
+    att_file [label="file"];
+    att_date [label="uploaded_at"];
 
     // Review Attributes
-    node [fillcolor="#FEF3C7", fontname="Segoe UI Bold"];
-    rv_id [label=<<u>id</u>>];
-    node [fillcolor="#DCFCE7", fontname="Segoe UI Semibold"];
-    rv_rating [label="rating (⭐)"];
+    rv_id [label=<<u>id</u> [PK]>, penwidth=2.4];
+    rv_bid [label="booking_id [FK]", style="dashed"];
+    rv_uid [label="user_id [FK]", style="dashed"];
+    rv_rating [label="rating (1-5)"];
     rv_comment [label="comment"];
     rv_service [label="service_used"];
+    rv_approved [label="is_approved"];
 
-    // Predefined Route Fares
-    node [fillcolor="#FEF3C7", fontname="Segoe UI Bold"];
-    rf_id [label=<<u>id</u>>];
-    node [fillcolor="#DCFCE7", fontname="Segoe UI Semibold"];
+    // Predefined Route Fare Attributes
+    rf_id [label=<<u>id</u> [PK]>, penwidth=2.4];
     rf_from [label="from_location"];
     rf_to [label="to_location"];
     rf_fixed [label="fixed_fare"];
     rf_double [label="double_trip_fare"];
+    rf_dist [label="distance_km"];
 
-    // Predefined Route Distances
-    node [fillcolor="#FEF3C7", fontname="Segoe UI Bold"];
-    rd_id [label=<<u>id</u>>];
-    node [fillcolor="#DCFCE7", fontname="Segoe UI Semibold"];
+    // Predefined Route Distance Attributes
+    rd_id [label=<<u>id</u> [PK]>, penwidth=2.4];
     rd_from [label="from_location"];
     rd_to [label="to_location"];
-    rd_km [label="distance_km"];
+    rd_dist [label="distance_km"];
 
     // ==========================================
-    // EDGES & CARDINALITIES
+    // EDGES / CONNECTIONS
     // ==========================================
-    // Entity -> Attribute connections
-    User -- {u_id u_username u_email u_phone u_fname u_lname u_date_joined};
-    Booking -- {b_id b_booking_id b_pickup b_dest b_pickup_coords b_dest_coords b_distance b_fare b_fare_type b_toll b_status b_payment_status b_journey_date b_vehicle_type b_cargo_type};
-    Driver -- {dr_id dr_name dr_mobile dr_license dr_exp dr_status};
-    Vehicle -- {vh_id vh_num vh_type vh_capacity vh_rc};
-    PaymentRequest -- {pay_id pay_payment_id pay_amount pay_total_fare pay_status pay_method};
-    Receipt -- {rc_id rc_receipt_id rc_pdf rc_sent};
-    Review -- {rv_id rv_rating rv_comment rv_service};
-    PredefinedRouteFare -- {rf_id rf_from rf_to rf_fixed rf_double};
-    PredefinedRouteDistance -- {rd_id rd_from rd_to rd_km};
+    // Entity to Relationship with Cardinalities
+    User -- rel_books [label="1", penwidth=2.4];
+    rel_books -- Booking [label="0..*", penwidth=2.4];
 
-    // Relationship connections with cardinalities
-    User -- rel_books [label="1", fontcolor="#DC2626"];
-    rel_books -- Booking [label="0..*", fontcolor="#DC2626"];
+    Booking -- rel_includes [label="1", penwidth=2.4];
+    rel_includes -- BookingAttachment [label="0..*", penwidth=2.4];
 
-    Booking -- rel_includes [label="1", fontcolor="#DC2626"];
-    rel_includes -- BookingAttachment [label="0..*", fontcolor="#DC2626"];
+    Booking -- rel_generates [label="1", penwidth=2.4];
+    rel_generates -- PaymentRequest [label="0..*", penwidth=2.4];
 
-    Booking -- rel_generates [label="1", fontcolor="#DC2626"];
-    rel_generates -- PaymentRequest [label="0..*", fontcolor="#DC2626"];
+    PaymentRequest -- rel_issues [label="1", penwidth=2.4];
+    rel_issues -- Receipt [label="0..1", penwidth=2.4];
 
-    PaymentRequest -- rel_issues [label="1", fontcolor="#DC2626"];
-    rel_issues -- Receipt [label="0..1", fontcolor="#DC2626"];
+    Booking -- rel_assigns [label="0..*", penwidth=2.4];
+    rel_assigns -- Driver [label="0..1", penwidth=2.4];
 
-    Booking -- rel_assigns [label="0..*", fontcolor="#DC2626"];
-    rel_assigns -- Driver [label="0..1", fontcolor="#DC2626"];
+    Driver -- rel_operates [label="1", penwidth=2.4];
+    rel_operates -- Vehicle [label="1", penwidth=2.4];
 
-    Driver -- rel_operates [label="1", fontcolor="#DC2626"];
-    rel_operates -- Vehicle [label="1", fontcolor="#DC2626"];
+    User -- rel_submits [label="1", penwidth=2.4];
+    rel_submits -- Review [label="0..*", penwidth=2.4];
 
-    User -- rel_submits [label="1", fontcolor="#DC2626"];
-    rel_submits -- Review [label="0..*", fontcolor="#DC2626"];
+    Booking -- rel_receives [label="0..1", penwidth=2.4];
+    rel_receives -- Review [label="0..*", penwidth=2.4];
 
-    Booking -- rel_receives [label="0..1", fontcolor="#DC2626"];
-    rel_receives -- Review [label="0..*", fontcolor="#DC2626"];
+    Booking -- rel_applies [label="0..*", penwidth=2.4];
+    rel_applies -- PredefinedRouteFare [label="0..1", penwidth=2.4];
 
-    Booking -- rel_applies [label="0..*", fontcolor="#DC2626"];
-    rel_applies -- PredefinedRouteFare [label="0..1", fontcolor="#DC2626"];
+    Booking -- rel_measures [label="0..*", penwidth=2.4];
+    rel_measures -- PredefinedRouteDistance [label="0..1", penwidth=2.4];
 
-    Booking -- rel_measures [label="0..*", fontcolor="#DC2626"];
-    rel_measures -- PredefinedRouteDistance [label="0..1", fontcolor="#DC2626"];
+    // Entity to Attributes
+    User -- { u_id u_username u_email u_phone u_fname u_lname u_date_joined };
+    Booking -- { b_id b_booking_id b_uid b_adid b_pickup b_dest b_pickup_coords b_dest_coords b_distance b_fare b_fare_type b_toll b_status b_payment_status b_journey_date b_vehicle_type b_cargo_type };
+    Driver -- { dr_id dr_name dr_mobile dr_license dr_exp dr_status };
+    Vehicle -- { vh_id vh_driver vh_num vh_type vh_capacity vh_rc };
+    PaymentRequest -- { pay_id pay_pid pay_bid pay_amt pay_tot pay_status pay_type pay_meth };
+    Receipt -- { rc_id rc_rid rc_prid rc_pdf rc_date rc_sent };
+    BookingAttachment -- { att_id att_bid att_type att_file att_date };
+    Review -- { rv_id rv_bid rv_uid rv_rating rv_comment rv_service rv_approved };
+    PredefinedRouteFare -- { rf_id rf_from rf_to rf_fixed rf_double rf_dist };
+    PredefinedRouteDistance -- { rd_id rd_from rd_to rd_dist };
 }

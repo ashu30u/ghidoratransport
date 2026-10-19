@@ -742,6 +742,8 @@ def home(request):
             name = request.POST.get('name', '').strip()
             phone = request.POST.get('phone', '').strip()
             email = request.POST.get('email', '').strip()
+            if not email and request.user.is_authenticated and getattr(request.user, 'email', None):
+                email = request.user.email.strip()
             pickup = request.POST.get('pickup', '').strip()
             destination = request.POST.get('destination', '').strip()
 
@@ -860,41 +862,8 @@ def home(request):
 
             auto_assign_driver_to_booking(booking)
 
-            # Instant Background Async Admin Email Notification (Zero UI Blocking)
-            def _send_admin_booking_email_async(b):
-                try:
-                    from django.core.mail import EmailMessage
-                    from django.conf import settings
-                    subj = f"🚚 NEW BOOKING [{b.booking_id}] — {b.name} ({b.phone})"
-                    msg_body = f"""New Booking Received on Ghidora Transport!
-
-Booking ID: {b.booking_id}
-Customer Name: {b.name}
-Phone: {b.phone}
-Email: {b.email or 'N/A'}
-Pickup: {b.pickup}
-Destination: {b.destination}
-Vehicle Type: {b.vehicle_type}
-Trip Type: {b.trip_type}
-Journey Date: {b.journey_date}
-Distance: {b.distance} KM
-Total Fare: ₹{b.fare}
-Status: {b.status}
-
-Render Admin Link: https://ghidoratransport.onrender.com/admin/booking/booking/{b.id}/change/
-"""
-                    mail = EmailMessage(
-                        subject=subj,
-                        body=msg_body,
-                        from_email=settings.DEFAULT_FROM_EMAIL,
-                        to=[settings.EMAIL_HOST_USER, 'ghidoratransport@gmail.com'],
-                    )
-                    mail.send(fail_silently=True)
-                except Exception as ex:
-                    print("❌ Async booking email exception:", ex)
-
-            import threading
-            threading.Thread(target=_send_admin_booking_email_async, args=(booking,), daemon=True).start()
+            # Automatic async background email notifications (Admin alert & Customer confirmation)
+            # are dispatched automatically via Booking post_save signal handler.
 
             context.update({
                 "success": True,
@@ -1758,12 +1727,17 @@ def submit_user_review(request):
             except Exception:
                 pass
 
+        # Check Review Auto-Approval & Auto-Verification Setting
+        from .models import ReviewSetting
+        rev_setting = ReviewSetting.get_settings()
+        auto_approve = getattr(rev_setting, 'auto_approve_reviews', True)
+
         if request.user.is_authenticated:
             user = request.user
             guest_name = user.get_full_name() or user.username
             guest_email = user.email
             guest_phone = getattr(user, 'phone', '')
-            is_verified = True
+            is_verified = True if getattr(rev_setting, 'auto_verify_logged_in', True) else False
         else:
             user = None
             guest_name = request.POST.get('name', '').strip() or "Guest Customer"
@@ -1784,7 +1758,7 @@ def submit_user_review(request):
                 review=comment,
                 service_used=service_used,
                 photo=photo if photo else None,
-                is_approved=True,
+                is_approved=auto_approve,
                 is_verified=is_verified,
                 ip_address=clean_ip
             )
@@ -1821,7 +1795,7 @@ def submit_user_review(request):
                 review=comment,
                 service_used=service_used,
                 photo=photo if photo else None,
-                is_approved=True,
+                is_approved=auto_approve,
                 is_verified=is_verified,
                 ip_address=clean_ip
             )
@@ -1832,13 +1806,19 @@ def submit_user_review(request):
         except Exception:
             pass
 
+        if auto_approve:
+            success_msg = "✅ Thank you! Your review has been submitted & published successfully."
+        else:
+            success_msg = "✅ Thank you! Your review has been submitted and will appear on the website once verified by Admin."
+
         return JsonResponse({
             "status": "success",
-            "message": "✅ Thank you! Your review has been submitted & published successfully.",
+            "message": success_msg,
             "review_id": review_obj.id,
             "display_name": review_obj.display_name,
             "rating": review_obj.rating,
-            "is_verified": review_obj.is_verified
+            "is_verified": review_obj.is_verified,
+            "is_approved": review_obj.is_approved
         })
 
     except Exception as e:

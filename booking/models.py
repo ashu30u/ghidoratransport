@@ -414,12 +414,217 @@ Please check Live Admin Panel: https://ghidoratransport.onrender.com/admin/
         logger.warning("Admin email notification failed: %s", e)
 
 
+
+def _send_customer_booking_confirmation_worker(booking_id):
+    from django.core.mail import EmailMultiAlternatives
+    from django.conf import settings
+    try:
+        instance = Booking.objects.filter(pk=booking_id).first()
+        if not instance:
+            return
+
+        customer_email = (instance.email or '').strip()
+        if not customer_email and instance.user and instance.user.email:
+            customer_email = instance.user.email.strip()
+
+        if not customer_email:
+            logger.info("No customer email found for booking #%s. Skipping customer confirmation email.", getattr(instance, 'booking_id', booking_id))
+            return
+
+        subject = f"🚚 Booking Confirmation #{instance.booking_id} — Ghidora Transport"
+
+        plain_text = f"""Dear {instance.name},
+
+Thank you for booking with Ghidora Transport Logistics!
+Your booking request has been successfully received and recorded in our system.
+
+=======================================================
+BOOKING SUMMARY
+=======================================================
+Booking ID   : #{instance.booking_id}
+Customer Name: {instance.name}
+Phone        : {instance.phone}
+Route        : {instance.pickup} ➔ {instance.destination}
+Journey Date : {instance.journey_date}
+Vehicle Type : {instance.vehicle_type}
+Trip Type    : {instance.trip_type}
+Distance     : {instance.distance} KM
+Total Fare   : ₹{instance.fare} ({getattr(instance, 'fare_type', 'Calculated Fare')})
+Status       : {instance.status}
+Cargo Type   : {instance.cargo_type or 'General Goods'}
+Weight       : {instance.weight_value or 'Standard'} {instance.weight_unit or ''}
+
+=======================================================
+LIVE TRACKING & SUPPORT
+=======================================================
+Track your trip status live here:
+https://ghidoratransport.onrender.com/track/
+
+Helpline Numbers:
+📞 +91 7489297841 | +91 6266014139
+✉️ Email: ghidoratransport@gmail.com
+🌐 Website: https://ghidoratransport.onrender.com
+
+Warm regards,
+Ghidora Transport Logistics
+Kodebod, Kurud, Dhamtari, Chhattisgarh
+"""
+
+        html_content = f"""
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Booking Confirmation - Ghidora Transport</title>
+</head>
+<body style="margin: 0; padding: 20px 10px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f1f5f9; color: #1e293b;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.08);">
+    <!-- Header -->
+    <tr>
+      <td style="background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%); padding: 28px 24px; text-align: center;">
+        <h1 style="margin: 0; color: #ffffff; font-size: 24px; font-weight: 800; letter-spacing: 0.5px;">GHIDORA TRANSPORT</h1>
+        <p style="margin: 6px 0 0; color: #93c5fd; font-size: 13px; font-weight: 500; text-transform: uppercase; letter-spacing: 1px;">Logistics & Commercial Goods Transport</p>
+      </td>
+    </tr>
+
+    <!-- Status Banner -->
+    <tr>
+      <td style="background-color: #ecfdf5; border-bottom: 2px solid #a7f3d0; padding: 14px 24px; text-align: center;">
+        <span style="display: inline-block; background-color: #10b981; color: #ffffff; font-size: 12px; font-weight: 700; text-transform: uppercase; padding: 4px 12px; border-radius: 9999px; letter-spacing: 0.5px; margin-bottom: 4px;">✔ Booking Received</span>
+        <h2 style="margin: 4px 0 0; font-size: 18px; color: #065f46; font-weight: 700;">Booking Confirmed!</h2>
+      </td>
+    </tr>
+
+    <!-- Body -->
+    <tr>
+      <td style="padding: 24px;">
+        <p style="margin: 0 0 16px; font-size: 15px; line-height: 1.5; color: #334155;">
+          Dear <strong>{instance.name}</strong>,<br>
+          Thank you for choosing <strong>Ghidora Transport</strong>! We have received your booking request and our team is preparing for your transport.
+        </p>
+
+        <!-- Booking ID Card -->
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 20px;">
+          <tr>
+            <td style="padding: 14px 18px;">
+              <span style="font-size: 12px; color: #64748b; font-weight: 600; text-transform: uppercase;">Your Booking ID</span><br>
+              <strong style="font-size: 22px; color: #2563eb; letter-spacing: 0.5px;">#{instance.booking_id}</strong>
+            </td>
+            <td style="padding: 14px 18px; text-align: right;">
+              <span style="font-size: 12px; color: #64748b; font-weight: 600; text-transform: uppercase;">Total Fare</span><br>
+              <strong style="font-size: 22px; color: #059669;">₹{instance.fare}</strong>
+            </td>
+          </tr>
+        </table>
+
+        <!-- Details Table -->
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse: collapse; margin-bottom: 24px; font-size: 14px;">
+          <tr style="border-bottom: 1px solid #f1f5f9;">
+            <td style="padding: 10px 0; color: #64748b; font-weight: 600; width: 38%;">Pickup Location:</td>
+            <td style="padding: 10px 0; color: #0f172a; font-weight: 600;">{instance.pickup}</td>
+          </tr>
+          <tr style="border-bottom: 1px solid #f1f5f9;">
+            <td style="padding: 10px 0; color: #64748b; font-weight: 600;">Destination:</td>
+            <td style="padding: 10px 0; color: #0f172a; font-weight: 600;">{instance.destination}</td>
+          </tr>
+          <tr style="border-bottom: 1px solid #f1f5f9;">
+            <td style="padding: 10px 0; color: #64748b; font-weight: 600;">Journey Date:</td>
+            <td style="padding: 10px 0; color: #0f172a; font-weight: 600;">{instance.journey_date}</td>
+          </tr>
+          <tr style="border-bottom: 1px solid #f1f5f9;">
+            <td style="padding: 10px 0; color: #64748b; font-weight: 600;">Vehicle:</td>
+            <td style="padding: 10px 0; color: #0f172a; font-weight: 600;">{instance.vehicle_type} ({instance.trip_type})</td>
+          </tr>
+          <tr style="border-bottom: 1px solid #f1f5f9;">
+            <td style="padding: 10px 0; color: #64748b; font-weight: 600;">Total Distance:</td>
+            <td style="padding: 10px 0; color: #0f172a;">{instance.distance} KM</td>
+          </tr>
+          <tr style="border-bottom: 1px solid #f1f5f9;">
+            <td style="padding: 10px 0; color: #64748b; font-weight: 600;">Cargo & Weight:</td>
+            <td style="padding: 10px 0; color: #0f172a;">{instance.cargo_type or 'General Cargo'} ({instance.weight_value or 'Standard'} {instance.weight_unit or ''})</td>
+          </tr>
+          <tr>
+            <td style="padding: 10px 0; color: #64748b; font-weight: 600;">Status:</td>
+            <td style="padding: 10px 0; color: #2563eb; font-weight: 700;">{instance.status}</td>
+          </tr>
+        </table>
+
+        <!-- Button -->
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 24px;">
+          <tr>
+            <td style="text-align: center;">
+              <a href="https://ghidoratransport.onrender.com/track/" target="_blank" style="display: inline-block; background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: #ffffff; text-decoration: none; font-size: 14px; font-weight: 700; padding: 12px 28px; border-radius: 8px; box-shadow: 0 2px 8px rgba(37,99,235,0.3);">
+                🚚 Track Booking Online
+              </a>
+            </td>
+          </tr>
+        </table>
+
+        <!-- Help box -->
+        <div style="background-color: #f8fafc; border-left: 4px solid #2563eb; padding: 12px 16px; border-radius: 4px; font-size: 13px; color: #475569; line-height: 1.5;">
+          <strong>Need immediate help or vehicle updates?</strong><br>
+          Call our support team: <strong>+91 7489297841</strong> / <strong>+91 6266014139</strong><br>
+          Email: <a href="mailto:ghidoratransport@gmail.com" style="color: #2563eb;">ghidoratransport@gmail.com</a>
+        </div>
+      </td>
+    </tr>
+
+    <!-- Footer -->
+    <tr>
+      <td style="background-color: #0f172a; padding: 20px 24px; text-align: center; color: #94a3b8; font-size: 12px; line-height: 1.5;">
+        <strong style="color: #ffffff;">Ghidora Transport Logistics</strong><br>
+        Kodebod, Kurud, Dhamtari, Chhattisgarh, India<br>
+        Website: <a href="https://ghidoratransport.onrender.com" style="color: #60a5fa; text-decoration: none;">https://ghidoratransport.onrender.com</a>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+"""
+
+        msg = EmailMultiAlternatives(
+            subject=subject,
+            body=plain_text,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            to=[customer_email],
+        )
+        msg.attach_alternative(html_content, "text/html")
+
+        # Optional: Attach Receipt PDF if available
+        try:
+            from .utils import generate_receipt_pdf
+            pdf_buffer = generate_receipt_pdf(instance)
+            if pdf_buffer:
+                msg.attach(
+                    f"Booking_Receipt_{instance.booking_id}.pdf",
+                    pdf_buffer.getvalue(),
+                    "application/pdf"
+                )
+        except Exception as pdf_err:
+            logger.warning("Could not attach receipt PDF to customer confirmation: %s", pdf_err)
+
+        msg.send(fail_silently=False)
+        logger.info("Customer booking confirmation email sent to %s for #%s", customer_email, instance.booking_id)
+        print(f"[OK] Customer confirmation email sent to {customer_email} for #{instance.booking_id}")
+    except Exception as e:
+        logger.error("Customer booking confirmation email failed for booking %s: %s", booking_id, e)
+        print(f"[ERROR] Customer booking confirmation email failed for booking {booking_id}: {e}")
+
+
 @receiver(post_save, sender=Booking)
-def _send_admin_new_booking_alert(sender, instance, created, **kwargs):
+def _send_booking_notifications(sender, instance, created, **kwargs):
     if created:
         import threading
+        # 1. Admin Alert
         threading.Thread(
             target=_send_admin_new_booking_alert_worker,
+            args=(instance.pk,),
+            daemon=True
+        ).start()
+        # 2. Customer Confirmation Email
+        threading.Thread(
+            target=_send_customer_booking_confirmation_worker,
             args=(instance.pk,),
             daemon=True
         ).start()
@@ -670,4 +875,46 @@ class PredefinedRouteDistance(models.Model):
 
     def __str__(self):
         dir_str = "⇄" if self.same_direction_both else "➔"
-        return f"{self.from_location} {dir_str} {self.to_location}: {self.distance_km} KM ({'Active' if self.is_active else 'Inactive'})"
+        return f"{self.from_location} {dir_str} {self.to_location}: {self.distance_km} KM ({'Active' if self.is_active else 'Inactive'})"
+
+
+# ============================================================
+# Review System Publishing Configuration
+# ============================================================
+class ReviewSetting(models.Model):
+    """
+    Global configuration for customer reviews publishing:
+    - auto_approve_reviews = True: Customer reviews appear instantly on the website.
+    - auto_approve_reviews = False: Reviews require Admin approval (Manual Verification Mode).
+    """
+    auto_approve_reviews = models.BooleanField(
+        default=True,
+        verbose_name="Auto-Publish Reviews (Automatic Mode)",
+        help_text="If ON: Reviews submitted by customers appear on the website instantly. If OFF: Reviews require Admin approval (Manual Mode)."
+    )
+    auto_verify_logged_in = models.BooleanField(
+        default=True,
+        verbose_name="Auto-Verify Registered Customers",
+        help_text="If ON: Reviews submitted by logged-in users receive the Verified Customer badge automatically."
+    )
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Review System Setting"
+        verbose_name_plural = "Review System Settings"
+
+    def __str__(self):
+        mode = "🟢 AUTOMATIC (Instant Publish)" if self.auto_approve_reviews else "🛡️ MANUAL (Admin Verification Required)"
+        return f"Review Mode: {mode}"
+
+    @classmethod
+    def get_settings(cls):
+        try:
+            obj, _ = cls.objects.get_or_create(id=1)
+            return obj
+        except Exception:
+            class Dummy:
+                auto_approve_reviews = True
+                auto_verify_logged_in = True
+            return Dummy()
+
